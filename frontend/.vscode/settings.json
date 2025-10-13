@@ -1,0 +1,15 @@
+{
+  "files.readonlyInclude": {
+    "**/node_modules/**": true,
+    "**/.tanstack/**": true,
+    "**/routeTree.gen.ts": true,
+    "**/openapi/**.json": true,
+    "src/api/**": true
+  },
+  "files.watcherExclude": {
+    "**/routeTree.gen.ts": true
+  },
+  "search.exclude": {
+    "**/routeTree.gen.ts": true
+  }
+}
