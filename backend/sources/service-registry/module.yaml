@@ -1,0 +1,8 @@
+product: jvm/app
+settings:
+  springBoot:
+    enabled: true
+
+dependencies:
+  - bom: $libs.spring.cloud.dependencies
+  - $libs.spring.cloud.starter.netflix.eureka.server

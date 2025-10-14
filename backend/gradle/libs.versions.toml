@@ -1,0 +1,7 @@
+[versions]
+spring-cloud = "2025.0.0"
+
+[libraries]
+spring-cloud-dependencies = { module = "org.springframework.cloud:spring-cloud-dependencies", version.ref = "spring-cloud" }
+spring-cloud-starter-netflix-eureka-server = "org.springframework.cloud:spring-cloud-starter-netflix-eureka-server"
+spring-cloud-starter-netflix-eureka-client = "org.springframework.cloud:spring-cloud-starter-netflix-eureka-client"
