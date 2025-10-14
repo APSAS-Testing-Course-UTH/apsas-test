@@ -1,3 +1,4 @@
 modules:
   - sources/gateway
+  - sources/config-server
   - sources/service-registry
