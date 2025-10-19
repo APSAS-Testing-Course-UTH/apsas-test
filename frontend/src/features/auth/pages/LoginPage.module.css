@@ -1,0 +1,53 @@
+/* LoginPage.module.css - Layout với form và background tách biệt */
+.wrapper {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.formSection {
+  flex: 0 0 35%; /* Form takes 35% of screen width */
+  display: flex;
+  align-items: stretch; /* Changed from center to stretch */
+  justify-content: center;
+  /* Removed padding since LoginForm handles it */  
+  background: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-9));
+}
+
+.backgroundSection {
+  flex: 0 0 65%; /* Background takes 65% of screen width */
+  background-image: url('/uth-background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  /* border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px; */
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .wrapper {
+    flex-direction: column;
+    min-height: 100vh;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .formSection {
+    flex: 1; /* Take full width on mobile */
+    min-height: 0;
+    /* Removed padding since LoginForm handles it */
+    overflow-y: auto;
+  }
+
+  .backgroundSection {
+    display: none; /* Hide background image on mobile */
+  }
+}
+
+@media (max-width: 480px) {
+  .formSection {
+    /* Removed padding since LoginForm handles it */
+  }
+}

@@ -11,4 +11,5 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       <ReactQueryDevtools />
     </>
   ),
+  notFoundComponent: () => <div>Not Found</div>,
 })
