@@ -11,5 +11,10 @@
   },
   "search.exclude": {
     "**/routeTree.gen.ts": true
+  },
+  "github.copilot.enable": {
+    "*": true,
+    "plaintext": true,
+    "markdown": true
   }
 }
