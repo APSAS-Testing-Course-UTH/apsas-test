@@ -1,0 +1,2 @@
+jwt:
+  secret: dev-secret-key-for-testing-only-change-in-production-minimum-256-bits-required

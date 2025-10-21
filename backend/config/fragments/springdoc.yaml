@@ -1,0 +1,4 @@
+springdoc:
+  default-flat-param-object: true
+  api-docs:
+    path: /api-docs

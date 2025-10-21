@@ -1,0 +1,16 @@
+product: jvm/app
+
+apply:
+  - ../service.module-template.yaml
+
+settings:
+  jvm:
+    mainClass: apsas.evaluation.EvaluationServiceApplication
+
+dependencies:
+  - $spring.boot.starter.web
+  - $spring.boot.starter.validation
+  - $libs.springdoc.openapi.starter.webmvc.api
+  - $libs.spring.cloud.starter.openfeign
+  - $libs.spring.retry
+  - $spring.boot.starter.aop

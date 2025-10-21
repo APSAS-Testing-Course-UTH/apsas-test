@@ -1,4 +1,10 @@
 modules:
-  - sources/gateway
-  - sources/config-server
   - sources/service-registry
+  - sources/config-server
+  - sources/gateway
+  - sources/services/identity
+  - sources/services/content
+  - sources/services/submission
+  - sources/services/evaluation
+  - sources/services/support
+  - sources/services/notification

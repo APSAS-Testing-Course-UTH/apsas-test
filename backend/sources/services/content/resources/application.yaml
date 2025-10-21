@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: content-service
+
+  config:
+    import: "configserver:"
+
+  cloud:
+    config:
+      discovery:
+        enabled: true

@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: identity-service
+
+  config:
+    import: "configserver:"
+
+  cloud:
+    config:
+      discovery:
+        enabled: true

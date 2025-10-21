@@ -1,0 +1,37 @@
+services:
+  # Infrastructure Services
+  postgres:
+    image: postgres:17-alpine
+    container_name: apsas-db
+    environment:
+      POSTGRES_USER: apsas
+      POSTGRES_PASSWORD: apsas
+      POSTGRES_DB: apsas
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - apsas-backend
+
+  rabbitmq:
+    image: rabbitmq:4.1-management-alpine
+    container_name: apsas-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: apsas
+      RABBITMQ_DEFAULT_PASS: apsas
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - apsas-backend
+
+networks:
+  apsas-backend:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  rabbitmq_data:

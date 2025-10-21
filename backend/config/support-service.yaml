@@ -1,0 +1,13 @@
+server:
+  port: 8086
+
+spring:
+  config:
+    import:
+      - file:./config/fragments/database.yaml
+      - file:./config/fragments/springdoc.yaml
+      - file:./config/fragments/rabbitmq.yaml
+      - file:./config/fragments/eureka-client.yaml
+
+database:
+  schema: support

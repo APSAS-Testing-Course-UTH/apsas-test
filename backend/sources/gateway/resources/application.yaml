@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: api-gateway
+
+  config:
+    import: "configserver:"
+
+  cloud:
+    config:
+      discovery:
+        enabled: true

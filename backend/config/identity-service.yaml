@@ -1,0 +1,18 @@
+spring:
+  config:
+    import:
+      - file:./config/fragments/jwt.yaml
+      - file:./config/fragments/database.yaml
+      - file:./config/fragments/springdoc.yaml
+      - file:./config/fragments/rabbitmq.yaml
+      - file:./config/fragments/eureka-client.yaml
+
+database:
+  schema: identity
+
+server:
+  port: 8081
+
+verification:
+  email-token-expiration: ${EMAIL_TOKEN_EXPIRATION:86400} # 24 hours in seconds
+  password-reset-token-expiration: ${PASSWORD_RESET_TOKEN_EXPIRATION:3600} # 1 hour in seconds

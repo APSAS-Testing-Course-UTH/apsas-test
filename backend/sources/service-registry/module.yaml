@@ -1,8 +1,10 @@
 product: jvm/app
+apply:
+  - ../spring-cloud.module-template.yaml
+
 settings:
-  springBoot:
-    enabled: true
+  jvm:
+    mainClass: apsas.serviceregistry.ServiceRegistryApplication
 
 dependencies:
-  - bom: $libs.spring.cloud.dependencies
   - $libs.spring.cloud.starter.netflix.eureka.server
