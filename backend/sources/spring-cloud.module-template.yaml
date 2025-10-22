@@ -2,8 +2,5 @@ settings:
   springBoot:
     enabled: true
 
-  jvm:
-    release: 21
-
 dependencies:
   - bom: $libs.spring.cloud.dependencies

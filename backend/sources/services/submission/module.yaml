@@ -1,6 +1,7 @@
 product: jvm/app
 
 apply:
+  - ../../jvm.module-template.yaml
   - ../service.module-template.yaml
 
 settings:

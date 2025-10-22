@@ -1,5 +1,6 @@
 product: jvm/app
 apply:
+  - ../jvm.module-template.yaml
   - ../spring-cloud.module-template.yaml
 
 settings:
