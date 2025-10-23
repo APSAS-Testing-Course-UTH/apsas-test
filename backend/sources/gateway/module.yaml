@@ -8,6 +8,7 @@ settings:
     mainClass: apsas.gateway.ApiGatewayApplication
 
 dependencies:
+  - ../shared/security
   - $spring.boot.starter
   - $spring.boot.starter.webflux
   - $spring.boot.starter.oauth2.resource.server
