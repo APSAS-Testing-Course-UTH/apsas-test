@@ -1,0 +1,9 @@
+product: jvm/lib
+apply:
+  - ../spring-lib.module-template.yaml
+  - ../../jvm.module-template.yaml
+
+dependencies:
+  - $spring.boot.starter.web: exported
+  - $spring.boot.starter.data.jpa: exported
+  - $libs.springdoc.openapi.starter.webmvc.api: exported

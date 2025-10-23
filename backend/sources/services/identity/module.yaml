@@ -3,12 +3,16 @@ product: jvm/app
 apply:
   - ../../jvm.module-template.yaml
   - ../service.module-template.yaml
+  - ../service-test.module-template.yaml
 
 settings:
   jvm:
     mainClass: apsas.identity.IdentityServiceApplication
 
 dependencies:
+  - ../../shared/security
+  - ../../shared/messaging
+  - ../../shared/common
   - $spring.boot.starter.web
   - $spring.boot.starter.data.jpa
   - $spring.boot.starter.validation

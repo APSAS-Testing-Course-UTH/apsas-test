@@ -1,0 +1,7 @@
+product: jvm/lib
+apply:
+  - ../../jvm.module-template.yaml
+  - ../spring-lib.module-template.yaml
+
+dependencies:
+  - $spring.boot.starter.amqp: exported

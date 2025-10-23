@@ -9,3 +9,5 @@ modules:
   - sources/services/evaluation
   - sources/services/support
   - sources/services/notification
+  - sources/shared/messaging
+  - sources/shared/common
