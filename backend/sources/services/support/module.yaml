@@ -8,10 +8,18 @@ settings:
   jvm:
     mainClass: apsas.support.SupportServiceApplication
 
+  java:
+    annotationProcessing:
+      processors:
+        - $libs.mapstruct.processor
+
 dependencies:
+  - ../../shared/security
+  - ../../shared/common
   - $spring.boot.starter.web
   - $spring.boot.starter.websocket
   - $spring.boot.starter.data.jpa
   - $spring.boot.starter.validation
   - $libs.postgresql
   - $libs.springdoc.openapi.starter.webmvc.api
+  - $libs.mapstruct

@@ -1,0 +1,155 @@
+package apsas.support.service;
+
+import apsas.shared.common.dto.PageResponse;
+import apsas.shared.common.exception.BadRequestException;
+import apsas.shared.common.exception.ForbiddenException;
+import apsas.shared.common.exception.NotFoundException;
+import apsas.support.mapper.SupportSessionMapper;
+import apsas.support.model.dto.SupportSessionDto;
+import apsas.support.model.entity.SupportMessage;
+import apsas.support.model.entity.SupportSession;
+import apsas.support.repository.SupportMessageRepository;
+import apsas.support.repository.SupportSessionRepository;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@AllArgsConstructor
+public class SupportService {
+  private final SupportSessionRepository sessionRepository;
+  private final SupportMessageRepository messageRepository;
+  private final SupportSessionMapper sessionMapper;
+
+  @Transactional
+  public SupportSession createSession(UUID studentId, String initialMessage) {
+    SupportSession session = new SupportSession();
+    session.setStudentId(studentId);
+    session.setIsClosed(false);
+
+    SupportMessage message = new SupportMessage();
+    message.setSenderId(studentId);
+    message.setContent(initialMessage);
+    message.setIsInstructor(false);
+    message.setIsRead(false);
+
+    session.addMessage(message);
+
+    return sessionRepository.save(session);
+  }
+
+  @Transactional(readOnly = true)
+  public SupportSession getSessionById(UUID sessionId) {
+    return sessionRepository
+        .findById(sessionId)
+        .orElseThrow(() -> new NotFoundException("Support session not found"));
+  }
+
+  @Transactional(readOnly = true)
+  public List<SupportSession> getSessionsForStudent(UUID studentId) {
+    return sessionRepository.findByStudentIdOrderByCreatedAtDesc(studentId);
+  }
+
+  @Transactional(readOnly = true)
+  public PageResponse<SupportSessionDto> getSessionsForStudent(UUID studentId, Pageable pageable) {
+    Page<SupportSession> sessionPage =
+        sessionRepository.findByStudentIdOrderByCreatedAtDesc(studentId, pageable);
+    Page<SupportSessionDto> responsePage = sessionPage.map(sessionMapper::toDto);
+    return PageResponse.of(responsePage);
+  }
+
+  @Transactional(readOnly = true)
+  public List<SupportSession> getAllSessions() {
+    return sessionRepository.findAll();
+  }
+
+  @Transactional(readOnly = true)
+  public PageResponse<SupportSessionDto> getAllSessions(Pageable pageable) {
+    Page<SupportSession> sessionPage = sessionRepository.findAll(pageable);
+    Page<SupportSessionDto> responsePage = sessionPage.map(sessionMapper::toDto);
+    return PageResponse.of(responsePage);
+  }
+
+  @Transactional(readOnly = true)
+  public List<SupportSession> getOpenSessions() {
+    return sessionRepository.findByIsClosedOrderByCreatedAtDesc(false);
+  }
+
+  @Transactional
+  public SupportSession closeSession(UUID sessionId, UUID userId, String userRole) {
+    SupportSession session = getSessionById(sessionId);
+
+    if (session.getIsClosed()) {
+      throw new BadRequestException("Session is already closed");
+    }
+
+    // Only the student who created the session can close it
+    if (!session.getStudentId().equals(userId)) {
+      throw new ForbiddenException("Only the student who created this session can close it");
+    }
+
+    session.setIsClosed(true);
+    session.setClosedAt(LocalDateTime.now());
+
+    return sessionRepository.save(session);
+  }
+
+  @Transactional
+  public SupportMessage sendMessage(
+      UUID sessionId, UUID senderId, String content, boolean isInstructor) {
+    SupportSession session = getSessionById(sessionId);
+
+    if (session.getIsClosed()) {
+      throw new BadRequestException("Cannot send message to a closed session");
+    }
+
+    // If instructor sends a message and is not yet assigned, assign them
+    if (isInstructor && session.getInstructorId() == null) {
+      session.setInstructorId(senderId);
+      sessionRepository.save(session);
+    }
+
+    SupportMessage message = new SupportMessage();
+    message.setSenderId(senderId);
+    message.setContent(content);
+    message.setIsInstructor(isInstructor);
+    message.setIsRead(false);
+
+    session.addMessage(message);
+    messageRepository.save(message);
+
+    return message;
+  }
+
+  @Transactional
+  public void markMessagesAsRead(UUID sessionId, UUID userId) {
+    SupportSession session = getSessionById(sessionId);
+
+    session.getMessages().stream()
+        .filter(msg -> !msg.getSenderId().equals(userId))
+        .filter(msg -> !msg.getIsRead())
+        .forEach(
+            msg -> {
+              msg.setIsRead(true);
+              messageRepository.save(msg);
+            });
+  }
+
+  public void validateUserAccess(SupportSession session, UUID userId, String userRole) {
+    boolean isStudent = "STUDENT".equals(userRole);
+    boolean isInstructor = "INSTRUCTOR".equals(userRole);
+
+    if (isStudent && !session.getStudentId().equals(userId)) {
+      throw new ForbiddenException("You don't have access to this session");
+    }
+
+    if (!isStudent && !isInstructor) {
+      throw new ForbiddenException("You don't have permission to access support sessions");
+    }
+  }
+}
