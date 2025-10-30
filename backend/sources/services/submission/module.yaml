@@ -9,6 +9,9 @@ settings:
     mainClass: apsas.submission.SubmissionServiceApplication
 
 dependencies:
+  - ../../shared/security
+  - ../../shared/common
+  - ../../shared/messaging
   - $spring.boot.starter.web
   - $spring.boot.starter.data.jpa
   - $spring.boot.starter.validation
