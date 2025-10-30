@@ -9,6 +9,9 @@ settings:
     mainClass: apsas.content.ContentServiceApplication
 
 dependencies:
+  - ../../shared/security
+  - ../../shared/messaging
+  - ../../shared/common
   - $spring.boot.starter.web
   - $spring.boot.starter.data.jpa
   - $spring.boot.starter.validation
