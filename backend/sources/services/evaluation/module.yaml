@@ -9,6 +9,7 @@ settings:
     mainClass: apsas.evaluation.EvaluationServiceApplication
 
 dependencies:
+  - ../../shared/messaging
   - $spring.boot.starter.web
   - $spring.boot.starter.validation
   - $libs.springdoc.openapi.starter.webmvc.api
