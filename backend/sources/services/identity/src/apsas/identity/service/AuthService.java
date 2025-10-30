@@ -30,6 +30,7 @@ public class AuthService {
   private final PasswordEncoder passwordEncoder;
   private final JwtTokenProvider jwtTokenProvider;
   private final EventPublisher eventPublisher;
+  private final UserMapper userMapper;
 
   @Value("${verification.email-token-expiration}")
   private long emailTokenExpiration;
@@ -43,13 +44,15 @@ public class AuthService {
       PasswordResetTokenRepository passwordResetTokenRepository,
       PasswordEncoder passwordEncoder,
       JwtTokenProvider jwtTokenProvider,
-      EventPublisher eventPublisher) {
+      EventPublisher eventPublisher,
+      UserMapper userMapper) {
     this.userRepository = userRepository;
     this.emailVerificationTokenRepository = emailVerificationTokenRepository;
     this.passwordResetTokenRepository = passwordResetTokenRepository;
     this.passwordEncoder = passwordEncoder;
     this.jwtTokenProvider = jwtTokenProvider;
     this.eventPublisher = eventPublisher;
+    this.userMapper = userMapper;
   }
 
   @Transactional
@@ -58,7 +61,7 @@ public class AuthService {
       throw new BadRequestException("Email already registered");
     }
 
-    User user = UserMapper.toUserFromRegisterRequest(request, passwordEncoder);
+    User user = userMapper.toUserFromRegisterRequest(request);
 
     user = userRepository.save(user);
 
@@ -77,7 +80,7 @@ public class AuthService {
     eventPublisher.publish(RabbitMQConfig.USER_REGISTERED_ROUTING_KEY, event);
 
     String jwtToken = jwtTokenProvider.generateToken(user);
-    UserResponse userResponse = UserMapper.toUserResponse(user);
+    UserResponse userResponse = userMapper.toUserResponse(user);
 
     return new AuthResponse(jwtToken, userResponse);
   }
@@ -98,10 +101,12 @@ public class AuthService {
     }
 
     String token = jwtTokenProvider.generateToken(user);
-    UserResponse userResponse = UserMapper.toUserResponse(user);
+    UserResponse userResponse = userMapper.toUserResponse(user);
 
     return new AuthResponse(token, userResponse);
   }
+
+  // ...existing code...
 
   @Transactional
   public void verifyEmail(String token) {

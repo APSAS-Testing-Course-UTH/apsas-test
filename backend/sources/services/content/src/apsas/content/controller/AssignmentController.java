@@ -34,10 +34,13 @@ public class AssignmentController {
   }
 
   @GetMapping
-  @Operation(summary = "Get all assignments", description = "Get all available assignments with pagination and sorting")
+  @Operation(
+      summary = "Get all assignments",
+      description = "Get all available assignments with pagination and sorting")
   public ResponseEntity<PageResponse<AssignmentResponse>> getAllAssignments(
       @Parameter PageRequestParams pageParams) {
-    PageResponse<AssignmentResponse> assignments = assignmentService.getAllAssignments(pageParams.toPageable());
+    PageResponse<AssignmentResponse> assignments =
+        assignmentService.getAllAssignments(pageParams.toPageable());
     return ResponseEntity.ok(assignments);
   }
 

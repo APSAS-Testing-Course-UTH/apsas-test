@@ -33,5 +33,4 @@ public class PasswordResetToken {
   protected void onCreate() {
     createdAt = LocalDateTime.now();
   }
-
 }

@@ -9,6 +9,11 @@ settings:
   jvm:
     mainClass: apsas.identity.IdentityServiceApplication
 
+  java:
+    annotationProcessing:
+      processors:
+        - $libs.mapstruct.processor
+
 dependencies:
   - ../../shared/security
   - ../../shared/messaging
@@ -19,3 +24,4 @@ dependencies:
   - $libs.spring.security.oauth2.jose
   - $libs.postgresql
   - $libs.springdoc.openapi.starter.webmvc.api
+  - $libs.mapstruct

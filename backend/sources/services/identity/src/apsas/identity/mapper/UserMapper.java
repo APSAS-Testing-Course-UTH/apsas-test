@@ -4,66 +4,36 @@ import apsas.identity.model.dto.CreateUserRequest;
 import apsas.identity.model.dto.RegisterRequest;
 import apsas.identity.model.dto.UserResponse;
 import apsas.identity.model.entity.User;
-import apsas.identity.model.entity.UserRole;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-public class UserMapper {
+@Mapper(componentModel = "spring")
+public abstract class UserMapper {
 
-  private UserMapper() {
-    // Utility class
-  }
+  @Autowired protected PasswordEncoder passwordEncoder;
 
-  public static User toUser(CreateUserRequest request, PasswordEncoder passwordEncoder) {
-    if (request == null) {
-      return null;
-    }
+  @Mapping(target = "passwordHash", source = "password", qualifiedByName = "encodePassword")
+  @Mapping(target = "id", ignore = true)
+  @Mapping(target = "createdAt", ignore = true)
+  @Mapping(target = "updatedAt", ignore = true)
+  public abstract User toUser(CreateUserRequest request);
 
-    User user = new User();
-    user.setEmail(request.getEmail());
-    user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-    user.setFirstName(request.getFirstName());
-    user.setLastName(request.getLastName());
-    user.setRole(request.getRole());
-    user.setIsActive(request.getIsActive());
-    user.setIsEmailVerified(request.getIsEmailVerified());
+  public abstract UserResponse toUserResponse(User user);
 
-    return user;
-  }
+  @Mapping(target = "passwordHash", source = "password", qualifiedByName = "encodePassword")
+  @Mapping(target = "role", constant = "STUDENT")
+  @Mapping(target = "isActive", constant = "true")
+  @Mapping(target = "isEmailVerified", constant = "false")
+  @Mapping(target = "id", ignore = true)
+  @Mapping(target = "createdAt", ignore = true)
+  @Mapping(target = "updatedAt", ignore = true)
+  public abstract User toUserFromRegisterRequest(RegisterRequest request);
 
-  public static UserResponse toUserResponse(User user) {
-    if (user == null) {
-      return null;
-    }
-
-    UserResponse response = new UserResponse();
-    response.setId(user.getId());
-    response.setEmail(user.getEmail());
-    response.setFirstName(user.getFirstName());
-    response.setLastName(user.getLastName());
-    response.setRole(user.getRole());
-    response.setIsActive(user.getIsActive());
-    response.setIsEmailVerified(user.getIsEmailVerified());
-    response.setCreatedAt(user.getCreatedAt());
-    response.setUpdatedAt(user.getUpdatedAt());
-
-    return response;
-  }
-
-  public static User toUserFromRegisterRequest(
-      RegisterRequest request, PasswordEncoder passwordEncoder) {
-    if (request == null) {
-      return null;
-    }
-
-    User user = new User();
-    user.setEmail(request.getEmail());
-    user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-    user.setFirstName(request.getFirstName());
-    user.setLastName(request.getLastName());
-    user.setRole(UserRole.STUDENT);
-    user.setIsActive(true);
-    user.setIsEmailVerified(false);
-
-    return user;
+  @Named("encodePassword")
+  public String encodePassword(String password) {
+    return passwordEncoder.encode(password);
   }
 }

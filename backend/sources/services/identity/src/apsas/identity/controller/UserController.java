@@ -81,7 +81,9 @@ public class UserController {
 
   @GetMapping
   @PreAuthorize("hasRole('ADMIN')")
-  @Operation(summary = "Get all users", description = "Get all users with pagination and sorting (Admin only)")
+  @Operation(
+      summary = "Get all users",
+      description = "Get all users with pagination and sorting (Admin only)")
   public ResponseEntity<PageResponse<UserResponse>> getAllUsers(
       @Parameter PageRequestParams pageParams) {
     PageResponse<UserResponse> response = userService.getAllUsers(pageParams.toPageable());

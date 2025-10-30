@@ -29,5 +29,4 @@ public class AssignmentResponse {
   private List<TestCase> testCases;
   private Set<SkillResponse> skills;
   private Set<TutorialResponse> tutorials;
-
 }

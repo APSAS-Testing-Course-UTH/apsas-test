@@ -1,5 +1,7 @@
 package apsas.content.model.dto;
 
+import apsas.content.model.entity.DifficultyLevel;
+import apsas.content.model.entity.TestCase;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
@@ -7,8 +9,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import apsas.content.model.entity.DifficultyLevel;
-import apsas.content.model.entity.TestCase;
 import lombok.Getter;
 import lombok.Setter;
 

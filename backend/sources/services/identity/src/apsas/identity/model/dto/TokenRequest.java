@@ -10,5 +10,4 @@ public class TokenRequest {
 
   @NotBlank(message = "Token is required")
   private String token;
-
 }

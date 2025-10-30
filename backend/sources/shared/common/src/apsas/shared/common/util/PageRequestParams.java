@@ -12,13 +12,22 @@ import org.springframework.data.domain.Sort;
  */
 public class PageRequestParams {
 
-  @Parameter(description = "Page number (0-indexed)", example = "0", schema = @Schema(defaultValue = "0", minimum = "0"))
+  @Parameter(
+      description = "Page number (0-indexed)",
+      example = "0",
+      schema = @Schema(defaultValue = "0", minimum = "0"))
   private Integer page = 0;
 
-  @Parameter(description = "Number of items per page", example = "10", schema = @Schema(defaultValue = "10", minimum = "1", maximum = "100"))
+  @Parameter(
+      description = "Number of items per page",
+      example = "10",
+      schema = @Schema(defaultValue = "10", minimum = "1", maximum = "100"))
   private Integer size = 10;
 
-  @Parameter(description = "Sort by field(s). Format: field1,direction;field2,direction. Direction can be 'asc' or 'desc'. Multiple sort criteria separated by semicolon.", example = "createdAt,desc;name,asc")
+  @Parameter(
+      description =
+          "Sort by field(s). Format: field1,direction;field2,direction. Direction can be 'asc' or 'desc'. Multiple sort criteria separated by semicolon.",
+      example = "createdAt,desc;name,asc")
   private String sort;
 
   public PageRequestParams() {}

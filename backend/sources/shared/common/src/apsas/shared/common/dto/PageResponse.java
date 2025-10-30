@@ -14,13 +14,13 @@ public record PageResponse<T>(
     @Schema(description = "Current page number (0-indexed)", example = "0") int pageNumber,
     @Schema(description = "Number of items per page", example = "10") int pageSize,
     @Schema(description = "Total number of items across all pages", example = "100")
-    long totalElements,
+        long totalElements,
     @Schema(description = "Total number of pages", example = "10") int totalPages,
     @Schema(description = "Whether this is the first page", example = "true") boolean first,
     @Schema(description = "Whether this is the last page", example = "false") boolean last,
     @Schema(description = "Whether there is a next page", example = "true") boolean hasNext,
     @Schema(description = "Whether there is a previous page", example = "false")
-    boolean hasPrevious) {
+        boolean hasPrevious) {
 
   /**
    * Creates a PageResponse from Spring Data's Page object.

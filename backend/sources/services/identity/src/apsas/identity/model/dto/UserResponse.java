@@ -19,5 +19,4 @@ public class UserResponse {
   private Boolean isEmailVerified;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
-
 }

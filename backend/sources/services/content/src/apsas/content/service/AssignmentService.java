@@ -135,7 +135,8 @@ public class AssignmentService {
       if (skills.size() != request.getSkillIds().size()) {
         throw new BadRequestException("One or more skill IDs are invalid");
       }
-      assignmentMapper.updateSkills(assignment, skills);
+      assignment.getSkills().clear();
+      assignment.getSkills().addAll(skills);
     }
 
     // Update tutorials
@@ -145,7 +146,8 @@ public class AssignmentService {
       if (tutorials.size() != request.getTutorialIds().size()) {
         throw new BadRequestException("One or more tutorial IDs are invalid");
       }
-      assignmentMapper.updateTutorials(assignment, tutorials);
+      assignment.getTutorials().clear();
+      assignment.getTutorials().addAll(tutorials);
     }
 
     Assignment updatedAssignment = assignmentRepository.save(assignment);
@@ -169,7 +171,9 @@ public class AssignmentService {
     Assignment updatedAssignment = assignmentRepository.save(assignment);
 
     // Publish event for schedule update
-    AssignmentScheduleUpdatedEvent event = new AssignmentScheduleUpdatedEvent(assignment.getId(), request.getStartDate(), request.getDueDate(), LocalDateTime.now());
+    AssignmentScheduleUpdatedEvent event =
+        new AssignmentScheduleUpdatedEvent(
+            assignment.getId(), request.getStartDate(), request.getDueDate(), LocalDateTime.now());
     eventPublisher.publish(RabbitMQConfig.ASSIGNMENT_SCHEDULE_UPDATED_ROUTING_KEY, event);
 
     return assignmentMapper.toResponse(updatedAssignment);
@@ -210,7 +214,9 @@ public class AssignmentService {
     Assignment publishedAssignment = assignmentRepository.save(assignment);
 
     // Publish event for assignment publication
-    AssignmentPublishedEvent event = new AssignmentPublishedEvent(assignment.getId(), assignment.getTitle(), LocalDateTime.now());
+    AssignmentPublishedEvent event =
+        new AssignmentPublishedEvent(
+            assignment.getId(), assignment.getTitle(), LocalDateTime.now());
     eventPublisher.publish(RabbitMQConfig.ASSIGNMENT_PUBLISHED_ROUTING_KEY, event);
 
     return assignmentMapper.toResponse(publishedAssignment);

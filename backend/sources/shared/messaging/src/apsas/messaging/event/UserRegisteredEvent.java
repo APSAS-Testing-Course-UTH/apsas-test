@@ -16,7 +16,8 @@ public class UserRegisteredEvent {
     this.timestamp = LocalDateTime.now();
   }
 
-  public UserRegisteredEvent(UUID userId, String email, String firstName, String lastName, String verificationToken) {
+  public UserRegisteredEvent(
+      UUID userId, String email, String firstName, String lastName, String verificationToken) {
     this.userId = userId;
     this.email = email;
     this.firstName = firstName;

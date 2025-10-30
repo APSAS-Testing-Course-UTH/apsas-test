@@ -1,12 +1,12 @@
 package apsas.messaging.event;
 
+import apsas.messaging.model.SubmissionResult;
+import apsas.messaging.model.SubmissionStatus;
+import apsas.messaging.model.TestCaseResult;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import apsas.messaging.model.SubmissionResult;
-import apsas.messaging.model.SubmissionStatus;
-import apsas.messaging.model.TestCaseResult;
 
 public class SubmissionEvaluatedEvent {
   private UUID submissionId;

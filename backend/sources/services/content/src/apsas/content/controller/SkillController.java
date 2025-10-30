@@ -31,7 +31,9 @@ public class SkillController {
   }
 
   @GetMapping
-  @Operation(summary = "Get all skills", description = "Get all available skills with pagination and sorting")
+  @Operation(
+      summary = "Get all skills",
+      description = "Get all available skills with pagination and sorting")
   public ResponseEntity<PageResponse<SkillResponse>> getAllSkills(
       @Parameter PageRequestParams pageParams) {
     PageResponse<SkillResponse> skills = skillService.getAllSkills(pageParams.toPageable());

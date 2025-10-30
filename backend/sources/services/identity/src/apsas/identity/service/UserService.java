@@ -23,10 +23,13 @@ public class UserService {
 
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
+  private final UserMapper userMapper;
 
-  public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+  public UserService(
+      UserRepository userRepository, PasswordEncoder passwordEncoder, UserMapper userMapper) {
     this.userRepository = userRepository;
     this.passwordEncoder = passwordEncoder;
+    this.userMapper = userMapper;
   }
 
   @Transactional(readOnly = true)
@@ -35,34 +38,34 @@ public class UserService {
         userRepository
             .findById(userId)
             .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-    return UserMapper.toUserResponse(user);
+    return userMapper.toUserResponse(user);
   }
 
   @Transactional(readOnly = true)
   public List<UserResponse> getAllUsers() {
     return userRepository.findAll().stream()
-        .map(UserMapper::toUserResponse)
+        .map(userMapper::toUserResponse)
         .collect(Collectors.toList());
   }
 
   @Transactional(readOnly = true)
   public PageResponse<UserResponse> getAllUsers(Pageable pageable) {
     Page<User> userPage = userRepository.findAll(pageable);
-    Page<UserResponse> responsePage = userPage.map(UserMapper::toUserResponse);
+    Page<UserResponse> responsePage = userPage.map(userMapper::toUserResponse);
     return PageResponse.of(responsePage);
   }
 
   @Transactional(readOnly = true)
   public List<UserResponse> getUsersByRole(UserRole role) {
     return userRepository.findByRole(role).stream()
-        .map(UserMapper::toUserResponse)
+        .map(userMapper::toUserResponse)
         .collect(Collectors.toList());
   }
 
   @Transactional(readOnly = true)
   public PageResponse<UserResponse> getUsersByRole(UserRole role, Pageable pageable) {
     Page<User> userPage = userRepository.findByRole(role, pageable);
-    Page<UserResponse> responsePage = userPage.map(UserMapper::toUserResponse);
+    Page<UserResponse> responsePage = userPage.map(userMapper::toUserResponse);
     return PageResponse.of(responsePage);
   }
 
@@ -72,10 +75,10 @@ public class UserService {
       throw new BadRequestException("Email already registered");
     }
 
-    User user = UserMapper.toUser(request, passwordEncoder);
+    User user = userMapper.toUser(request);
 
     user = userRepository.save(user);
-    return UserMapper.toUserResponse(user);
+    return userMapper.toUserResponse(user);
   }
 
   @Transactional
@@ -94,7 +97,7 @@ public class UserService {
     }
 
     user = userRepository.save(user);
-    return UserMapper.toUserResponse(user);
+    return userMapper.toUserResponse(user);
   }
 
   @Transactional
