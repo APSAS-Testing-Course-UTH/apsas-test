@@ -3,7 +3,8 @@ package apsas.support.model.dto;
 import java.util.UUID;
 
 public record WebSocketMessage(
-    String type, UUID sessionId, UUID userId, String content, Object data) {
+    String type, UUID sessionId, UUID userId, String content, Object data
+) {
   public static WebSocketMessage sessionJoined(UUID sessionId, UUID userId) {
     return new WebSocketMessage("session_joined", sessionId, userId, null, null);
   }

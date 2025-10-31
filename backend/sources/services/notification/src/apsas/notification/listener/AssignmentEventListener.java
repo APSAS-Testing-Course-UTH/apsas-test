@@ -26,7 +26,8 @@ public class AssignmentEventListener {
       logger.info(
           "Received assignment published event for assignment: {} - {}",
           event.getAssignmentId(),
-          event.getTitle());
+          event.getTitle()
+      );
 
       // TODO: Implement full notification logic
       // 1. Fetch assignment details (description, deadline) from content service

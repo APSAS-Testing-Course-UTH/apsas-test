@@ -21,9 +21,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-/** Controller quản lý các endpoint liên quan đến phiên hỗ trợ */
+/**
+ * Controller quản lý các endpoint liên quan đến phiên hỗ trợ
+ */
 @RestController
 @RequestMapping("/api/v1/support/sessions")
 @Tag(name = "Support", description = "Support session management endpoints")
@@ -37,11 +44,17 @@ public class SupportController {
   @PreAuthorize("hasAnyRole('STUDENT', 'INSTRUCTOR')")
   @Operation(
       summary = "List all support sessions",
-      description = "Instructors view all sessions with pagination, students view their own")
+      description = "Instructors view all sessions with pagination, students view their own"
+  )
   @ApiResponses(
-      value = {@ApiResponse(responseCode = "200", description = "Successfully retrieved sessions")})
+      value = {@ApiResponse(responseCode = "200", description = "Successfully retrieved sessions")}
+  )
   public ResponseEntity<PageResponse<SupportSessionDto>> listSessions(
-      @Parameter PageRequestParams pageParams, @AuthenticationPrincipal UserPrincipal principal) {
+      @Parameter
+      PageRequestParams pageParams,
+      @AuthenticationPrincipal
+      UserPrincipal principal
+  ) {
 
     PageResponse<SupportSessionDto> sessions;
     if ("INSTRUCTOR".equals(principal.role())) {
@@ -57,15 +70,21 @@ public class SupportController {
   @PreAuthorize("hasAnyRole('STUDENT', 'INSTRUCTOR')")
   @Operation(
       summary = "Get support session by ID",
-      description = "Instructors can view all, students can view their own")
+      description = "Instructors can view all, students can view their own"
+  )
   @ApiResponses(
       value = {
-        @ApiResponse(responseCode = "200", description = "Successfully retrieved session"),
-        @ApiResponse(responseCode = "404", description = "Session not found"),
-        @ApiResponse(responseCode = "403", description = "Access denied")
-      })
+          @ApiResponse(responseCode = "200", description = "Successfully retrieved session"),
+          @ApiResponse(responseCode = "404", description = "Session not found"),
+          @ApiResponse(responseCode = "403", description = "Access denied")
+      }
+  )
   public ResponseEntity<SupportSessionDto> getSessionById(
-      @PathVariable UUID id, @AuthenticationPrincipal UserPrincipal principal) {
+      @PathVariable
+      UUID id,
+      @AuthenticationPrincipal
+      UserPrincipal principal
+  ) {
 
     SupportSession session = supportService.getSessionById(id);
     supportService.validateUserAccess(session, principal.userId(), principal.role());
@@ -80,15 +99,21 @@ public class SupportController {
   @PreAuthorize("hasRole('STUDENT')")
   @Operation(
       summary = "Create a new support session",
-      description = "Students can create support sessions")
+      description = "Students can create support sessions"
+  )
   @ApiResponses(
       value = {
-        @ApiResponse(responseCode = "201", description = "Session created successfully"),
-        @ApiResponse(responseCode = "400", description = "Invalid request")
-      })
+          @ApiResponse(responseCode = "201", description = "Session created successfully"),
+          @ApiResponse(responseCode = "400", description = "Invalid request")
+      }
+  )
   public ResponseEntity<SupportSessionDto> createSession(
-      @Valid @RequestBody CreateSupportSessionRequest request,
-      @AuthenticationPrincipal UserPrincipal principal) {
+      @Valid
+      @RequestBody
+      CreateSupportSessionRequest request,
+      @AuthenticationPrincipal
+      UserPrincipal principal
+  ) {
 
     SupportSession session =
         supportService.createSession(principal.userId(), request.initialMessage());
@@ -100,16 +125,22 @@ public class SupportController {
   @PreAuthorize("hasRole('STUDENT')")
   @Operation(
       summary = "Close a support session",
-      description = "Only the student who created the session can close it")
+      description = "Only the student who created the session can close it"
+  )
   @ApiResponses(
       value = {
-        @ApiResponse(responseCode = "200", description = "Session closed successfully"),
-        @ApiResponse(responseCode = "404", description = "Session not found"),
-        @ApiResponse(responseCode = "403", description = "Access denied"),
-        @ApiResponse(responseCode = "400", description = "Session already closed")
-      })
+          @ApiResponse(responseCode = "200", description = "Session closed successfully"),
+          @ApiResponse(responseCode = "404", description = "Session not found"),
+          @ApiResponse(responseCode = "403", description = "Access denied"),
+          @ApiResponse(responseCode = "400", description = "Session already closed")
+      }
+  )
   public ResponseEntity<SupportSessionDto> closeSession(
-      @PathVariable UUID id, @AuthenticationPrincipal UserPrincipal principal) {
+      @PathVariable
+      UUID id,
+      @AuthenticationPrincipal
+      UserPrincipal principal
+  ) {
 
     SupportSession session = supportService.closeSession(id, principal.userId(), principal.role());
 

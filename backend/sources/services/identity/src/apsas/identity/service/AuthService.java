@@ -1,11 +1,15 @@
 package apsas.identity.service;
 
-import apsas.identity.exception.BadRequestException;
-import apsas.identity.exception.ResourceNotFoundException;
-import apsas.identity.exception.UnauthorizedException;
 import apsas.identity.mapper.UserMapper;
-import apsas.identity.model.dto.*;
-import apsas.identity.model.entity.*;
+import apsas.identity.model.dto.AuthResponse;
+import apsas.identity.model.dto.EmailRequest;
+import apsas.identity.model.dto.LoginRequest;
+import apsas.identity.model.dto.RegisterRequest;
+import apsas.identity.model.dto.ResetPasswordRequest;
+import apsas.identity.model.dto.UserResponse;
+import apsas.identity.model.entity.EmailVerificationToken;
+import apsas.identity.model.entity.PasswordResetToken;
+import apsas.identity.model.entity.User;
 import apsas.identity.repository.EmailVerificationTokenRepository;
 import apsas.identity.repository.PasswordResetTokenRepository;
 import apsas.identity.repository.UserRepository;
@@ -14,16 +18,20 @@ import apsas.messaging.event.EventPublisher;
 import apsas.messaging.event.PasswordResetRequestedEvent;
 import apsas.messaging.event.RabbitMQConfig;
 import apsas.messaging.event.UserRegisteredEvent;
+import apsas.shared.common.exception.BadRequestException;
+import apsas.shared.common.exception.NotFoundException;
+import apsas.shared.common.exception.UnauthorizedException;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
-
   private final UserRepository userRepository;
   private final EmailVerificationTokenRepository emailVerificationTokenRepository;
   private final PasswordResetTokenRepository passwordResetTokenRepository;
@@ -37,23 +45,6 @@ public class AuthService {
 
   @Value("${verification.password-reset-token-expiration}")
   private long passwordResetTokenExpiration;
-
-  public AuthService(
-      UserRepository userRepository,
-      EmailVerificationTokenRepository emailVerificationTokenRepository,
-      PasswordResetTokenRepository passwordResetTokenRepository,
-      PasswordEncoder passwordEncoder,
-      JwtTokenProvider jwtTokenProvider,
-      EventPublisher eventPublisher,
-      UserMapper userMapper) {
-    this.userRepository = userRepository;
-    this.emailVerificationTokenRepository = emailVerificationTokenRepository;
-    this.passwordResetTokenRepository = passwordResetTokenRepository;
-    this.passwordEncoder = passwordEncoder;
-    this.jwtTokenProvider = jwtTokenProvider;
-    this.eventPublisher = eventPublisher;
-    this.userMapper = userMapper;
-  }
 
   @Transactional
   public AuthResponse register(RegisterRequest request) {
@@ -106,8 +97,6 @@ public class AuthService {
     return new AuthResponse(token, userResponse);
   }
 
-  // ...existing code...
-
   @Transactional
   public void verifyEmail(String token) {
     EmailVerificationToken verificationToken =
@@ -131,7 +120,7 @@ public class AuthService {
     User user =
         userRepository
             .findByEmail(request.getEmail())
-            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+            .orElseThrow(() -> new NotFoundException("User not found"));
 
     if (user.getIsEmailVerified()) {
       throw new BadRequestException("Email already verified");
@@ -162,7 +151,7 @@ public class AuthService {
     User user =
         userRepository
             .findByEmail(request.getEmail())
-            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+            .orElseThrow(() -> new NotFoundException("User not found"));
 
     // Delete old token if exists
     passwordResetTokenRepository.findByUser(user).ifPresent(passwordResetTokenRepository::delete);

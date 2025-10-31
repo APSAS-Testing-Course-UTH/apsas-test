@@ -16,5 +16,8 @@ public interface RateLimitRepository extends JpaRepository<RateLimit, UUID> {
 
   @Modifying
   @Query("DELETE FROM RateLimit r WHERE r.windowStart < :expiryTime")
-  void deleteExpiredWindows(@Param("expiryTime") LocalDateTime expiryTime);
+  void deleteExpiredWindows(
+      @Param("expiryTime")
+      LocalDateTime expiryTime
+  );
 }

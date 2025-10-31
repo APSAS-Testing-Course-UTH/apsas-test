@@ -1,17 +1,28 @@
 package apsas.submission.model.entity;
 
 import io.hypersistence.utils.hibernate.type.json.JsonType;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.Type;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "submissions", schema = "submission")
 public class Submission {
-
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
   private UUID id;
@@ -60,100 +71,4 @@ public class Submission {
     }
   }
 
-  // Getters and Setters
-  public UUID getId() {
-    return id;
-  }
-
-  public void setId(UUID id) {
-    this.id = id;
-  }
-
-  public UUID getAssignmentId() {
-    return assignmentId;
-  }
-
-  public void setAssignmentId(UUID assignmentId) {
-    this.assignmentId = assignmentId;
-  }
-
-  public UUID getStudentId() {
-    return studentId;
-  }
-
-  public void setStudentId(UUID studentId) {
-    this.studentId = studentId;
-  }
-
-  public LocalDateTime getSubmittedAt() {
-    return submittedAt;
-  }
-
-  public void setSubmittedAt(LocalDateTime submittedAt) {
-    this.submittedAt = submittedAt;
-  }
-
-  public SubmissionStatus getStatus() {
-    return status;
-  }
-
-  public void setStatus(SubmissionStatus status) {
-    this.status = status;
-  }
-
-  public String getCode() {
-    return code;
-  }
-
-  public void setCode(String code) {
-    this.code = code;
-  }
-
-  public String getLanguage() {
-    return language;
-  }
-
-  public void setLanguage(String language) {
-    this.language = language;
-  }
-
-  public SubmissionResult getResult() {
-    return result;
-  }
-
-  public void setResult(SubmissionResult result) {
-    this.result = result;
-  }
-
-  public BigDecimal getScore() {
-    return score;
-  }
-
-  public void setScore(BigDecimal score) {
-    this.score = score;
-  }
-
-  public List<TestCaseResult> getTestCaseResults() {
-    return testCaseResults;
-  }
-
-  public void setTestCaseResults(List<TestCaseResult> testCaseResults) {
-    this.testCaseResults = testCaseResults;
-  }
-
-  public LocalDateTime getEvaluatedAt() {
-    return evaluatedAt;
-  }
-
-  public void setEvaluatedAt(LocalDateTime evaluatedAt) {
-    this.evaluatedAt = evaluatedAt;
-  }
-
-  public String getFeedback() {
-    return feedback;
-  }
-
-  public void setFeedback(String feedback) {
-    this.feedback = feedback;
-  }
 }

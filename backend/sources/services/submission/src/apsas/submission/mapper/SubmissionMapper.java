@@ -1,65 +1,36 @@
 package apsas.submission.mapper;
 
-import java.util.UUID;
-import java.util.stream.Collectors;
-import org.springframework.stereotype.Component;
 import apsas.submission.model.dto.CreateSubmissionRequest;
 import apsas.submission.model.dto.SubmissionResponse;
 import apsas.submission.model.dto.TestCaseResultResponse;
 import apsas.submission.model.entity.Submission;
 import apsas.submission.model.entity.TestCaseResult;
+import java.util.List;
+import java.util.UUID;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-@Component
-public class SubmissionMapper {
+@Mapper(componentModel = "spring")
+public interface SubmissionMapper {
 
-  public Submission toEntity(CreateSubmissionRequest request, UUID studentId) {
-    Submission submission = new Submission();
-    submission.setAssignmentId(request.getAssignmentId());
-    submission.setStudentId(studentId);
-    submission.setCode(request.getCode());
-    submission.setLanguage(request.getLanguage());
-    return submission;
-  }
+  @Mapping(target = "testCaseResults", ignore = true)
+  @Mapping(target = "submittedAt", ignore = true)
+  @Mapping(target = "status", ignore = true)
+  @Mapping(target = "score", ignore = true)
+  @Mapping(target = "result", ignore = true)
+  @Mapping(target = "id", ignore = true)
+  @Mapping(target = "feedback", ignore = true)
+  @Mapping(target = "evaluatedAt", ignore = true)
+  @Mapping(target = "studentId", source = "studentId")
+  @Mapping(target = "assignmentId", source = "request.assignmentId")
+  @Mapping(target = "code", source = "request.code")
+  @Mapping(target = "language", source = "request.language")
+  Submission toEntity(CreateSubmissionRequest request, UUID studentId);
 
-  public SubmissionResponse toResponse(Submission submission) {
-    SubmissionResponse response = new SubmissionResponse();
-    response.setId(submission.getId());
-    response.setAssignmentId(submission.getAssignmentId());
-    response.setStudentId(submission.getStudentId());
-    response.setSubmittedAt(submission.getSubmittedAt());
-    response.setStatus(submission.getStatus());
-    response.setCode(submission.getCode());
-    response.setLanguage(submission.getLanguage());
-    response.setResult(submission.getResult());
-    response.setScore(submission.getScore());
-    response.setEvaluatedAt(submission.getEvaluatedAt());
-    response.setFeedback(submission.getFeedback());
+  @Mapping(target = "testCaseResults", source = "testCaseResults")
+  SubmissionResponse toResponse(Submission submission);
 
-    if (submission.getTestCaseResults() != null) {
-      response.setTestCaseResults(
-          submission.getTestCaseResults().stream()
-              .map(this::toTestCaseResultResponse)
-              .collect(Collectors.toList()));
-    }
+  TestCaseResultResponse toTestCaseResultResponse(TestCaseResult testCaseResult);
 
-    return response;
-  }
-
-  public TestCaseResultResponse toTestCaseResultResponse(TestCaseResult testCaseResult) {
-    TestCaseResultResponse response = new TestCaseResultResponse();
-    response.setOrder(testCaseResult.getOrder());
-    response.setDescription(testCaseResult.getDescription());
-    response.setHidden(testCaseResult.getHidden());
-    response.setWeight(testCaseResult.getWeight());
-    response.setInput(testCaseResult.getInput());
-    response.setOutput(testCaseResult.getOutput());
-    response.setTimeout(testCaseResult.getTimeout());
-    response.setMemoryLimit(testCaseResult.getMemoryLimit());
-    response.setPassed(testCaseResult.getPassed());
-    response.setActualOutput(testCaseResult.getActualOutput());
-    response.setErrorMessage(testCaseResult.getErrorMessage());
-    response.setExecutionTime(testCaseResult.getExecutionTime());
-    response.setMemoryUsed(testCaseResult.getMemoryUsed());
-    return response;
-  }
+  List<TestCaseResultResponse> toTestCaseResultResponses(List<TestCaseResult> testCaseResults);
 }

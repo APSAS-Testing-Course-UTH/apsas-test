@@ -16,7 +16,14 @@ import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/skills")
@@ -33,16 +40,22 @@ public class SkillController {
   @GetMapping
   @Operation(
       summary = "Get all skills",
-      description = "Get all available skills with pagination and sorting")
+      description = "Get all available skills with pagination and sorting"
+  )
   public ResponseEntity<PageResponse<SkillResponse>> getAllSkills(
-      @Parameter PageRequestParams pageParams) {
+      @Parameter
+      PageRequestParams pageParams
+  ) {
     PageResponse<SkillResponse> skills = skillService.getAllSkills(pageParams.toPageable());
     return ResponseEntity.ok(skills);
   }
 
   @GetMapping("/{id}")
   @Operation(summary = "Get skill by ID", description = "Get skill details by ID")
-  public ResponseEntity<SkillResponse> getSkillById(@PathVariable UUID id) {
+  public ResponseEntity<SkillResponse> getSkillById(
+      @PathVariable
+      UUID id
+  ) {
     SkillResponse skill = skillService.getSkillById(id);
     return ResponseEntity.ok(skill);
   }
@@ -51,8 +64,13 @@ public class SkillController {
   @PreAuthorize("hasRole('CONTENT_PROVIDER')")
   @Operation(
       summary = "Create a new skill",
-      description = "Create a new skill (Content Provider only)")
-  public ResponseEntity<SkillResponse> createSkill(@Valid @RequestBody CreateSkillRequest request) {
+      description = "Create a new skill (Content Provider only)"
+  )
+  public ResponseEntity<SkillResponse> createSkill(
+      @Valid
+      @RequestBody
+      CreateSkillRequest request
+  ) {
     SkillResponse skill = skillService.createSkill(request);
     return new ResponseEntity<>(skill, HttpStatus.CREATED);
   }
@@ -61,7 +79,12 @@ public class SkillController {
   @PreAuthorize("hasRole('CONTENT_PROVIDER')")
   @Operation(summary = "Update skill", description = "Update skill details (Content Provider only)")
   public ResponseEntity<SkillResponse> updateSkill(
-      @PathVariable UUID id, @Valid @RequestBody UpdateSkillRequest request) {
+      @PathVariable
+      UUID id,
+      @Valid
+      @RequestBody
+      UpdateSkillRequest request
+  ) {
     SkillResponse skill = skillService.updateSkill(id, request);
     return ResponseEntity.ok(skill);
   }
@@ -69,7 +92,10 @@ public class SkillController {
   @DeleteMapping("/{id}")
   @PreAuthorize("hasRole('CONTENT_PROVIDER')")
   @Operation(summary = "Delete skill", description = "Delete a skill (Content Provider only)")
-  public ResponseEntity<Map<String, String>> deleteSkill(@PathVariable UUID id) {
+  public ResponseEntity<Map<String, String>> deleteSkill(
+      @PathVariable
+      UUID id
+  ) {
     skillService.deleteSkill(id);
     return ResponseEntity.ok(Map.of("message", "Skill deleted successfully"));
   }

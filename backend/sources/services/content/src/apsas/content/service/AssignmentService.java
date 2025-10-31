@@ -1,8 +1,5 @@
 package apsas.content.service;
 
-import apsas.content.exception.BadRequestException;
-import apsas.content.exception.ResourceNotFoundException;
-import apsas.content.exception.UnauthorizedException;
 import apsas.content.mapper.AssignmentMapper;
 import apsas.content.model.dto.AssignmentResponse;
 import apsas.content.model.dto.CreateAssignmentRequest;
@@ -20,6 +17,9 @@ import apsas.messaging.event.AssignmentScheduleUpdatedEvent;
 import apsas.messaging.event.EventPublisher;
 import apsas.messaging.event.RabbitMQConfig;
 import apsas.shared.common.dto.PageResponse;
+import apsas.shared.common.exception.BadRequestException;
+import apsas.shared.common.exception.NotFoundException;
+import apsas.shared.common.exception.UnauthorizedException;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
@@ -45,7 +45,8 @@ public class AssignmentService {
       SkillRepository skillRepository,
       TutorialRepository tutorialRepository,
       AssignmentMapper assignmentMapper,
-      EventPublisher eventPublisher) {
+      EventPublisher eventPublisher
+  ) {
     this.assignmentRepository = assignmentRepository;
     this.skillRepository = skillRepository;
     this.tutorialRepository = tutorialRepository;
@@ -73,7 +74,7 @@ public class AssignmentService {
         assignmentRepository
             .findById(id)
             .orElseThrow(
-                () -> new ResourceNotFoundException("Assignment not found with id: " + id));
+                () -> new NotFoundException("Assignment not found with id: " + id));
     return assignmentMapper.toResponse(assignment);
   }
 
@@ -113,7 +114,7 @@ public class AssignmentService {
         assignmentRepository
             .findById(id)
             .orElseThrow(
-                () -> new ResourceNotFoundException("Assignment not found with id: " + id));
+                () -> new NotFoundException("Assignment not found with id: " + id));
 
     if (!assignment.getCreatorId().equals(userId)) {
       throw new UnauthorizedException("You are not authorized to update this assignment");
@@ -161,7 +162,7 @@ public class AssignmentService {
         assignmentRepository
             .findById(id)
             .orElseThrow(
-                () -> new ResourceNotFoundException("Assignment not found with id: " + id));
+                () -> new NotFoundException("Assignment not found with id: " + id));
 
     validateDates(request.getStartDate(), request.getDueDate());
 
@@ -185,7 +186,7 @@ public class AssignmentService {
         assignmentRepository
             .findById(id)
             .orElseThrow(
-                () -> new ResourceNotFoundException("Assignment not found with id: " + id));
+                () -> new NotFoundException("Assignment not found with id: " + id));
 
     if (!assignment.getCreatorId().equals(userId)) {
       throw new UnauthorizedException("You are not authorized to delete this assignment");
@@ -200,7 +201,7 @@ public class AssignmentService {
         assignmentRepository
             .findById(id)
             .orElseThrow(
-                () -> new ResourceNotFoundException("Assignment not found with id: " + id));
+                () -> new NotFoundException("Assignment not found with id: " + id));
 
     if (!assignment.getCreatorId().equals(userId)) {
       throw new UnauthorizedException("You are not authorized to publish this assignment");
@@ -228,7 +229,7 @@ public class AssignmentService {
         assignmentRepository
             .findById(id)
             .orElseThrow(
-                () -> new ResourceNotFoundException("Assignment not found with id: " + id));
+                () -> new NotFoundException("Assignment not found with id: " + id));
 
     if (!assignment.getCreatorId().equals(userId)) {
       throw new UnauthorizedException("You are not authorized to archive this assignment");

@@ -4,94 +4,38 @@ CREATE SCHEMA IF NOT EXISTS identity;
 -- Users Table
 CREATE TABLE IF NOT EXISTS identity.users
 (
-    id
-    UUID
-    PRIMARY
-    KEY
-    DEFAULT
-    gen_random_uuid
-(
-),
-    email VARCHAR
-(
-    255
-) UNIQUE NOT NULL,
-    password_hash VARCHAR
-(
-    255
-) NOT NULL,
-    first_name VARCHAR
-(
-    100
-) NOT NULL,
-    last_name VARCHAR
-(
-    100
-) NOT NULL,
-    role VARCHAR
-(
-    50
-) NOT NULL CHECK
-(
-    role
-    IN
-(
-    'STUDENT',
-    'INSTRUCTOR',
-    'CONTENT_PROVIDER',
-    'ADMIN'
-)),
-    is_active BOOLEAN DEFAULT TRUE,
-    is_email_verified BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
+    id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    email             VARCHAR(255) UNIQUE NOT NULL,
+    password_hash     VARCHAR(255)        NOT NULL,
+    first_name        VARCHAR(100)        NOT NULL,
+    last_name         VARCHAR(100)        NOT NULL,
+    role              VARCHAR(50)         NOT NULL CHECK (role IN ('STUDENT', 'INSTRUCTOR',
+                                                                   'CONTENT_PROVIDER', 'ADMIN')),
+    is_active         BOOLEAN          DEFAULT TRUE,
+    is_email_verified BOOLEAN          DEFAULT FALSE,
+    created_at        TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
+    updated_at        TIMESTAMP        DEFAULT CURRENT_TIMESTAMP
+);
 
 -- Email Verification Tokens
 CREATE TABLE IF NOT EXISTS identity.email_verification_tokens
 (
-    id
-    UUID
-    PRIMARY
-    KEY
-    DEFAULT
-    gen_random_uuid
-(
-),
-    user_id UUID NOT NULL REFERENCES identity.users
-(
-    id
-) ON DELETE CASCADE,
-    token VARCHAR
-(
-    255
-) UNIQUE NOT NULL,
-    expires_at TIMESTAMP NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
+    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id    UUID                NOT NULL REFERENCES identity.users (id) ON DELETE CASCADE,
+    token      VARCHAR(255) UNIQUE NOT NULL,
+    expires_at TIMESTAMP           NOT NULL,
+    created_at TIMESTAMP        DEFAULT CURRENT_TIMESTAMP
+);
 
 -- Password Reset Tokens
 CREATE TABLE IF NOT EXISTS identity.password_reset_tokens
 (
-    id
-    UUID
-    PRIMARY
-    KEY
-    DEFAULT
-    gen_random_uuid
-(
-),
-    user_id UUID NOT NULL REFERENCES identity.users
-(
-    id
-) ON DELETE CASCADE,
-    token VARCHAR
-(
-    255
-) UNIQUE NOT NULL,
-    expires_at TIMESTAMP NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
+    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id    UUID                NOT NULL REFERENCES identity.users (id) ON DELETE CASCADE,
+    token      VARCHAR(255) UNIQUE NOT NULL,
+    expires_at TIMESTAMP           NOT NULL,
+    created_at TIMESTAMP        DEFAULT CURRENT_TIMESTAMP
+);
 
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_users_email ON identity.users (email);

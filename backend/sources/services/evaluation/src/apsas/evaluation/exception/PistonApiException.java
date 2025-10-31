@@ -1,12 +1,17 @@
 package apsas.evaluation.exception;
 
-/** Exception thrown when Piston API communication fails */
-public class PistonApiException extends RuntimeException {
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+
+/**
+ * Exception thrown when Piston API communication fails
+ */
+public class PistonApiException extends ResponseStatusException {
   public PistonApiException(String message) {
-    super(message);
+    super(HttpStatus.SERVICE_UNAVAILABLE, message);
   }
 
   public PistonApiException(String message, Throwable cause) {
-    super(message, cause);
+    super(HttpStatus.SERVICE_UNAVAILABLE, message, cause);
   }
 }

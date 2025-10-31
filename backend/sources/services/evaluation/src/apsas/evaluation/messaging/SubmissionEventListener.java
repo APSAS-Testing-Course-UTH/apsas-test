@@ -8,7 +8,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
-/** RabbitMQ listener for submission evaluation events */
+/**
+ * RabbitMQ listener for submission evaluation events
+ */
 @Component
 @AllArgsConstructor
 public class SubmissionEventListener {

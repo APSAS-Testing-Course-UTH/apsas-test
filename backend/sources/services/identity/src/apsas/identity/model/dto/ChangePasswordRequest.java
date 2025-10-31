@@ -2,11 +2,13 @@ package apsas.identity.model.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class ChangePasswordRequest {
   @NotBlank(message = "Current password is required")
   private String currentPassword;

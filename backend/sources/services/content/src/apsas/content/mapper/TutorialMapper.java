@@ -12,7 +12,8 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 
 @Mapper(
     componentModel = "spring",
-    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
+)
 public interface TutorialMapper {
 
   @Mapping(target = "creatorId", source = "creatorId")
@@ -27,7 +28,10 @@ public interface TutorialMapper {
   @Mapping(target = "createdAt", ignore = true)
   @Mapping(target = "updatedAt", ignore = true)
   @Mapping(target = "assignments", ignore = true)
-  void updateEntity(@MappingTarget Tutorial tutorial, UpdateTutorialRequest request);
+  void updateEntity(
+      @MappingTarget
+      Tutorial tutorial, UpdateTutorialRequest request
+  );
 
   TutorialResponse toResponse(Tutorial tutorial);
 }

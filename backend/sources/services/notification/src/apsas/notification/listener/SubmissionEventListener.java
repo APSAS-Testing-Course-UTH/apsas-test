@@ -26,7 +26,8 @@ public class SubmissionEventListener {
       logger.info(
           "Received submission evaluated event for submission: {} with score: {}",
           event.getSubmissionId(),
-          event.getScore());
+          event.getScore()
+      );
 
       // TODO: Implement full notification logic
       // 1. Fetch submission details (student ID, assignment ID) from submission service

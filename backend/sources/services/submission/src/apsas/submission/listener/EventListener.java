@@ -1,13 +1,13 @@
 package apsas.submission.listener;
 
-import java.time.LocalDateTime;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.stereotype.Component;
 import apsas.messaging.event.SubmissionEvaluatedEvent;
 import apsas.submission.model.entity.SubmissionResult;
 import apsas.submission.model.entity.SubmissionStatus;
 import apsas.submission.model.entity.TestCaseResult;
 import apsas.submission.repository.SubmissionRepository;
+import java.time.LocalDateTime;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.stereotype.Component;
 
 @Component
 public class EventListener {
@@ -35,7 +35,7 @@ public class EventListener {
             });
   }
 
-  private SubmissionResult mapToSubmissionResult(SubmissionResult result) {
+  private SubmissionResult mapToSubmissionResult(apsas.messaging.model.SubmissionResult result) {
     if (result == null) {
       return null;
     }
@@ -47,7 +47,8 @@ public class EventListener {
   }
 
   private SubmissionStatus mapToSubmissionStatus(
-      apsas.messaging.model.SubmissionStatus status) {
+      apsas.messaging.model.SubmissionStatus status
+  ) {
     if (status == null) {
       return null;
     }
@@ -59,7 +60,8 @@ public class EventListener {
   }
 
   private TestCaseResult mapToTestCaseResult(
-      apsas.messaging.model.TestCaseResult result) {
+      apsas.messaging.model.TestCaseResult result
+  ) {
     if (result == null) {
       return null;
     }

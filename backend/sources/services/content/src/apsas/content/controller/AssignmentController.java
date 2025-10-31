@@ -19,7 +19,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/assignments")
@@ -36,9 +43,12 @@ public class AssignmentController {
   @GetMapping
   @Operation(
       summary = "Get all assignments",
-      description = "Get all available assignments with pagination and sorting")
+      description = "Get all available assignments with pagination and sorting"
+  )
   public ResponseEntity<PageResponse<AssignmentResponse>> getAllAssignments(
-      @Parameter PageRequestParams pageParams) {
+      @Parameter
+      PageRequestParams pageParams
+  ) {
     PageResponse<AssignmentResponse> assignments =
         assignmentService.getAllAssignments(pageParams.toPageable());
     return ResponseEntity.ok(assignments);
@@ -46,7 +56,10 @@ public class AssignmentController {
 
   @GetMapping("/{id}")
   @Operation(summary = "Get assignment by ID", description = "Get assignment details by ID")
-  public ResponseEntity<AssignmentResponse> getAssignmentById(@PathVariable UUID id) {
+  public ResponseEntity<AssignmentResponse> getAssignmentById(
+      @PathVariable
+      UUID id
+  ) {
     AssignmentResponse assignment = assignmentService.getAssignmentById(id);
     return ResponseEntity.ok(assignment);
   }
@@ -55,9 +68,13 @@ public class AssignmentController {
   @PreAuthorize("hasRole('CONTENT_PROVIDER')")
   @Operation(
       summary = "Create a new assignment",
-      description = "Create a new assignment (Content Provider only)")
+      description = "Create a new assignment (Content Provider only)"
+  )
   public ResponseEntity<AssignmentResponse> createAssignment(
-      @Valid @RequestBody CreateAssignmentRequest request, Authentication authentication) {
+      @Valid
+      @RequestBody
+      CreateAssignmentRequest request, Authentication authentication
+  ) {
     UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
     UUID creatorId = userPrincipal.userId();
     AssignmentResponse assignment = assignmentService.createAssignment(request, creatorId);
@@ -68,11 +85,16 @@ public class AssignmentController {
   @PreAuthorize("hasRole('CONTENT_PROVIDER')")
   @Operation(
       summary = "Update assignment",
-      description = "Update assignment details (Content Provider only)")
+      description = "Update assignment details (Content Provider only)"
+  )
   public ResponseEntity<AssignmentResponse> updateAssignment(
-      @PathVariable UUID id,
-      @Valid @RequestBody UpdateAssignmentRequest request,
-      Authentication authentication) {
+      @PathVariable
+      UUID id,
+      @Valid
+      @RequestBody
+      UpdateAssignmentRequest request,
+      Authentication authentication
+  ) {
     UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
     UUID userId = userPrincipal.userId();
     AssignmentResponse assignment = assignmentService.updateAssignment(id, request, userId);
@@ -83,9 +105,15 @@ public class AssignmentController {
   @PreAuthorize("hasRole('INSTRUCTOR')")
   @Operation(
       summary = "Update assignment schedule",
-      description = "Update assignment schedule (start_date, due_date) (Instructor only)")
+      description = "Update assignment schedule (start_date, due_date) (Instructor only)"
+  )
   public ResponseEntity<AssignmentResponse> updateAssignmentSchedule(
-      @PathVariable UUID id, @Valid @RequestBody UpdateAssignmentScheduleRequest request) {
+      @PathVariable
+      UUID id,
+      @Valid
+      @RequestBody
+      UpdateAssignmentScheduleRequest request
+  ) {
     AssignmentResponse assignment = assignmentService.updateAssignmentSchedule(id, request);
     return ResponseEntity.ok(assignment);
   }
@@ -94,9 +122,12 @@ public class AssignmentController {
   @PreAuthorize("hasRole('CONTENT_PROVIDER')")
   @Operation(
       summary = "Delete assignment",
-      description = "Delete an assignment (Content Provider only)")
+      description = "Delete an assignment (Content Provider only)"
+  )
   public ResponseEntity<Map<String, String>> deleteAssignment(
-      @PathVariable UUID id, Authentication authentication) {
+      @PathVariable
+      UUID id, Authentication authentication
+  ) {
     UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
     UUID userId = userPrincipal.userId();
     assignmentService.deleteAssignment(id, userId);
@@ -107,9 +138,12 @@ public class AssignmentController {
   @PreAuthorize("hasRole('CONTENT_PROVIDER')")
   @Operation(
       summary = "Publish an assignment",
-      description = "Publish a draft assignment (Content Provider only)")
+      description = "Publish a draft assignment (Content Provider only)"
+  )
   public ResponseEntity<AssignmentResponse> publishAssignment(
-      @PathVariable UUID id, Authentication authentication) {
+      @PathVariable
+      UUID id, Authentication authentication
+  ) {
     UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
     UUID userId = userPrincipal.userId();
     AssignmentResponse assignment = assignmentService.publishAssignment(id, userId);
@@ -120,9 +154,12 @@ public class AssignmentController {
   @PreAuthorize("hasRole('CONTENT_PROVIDER')")
   @Operation(
       summary = "Archive an assignment",
-      description = "Archive an assignment (Content Provider only)")
+      description = "Archive an assignment (Content Provider only)"
+  )
   public ResponseEntity<AssignmentResponse> archiveAssignment(
-      @PathVariable UUID id, Authentication authentication) {
+      @PathVariable
+      UUID id, Authentication authentication
+  ) {
     UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
     UUID userId = userPrincipal.userId();
     AssignmentResponse assignment = assignmentService.archiveAssignment(id, userId);

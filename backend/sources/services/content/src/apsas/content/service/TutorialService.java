@@ -1,7 +1,5 @@
 package apsas.content.service;
 
-import apsas.content.exception.ResourceNotFoundException;
-import apsas.content.exception.UnauthorizedException;
 import apsas.content.mapper.TutorialMapper;
 import apsas.content.model.dto.CreateTutorialRequest;
 import apsas.content.model.dto.TutorialResponse;
@@ -9,6 +7,8 @@ import apsas.content.model.dto.UpdateTutorialRequest;
 import apsas.content.model.entity.Tutorial;
 import apsas.content.repository.TutorialRepository;
 import apsas.shared.common.dto.PageResponse;
+import apsas.shared.common.exception.NotFoundException;
+import apsas.shared.common.exception.UnauthorizedException;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -47,7 +47,7 @@ public class TutorialService {
     Tutorial tutorial =
         tutorialRepository
             .findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Tutorial not found with id: " + id));
+            .orElseThrow(() -> new NotFoundException("Tutorial not found with id: " + id));
     return tutorialMapper.toResponse(tutorial);
   }
 
@@ -63,7 +63,7 @@ public class TutorialService {
     Tutorial tutorial =
         tutorialRepository
             .findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Tutorial not found with id: " + id));
+            .orElseThrow(() -> new NotFoundException("Tutorial not found with id: " + id));
 
     if (!tutorial.getCreatorId().equals(userId)) {
       throw new UnauthorizedException("You are not authorized to update this tutorial");
@@ -79,7 +79,7 @@ public class TutorialService {
     Tutorial tutorial =
         tutorialRepository
             .findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Tutorial not found with id: " + id));
+            .orElseThrow(() -> new NotFoundException("Tutorial not found with id: " + id));
 
     if (!tutorial.getCreatorId().equals(userId)) {
       throw new UnauthorizedException("You are not authorized to delete this tutorial");

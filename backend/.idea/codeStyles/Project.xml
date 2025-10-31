@@ -1,5 +1,6 @@
 <component name="ProjectCodeStyleConfiguration">
   <code_scheme name="Project" version="173">
+    <option name="AUTODETECT_INDENTS" value="false" />
     <option name="OTHER_INDENT_OPTIONS">
       <value>
         <option name="INDENT_SIZE" value="2" />
@@ -41,6 +42,12 @@
       <option name="INDENT_CHAINED_CALLS" value="false" />
     </JSCodeStyleSettings>
     <JavaCodeStyleSettings>
+      <option name="ANNOTATION_NEW_LINE_IN_RECORD_COMPONENT" value="true" />
+      <option name="ANNOTATION_PARAMETER_WRAP" value="5" />
+      <option name="ENUM_FIELD_ANNOTATION_WRAP" value="2" />
+      <option name="NEW_LINE_AFTER_LPAREN_IN_ANNOTATION" value="true" />
+      <option name="RPAREN_ON_NEW_LINE_IN_ANNOTATION" value="true" />
+      <option name="ALIGN_MULTILINE_TEXT_BLOCKS" value="true" />
       <option name="INSERT_INNER_CLASS_IMPORTS" value="true" />
       <option name="CLASS_COUNT_TO_USE_IMPORT_ON_DEMAND" value="999" />
       <option name="NAMES_COUNT_TO_USE_IMPORT_ON_DEMAND" value="999" />
@@ -55,6 +62,11 @@
           <package name="" withSubpackages="true" static="false" />
         </value>
       </option>
+      <option name="RECORD_COMPONENTS_WRAP" value="5" />
+      <option name="ALIGN_MULTILINE_RECORDS" value="false" />
+      <option name="NEW_LINE_AFTER_LPAREN_IN_RECORD_HEADER" value="true" />
+      <option name="RPAREN_ON_NEW_LINE_IN_RECORD_HEADER" value="true" />
+      <option name="ALIGN_MULTILINE_DECONSTRUCTION_LIST_COMPONENTS" value="false" />
     </JavaCodeStyleSettings>
     <Objective-C>
       <option name="INDENT_NAMESPACE_MEMBERS" value="0" />
@@ -133,21 +145,30 @@
       </indentOptions>
     </codeStyleSettings>
     <codeStyleSettings language="JAVA">
+      <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
       <option name="KEEP_CONTROL_STATEMENT_IN_ONE_LINE" value="false" />
-      <option name="KEEP_BLANK_LINES_IN_CODE" value="1" />
-      <option name="BLANK_LINES_AFTER_CLASS_HEADER" value="1" />
+      <option name="KEEP_BLANK_LINES_IN_DECLARATIONS" value="1" />
+      <option name="KEEP_BLANK_LINES_BEFORE_RBRACE" value="1" />
+      <option name="BLANK_LINES_AROUND_CLASS" value="0" />
       <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />
       <option name="ALIGN_MULTILINE_RESOURCES" value="false" />
       <option name="ALIGN_MULTILINE_FOR" value="false" />
-      <option name="CALL_PARAMETERS_WRAP" value="1" />
-      <option name="METHOD_PARAMETERS_WRAP" value="1" />
+      <option name="CALL_PARAMETERS_WRAP" value="5" />
+      <option name="CALL_PARAMETERS_LPAREN_ON_NEXT_LINE" value="true" />
+      <option name="CALL_PARAMETERS_RPAREN_ON_NEXT_LINE" value="true" />
+      <option name="METHOD_PARAMETERS_WRAP" value="5" />
+      <option name="METHOD_PARAMETERS_LPAREN_ON_NEXT_LINE" value="true" />
+      <option name="METHOD_PARAMETERS_RPAREN_ON_NEXT_LINE" value="true" />
       <option name="EXTENDS_LIST_WRAP" value="1" />
       <option name="THROWS_KEYWORD_WRAP" value="1" />
-      <option name="METHOD_CALL_CHAIN_WRAP" value="1" />
+      <option name="METHOD_CALL_CHAIN_WRAP" value="5" />
       <option name="BINARY_OPERATION_WRAP" value="1" />
       <option name="BINARY_OPERATION_SIGN_ON_NEXT_LINE" value="true" />
       <option name="TERNARY_OPERATION_WRAP" value="1" />
       <option name="TERNARY_OPERATION_SIGNS_ON_NEXT_LINE" value="true" />
+      <option name="KEEP_SIMPLE_METHODS_IN_ONE_LINE" value="true" />
+      <option name="KEEP_SIMPLE_LAMBDAS_IN_ONE_LINE" value="true" />
+      <option name="KEEP_SIMPLE_CLASSES_IN_ONE_LINE" value="true" />
       <option name="FOR_STATEMENT_WRAP" value="1" />
       <option name="ARRAY_INITIALIZER_WRAP" value="1" />
       <option name="WRAP_COMMENTS" value="true" />
@@ -155,6 +176,9 @@
       <option name="DOWHILE_BRACE_FORCE" value="3" />
       <option name="WHILE_BRACE_FORCE" value="3" />
       <option name="FOR_BRACE_FORCE" value="3" />
+      <option name="PARAMETER_ANNOTATION_WRAP" value="2" />
+      <option name="VARIABLE_ANNOTATION_WRAP" value="2" />
+      <option name="ENUM_CONSTANTS_WRAP" value="2" />
       <indentOptions>
         <option name="INDENT_SIZE" value="2" />
         <option name="CONTINUATION_INDENT_SIZE" value="4" />

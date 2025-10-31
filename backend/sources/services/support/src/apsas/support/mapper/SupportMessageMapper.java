@@ -6,7 +6,9 @@ import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants.ComponentModel;
 
-/** Mapper class dùng để chuyển đổi giữa SupportMessage và SupportMessageDto */
+/**
+ * Mapper class dùng để chuyển đổi giữa SupportMessage và SupportMessageDto
+ */
 @Mapper(componentModel = ComponentModel.SPRING)
 public interface SupportMessageMapper {
   SupportMessageDto toDto(SupportMessage message);

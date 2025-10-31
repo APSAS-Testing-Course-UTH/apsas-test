@@ -30,7 +30,8 @@ public class FcmServiceNoOp implements IFcmService {
         "FCM is disabled. Skipping multicast notification: title={}, body={}, tokenCount={}",
         title,
         body,
-        tokens != null ? tokens.size() : 0);
+        tokens != null ? tokens.size() : 0
+    );
   }
 
   @Override

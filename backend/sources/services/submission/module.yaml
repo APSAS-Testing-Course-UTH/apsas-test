@@ -8,6 +8,11 @@ settings:
   jvm:
     mainClass: apsas.submission.SubmissionServiceApplication
 
+  java:
+    annotationProcessing:
+      processors:
+        - $libs.mapstruct.processor
+
 dependencies:
   - ../../shared/security
   - ../../shared/common
@@ -18,3 +23,4 @@ dependencies:
   - $libs.postgresql
   - $libs.springdoc.openapi.starter.webmvc.api
   - $libs.hypersistence.utils.hibernate63
+  - $libs.mapstruct

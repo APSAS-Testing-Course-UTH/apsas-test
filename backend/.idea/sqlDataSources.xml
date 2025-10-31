@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SqlDataSourceStorage">
+    <option name="dataSources">
+      <list>
+        <State>
+          <option name="id" value="784eb76c-3af0-443f-ab3e-e0416582e63b" />
+          <option name="name" value="DDL data source" />
+          <option name="dbmsName" value="POSTGRES" />
+          <option name="urls">
+            <array>
+              <option value="file://$PROJECT_DIR$/sources/services/identity/resources/schema.sql" />
+              <option value="file://$PROJECT_DIR$/sources/services/content/resources/schema.sql" />
+              <option value="file://$PROJECT_DIR$/sources/services/notification/resources/schema.sql" />
+              <option value="file://$PROJECT_DIR$/sources/services/submission/resources/schema.sql" />
+              <option value="file://$PROJECT_DIR$/sources/services/support/resources/schema.sql" />
+            </array>
+          </option>
+          <option name="outLayout" value="File per object by schema.groovy" />
+        </State>
+      </list>
+    </option>
+  </component>
+</project>

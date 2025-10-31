@@ -14,7 +14,13 @@ import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/devices")
@@ -31,9 +37,13 @@ public class DeviceTokenController {
   @PostMapping("/register")
   @Operation(
       summary = "Register FCM device token",
-      description = "Register a Firebase Cloud Messaging device token for push notifications")
+      description = "Register a Firebase Cloud Messaging device token for push notifications"
+  )
   public ResponseEntity<DeviceTokenResponse> registerDevice(
-      @Valid @RequestBody RegisterDeviceRequest request, Authentication authentication) {
+      @Valid
+      @RequestBody
+      RegisterDeviceRequest request, Authentication authentication
+  ) {
     UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
     UUID userId = userPrincipal.userId();
     DeviceTokenResponse response = deviceTokenService.registerToken(request, userId);
@@ -43,7 +53,9 @@ public class DeviceTokenController {
   @DeleteMapping("/{token}")
   @Operation(summary = "Remove device token", description = "Remove a registered FCM device token")
   public ResponseEntity<Map<String, String>> removeDevice(
-      @PathVariable String token, Authentication authentication) {
+      @PathVariable
+      String token, Authentication authentication
+  ) {
     deviceTokenService.removeToken(token);
     return ResponseEntity.ok(Map.of("message", "Device token removed successfully"));
   }
@@ -51,7 +63,8 @@ public class DeviceTokenController {
   @GetMapping
   @Operation(
       summary = "Get user devices",
-      description = "Get all registered devices for the current user")
+      description = "Get all registered devices for the current user"
+  )
   public ResponseEntity<List<DeviceTokenResponse>> getUserDevices(Authentication authentication) {
     UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
     UUID userId = userPrincipal.userId();

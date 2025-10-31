@@ -66,13 +66,15 @@ public class EmailService {
             "%s?token=%s",
             System.getenv()
                 .getOrDefault("VERIFICATION_BASE_URL", "http://localhost:3000/verify-email"),
-            verificationToken);
+            verificationToken
+        );
 
     Map<String, Object> variables =
         Map.of(
             "firstName", firstName,
             "lastName", lastName,
-            "verificationUrl", verificationUrl);
+            "verificationUrl", verificationUrl
+        );
 
     sendEmail(to, "Verify Your Email - APSAS", "email/verification-email", variables);
   }
@@ -83,7 +85,8 @@ public class EmailService {
             "%s?token=%s",
             System.getenv()
                 .getOrDefault("RESET_PASSWORD_BASE_URL", "http://localhost:3000/reset-password"),
-            resetToken);
+            resetToken
+        );
 
     Map<String, Object> variables = Map.of("firstName", firstName, "resetUrl", resetUrl);
 
@@ -96,20 +99,23 @@ public class EmailService {
       String assignmentTitle,
       String description,
       String deadline,
-      String assignmentUrl) {
+      String assignmentUrl
+  ) {
     Map<String, Object> variables =
         Map.of(
             "firstName", firstName,
             "assignmentTitle", assignmentTitle,
             "description", description,
             "deadline", deadline,
-            "assignmentUrl", assignmentUrl);
+            "assignmentUrl", assignmentUrl
+        );
 
     sendEmail(
         to,
         "New Assignment Published: " + assignmentTitle,
         "email/assignment-published",
-        variables);
+        variables
+    );
   }
 
   public void sendAssignmentReminderEmail(
@@ -118,20 +124,23 @@ public class EmailService {
       String assignmentTitle,
       String deadline,
       String timeRemaining,
-      String assignmentUrl) {
+      String assignmentUrl
+  ) {
     Map<String, Object> variables =
         Map.of(
             "firstName", firstName,
             "assignmentTitle", assignmentTitle,
             "deadline", deadline,
             "timeRemaining", timeRemaining,
-            "assignmentUrl", assignmentUrl);
+            "assignmentUrl", assignmentUrl
+        );
 
     sendEmail(
         to,
         "Reminder: Assignment Deadline Approaching - " + assignmentTitle,
         "email/assignment-reminder",
-        variables);
+        variables
+    );
   }
 
   public void sendSubmissionEvaluatedEmail(
@@ -144,7 +153,8 @@ public class EmailService {
       Integer totalTests,
       String executionTime,
       String feedback,
-      String submissionUrl) {
+      String submissionUrl
+  ) {
     Map<String, Object> variables =
         Map.of(
             "firstName", firstName,
@@ -155,7 +165,8 @@ public class EmailService {
             "totalTests", totalTests,
             "executionTime", executionTime,
             "feedback", feedback != null ? feedback : "",
-            "submissionUrl", submissionUrl);
+            "submissionUrl", submissionUrl
+        );
 
     sendEmail(
         to, "Submission Evaluated: " + assignmentTitle, "email/submission-evaluated", variables);

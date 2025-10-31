@@ -6,4 +6,5 @@ import java.util.UUID;
 
 public record SendMessageRequest(
     @NotNull(message = "Session ID is required") UUID sessionId,
-    @NotBlank(message = "Content is required") String content) {}
+    @NotBlank(message = "Content is required") String content
+) {}

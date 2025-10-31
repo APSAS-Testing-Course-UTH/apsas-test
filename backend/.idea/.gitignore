@@ -21,5 +21,6 @@
 !project-color
 !vcs.xml
 !.name
-!google-java-format.xml
 !externalDependencies.xml
+!sqldialects.xml
+!sqlDataSources.xml

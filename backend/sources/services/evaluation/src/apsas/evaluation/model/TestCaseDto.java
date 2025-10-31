@@ -1,6 +1,8 @@
 package apsas.evaluation.model;
 
-/** DTO for Test Case details */
+/**
+ * DTO for Test Case details
+ */
 public record TestCaseDto(
     Integer order,
     String description,
@@ -9,4 +11,5 @@ public record TestCaseDto(
     String input,
     String output,
     Integer timeout,
-    Integer memoryLimit) {}
+    Integer memoryLimit
+) {}

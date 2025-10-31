@@ -68,7 +68,8 @@ public class RateLimitService {
           userId,
           notificationType,
           rateLimit.getSentCount(),
-          limit);
+          limit
+      );
       return false;
     }
 

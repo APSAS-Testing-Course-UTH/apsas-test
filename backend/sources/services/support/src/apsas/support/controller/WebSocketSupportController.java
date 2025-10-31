@@ -18,7 +18,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 
-/** Controller xử lý các kết nối WebSocket cho hỗ trợ trực tiếp */
+/**
+ * Controller xử lý các kết nối WebSocket cho hỗ trợ trực tiếp
+ */
 @Controller
 @RequiredArgsConstructor
 public class WebSocketSupportController {
@@ -29,7 +31,11 @@ public class WebSocketSupportController {
   @SubscribeMapping("/support/sessions/{sessionId}")
   @PreAuthorize("hasAnyRole('STUDENT', 'INSTRUCTOR')")
   public void handleSubscribe(
-      @DestinationVariable UUID sessionId, @AuthenticationPrincipal UserPrincipal userPrincipal) {
+      @DestinationVariable
+      UUID sessionId,
+      @AuthenticationPrincipal
+      UserPrincipal userPrincipal
+  ) {
 
     // Validate access to the session
     SupportSession session = supportService.getSessionById(sessionId);
@@ -44,9 +50,13 @@ public class WebSocketSupportController {
   @MessageMapping("/support/sessions/{sessionId}/message")
   @PreAuthorize("hasAnyRole('STUDENT', 'INSTRUCTOR')")
   public void handleMessage(
-      @DestinationVariable UUID sessionId,
-      @Payload SendMessageRequest request,
-      @AuthenticationPrincipal UserPrincipal userPrincipal) {
+      @DestinationVariable
+      UUID sessionId,
+      @Payload
+      SendMessageRequest request,
+      @AuthenticationPrincipal
+      UserPrincipal userPrincipal
+  ) {
 
     // Validate access to the session
     SupportSession session = supportService.getSessionById(sessionId);
@@ -68,7 +78,11 @@ public class WebSocketSupportController {
   @MessageMapping("/support/sessions/{sessionId}/leave")
   @PreAuthorize("hasAnyRole('STUDENT', 'INSTRUCTOR')")
   public void handleLeave(
-      @DestinationVariable UUID sessionId, @AuthenticationPrincipal UserPrincipal userPrincipal) {
+      @DestinationVariable
+      UUID sessionId,
+      @AuthenticationPrincipal
+      UserPrincipal userPrincipal
+  ) {
 
     // Notify other users that someone left
     WebSocketMessage leaveMessage = WebSocketMessage.sessionLeft(sessionId, userPrincipal.userId());

@@ -1,17 +1,21 @@
 package apsas.identity.service;
 
-import apsas.identity.exception.BadRequestException;
-import apsas.identity.exception.ResourceNotFoundException;
-import apsas.identity.exception.UnauthorizedException;
 import apsas.identity.mapper.UserMapper;
-import apsas.identity.model.dto.*;
+import apsas.identity.model.dto.ChangePasswordRequest;
+import apsas.identity.model.dto.CreateUserRequest;
+import apsas.identity.model.dto.UpdateProfileRequest;
+import apsas.identity.model.dto.UserResponse;
 import apsas.identity.model.entity.User;
 import apsas.identity.model.entity.UserRole;
 import apsas.identity.repository.UserRepository;
 import apsas.shared.common.dto.PageResponse;
+import apsas.shared.common.exception.BadRequestException;
+import apsas.shared.common.exception.NotFoundException;
+import apsas.shared.common.exception.UnauthorizedException;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,25 +23,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
-
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final UserMapper userMapper;
-
-  public UserService(
-      UserRepository userRepository, PasswordEncoder passwordEncoder, UserMapper userMapper) {
-    this.userRepository = userRepository;
-    this.passwordEncoder = passwordEncoder;
-    this.userMapper = userMapper;
-  }
 
   @Transactional(readOnly = true)
   public UserResponse getUserById(UUID userId) {
     User user =
         userRepository
             .findById(userId)
-            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+            .orElseThrow(() -> new NotFoundException("User not found"));
     return userMapper.toUserResponse(user);
   }
 
@@ -86,7 +83,7 @@ public class UserService {
     User user =
         userRepository
             .findById(userId)
-            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+            .orElseThrow(() -> new NotFoundException("User not found"));
 
     if (request.getFirstName() != null && !request.getFirstName().isEmpty()) {
       user.setFirstName(request.getFirstName());
@@ -105,7 +102,7 @@ public class UserService {
     User user =
         userRepository
             .findById(userId)
-            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+            .orElseThrow(() -> new NotFoundException("User not found"));
 
     if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPasswordHash())) {
       throw new UnauthorizedException("Current password is incorrect");
@@ -120,7 +117,7 @@ public class UserService {
     User user =
         userRepository
             .findById(userId)
-            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+            .orElseThrow(() -> new NotFoundException("User not found"));
 
     user.setIsActive(false);
     userRepository.save(user);
@@ -131,7 +128,7 @@ public class UserService {
     User user =
         userRepository
             .findById(userId)
-            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+            .orElseThrow(() -> new NotFoundException("User not found"));
 
     user.setIsActive(true);
     userRepository.save(user);
@@ -140,7 +137,7 @@ public class UserService {
   @Transactional
   public void deleteUser(UUID userId) {
     if (!userRepository.existsById(userId)) {
-      throw new ResourceNotFoundException("User not found");
+      throw new NotFoundException("User not found");
     }
     userRepository.deleteById(userId);
   }

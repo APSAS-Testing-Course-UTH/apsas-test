@@ -15,14 +15,19 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
-/** Client for interacting with Piston API v2 */
+/**
+ * Client for interacting with Piston API v2
+ */
 @Component
 public class PistonApiClient {
   private static final Logger logger = LoggerFactory.getLogger(PistonApiClient.class);
 
   private final RestClient restClient;
 
-  public PistonApiClient(@Value("${piston.api.url}") String pistonApiUrl) {
+  public PistonApiClient(
+      @Value("${piston.api.url}")
+      String pistonApiUrl
+  ) {
     this.restClient =
         RestClient.builder()
             .baseUrl(pistonApiUrl)
@@ -38,7 +43,8 @@ public class PistonApiClient {
    */
   @Retryable(
       retryFor = {Exception.class},
-      backoff = @Backoff(delay = 1000, multiplier = 2))
+      backoff = @Backoff(delay = 1000, multiplier = 2)
+  )
   public List<RuntimeResponse> getRuntimes() {
     logger.debug("Fetching supported runtimes from Piston API");
 
@@ -53,13 +59,15 @@ public class PistonApiClient {
                   (request, response) -> {
                     throw new PistonApiException(
                         "Client error when fetching runtimes: " + response.getStatusCode());
-                  })
+                  }
+              )
               .onStatus(
                   HttpStatusCode::is5xxServerError,
                   (request, response) -> {
                     throw new PistonApiException(
                         "Server error when fetching runtimes: " + response.getStatusCode());
-                  })
+                  }
+              )
               .body(new ParameterizedTypeReference<>() {});
 
       logger.info("Successfully fetched {} runtimes from Piston API", runtimes.size());
@@ -79,12 +87,14 @@ public class PistonApiClient {
    */
   @Retryable(
       retryFor = {Exception.class},
-      backoff = @Backoff(delay = 1000, multiplier = 2))
+      backoff = @Backoff(delay = 1000, multiplier = 2)
+  )
   public PistonExecuteResponse execute(PistonExecuteRequest request) {
     logger.debug(
         "Executing code with Piston API - Language: {}, Version: {}",
         request.language(),
-        request.version());
+        request.version()
+    );
 
     try {
       PistonExecuteResponse response =
@@ -97,12 +107,14 @@ public class PistonApiClient {
                   HttpStatusCode::is4xxClientError,
                   (req, res) -> {
                     throw new PistonApiException("Piston API client error: " + res.getStatusCode());
-                  })
+                  }
+              )
               .onStatus(
                   HttpStatusCode::is5xxServerError,
                   (req, res) -> {
                     throw new PistonApiException("Piston API server error: " + res.getStatusCode());
-                  })
+                  }
+              )
               .body(PistonExecuteResponse.class);
 
       logger.debug("Code execution completed successfully");

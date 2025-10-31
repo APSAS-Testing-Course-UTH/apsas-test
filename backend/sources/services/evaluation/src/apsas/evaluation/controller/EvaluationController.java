@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/** REST controller for evaluation-related endpoints */
+/**
+ * REST controller for evaluation-related endpoints
+ */
 @RestController
 @RequestMapping("/api/v1")
 @Tag(name = "Evaluation", description = "Code evaluation management")
@@ -33,12 +35,14 @@ public class EvaluationController {
   @GetMapping("/runtimes")
   @Operation(
       summary = "Get supported runtimes",
-      description = "Returns list of all supported programming languages and their versions")
+      description = "Returns list of all supported programming languages and their versions"
+  )
   @ApiResponses(
       value = {
-        @ApiResponse(responseCode = "200", description = "Successfully retrieved runtimes"),
-        @ApiResponse(responseCode = "500", description = "Internal server error")
-      })
+          @ApiResponse(responseCode = "200", description = "Successfully retrieved runtimes"),
+          @ApiResponse(responseCode = "500", description = "Internal server error")
+      }
+  )
   public ResponseEntity<List<RuntimeResponse>> getSupportedRuntimes() {
     logger.debug("Fetching supported runtimes");
     List<RuntimeResponse> runtimes = evaluationService.getSupportedRuntimes();

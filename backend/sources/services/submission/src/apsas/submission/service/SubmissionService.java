@@ -1,5 +1,17 @@
 package apsas.submission.service;
 
+import apsas.messaging.event.EventPublisher;
+import apsas.messaging.event.RabbitMQConfig;
+import apsas.messaging.event.SubmissionCreatedEvent;
+import apsas.shared.common.dto.PageResponse;
+import apsas.shared.common.exception.NotFoundException;
+import apsas.shared.common.exception.UnauthorizedException;
+import apsas.submission.mapper.SubmissionMapper;
+import apsas.submission.model.dto.CreateSubmissionRequest;
+import apsas.submission.model.dto.SubmissionResponse;
+import apsas.submission.model.entity.Submission;
+import apsas.submission.model.entity.SubmissionStatus;
+import apsas.submission.repository.SubmissionRepository;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -7,18 +19,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import apsas.messaging.event.EventPublisher;
-import apsas.messaging.event.RabbitMQConfig;
-import apsas.messaging.event.SubmissionCreatedEvent;
-import apsas.submission.exception.ResourceNotFoundException;
-import apsas.submission.exception.UnauthorizedException;
-import apsas.submission.mapper.SubmissionMapper;
-import apsas.submission.model.dto.CreateSubmissionRequest;
-import apsas.submission.model.dto.SubmissionResponse;
-import apsas.shared.common.dto.PageResponse;
-import apsas.submission.model.entity.Submission;
-import apsas.submission.model.entity.SubmissionStatus;
-import apsas.submission.repository.SubmissionRepository;
 
 @Service
 public class SubmissionService {
@@ -30,7 +30,8 @@ public class SubmissionService {
   public SubmissionService(
       SubmissionRepository submissionRepository,
       SubmissionMapper submissionMapper,
-      EventPublisher eventPublisher) {
+      EventPublisher eventPublisher
+  ) {
     this.submissionRepository = submissionRepository;
     this.submissionMapper = submissionMapper;
     this.eventPublisher = eventPublisher;
@@ -42,7 +43,8 @@ public class SubmissionService {
       UUID assignmentId,
       UUID filterStudentId,
       SubmissionStatus status,
-      boolean isInstructor) {
+      boolean isInstructor
+  ) {
     List<Submission> submissions;
 
     if (isInstructor) {
@@ -72,16 +74,27 @@ public class SubmissionService {
       UUID filterStudentId,
       SubmissionStatus status,
       boolean isInstructor,
-      Pageable pageable) {
+      Pageable pageable
+  ) {
     Page<Submission> submissionPage;
 
     if (isInstructor) {
       // Instructors can filter by assignment, student, and status with pagination
-      submissionPage = submissionRepository.findByFilters(assignmentId, filterStudentId, status, pageable);
+      submissionPage = submissionRepository.findByFilters(
+          assignmentId,
+          filterStudentId,
+          status,
+          pageable
+      );
     } else {
       // Students can only see their own submissions
       // For students, we need to use findByFilters with their studentId
-      submissionPage = submissionRepository.findByFilters(assignmentId, studentId, status, pageable);
+      submissionPage = submissionRepository.findByFilters(
+          assignmentId,
+          studentId,
+          status,
+          pageable
+      );
     }
 
     Page<SubmissionResponse> responsePage = submissionPage.map(submissionMapper::toResponse);
@@ -93,8 +106,7 @@ public class SubmissionService {
     Submission submission =
         submissionRepository
             .findById(id)
-            .orElseThrow(
-                () -> new ResourceNotFoundException("Submission not found with id: " + id));
+            .orElseThrow(() -> new NotFoundException("Submission not found with id: " + id));
 
     // Students can only view their own submissions
     if (!isInstructor && !submission.getStudentId().equals(studentId)) {
@@ -127,9 +139,8 @@ public class SubmissionService {
     Submission submission =
         submissionRepository
             .findById(submissionId)
-            .orElseThrow(
-                () ->
-                    new ResourceNotFoundException("Submission not found with id: " + submissionId));
+            .orElseThrow(() -> new NotFoundException(
+                "Submission not found with id: " + submissionId));
 
     submission.setStatus(evaluationResult.getStatus());
     submission.setResult(evaluationResult.getResult());
@@ -153,7 +164,7 @@ public class SubmissionService {
             .findById(submissionId)
             .orElseThrow(
                 () ->
-                    new ResourceNotFoundException("Submission not found with id: " + submissionId));
+                    new NotFoundException("Submission not found with id: " + submissionId));
 
     submission.setFeedback(feedback);
     Submission updatedSubmission = submissionRepository.save(submission);

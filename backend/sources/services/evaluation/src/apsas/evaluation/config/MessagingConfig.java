@@ -8,7 +8,9 @@ import org.springframework.amqp.core.TopicExchange;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/** RabbitMQ configuration for Evaluation Service */
+/**
+ * RabbitMQ configuration for Evaluation Service
+ */
 @Configuration
 public class MessagingConfig {
 

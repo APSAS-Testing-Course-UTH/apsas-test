@@ -1,19 +1,12 @@
 package apsas.identity.model.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.RequiredArgsConstructor;
 
-@Setter
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AuthResponse {
-  private String token;
-  private String type = "Bearer";
-  private UserResponse user;
-
-  public AuthResponse(String token, UserResponse user) {
-    this.token = token;
-    this.user = user;
-  }
+  private final String token;
+  private final String type = "Bearer";
+  private final UserResponse user;
 }

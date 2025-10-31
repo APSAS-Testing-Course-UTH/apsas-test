@@ -3,6 +3,7 @@ package apsas.identity.security;
 import apsas.identity.model.entity.User;
 import apsas.shared.security.JwtClaims;
 import java.time.Instant;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwsHeader;
@@ -12,6 +13,7 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class JwtTokenProvider {
   private final JwtEncoder jwtEncoder;
 
@@ -20,10 +22,6 @@ public class JwtTokenProvider {
 
   @Value("${jwt.expiration}")
   private long jwtExpiration;
-
-  public JwtTokenProvider(JwtEncoder jwtEncoder) {
-    this.jwtEncoder = jwtEncoder;
-  }
 
   public String generateToken(User user) {
     var now = Instant.now();
@@ -42,7 +40,8 @@ public class JwtTokenProvider {
                     .claim(JwtClaims.IS_ACTIVE, user.getIsActive())
                     .claim(JwtClaims.FIRST_NAME, user.getFirstName())
                     .claim(JwtClaims.LAST_NAME, user.getLastName())
-                    .build()))
+                    .build()
+            ))
         .getTokenValue();
   }
 }

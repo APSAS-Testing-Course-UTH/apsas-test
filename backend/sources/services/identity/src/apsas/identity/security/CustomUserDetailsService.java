@@ -4,19 +4,17 @@ import apsas.identity.model.entity.User;
 import apsas.identity.repository.UserRepository;
 import apsas.shared.security.UserPrincipal;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
   private final UserRepository userRepository;
-
-  public CustomUserDetailsService(UserRepository userRepository) {
-    this.userRepository = userRepository;
-  }
 
   @Override
   public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
@@ -28,7 +26,8 @@ public class CustomUserDetailsService implements UserDetailsService {
           user.getFirstName(),
           user.getLastName(),
           user.getRole().name(),
-          user.getIsActive());
+          user.getIsActive()
+      );
     } catch (IllegalArgumentException e) {
       throw new UsernameNotFoundException("Invalid user ID format: " + userId);
     }

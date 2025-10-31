@@ -22,7 +22,8 @@ public class NotificationPreferencesService {
 
   public NotificationPreferencesService(
       NotificationPreferencesRepository preferencesRepository,
-      NotificationPreferencesMapper preferencesMapper) {
+      NotificationPreferencesMapper preferencesMapper
+  ) {
     this.preferencesRepository = preferencesRepository;
     this.preferencesMapper = preferencesMapper;
   }

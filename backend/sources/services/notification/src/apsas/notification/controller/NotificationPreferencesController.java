@@ -11,13 +11,18 @@ import jakarta.validation.Valid;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/preferences")
 @Tag(
     name = "Notification Preferences",
-    description = "Notification preferences management endpoints")
+    description = "Notification preferences management endpoints"
+)
 @SecurityRequirement(name = "Bearer Authentication")
 public class NotificationPreferencesController {
 
@@ -30,9 +35,11 @@ public class NotificationPreferencesController {
   @GetMapping
   @Operation(
       summary = "Get notification preferences",
-      description = "Get notification preferences for the current user")
+      description = "Get notification preferences for the current user"
+  )
   public ResponseEntity<NotificationPreferencesResponse> getPreferences(
-      Authentication authentication) {
+      Authentication authentication
+  ) {
     UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
     UUID userId = userPrincipal.userId();
     NotificationPreferencesResponse response = preferencesService.getPreferences(userId);
@@ -42,9 +49,13 @@ public class NotificationPreferencesController {
   @PutMapping
   @Operation(
       summary = "Update notification preferences",
-      description = "Update notification preferences for the current user")
+      description = "Update notification preferences for the current user"
+  )
   public ResponseEntity<NotificationPreferencesResponse> updatePreferences(
-      @Valid @RequestBody NotificationPreferencesRequest request, Authentication authentication) {
+      @Valid
+      @RequestBody
+      NotificationPreferencesRequest request, Authentication authentication
+  ) {
     UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
     UUID userId = userPrincipal.userId();
     NotificationPreferencesResponse response =

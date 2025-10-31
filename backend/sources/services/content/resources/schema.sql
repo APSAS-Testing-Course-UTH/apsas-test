@@ -4,150 +4,58 @@ CREATE SCHEMA IF NOT EXISTS content;
 -- Skills Table
 CREATE TABLE IF NOT EXISTS content.skills
 (
-    id
-    UUID
-    PRIMARY
-    KEY
-    DEFAULT
-    gen_random_uuid
-(
-),
-    name VARCHAR
-(
-    255
-) UNIQUE NOT NULL,
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name        VARCHAR(255) UNIQUE NOT NULL,
     description TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
+    created_at  TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP        DEFAULT CURRENT_TIMESTAMP
+);
 
 -- Assignments Table
 CREATE TABLE IF NOT EXISTS content.assignments
 (
-    id
-    UUID
-    PRIMARY
-    KEY
-    DEFAULT
-    gen_random_uuid
-(
-),
-    title VARCHAR
-(
-    255
-) NOT NULL,
-    description TEXT NOT NULL,
-    difficulty_level VARCHAR
-(
-    50
-) NOT NULL CHECK
-(
-    difficulty_level
-    IN
-(
-    'EASY',
-    'MEDIUM',
-    'HARD'
-)),
-    creator_id UUID NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    start_date TIMESTAMP,
-    due_date TIMESTAMP,
-    max_score DECIMAL
-(
-    5,
-    2
-) NOT NULL,
-    status VARCHAR
-(
-    50
-) NOT NULL CHECK
-(
-    status
-    IN
-(
-    'DRAFT',
-    'PUBLISHED',
-    'ARCHIVED'
-)),
-    languages JSONB NOT NULL,
-    test_cases JSONB NOT NULL
-    );
+    id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    title            VARCHAR(255)  NOT NULL,
+    description      TEXT          NOT NULL,
+    difficulty_level VARCHAR(50)   NOT NULL CHECK (difficulty_level IN ('EASY', 'MEDIUM', 'HARD')),
+    creator_id       UUID          NOT NULL,
+    created_at       TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
+    updated_at       TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
+    start_date       TIMESTAMP,
+    due_date         TIMESTAMP,
+    max_score        DECIMAL(5, 2) NOT NULL,
+    status           VARCHAR(50)   NOT NULL CHECK (status IN ('DRAFT', 'PUBLISHED', 'ARCHIVED')),
+    languages        JSONB         NOT NULL,
+    test_cases       JSONB         NOT NULL
+);
 
 -- Tutorials Table
 CREATE TABLE IF NOT EXISTS content.tutorials
 (
-    id
-    UUID
-    PRIMARY
-    KEY
-    DEFAULT
-    gen_random_uuid
-(
-),
-    title VARCHAR
-(
-    255
-) NOT NULL,
-    content TEXT NOT NULL,
-    creator_id UUID NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    tags JSONB
-    );
+    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    title      VARCHAR(255) NOT NULL,
+    content    TEXT         NOT NULL,
+    creator_id UUID         NOT NULL,
+    created_at TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
+    tags       JSONB
+);
 
 -- Assignment-Skill Association Table (Many-to-Many)
 CREATE TABLE IF NOT EXISTS content.assignment_skills
 (
-    assignment_id
-    UUID
-    NOT
-    NULL
-    REFERENCES
-    content
-    .
-    assignments
-(
-    id
-) ON DELETE CASCADE,
-    skill_id UUID NOT NULL REFERENCES content.skills
-(
-    id
-)
-  ON DELETE CASCADE,
-    PRIMARY KEY
-(
-    assignment_id,
-    skill_id
-)
-    );
+    assignment_id UUID NOT NULL REFERENCES content.assignments (id) ON DELETE CASCADE,
+    skill_id      UUID NOT NULL REFERENCES content.skills (id) ON DELETE CASCADE,
+    PRIMARY KEY (assignment_id, skill_id)
+);
 
 -- Assignment-Tutorial Association Table (Many-to-Many)
 CREATE TABLE IF NOT EXISTS content.assignment_tutorials
 (
-    assignment_id
-    UUID
-    NOT
-    NULL
-    REFERENCES
-    content
-    .
-    assignments
-(
-    id
-) ON DELETE CASCADE,
-    tutorial_id UUID NOT NULL REFERENCES content.tutorials
-(
-    id
-)
-  ON DELETE CASCADE,
-    PRIMARY KEY
-(
-    assignment_id,
-    tutorial_id
-)
-    );
+    assignment_id UUID NOT NULL REFERENCES content.assignments (id) ON DELETE CASCADE,
+    tutorial_id   UUID NOT NULL REFERENCES content.tutorials (id) ON DELETE CASCADE,
+    PRIMARY KEY (assignment_id, tutorial_id)
+);
 
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_assignments_creator_id ON content.assignments (creator_id);

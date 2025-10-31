@@ -65,7 +65,8 @@ public class FirebaseConfig {
               privateKey.replace("\\n", "\n"),
               clientEmail,
               clientId,
-              clientEmail.replace("@", "%40"));
+              clientEmail.replace("@", "%40")
+          );
 
       GoogleCredentials credentials =
           GoogleCredentials.fromStream(

@@ -11,7 +11,8 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 
 @Mapper(
     componentModel = "spring",
-    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
+)
 public interface SkillMapper {
 
   @Mapping(target = "id", ignore = true)
@@ -24,7 +25,10 @@ public interface SkillMapper {
   @Mapping(target = "createdAt", ignore = true)
   @Mapping(target = "updatedAt", ignore = true)
   @Mapping(target = "assignments", ignore = true)
-  void updateEntity(@MappingTarget Skill skill, UpdateSkillRequest request);
+  void updateEntity(
+      @MappingTarget
+      Skill skill, UpdateSkillRequest request
+  );
 
   SkillResponse toResponse(Skill skill);
 }

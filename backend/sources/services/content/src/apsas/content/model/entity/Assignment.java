@@ -1,7 +1,19 @@
 package apsas.content.model.entity;
 
 import io.hypersistence.utils.hibernate.type.json.JsonType;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -67,7 +79,8 @@ public class Assignment {
       name = "assignment_skills",
       schema = "content",
       joinColumns = @JoinColumn(name = "assignment_id"),
-      inverseJoinColumns = @JoinColumn(name = "skill_id"))
+      inverseJoinColumns = @JoinColumn(name = "skill_id")
+  )
   private Set<Skill> skills = new HashSet<>();
 
   @ManyToMany
@@ -75,7 +88,8 @@ public class Assignment {
       name = "assignment_tutorials",
       schema = "content",
       joinColumns = @JoinColumn(name = "assignment_id"),
-      inverseJoinColumns = @JoinColumn(name = "tutorial_id"))
+      inverseJoinColumns = @JoinColumn(name = "tutorial_id")
+  )
   private Set<Tutorial> tutorials = new HashSet<>();
 
   @PrePersist

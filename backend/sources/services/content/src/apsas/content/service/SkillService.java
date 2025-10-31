@@ -1,7 +1,5 @@
 package apsas.content.service;
 
-import apsas.content.exception.BadRequestException;
-import apsas.content.exception.ResourceNotFoundException;
 import apsas.content.mapper.SkillMapper;
 import apsas.content.model.dto.CreateSkillRequest;
 import apsas.content.model.dto.SkillResponse;
@@ -9,6 +7,8 @@ import apsas.content.model.dto.UpdateSkillRequest;
 import apsas.content.model.entity.Skill;
 import apsas.content.repository.SkillRepository;
 import apsas.shared.common.dto.PageResponse;
+import apsas.shared.common.exception.BadRequestException;
+import apsas.shared.common.exception.NotFoundException;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -47,7 +47,7 @@ public class SkillService {
     Skill skill =
         skillRepository
             .findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Skill not found with id: " + id));
+            .orElseThrow(() -> new NotFoundException("Skill not found with id: " + id));
     return skillMapper.toResponse(skill);
   }
 
@@ -67,7 +67,7 @@ public class SkillService {
     Skill skill =
         skillRepository
             .findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Skill not found with id: " + id));
+            .orElseThrow(() -> new NotFoundException("Skill not found with id: " + id));
 
     if (request.getName() != null && !request.getName().equals(skill.getName())) {
       if (skillRepository.existsByName(request.getName())) {
@@ -83,7 +83,7 @@ public class SkillService {
   @Transactional
   public void deleteSkill(UUID id) {
     if (!skillRepository.existsById(id)) {
-      throw new ResourceNotFoundException("Skill not found with id: " + id);
+      throw new NotFoundException("Skill not found with id: " + id);
     }
     skillRepository.deleteById(id);
   }

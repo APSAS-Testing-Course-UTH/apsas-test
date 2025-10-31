@@ -1,6 +1,12 @@
 package apsas.notification.service;
 
-import com.google.firebase.messaging.*;
+import com.google.firebase.messaging.BatchResponse;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingException;
+import com.google.firebase.messaging.Message;
+import com.google.firebase.messaging.MulticastMessage;
+import com.google.firebase.messaging.Notification;
+import com.google.firebase.messaging.SendResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +69,8 @@ public class FcmService implements IFcmService {
       logger.info(
           "Successfully sent multicast FCM message. Success: {}, Failure: {}",
           response.getSuccessCount(),
-          response.getFailureCount());
+          response.getFailureCount()
+      );
 
       if (response.getFailureCount() > 0) {
         handleBatchResponseFailures(tokens, response);
@@ -159,7 +166,8 @@ public class FcmService implements IFcmService {
             "submissionId",
             submissionId,
             "score",
-            String.valueOf(score));
+            String.valueOf(score)
+        );
     sendNotification(token, title, body, data);
   }
 }

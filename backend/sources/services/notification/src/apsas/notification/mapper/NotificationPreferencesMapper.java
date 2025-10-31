@@ -9,11 +9,15 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 
 @Mapper(
     componentModel = "spring",
-    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
+)
 public interface NotificationPreferencesMapper {
 
   NotificationPreferencesResponse toResponse(NotificationPreferences preferences);
 
   void updateEntity(
-      NotificationPreferencesRequest request, @MappingTarget NotificationPreferences preferences);
+      NotificationPreferencesRequest request,
+      @MappingTarget
+      NotificationPreferences preferences
+  );
 }

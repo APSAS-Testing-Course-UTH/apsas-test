@@ -27,7 +27,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-/** Service for evaluating code submissions */
+/**
+ * Service for evaluating code submissions
+ */
 @Service
 @AllArgsConstructor
 public class EvaluationService {
@@ -66,7 +68,8 @@ public class EvaluationService {
             "Unsupported language: "
                 + event.getLanguage()
                 + ". Allowed languages: "
-                + String.join(", ", assignment.languages()));
+                + String.join(", ", assignment.languages())
+        );
         return;
       }
 
@@ -102,7 +105,8 @@ public class EvaluationService {
           "Evaluation completed for submission: {} with result: {} and score: {}",
           event.getSubmissionId(),
           result,
-          score);
+          score
+      );
 
     } catch (Exception e) {
       logger.error("Error evaluating submission: {}", event.getSubmissionId(), e);
@@ -113,7 +117,7 @@ public class EvaluationService {
   /**
    * Execute a single test case asynchronously
    *
-   * @param code Student's code
+   * @param code     Student's code
    * @param language Programming language
    * @param testCase Test case to execute
    * @return Test case result
@@ -190,7 +194,7 @@ public class EvaluationService {
   /**
    * Create Piston execute request from code and test case
    *
-   * @param code Student's code
+   * @param code     Student's code
    * @param language Programming language
    * @param testCase Test case
    * @return Piston execute request
@@ -239,7 +243,7 @@ public class EvaluationService {
    * Compare expected and actual outputs
    *
    * @param expected Expected output
-   * @param actual Actual output
+   * @param actual   Actual output
    * @return True if outputs match
    */
   private boolean compareOutputs(String expected, String actual) {
@@ -311,7 +315,7 @@ public class EvaluationService {
   /**
    * Check if language is supported by the assignment
    *
-   * @param language Language to check
+   * @param language         Language to check
    * @param allowedLanguages Allowed languages for the assignment
    * @return True if language is supported
    */
@@ -348,7 +352,8 @@ public class EvaluationService {
             SubmissionResult.FAILED,
             BigDecimal.ZERO,
             List.of(errorResult),
-            LocalDateTime.now());
+            LocalDateTime.now()
+        );
 
     eventPublisher.publish(RabbitMQConfig.SUBMISSION_EVALUATED_ROUTING_KEY, event);
   }

@@ -11,4 +11,5 @@ public record SupportSessionDto(
     Boolean isClosed,
     LocalDateTime createdAt,
     LocalDateTime closedAt,
-    List<SupportMessageDto> messages) {}
+    List<SupportMessageDto> messages
+) {}

@@ -9,4 +9,5 @@ public record SupportMessageDto(
     String content,
     Boolean isInstructor,
     Boolean isRead,
-    LocalDateTime createdAt) {}
+    LocalDateTime createdAt
+) {}

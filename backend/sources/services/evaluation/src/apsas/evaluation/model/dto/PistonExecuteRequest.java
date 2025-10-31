@@ -2,7 +2,9 @@ package apsas.evaluation.model.dto;
 
 import java.util.List;
 
-/** Request model for Piston API execute endpoint */
+/**
+ * Request model for Piston API execute endpoint
+ */
 public record PistonExecuteRequest(
     String language,
     String version,
@@ -12,7 +14,8 @@ public record PistonExecuteRequest(
     Integer runTimeout,
     Integer compileTimeout,
     Long compileMemoryLimit,
-    Long runMemoryLimit) {
+    Long runMemoryLimit
+) {
   public PistonExecuteRequest(
       String language,
       String version,
@@ -20,7 +23,8 @@ public record PistonExecuteRequest(
       String stdin,
       Integer runTimeout,
       Integer compileTimeout,
-      Long runMemoryLimit) {
+      Long runMemoryLimit
+  ) {
     this(
         language,
         version,
@@ -30,7 +34,8 @@ public record PistonExecuteRequest(
         runTimeout,
         compileTimeout,
         -1L,
-        runMemoryLimit); // No limit
+        runMemoryLimit
+    ); // No limit
   }
 
   public record FileContent(String name, String content, String encoding) {

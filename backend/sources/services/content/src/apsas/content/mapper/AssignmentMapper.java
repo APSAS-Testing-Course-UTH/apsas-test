@@ -18,7 +18,8 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 @Mapper(
     componentModel = "spring",
     nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
-    uses = {SkillMapper.class, TutorialMapper.class})
+    uses = {SkillMapper.class, TutorialMapper.class}
+)
 public interface AssignmentMapper {
 
   @Mapping(target = "id", ignore = true)
@@ -36,7 +37,10 @@ public interface AssignmentMapper {
   @Mapping(target = "status", ignore = true)
   @Mapping(target = "skills", ignore = true)
   @Mapping(target = "tutorials", ignore = true)
-  void updateEntity(@MappingTarget Assignment assignment, UpdateAssignmentRequest request);
+  void updateEntity(
+      @MappingTarget
+      Assignment assignment, UpdateAssignmentRequest request
+  );
 
   @Mapping(target = "skills", source = "skills")
   @Mapping(target = "tutorials", source = "tutorials")

@@ -39,7 +39,8 @@ public class UserEventListener {
           event.getEmail(),
           event.getFirstName(),
           event.getLastName(),
-          event.getVerificationToken());
+          event.getVerificationToken()
+      );
 
       logger.info("Sent verification email to: {}", event.getEmail());
     } catch (Exception e) {
