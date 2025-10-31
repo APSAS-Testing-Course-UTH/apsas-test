@@ -1,0 +1,30 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="notification-service [dev]" type="AmperGenericRunConfigurationType" factoryName="Amper" folderName="services">
+    <ExternalSystemSettings>
+      <option name="env">
+        <map>
+          <entry key="SPRING_PROFILES_ACTIVE" value="dev" />
+        </map>
+      </option>
+      <option name="executionName" />
+      <option name="externalProjectPath" value="$PROJECT_DIR$" />
+      <option name="externalSystemIdString" value="AMPER" />
+      <option name="scriptParameters" />
+      <option name="taskDescriptions">
+        <list />
+      </option>
+      <option name="taskNames">
+        <list>
+          <option value="run" />
+          <option value="-m" />
+          <option value="notification" />
+        </list>
+      </option>
+      <option name="vmOptions" />
+    </ExternalSystemSettings>
+    <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+    <ExternalSystemReattachDebugProcess>false</ExternalSystemReattachDebugProcess>
+    <ExternalSystemDebugDisabled>false</ExternalSystemDebugDisabled>
+    <method v="2" />
+  </configuration>
+</component>

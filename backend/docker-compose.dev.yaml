@@ -1,3 +1,4 @@
+name: apasas-backend-dev
 services:
   # Infrastructure Services
   postgres:
@@ -28,6 +29,16 @@ services:
     networks:
       - apsas-backend
 
+  mailpit:
+    image: axllent/mailpit:latest
+    volumes:
+      - mailpit_data:/data
+    networks:
+      - apsas-backend
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+
 networks:
   apsas-backend:
     driver: bridge
@@ -35,3 +46,4 @@ networks:
 volumes:
   postgres_data:
   rabbitmq_data:
+  mailpit_data:

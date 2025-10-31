@@ -1,0 +1,10 @@
+firebase:
+  enabled: true
+  project-id: ${FIREBASE_PROJECT_ID}
+  credentials:
+    type: ${FIREBASE_CREDENTIALS_TYPE:service_account}
+    project-id: ${FIREBASE_CREDENTIALS_PROJECT_ID:${firebase.project-id}}
+    private-key-id: ${FIREBASE_PRIVATE_KEY_ID}
+    private-key: ${FIREBASE_PRIVATE_KEY}
+    client-email: ${FIREBASE_CLIENT_EMAIL}
+    client-id: ${FIREBASE_CLIENT_ID}

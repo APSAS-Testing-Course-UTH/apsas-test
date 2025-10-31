@@ -8,4 +8,23 @@ settings:
   jvm:
     mainClass: apsas.notification.NotificationServiceApplication
 
+  java:
+    annotationProcessing:
+      processors:
+        - $libs.mapstruct.processor
+
 dependencies:
+  - ../../shared/messaging
+  - ../../shared/common
+  - ../../shared/security
+  - $spring.boot.starter.web
+  - $spring.boot.starter.data.jpa
+  - $spring.boot.starter.mail
+  - $spring.boot.starter.thymeleaf
+  - $spring.boot.starter.validation
+  - $spring.boot.starter.amqp
+  - $libs.postgresql
+  - $libs.springdoc.openapi.starter.webmvc.api
+  - $libs.firebase.admin
+  - $libs.protobuf.java.util
+  - $libs.mapstruct

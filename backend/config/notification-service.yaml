@@ -4,5 +4,25 @@ server:
 spring:
   config:
     import:
+      - file:./config/fragments/database.yaml
+      - file:./config/fragments/springdoc.yaml
       - file:./config/fragments/rabbitmq.yaml
       - file:./config/fragments/eureka-client.yaml
+      - file:./config/fragments/mail.yaml
+      - file:./config/fragments/firebase.yaml
+
+notification:
+  email:
+    from: ${EMAIL_FROM:noreply@apsas.edu.vn}
+    from-name: ${EMAIL_FROM_NAME:APSAS System}
+    verification-url: ${VERIFICATION_BASE_URL:http://localhost:3000}/verify-email
+    reset-password-url: ${RESET_PASSWORD_BASE_URL:http://localhost:3000}/reset-password
+  rate-limit:
+    enabled: ${RATE_LIMIT_ENABLED:true}
+    window-minutes: ${RATE_LIMIT_WINDOW_MINUTES:60}
+    limits:
+      email-verification: 3
+      password-reset: 3
+      assignment-published: 10
+      assignment-reminder: 10
+      submission-evaluated: 20

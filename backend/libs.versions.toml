@@ -3,6 +3,8 @@ spring-cloud = "2025.0.0"
 springdoc = "2.8.13"
 hypersistence-utils-hibernate = "3.11.0"
 mapstruct = "1.6.3"
+firebase-admin = "9.4.2"
+protobuf = "4.32.1"
 
 [libraries]
 spring-cloud-dependencies = { module = "org.springframework.cloud:spring-cloud-dependencies", version.ref = "spring-cloud" }
@@ -21,6 +23,9 @@ hypersistence-utils-hibernate63 = { module = "io.hypersistence:hypersistence-uti
 
 mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "mapstruct" }
 mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "mapstruct" }
+
+firebase-admin = { module = "com.google.firebase:firebase-admin", version.ref = "firebase-admin" }
+protobuf-java-util = { module = "com.google.protobuf:protobuf-java-util", version.ref = "protobuf" }
 
 # Version is managed by Spring Boot
 spring-security-oauth2-jose = "org.springframework.security:spring-security-oauth2-jose"
