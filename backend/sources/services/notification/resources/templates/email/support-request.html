@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yêu Cầu Hỗ Trợ Mới</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .header {
+      text-align: center;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #ff6b6b;
+    }
+
+    .header h1 {
+      color: #ff6b6b;
+      margin: 0;
+    }
+
+    .content {
+      padding: 30px 0;
+    }
+
+    .info-box {
+      background-color: #fff3f3;
+      padding: 15px;
+      border-left: 4px solid #ff6b6b;
+      margin: 20px 0;
+    }
+
+    .message-box {
+      background-color: #f8f9fa;
+      padding: 15px;
+      border-radius: 5px;
+      margin: 20px 0;
+      font-style: italic;
+    }
+
+    .button {
+      display: inline-block;
+      padding: 12px 30px;
+      background-color: #ff6b6b;
+      color: #ffffff;
+      text-decoration: none;
+      border-radius: 5px;
+      margin: 20px 0;
+    }
+
+    .footer {
+      text-align: center;
+      padding-top: 20px;
+      border-top: 1px solid #eeeeee;
+      color: #999999;
+      font-size: 12px;
+    }
+
+    .student-info {
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>APSAS</h1>
+  </div>
+  <div class="content">
+    <h2>🆘 Yêu Cầu Hỗ Trợ Mới</h2>
+    <p>Xin chào <span th:text="${instructorName}">Instructor</span>,</p>
+    <p>Một sinh viên đã yêu cầu hỗ trợ và cần sự giúp đỡ của bạn.</p>
+    <div class="info-box">
+      <div class="student-info">
+        <p><strong>Sinh viên:</strong> <span th:text="${studentName}">Student Name</span></p>
+        <p><strong>Email:</strong> <a th:href="'mailto:' + ${studentEmail}"
+                                      th:text="${studentEmail}">student@email.com</a></p>
+      </div>
+    </div>
+    <p><strong>Tin Nhắn Ban Đầu:</strong></p>
+    <div class="message-box">
+      <p th:text="${initialMessage}">The student's initial message will appear here...</p>
+    </div>
+    <div style="text-align: center;">
+      <a th:href="${sessionUrl}" class="button">Xem Phiên Hỗ Trợ</a>
+    </div>
+    <p>Vui lòng phản hồi sinh viên sớm nhất có thể để cung cấp sự hỗ trợ mà họ cần.</p>
+  </div>
+  <div class="footer">
+    <p>&copy; 2025 APSAS. Bản quyền thuộc về APSAS.</p>
+  </div>
+</div>
+</body>
+</html>

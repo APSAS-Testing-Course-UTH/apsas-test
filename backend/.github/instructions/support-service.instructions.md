@@ -1,6 +1,10 @@
 # Support Service Instructions
 
-Support service is a microservice responsible for simple realtime chat support system between students and instructors. Students can create chat sessions to ask questions and get help from instructors. Instructors can view and respond to student support requests.
+Support service is a microservices responsible for simple realtime chat support system between students and instructors. Students can create chat sessions to ask questions and get help from instructors. Instructors can view and respond to student support requests.
+
+## Port
+
+- **Default**: 8085
 
 ## Permissions
 
@@ -35,6 +39,18 @@ Support service is a microservice responsible for simple realtime chat support s
 | GET    | /api/v1/support/sessions/{id}       | Get support session by ID (instructors can view all, students can view their own) | Student, Instructor |
 | POST   | /api/v1/support/sessions            | Create a new support session                                                      | Student             |
 | POST   | /api/v1/support/sessions/{id}/close | Close a support session (only the student who created it can close it)            | Student             |
+
+## WebSocket Implementation
+
+Support Service uses **Spring WebSocket with STOMP protocol** for real-time chat functionality:
+
+- Authenticated via JWT token in WebSocket connection handshake
+- Real-time bidirectional communication between students and instructors
+- Messages are persisted in the database for history
+
+### Configuration
+
+See `sources/services/support/src/apsas/support/config/WebSocketConfig.java` for WebSocket configuration.
 
 ## WebSocket Endpoints
 

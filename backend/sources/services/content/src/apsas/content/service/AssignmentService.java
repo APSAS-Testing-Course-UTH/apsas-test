@@ -12,54 +12,32 @@ import apsas.content.model.entity.Tutorial;
 import apsas.content.repository.AssignmentRepository;
 import apsas.content.repository.SkillRepository;
 import apsas.content.repository.TutorialRepository;
-import apsas.messaging.event.AssignmentPublishedEvent;
-import apsas.messaging.event.AssignmentScheduleUpdatedEvent;
-import apsas.messaging.event.EventPublisher;
-import apsas.messaging.event.RabbitMQConfig;
-import apsas.shared.common.dto.PageResponse;
-import apsas.shared.common.exception.BadRequestException;
-import apsas.shared.common.exception.NotFoundException;
-import apsas.shared.common.exception.UnauthorizedException;
+import apsas.shared.exception.BadRequestException;
+import apsas.shared.exception.NotFoundException;
+import apsas.shared.exception.UnauthorizedException;
+import apsas.shared.messaging.config.RabbitMqConfig;
+import apsas.shared.messaging.event.AssignmentPublishedEvent;
+import apsas.shared.messaging.event.AssignmentScheduleUpdatedEvent;
+import apsas.shared.messaging.event.EventPublisher;
+import apsas.shared.models.pagination.PageResponse;
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class AssignmentService {
-
   private final AssignmentRepository assignmentRepository;
   private final SkillRepository skillRepository;
   private final TutorialRepository tutorialRepository;
   private final AssignmentMapper assignmentMapper;
   private final EventPublisher eventPublisher;
-
-  public AssignmentService(
-      AssignmentRepository assignmentRepository,
-      SkillRepository skillRepository,
-      TutorialRepository tutorialRepository,
-      AssignmentMapper assignmentMapper,
-      EventPublisher eventPublisher
-  ) {
-    this.assignmentRepository = assignmentRepository;
-    this.skillRepository = skillRepository;
-    this.tutorialRepository = tutorialRepository;
-    this.assignmentMapper = assignmentMapper;
-    this.eventPublisher = eventPublisher;
-  }
-
-  @Transactional(readOnly = true)
-  public List<AssignmentResponse> getAllAssignments() {
-    return assignmentRepository.findAll().stream()
-        .map(assignmentMapper::toResponse)
-        .collect(Collectors.toList());
-  }
 
   @Transactional(readOnly = true)
   public PageResponse<AssignmentResponse> getAllAssignments(Pageable pageable) {
@@ -175,7 +153,7 @@ public class AssignmentService {
     AssignmentScheduleUpdatedEvent event =
         new AssignmentScheduleUpdatedEvent(
             assignment.getId(), request.getStartDate(), request.getDueDate(), LocalDateTime.now());
-    eventPublisher.publish(RabbitMQConfig.ASSIGNMENT_SCHEDULE_UPDATED_ROUTING_KEY, event);
+    eventPublisher.publish(RabbitMqConfig.ASSIGNMENT_SCHEDULE_UPDATED_ROUTING_KEY, event);
 
     return assignmentMapper.toResponse(updatedAssignment);
   }
@@ -218,7 +196,7 @@ public class AssignmentService {
     AssignmentPublishedEvent event =
         new AssignmentPublishedEvent(
             assignment.getId(), assignment.getTitle(), LocalDateTime.now());
-    eventPublisher.publish(RabbitMQConfig.ASSIGNMENT_PUBLISHED_ROUTING_KEY, event);
+    eventPublisher.publish(RabbitMqConfig.ASSIGNMENT_PUBLISHED_ROUTING_KEY, event);
 
     return assignmentMapper.toResponse(publishedAssignment);
   }

@@ -54,9 +54,4 @@ public class SupportSession {
     messages.add(message);
     message.setSession(this);
   }
-
-  public void removeMessage(SupportMessage message) {
-    messages.remove(message);
-    message.setSession(null);
-  }
 }

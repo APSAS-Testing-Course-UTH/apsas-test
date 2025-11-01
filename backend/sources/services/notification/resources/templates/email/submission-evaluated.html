@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Submission Evaluated</title>
+  <title>Bài Nộp Đã Được Chấm</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -93,30 +93,30 @@
     <h1>APSAS</h1>
   </div>
   <div class="content">
-    <h2>Your Submission Has Been Evaluated</h2>
-    <p>Hi <span th:text="${firstName}">Student</span>,</p>
-    <p>Your submission for <strong th:text="${assignmentTitle}">Assignment</strong> has been
-      evaluated.</p>
+    <h2>Bài Nộp Của Bạn Đã Được Chấm</h2>
+    <p>Xin chào <span th:text="${firstName}">Student</span>,</p>
+    <p>Bài nộp của bạn cho <strong th:text="${assignmentTitle}">Assignment</strong> đã được
+      chấm.</p>
     <div class="score" th:text="${score} + '/100'">85/100</div>
     <div class="status" th:classappend="${passed} ? 'passed' : 'failed'">
-      <strong th:text="${passed} ? 'PASSED ✓' : 'NEEDS IMPROVEMENT'"></strong>
+      <strong th:text="${passed} ? 'ĐẠT ✓' : 'CẦN CẢI THIỆN'"></strong>
     </div>
     <div class="result-box">
-      <h3>Evaluation Results</h3>
-      <p><strong>Test Cases Passed:</strong> <span th:text="${testsPassed}">8</span> / <span
+      <h3>Kết Quả Đánh Giá</h3>
+      <p><strong>Test Cases Đạt:</strong> <span th:text="${testsPassed}">8</span> / <span
           th:text="${totalTests}">10</span></p>
-      <p><strong>Execution Time:</strong> <span th:text="${executionTime}">125ms</span></p>
+      <p><strong>Thời Gian Thực Thi:</strong> <span th:text="${executionTime}">125ms</span></p>
       <div th:if="${feedback}">
-        <h4>Feedback:</h4>
+        <h4>Nhận Xét:</h4>
         <p th:text="${feedback}">Great work! Consider optimizing the algorithm.</p>
       </div>
     </div>
     <div style="text-align: center;">
-      <a th:href="${submissionUrl}" class="button">View Detailed Results</a>
+      <a th:href="${submissionUrl}" class="button">Xem Kết Quả Chi Tiết</a>
     </div>
   </div>
   <div class="footer">
-    <p>&copy; 2025 APSAS. All rights reserved.</p>
+    <p>&copy; 2025 APSAS. Bản quyền thuộc về APSAS.</p>
   </div>
 </div>
 </body>

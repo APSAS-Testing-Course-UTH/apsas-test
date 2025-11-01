@@ -1,9 +1,12 @@
 package apsas.support.service;
 
-import apsas.shared.common.dto.PageResponse;
-import apsas.shared.common.exception.BadRequestException;
-import apsas.shared.common.exception.ForbiddenException;
-import apsas.shared.common.exception.NotFoundException;
+import apsas.shared.exception.BadRequestException;
+import apsas.shared.exception.ForbiddenException;
+import apsas.shared.exception.NotFoundException;
+import apsas.shared.messaging.config.RabbitMqConfig;
+import apsas.shared.messaging.event.EventPublisher;
+import apsas.shared.messaging.event.SupportRequestedEvent;
+import apsas.shared.models.pagination.PageResponse;
 import apsas.support.mapper.SupportSessionMapper;
 import apsas.support.model.dto.SupportSessionDto;
 import apsas.support.model.entity.SupportMessage;
@@ -11,7 +14,6 @@ import apsas.support.model.entity.SupportSession;
 import apsas.support.repository.SupportMessageRepository;
 import apsas.support.repository.SupportSessionRepository;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,9 +27,11 @@ public class SupportService {
   private final SupportSessionRepository sessionRepository;
   private final SupportMessageRepository messageRepository;
   private final SupportSessionMapper sessionMapper;
+  private final EventPublisher eventPublisher;
 
   @Transactional
-  public SupportSession createSession(UUID studentId, String initialMessage) {
+  public SupportSession createSession(
+      UUID studentId, String studentEmail, String studentName, String initialMessage) {
     SupportSession session = new SupportSession();
     session.setStudentId(studentId);
     session.setIsClosed(false);
@@ -40,7 +44,15 @@ public class SupportService {
 
     session.addMessage(message);
 
-    return sessionRepository.save(session);
+    SupportSession savedSession = sessionRepository.save(session);
+
+    // Publish event to notify instructors
+    SupportRequestedEvent event =
+        new SupportRequestedEvent(
+            savedSession.getId(), studentId, studentEmail, studentName, initialMessage);
+    eventPublisher.publish(RabbitMqConfig.SUPPORT_REQUESTED_ROUTING_KEY, event);
+
+    return savedSession;
   }
 
   @Transactional(readOnly = true)
@@ -48,11 +60,6 @@ public class SupportService {
     return sessionRepository
         .findById(sessionId)
         .orElseThrow(() -> new NotFoundException("Support session not found"));
-  }
-
-  @Transactional(readOnly = true)
-  public List<SupportSession> getSessionsForStudent(UUID studentId) {
-    return sessionRepository.findByStudentIdOrderByCreatedAtDesc(studentId);
   }
 
   @Transactional(readOnly = true)
@@ -64,24 +71,14 @@ public class SupportService {
   }
 
   @Transactional(readOnly = true)
-  public List<SupportSession> getAllSessions() {
-    return sessionRepository.findAll();
-  }
-
-  @Transactional(readOnly = true)
   public PageResponse<SupportSessionDto> getAllSessions(Pageable pageable) {
     Page<SupportSession> sessionPage = sessionRepository.findAll(pageable);
     Page<SupportSessionDto> responsePage = sessionPage.map(sessionMapper::toDto);
     return PageResponse.of(responsePage);
   }
 
-  @Transactional(readOnly = true)
-  public List<SupportSession> getOpenSessions() {
-    return sessionRepository.findByIsClosedOrderByCreatedAtDesc(false);
-  }
-
   @Transactional
-  public SupportSession closeSession(UUID sessionId, UUID userId, String userRole) {
+  public SupportSession closeSession(UUID sessionId, UUID userId) {
     SupportSession session = getSessionById(sessionId);
 
     if (session.getIsClosed()) {

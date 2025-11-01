@@ -1,0 +1,10 @@
+product: jvm/lib
+
+apply:
+  - ../../jvm.module-template.yaml
+  - ../spring-lib.module-template.yaml
+
+dependencies:
+  - bom: $libs.spring.cloud.dependencies
+  - $libs.spring.cloud.starter.openfeign: exported
+  - $libs.spring.cloud.starter.loadbalancer: exported

@@ -16,10 +16,14 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
  */
 @UtilityClass
 public class UserPrincipals {
-  /** Tên header chứa thông tin người dùng được mã hóa. */
+  /**
+   * Tên header chứa thông tin người dùng được mã hóa.
+   */
   public static final String USER_INFO_HEADER = "X-User-Info";
 
-  /** Trích xuất thông tin người dùng từ header của yêu cầu HTTP. */
+  /**
+   * Trích xuất thông tin người dùng từ header của yêu cầu HTTP.
+   */
   public static Optional<UserPrincipal> fromHeader(HttpServletRequest request) {
     var userInfo = request.getHeader(USER_INFO_HEADER);
     if (userInfo == null || userInfo.isEmpty()) {
@@ -33,7 +37,9 @@ public class UserPrincipals {
     }
   }
 
-  /** Thêm thông tin người dùng vào header của yêu cầu HTTP (dùng trong Gateway). */
+  /**
+   * Thêm thông tin người dùng vào header của yêu cầu HTTP (dùng trong Gateway).
+   */
   public static ServerHttpRequest.Builder enrichRequestWithUserInfo(
       ServerHttpRequest.Builder request, UserPrincipal userPrincipal) {
     return toBase64(userPrincipal)
@@ -41,7 +47,9 @@ public class UserPrincipals {
         .orElse(request);
   }
 
-  /** Chuyển đổi UserPrincipal thành chuỗi Base64 để lưu trong header. */
+  /**
+   * Chuyển đổi UserPrincipal thành chuỗi Base64 để lưu trong header.
+   */
   public static Optional<String> toBase64(UserPrincipal userPrincipal) {
     try {
       return Optional.ofNullable(Base64.getEncoder().encodeToString(serialize(userPrincipal)));
@@ -50,7 +58,9 @@ public class UserPrincipals {
     }
   }
 
-  /** Chuyển đổi UserPrincipal thành mảng byte để phục vụ việc serialize. */
+  /**
+   * Chuyển đổi UserPrincipal thành mảng byte để phục vụ việc serialize.
+   */
   private static byte[] serialize(UserPrincipal userPrincipal) throws Exception {
     try (var byteStream = new ByteArrayOutputStream();
         var objectStream = new ObjectOutputStream(byteStream)) {
@@ -60,7 +70,9 @@ public class UserPrincipals {
     }
   }
 
-  /** Chuyển đổi mảng byte thành UserPrincipal để phục vụ việc deserialize. */
+  /**
+   * Chuyển đổi mảng byte thành UserPrincipal để phục vụ việc deserialize.
+   */
   private static UserPrincipal deserialize(byte[] data) throws Exception {
     try (var byteStream = new ByteArrayInputStream(data);
         var objectStream = new ObjectInputStream(byteStream)) {

@@ -40,11 +40,32 @@ This document provides instructions for using the Submission Service in your pro
 - `execution_time`: Time taken to execute the test case (in seconds).
 - `memory_used`: Memory used during the execution of the test case (in MB).
 
+## Port
+
+- **Default**: 8083
+
 ## Integration
 
-- The Submission Service should be integrated with the Content Service to fetch assignment details and test cases.
-- When a student submits a solution, the Submission Service send message to trigger the evaluation process (evaluation service will be implemented separately).
-- When the evaluation is complete, the evaluation service will trigger an event, listened by the Submission Service, to update the submission status and results.
+### Content Service
+- Fetches assignment details and validates language support before accepting submissions
+
+### Evaluation Service (via RabbitMQ)
+- **Publishing**: Sends `SubmissionCreatedEvent` to `submission.created` routing key when a submission is created
+- **Listening**: Listens for `SubmissionEvaluatedEvent` on `submission.evaluated.queue` to update submission results
+
+## Events
+
+### Published Events
+
+- **SubmissionCreatedEvent** (`submission.created` routing key)
+  - Payload: submissionId, assignmentId, studentId, code, language
+  - Consumed by: Evaluation Service
+
+### Consumed Events
+
+- **SubmissionEvaluatedEvent** (from `submission.evaluated.queue`)
+  - Payload: submissionId, score, testCaseResults[], feedback
+  - Updates submission status, score, and test case results
 
 ## API Endpoints
 

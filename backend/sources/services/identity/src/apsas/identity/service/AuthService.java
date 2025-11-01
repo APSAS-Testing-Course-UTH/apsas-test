@@ -14,13 +14,13 @@ import apsas.identity.repository.EmailVerificationTokenRepository;
 import apsas.identity.repository.PasswordResetTokenRepository;
 import apsas.identity.repository.UserRepository;
 import apsas.identity.security.JwtTokenProvider;
-import apsas.messaging.event.EventPublisher;
-import apsas.messaging.event.PasswordResetRequestedEvent;
-import apsas.messaging.event.RabbitMQConfig;
-import apsas.messaging.event.UserRegisteredEvent;
-import apsas.shared.common.exception.BadRequestException;
-import apsas.shared.common.exception.NotFoundException;
-import apsas.shared.common.exception.UnauthorizedException;
+import apsas.shared.exception.BadRequestException;
+import apsas.shared.exception.NotFoundException;
+import apsas.shared.exception.UnauthorizedException;
+import apsas.shared.messaging.config.RabbitMqConfig;
+import apsas.shared.messaging.event.EventPublisher;
+import apsas.shared.messaging.event.PasswordResetRequestedEvent;
+import apsas.shared.messaging.event.UserRegisteredEvent;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -53,22 +53,11 @@ public class AuthService {
     }
 
     User user = userMapper.toUserFromRegisterRequest(request);
-
     user = userRepository.save(user);
 
-    // Create email verification token
-    String token = generateToken();
-    EmailVerificationToken verificationToken = new EmailVerificationToken();
-    verificationToken.setUser(user);
-    verificationToken.setToken(token);
-    verificationToken.setExpiresAt(LocalDateTime.now().plusSeconds(emailTokenExpiration));
-    emailVerificationTokenRepository.save(verificationToken);
-
-    // Publish event for notification service
-    UserRegisteredEvent event =
-        new UserRegisteredEvent(
-            user.getId(), user.getEmail(), user.getFirstName(), user.getLastName(), token);
-    eventPublisher.publish(RabbitMQConfig.USER_REGISTERED_ROUTING_KEY, event);
+    // Create and send verification email
+    String token = createAndSaveEmailVerificationToken(user);
+    publishUserRegisteredEvent(user, token);
 
     String jwtToken = jwtTokenProvider.generateToken(user);
     UserResponse userResponse = userMapper.toUserResponse(user);
@@ -91,22 +80,15 @@ public class AuthService {
       throw new UnauthorizedException("Account is deactivated");
     }
 
-    String token = jwtTokenProvider.generateToken(user);
-    UserResponse userResponse = userMapper.toUserResponse(user);
-
-    return new AuthResponse(token, userResponse);
+    return createAuthResponse(user);
   }
 
   @Transactional
   public void verifyEmail(String token) {
-    EmailVerificationToken verificationToken =
-        emailVerificationTokenRepository
-            .findByToken(token)
-            .orElseThrow(() -> new BadRequestException("Invalid verification token"));
-
-    if (verificationToken.getExpiresAt().isBefore(LocalDateTime.now())) {
-      throw new BadRequestException("Verification token has expired");
-    }
+    EmailVerificationToken verificationToken = emailVerificationTokenRepository
+        .findByToken(token)
+        .orElseThrow(() -> new BadRequestException("Invalid verification token"));
+    validateTokenNotExpired(verificationToken.getExpiresAt(), "Verification token has expired");
 
     User user = verificationToken.getUser();
     user.setIsEmailVerified(true);
@@ -117,10 +99,7 @@ public class AuthService {
 
   @Transactional
   public void resendVerificationEmail(EmailRequest request) {
-    User user =
-        userRepository
-            .findByEmail(request.getEmail())
-            .orElseThrow(() -> new NotFoundException("User not found"));
+    User user = findUserByEmailForVerification(request.getEmail());
 
     if (user.getIsEmailVerified()) {
       throw new BadRequestException("Email already verified");
@@ -131,61 +110,90 @@ public class AuthService {
         .findByUser(user)
         .ifPresent(emailVerificationTokenRepository::delete);
 
-    // Create new token
-    String token = generateToken();
-    EmailVerificationToken verificationToken = new EmailVerificationToken();
-    verificationToken.setUser(user);
-    verificationToken.setToken(token);
-    verificationToken.setExpiresAt(LocalDateTime.now().plusSeconds(emailTokenExpiration));
-    emailVerificationTokenRepository.save(verificationToken);
-
-    // Publish event
-    UserRegisteredEvent event =
-        new UserRegisteredEvent(
-            user.getId(), user.getEmail(), user.getFirstName(), user.getLastName(), token);
-    eventPublisher.publish(RabbitMQConfig.USER_REGISTERED_ROUTING_KEY, event);
+    // Create and send new verification email
+    String token = createAndSaveEmailVerificationToken(user);
+    publishUserRegisteredEvent(user, token);
   }
 
   @Transactional
   public void requestPasswordReset(EmailRequest request) {
-    User user =
-        userRepository
-            .findByEmail(request.getEmail())
-            .orElseThrow(() -> new NotFoundException("User not found"));
+    User user = findUserByEmailForVerification(request.getEmail());
 
     // Delete old token if exists
     passwordResetTokenRepository.findByUser(user).ifPresent(passwordResetTokenRepository::delete);
 
-    // Create new token
-    String token = generateToken();
-    PasswordResetToken resetToken = new PasswordResetToken();
-    resetToken.setUser(user);
-    resetToken.setToken(token);
-    resetToken.setExpiresAt(LocalDateTime.now().plusSeconds(passwordResetTokenExpiration));
-    passwordResetTokenRepository.save(resetToken);
-
-    // Publish event
-    PasswordResetRequestedEvent event =
-        new PasswordResetRequestedEvent(user.getEmail(), user.getFirstName(), token);
-    eventPublisher.publish(RabbitMQConfig.PASSWORD_RESET_ROUTING_KEY, event);
+    // Create and send password reset email
+    String token = createAndSavePasswordResetToken(user);
+    publishPasswordResetEvent(user, token);
   }
 
   @Transactional
   public void resetPassword(ResetPasswordRequest request) {
-    PasswordResetToken resetToken =
-        passwordResetTokenRepository
-            .findByToken(request.getToken())
-            .orElseThrow(() -> new BadRequestException("Invalid reset token"));
-
-    if (resetToken.getExpiresAt().isBefore(LocalDateTime.now())) {
-      throw new BadRequestException("Reset token has expired");
-    }
+    PasswordResetToken resetToken = findPasswordResetToken(request.getToken());
+    validateTokenNotExpired(resetToken.getExpiresAt(), "Reset token has expired");
 
     User user = resetToken.getUser();
     user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
     userRepository.save(user);
 
     passwordResetTokenRepository.delete(resetToken);
+  }
+
+  private User findUserByEmailForVerification(String email) {
+    return userRepository
+        .findByEmail(email)
+        .orElseThrow(() -> new NotFoundException("User not found"));
+  }
+
+  private PasswordResetToken findPasswordResetToken(String token) {
+    return passwordResetTokenRepository
+        .findByToken(token)
+        .orElseThrow(() -> new BadRequestException("Invalid reset token"));
+  }
+
+  private void validateTokenNotExpired(LocalDateTime expiresAt, String errorMessage) {
+    if (expiresAt.isBefore(LocalDateTime.now())) {
+      throw new BadRequestException(errorMessage);
+    }
+  }
+
+  private String createAndSaveEmailVerificationToken(User user) {
+    String token = generateToken();
+    EmailVerificationToken verificationToken = new EmailVerificationToken();
+    verificationToken.setUser(user);
+    verificationToken.setToken(token);
+    verificationToken.setExpiresAt(LocalDateTime.now().plusSeconds(emailTokenExpiration));
+    emailVerificationTokenRepository.save(verificationToken);
+    return token;
+  }
+
+  private String createAndSavePasswordResetToken(User user) {
+    String token = generateToken();
+    PasswordResetToken resetToken = new PasswordResetToken();
+    resetToken.setUser(user);
+    resetToken.setToken(token);
+    resetToken.setExpiresAt(LocalDateTime.now().plusSeconds(passwordResetTokenExpiration));
+    passwordResetTokenRepository.save(resetToken);
+    return token;
+  }
+
+  private void publishUserRegisteredEvent(User user, String token) {
+    UserRegisteredEvent event =
+        new UserRegisteredEvent(
+            user.getId(), user.getEmail(), user.getFirstName(), user.getLastName(), token);
+    eventPublisher.publish(RabbitMqConfig.USER_REGISTERED_ROUTING_KEY, event);
+  }
+
+  private void publishPasswordResetEvent(User user, String token) {
+    PasswordResetRequestedEvent event =
+        new PasswordResetRequestedEvent(user.getEmail(), user.getFirstName(), token);
+    eventPublisher.publish(RabbitMqConfig.PASSWORD_RESET_ROUTING_KEY, event);
+  }
+
+  private AuthResponse createAuthResponse(User user) {
+    String token = jwtTokenProvider.generateToken(user);
+    UserResponse userResponse = userMapper.toUserResponse(user);
+    return new AuthResponse(token, userResponse);
   }
 
   private String generateToken() {

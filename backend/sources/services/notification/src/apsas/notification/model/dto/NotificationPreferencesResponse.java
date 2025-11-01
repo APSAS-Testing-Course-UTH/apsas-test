@@ -14,16 +14,12 @@ public class NotificationPreferencesResponse {
   private Boolean emailEnabled;
   private Boolean pushEnabled;
 
-  // Email preferences by type
-  private Boolean emailVerification;
-  private Boolean emailPasswordReset;
+  // Email preferences by type (verification and password reset are always enabled)
   private Boolean emailAssignmentPublished;
-  private Boolean emailAssignmentReminder;
   private Boolean emailSubmissionEvaluated;
 
   // Push preferences by type
   private Boolean pushAssignmentPublished;
-  private Boolean pushAssignmentReminder;
   private Boolean pushSubmissionEvaluated;
 
   private LocalDateTime createdAt;

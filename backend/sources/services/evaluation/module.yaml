@@ -7,12 +7,18 @@ apply:
 settings:
   jvm:
     mainClass: apsas.evaluation.EvaluationServiceApplication
+  java:
+    annotationProcessing:
+      processors:
+        - $libs.mapstruct.processor
 
 dependencies:
   - ../../shared/messaging
+  - ../../shared/models
+  - ../../shared/feign-clients
   - $spring.boot.starter.web
   - $spring.boot.starter.validation
   - $libs.springdoc.openapi.starter.webmvc.api
-  - $libs.spring.cloud.starter.openfeign
   - $libs.spring.retry
   - $spring.boot.starter.aop
+  - $libs.mapstruct

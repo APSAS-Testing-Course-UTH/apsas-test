@@ -6,34 +6,21 @@ import apsas.content.model.dto.TutorialResponse;
 import apsas.content.model.dto.UpdateTutorialRequest;
 import apsas.content.model.entity.Tutorial;
 import apsas.content.repository.TutorialRepository;
-import apsas.shared.common.dto.PageResponse;
-import apsas.shared.common.exception.NotFoundException;
-import apsas.shared.common.exception.UnauthorizedException;
-import java.util.List;
+import apsas.shared.exception.NotFoundException;
+import apsas.shared.exception.UnauthorizedException;
+import apsas.shared.models.pagination.PageResponse;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class TutorialService {
-
   private final TutorialRepository tutorialRepository;
   private final TutorialMapper tutorialMapper;
-
-  public TutorialService(TutorialRepository tutorialRepository, TutorialMapper tutorialMapper) {
-    this.tutorialRepository = tutorialRepository;
-    this.tutorialMapper = tutorialMapper;
-  }
-
-  @Transactional(readOnly = true)
-  public List<TutorialResponse> getAllTutorials() {
-    return tutorialRepository.findAll().stream()
-        .map(tutorialMapper::toResponse)
-        .collect(Collectors.toList());
-  }
 
   @Transactional(readOnly = true)
   public PageResponse<TutorialResponse> getAllTutorials(Pageable pageable) {

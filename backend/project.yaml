@@ -1,5 +1,7 @@
 modules:
   - sources/shared/security
+  - sources/shared/models
+  - sources/shared/feign-clients
   - sources/service-registry
   - sources/config-server
   - sources/gateway
@@ -10,4 +12,4 @@ modules:
   - sources/services/support
   - sources/services/notification
   - sources/shared/messaging
-  - sources/shared/common
+  - sources/shared/exception

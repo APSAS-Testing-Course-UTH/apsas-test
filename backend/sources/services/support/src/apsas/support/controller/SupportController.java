@@ -1,7 +1,7 @@
 package apsas.support.controller;
 
-import apsas.shared.common.dto.PageResponse;
-import apsas.shared.common.util.PageRequestParams;
+import apsas.shared.models.pagination.PageResponse;
+import apsas.shared.models.pagination.PageRequestParams;
 import apsas.shared.security.UserPrincipal;
 import apsas.support.mapper.SupportSessionMapper;
 import apsas.support.model.dto.CreateSupportSessionRequest;
@@ -115,8 +115,13 @@ public class SupportController {
       UserPrincipal principal
   ) {
 
+    String studentName = principal.firstName() + " " + principal.lastName();
     SupportSession session =
-        supportService.createSession(principal.userId(), request.initialMessage());
+        supportService.createSession(
+            principal.userId(),
+            principal.email(),
+            studentName,
+            request.initialMessage());
 
     return ResponseEntity.status(HttpStatus.CREATED).body(sessionMapper.toDto(session));
   }
@@ -142,7 +147,7 @@ public class SupportController {
       UserPrincipal principal
   ) {
 
-    SupportSession session = supportService.closeSession(id, principal.userId(), principal.role());
+    SupportSession session = supportService.closeSession(id, principal.userId());
 
     return ResponseEntity.ok(sessionMapper.toDto(session));
   }

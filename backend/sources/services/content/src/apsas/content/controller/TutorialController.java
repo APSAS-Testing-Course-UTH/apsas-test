@@ -4,8 +4,8 @@ import apsas.content.model.dto.CreateTutorialRequest;
 import apsas.content.model.dto.TutorialResponse;
 import apsas.content.model.dto.UpdateTutorialRequest;
 import apsas.content.service.TutorialService;
-import apsas.shared.common.dto.PageResponse;
-import apsas.shared.common.util.PageRequestParams;
+import apsas.shared.models.pagination.PageRequestParams;
+import apsas.shared.models.pagination.PageResponse;
 import apsas.shared.security.UserPrincipal;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.Map;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,13 +32,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/tutorials")
 @Tag(name = "Tutorial Management", description = "Tutorial management endpoints")
 @SecurityRequirement(name = "Bearer Authentication")
+@RequiredArgsConstructor
 public class TutorialController {
-
   private final TutorialService tutorialService;
-
-  public TutorialController(TutorialService tutorialService) {
-    this.tutorialService = tutorialService;
-  }
 
   @GetMapping
   @Operation(

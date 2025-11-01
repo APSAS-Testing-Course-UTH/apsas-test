@@ -1,61 +1,65 @@
 package apsas.notification.listener;
 
-import apsas.messaging.event.AssignmentPublishedEvent;
-import apsas.messaging.event.AssignmentScheduleUpdatedEvent;
-import apsas.notification.config.MessagingConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import apsas.feign.client.AssignmentFeignClient;
+import apsas.feign.client.UserFeignClient;
+import apsas.feign.dto.AssignmentResponse;
+import apsas.feign.dto.UserResponse;
+import apsas.notification.service.NotificationDispatcher;
+import apsas.shared.messaging.config.RabbitMqConfig;
+import apsas.shared.messaging.event.AssignmentPublishedEvent;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
+@Log4j2
 public class AssignmentEventListener {
+  private final NotificationDispatcher notificationDispatcher;
+  private final AssignmentFeignClient assignmentFeignClient;
+  private final UserFeignClient userFeignClient;
 
-  private static final Logger logger = LoggerFactory.getLogger(AssignmentEventListener.class);
+  @Value("${notification.url.assignment}")
+  private String assignmentUrlTemplate;
 
-  // Note: This is a placeholder implementation
-  // In a real system, you would need to:
-  // 1. Fetch assignment details from content service
-  // 2. Get list of enrolled students
-  // 3. Check notification preferences for each student
-  // 4. Send email and/or push notifications
-
-  @RabbitListener(queues = MessagingConfig.ASSIGNMENT_PUBLISHED_QUEUE)
+  @RabbitListener(queues = RabbitMqConfig.NOTIFICATION_ASSIGNMENT_PUBLISHED_QUEUE)
   public void handleAssignmentPublished(AssignmentPublishedEvent event) {
     try {
-      logger.info(
-          "Received assignment published event for assignment: {} - {}",
-          event.getAssignmentId(),
-          event.getTitle()
-      );
+      AssignmentResponse assignment = assignmentFeignClient.getAssignmentById(event.getAssignmentId());
+      if (assignment == null) {
+        return;
+      }
 
-      // TODO: Implement full notification logic
-      // 1. Fetch assignment details (description, deadline) from content service
-      // 2. Get enrolled students from content service
-      // 3. For each student:
-      //    - Check notification preferences
-      //    - Check rate limits
-      //    - Send email notification if enabled
-      //    - Send push notification if enabled and has device tokens
+      List<UserResponse> students = userFeignClient.getUsersByRole("STUDENT");
+      if (students == null || students.isEmpty()) {
+        return;
+      }
 
-      logger.info("Assignment published notification processed for: {}", event.getTitle());
+      // Format deadline for display
+      String deadline = assignment.getDueDate() != null
+          ? assignment.getDueDate().toString()
+          : "No deadline";
+
+      // Send notification to each student
+      String assignmentUrl = assignmentUrlTemplate.replace("%id%", event.getAssignmentId().toString());
+
+      for (UserResponse student : students) {
+        if (Boolean.TRUE.equals(student.getIsActive())) {
+          notificationDispatcher.sendAssignmentPublishedNotification(
+              student.getId(),
+              student.getEmail(),
+              student.getFirstName(),
+              assignment.getTitle(),
+              deadline,
+              assignmentUrl
+          );
+        }
+      }
     } catch (Exception e) {
-      logger.error("Error handling assignment published event", e);
-    }
-  }
-
-  @RabbitListener(queues = MessagingConfig.ASSIGNMENT_SCHEDULE_UPDATED_QUEUE)
-  public void handleAssignmentScheduleUpdated(AssignmentScheduleUpdatedEvent event) {
-    try {
-      logger.info(
-          "Received assignment schedule updated event for assignment: {}", event.getAssignmentId());
-
-      // TODO: Implement notification logic similar to assignment published
-      // Send notifications about deadline changes
-
-      logger.info("Assignment schedule update notification processed");
-    } catch (Exception e) {
-      logger.error("Error handling assignment schedule updated event", e);
+      log.error("Error handling assignment published event", e);
     }
   }
 }

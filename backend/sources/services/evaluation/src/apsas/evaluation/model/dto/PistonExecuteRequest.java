@@ -35,7 +35,7 @@ public record PistonExecuteRequest(
         compileTimeout,
         -1L,
         runMemoryLimit
-    ); // No limit
+    );
   }
 
   public record FileContent(String name, String content, String encoding) {

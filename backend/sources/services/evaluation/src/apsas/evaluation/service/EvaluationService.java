@@ -1,19 +1,21 @@
 package apsas.evaluation.service;
 
-import apsas.evaluation.client.ContentServiceClient;
 import apsas.evaluation.client.PistonApiClient;
-import apsas.evaluation.model.AssignmentDto;
-import apsas.evaluation.model.TestCaseDto;
+import apsas.evaluation.mapper.PistonRequestMapper;
+import apsas.evaluation.mapper.TestCaseMapper;
 import apsas.evaluation.model.dto.PistonExecuteRequest;
 import apsas.evaluation.model.dto.PistonExecuteResponse;
 import apsas.evaluation.model.dto.RuntimeResponse;
-import apsas.messaging.event.EventPublisher;
-import apsas.messaging.event.RabbitMQConfig;
-import apsas.messaging.event.SubmissionCreatedEvent;
-import apsas.messaging.event.SubmissionEvaluatedEvent;
-import apsas.messaging.model.SubmissionResult;
-import apsas.messaging.model.SubmissionStatus;
-import apsas.messaging.model.TestCaseResult;
+import apsas.feign.client.AssignmentFeignClient;
+import apsas.feign.dto.AssignmentResponse;
+import apsas.feign.dto.TestCaseDto;
+import apsas.shared.messaging.config.RabbitMqConfig;
+import apsas.shared.messaging.event.EventPublisher;
+import apsas.shared.messaging.event.SubmissionCreatedEvent;
+import apsas.shared.messaging.event.SubmissionEvaluatedEvent;
+import apsas.shared.messaging.model.SubmissionResult;
+import apsas.shared.messaging.model.SubmissionStatus;
+import apsas.shared.models.submission.TestCaseResultDto;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
@@ -36,8 +38,10 @@ public class EvaluationService {
   private static final Logger logger = LoggerFactory.getLogger(EvaluationService.class);
 
   private final PistonApiClient pistonApiClient;
-  private final ContentServiceClient contentServiceClient;
+  private final AssignmentFeignClient assignmentFeignClient;
   private final EventPublisher eventPublisher;
+  private final TestCaseMapper testCaseMapper;
+  private final PistonRequestMapper pistonRequestMapper;
 
   /**
    * Get list of supported programming languages and their versions
@@ -59,23 +63,23 @@ public class EvaluationService {
 
     try {
       // Fetch assignment details
-      AssignmentDto assignment = contentServiceClient.getAssignment(event.getAssignmentId());
+      AssignmentResponse assignment = assignmentFeignClient.getAssignmentById(event.getAssignmentId());
 
       // Validate language is supported
-      if (!isLanguageSupported(event.getLanguage(), assignment.languages())) {
+      if (!isLanguageSupported(event.getLanguage(), assignment.getLanguages())) {
         publishFailedEvaluation(
             event.getSubmissionId(),
             "Unsupported language: "
                 + event.getLanguage()
                 + ". Allowed languages: "
-                + String.join(", ", assignment.languages())
+                + String.join(", ", assignment.getLanguages())
         );
         return;
       }
 
       // Execute test cases in parallel
-      List<CompletableFuture<TestCaseResult>> futures = new ArrayList<>();
-      for (TestCaseDto testCase : assignment.testCases()) {
+      List<CompletableFuture<apsas.shared.models.submission.TestCaseResultDto>> futures = new ArrayList<>();
+      for (TestCaseDto testCase : assignment.getTestCases()) {
         futures.add(executeTestCase(event.getCode(), event.getLanguage(), testCase));
       }
 
@@ -83,8 +87,8 @@ public class EvaluationService {
       CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
 
       // Collect results
-      List<TestCaseResult> testCaseResults = new ArrayList<>();
-      for (CompletableFuture<TestCaseResult> future : futures) {
+      List<apsas.shared.models.submission.TestCaseResultDto> testCaseResults = new ArrayList<>();
+      for (CompletableFuture<apsas.shared.models.submission.TestCaseResultDto> future : futures) {
         testCaseResults.add(future.join());
       }
 
@@ -99,7 +103,7 @@ public class EvaluationService {
           new SubmissionEvaluatedEvent(
               event.getSubmissionId(), status, result, score, testCaseResults, LocalDateTime.now());
 
-      eventPublisher.publish(RabbitMQConfig.SUBMISSION_EVALUATED_ROUTING_KEY, evaluatedEvent);
+      eventPublisher.publish(RabbitMqConfig.SUBMISSION_EVALUATED_ROUTING_KEY, evaluatedEvent);
 
       logger.info(
           "Evaluation completed for submission: {} with result: {} and score: {}",
@@ -123,25 +127,23 @@ public class EvaluationService {
    * @return Test case result
    */
   @Async
-  protected CompletableFuture<TestCaseResult> executeTestCase(
-      String code, String language, TestCaseDto testCase) {
+  protected CompletableFuture<apsas.shared.models.submission.TestCaseResultDto> executeTestCase(
+      String code, String language, apsas.feign.dto.TestCaseDto testCase) {
     return CompletableFuture.supplyAsync(
         () -> {
-          logger.debug("Executing test case: {}", testCase.description());
+          logger.debug("Executing test case: {}", testCase.getDescription());
 
-          TestCaseResult result = new TestCaseResult();
-          result.setOrder(testCase.order());
-          result.setDescription(testCase.description());
-          result.setHidden(testCase.hidden());
-          result.setWeight(testCase.weight());
-          result.setInput(testCase.input());
-          result.setOutput(testCase.output());
-          result.setTimeout(testCase.timeout());
-          result.setMemoryLimit(testCase.memoryLimit());
+          // Use mapper to create initial TestCaseResultDto  
+          apsas.shared.models.submission.TestCaseResultDto result = testCaseMapper.toTestCaseResult(
+              testCase);
 
           try {
-            // Prepare execution request
-            PistonExecuteRequest request = createExecuteRequest(code, language, testCase);
+            // Prepare execution request using mapper
+            PistonExecuteRequest request = pistonRequestMapper.createExecuteRequest(
+                code,
+                language,
+                testCase
+            );
 
             // Execute code
             long startTime = System.currentTimeMillis();
@@ -172,71 +174,23 @@ public class EvaluationService {
             result.setExecutionTime((double) (endTime - startTime));
 
             // Compare outputs
-            boolean passed = compareOutputs(testCase.output(), actualOutput);
+            boolean passed = compareOutputs(testCase.getOutput(), actualOutput);
             result.setPassed(passed);
 
             if (!passed) {
               result.setErrorMessage("Output mismatch");
             }
 
-            logger.debug("Test case {} execution completed: {}", testCase.order(), passed);
+            logger.debug("Test case {} execution completed: {}", testCase.getOrder(), passed);
             return result;
 
           } catch (Exception e) {
-            logger.error("Error executing test case: {}", testCase.description(), e);
+            logger.error("Error executing test case: {}", testCase.getDescription(), e);
             result.setPassed(false);
             result.setErrorMessage("Execution error: " + e.getMessage());
             return result;
           }
         });
-  }
-
-  /**
-   * Create Piston execute request from code and test case
-   *
-   * @param code     Student's code
-   * @param language Programming language
-   * @param testCase Test case
-   * @return Piston execute request
-   */
-  private PistonExecuteRequest createExecuteRequest(
-      String code, String language, TestCaseDto testCase) {
-    List<PistonExecuteRequest.FileContent> files = new ArrayList<>();
-
-    // Determine file name based on language
-    String fileName = getFileName(language);
-    files.add(new PistonExecuteRequest.FileContent(fileName, code));
-
-    // Set timeout and memory limits
-    Integer timeout = testCase.timeout() != null ? testCase.timeout() : 5000;
-    Long memoryLimit =
-        testCase.memoryLimit() != null ? testCase.memoryLimit().longValue() * 1024 * 1024 : -1L;
-
-    return new PistonExecuteRequest(
-        language, "*", files, testCase.input(), timeout, timeout, memoryLimit);
-  }
-
-  /**
-   * Get appropriate file name based on language
-   *
-   * @param language Programming language
-   * @return File name
-   */
-  private String getFileName(String language) {
-    return switch (language.toLowerCase()) {
-      case "java" -> "Main.java";
-      case "python", "python3" -> "main.py";
-      case "javascript", "js", "node" -> "main.js";
-      case "typescript", "ts" -> "main.ts";
-      case "c" -> "main.c";
-      case "cpp", "c++" -> "main.cpp";
-      case "go" -> "main.go";
-      case "rust" -> "main.rs";
-      case "ruby" -> "main.rb";
-      case "php" -> "main.php";
-      case "csharp", "c#" -> "Main.cs";
-      default -> "main.txt";
-    };
   }
 
   /**
@@ -264,7 +218,7 @@ public class EvaluationService {
    * @param testCaseResults List of test case results
    * @return Overall score
    */
-  private BigDecimal calculateScore(List<TestCaseResult> testCaseResults) {
+  private BigDecimal calculateScore(List<TestCaseResultDto> testCaseResults) {
     if (testCaseResults.isEmpty()) {
       return BigDecimal.ZERO;
     }
@@ -272,7 +226,7 @@ public class EvaluationService {
     double totalWeight = 0;
     double earnedWeight = 0;
 
-    for (TestCaseResult result : testCaseResults) {
+    for (TestCaseResultDto result : testCaseResults) {
       double weight = result.getWeight() != null ? result.getWeight() : 1.0;
       totalWeight += weight;
       if (result.getPassed() != null && result.getPassed()) {
@@ -293,7 +247,7 @@ public class EvaluationService {
    * @param testCaseResults List of test case results
    * @return Submission result
    */
-  private SubmissionResult determineResult(List<TestCaseResult> testCaseResults) {
+  private SubmissionResult determineResult(List<TestCaseResultDto> testCaseResults) {
     if (testCaseResults.isEmpty()) {
       return SubmissionResult.FAILED;
     }
@@ -341,7 +295,7 @@ public class EvaluationService {
   private void publishFailedEvaluation(UUID submissionId, String errorMessage) {
     logger.warn("Publishing failed evaluation for submission: {}", submissionId);
 
-    TestCaseResult errorResult = new TestCaseResult();
+    TestCaseResultDto errorResult = new TestCaseResultDto();
     errorResult.setPassed(false);
     errorResult.setErrorMessage(errorMessage);
 
@@ -355,6 +309,6 @@ public class EvaluationService {
             LocalDateTime.now()
         );
 
-    eventPublisher.publish(RabbitMQConfig.SUBMISSION_EVALUATED_ROUTING_KEY, event);
+    eventPublisher.publish(RabbitMqConfig.SUBMISSION_EVALUATED_ROUTING_KEY, event);
   }
 }

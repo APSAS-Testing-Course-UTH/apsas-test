@@ -9,6 +9,4 @@ public interface NotificationPreferencesRepository
     extends JpaRepository<NotificationPreferences, UUID> {
 
   Optional<NotificationPreferences> findByUserId(UUID userId);
-
-  boolean existsByUserId(UUID userId);
 }

@@ -15,8 +15,10 @@ settings:
 
 dependencies:
   - ../../shared/security
-  - ../../shared/common
+  - ../../shared/exception
   - ../../shared/messaging
+  - ../../shared/models
+  - ../../shared/feign-clients
   - $spring.boot.starter.web
   - $spring.boot.starter.data.jpa
   - $spring.boot.starter.validation

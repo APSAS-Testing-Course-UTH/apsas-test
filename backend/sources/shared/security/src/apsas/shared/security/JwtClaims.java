@@ -2,7 +2,9 @@ package apsas.shared.security;
 
 import lombok.experimental.UtilityClass;
 
-/** Các claim được sử dụng trong JWT. */
+/**
+ * Các claim được sử dụng trong JWT.
+ */
 @UtilityClass
 public final class JwtClaims {
   public static final String USER_ID = "user_id";

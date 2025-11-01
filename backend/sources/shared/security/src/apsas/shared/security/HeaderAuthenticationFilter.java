@@ -9,13 +9,16 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-/** Lớp lọc xác thực người dùng dựa trên thông tin trong header của yêu cầu HTTP. */
+/**
+ * Lớp lọc xác thực người dùng dựa trên thông tin trong header của yêu cầu HTTP.
+ */
 public class HeaderAuthenticationFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(
       @NotNull HttpServletRequest request,
       @NotNull HttpServletResponse response,
-      @NotNull FilterChain filterChain)
+      @NotNull FilterChain filterChain
+  )
       throws ServletException, IOException {
     UserPrincipals.fromHeader(request)
         .ifPresent(

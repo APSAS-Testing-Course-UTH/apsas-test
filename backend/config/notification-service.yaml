@@ -11,18 +11,16 @@ spring:
       - file:./config/fragments/mail.yaml
       - file:./config/fragments/firebase.yaml
 
+database:
+  schema: notification
+
 notification:
+  url:
+    assignment: ${ASSIGNMENT_URL:http://localhost:3000/assignments/%id%}
+    submission: ${SUBMISSION_URL:http://localhost:3000/submissions/%id%}
+    support-session: ${SUPPORT_SESSION_URL:http://localhost:3000/support/sessions/%id%}
+    verification: ${VERIFICATION_URL:http://localhost:3000/verify-email?token=%token%}
+    reset-password: ${RESET_PASSWORD_URL:http://localhost:3000/reset-password?token=%token%}
   email:
     from: ${EMAIL_FROM:noreply@apsas.edu.vn}
     from-name: ${EMAIL_FROM_NAME:APSAS System}
-    verification-url: ${VERIFICATION_BASE_URL:http://localhost:3000}/verify-email
-    reset-password-url: ${RESET_PASSWORD_BASE_URL:http://localhost:3000}/reset-password
-  rate-limit:
-    enabled: ${RATE_LIMIT_ENABLED:true}
-    window-minutes: ${RATE_LIMIT_WINDOW_MINUTES:60}
-    limits:
-      email-verification: 3
-      password-reset: 3
-      assignment-published: 10
-      assignment-reminder: 10
-      submission-evaluated: 20

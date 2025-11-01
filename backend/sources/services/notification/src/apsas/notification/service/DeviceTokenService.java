@@ -9,23 +9,14 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class DeviceTokenService {
-
-  private static final Logger logger = LoggerFactory.getLogger(DeviceTokenService.class);
-
   private final DeviceTokenRepository deviceTokenRepository;
   private final DeviceTokenMapper deviceTokenMapper;
-
-  public DeviceTokenService(
-      DeviceTokenRepository deviceTokenRepository, DeviceTokenMapper deviceTokenMapper) {
-    this.deviceTokenRepository = deviceTokenRepository;
-    this.deviceTokenMapper = deviceTokenMapper;
-  }
 
   @Transactional
   public DeviceTokenResponse registerToken(RegisterDeviceRequest request, UUID userId) {
@@ -39,39 +30,18 @@ public class DeviceTokenService {
       existingToken.setUserAgent(request.getUserAgent());
       existingToken.setIsActive(true);
       DeviceToken saved = deviceTokenRepository.save(existingToken);
-      logger.info("Updated existing device token for user: {}", userId);
       return deviceTokenMapper.toResponse(saved);
     }
 
     // Create new token
     DeviceToken deviceToken = deviceTokenMapper.toEntity(request, userId);
     DeviceToken saved = deviceTokenRepository.save(deviceToken);
-    logger.info("Registered new device token for user: {}", userId);
     return deviceTokenMapper.toResponse(saved);
-  }
-
-  @Transactional
-  public void deactivateToken(String token) {
-    deviceTokenRepository
-        .findByToken(token)
-        .ifPresent(
-            deviceToken -> {
-              deviceToken.setIsActive(false);
-              deviceTokenRepository.save(deviceToken);
-              logger.info("Deactivated device token: {}", token);
-            });
   }
 
   @Transactional
   public void removeToken(String token) {
     deviceTokenRepository.deleteByToken(token);
-    logger.info("Removed device token: {}", token);
-  }
-
-  public List<DeviceTokenResponse> getActiveTokensByUserId(UUID userId) {
-    return deviceTokenRepository.findByUserIdAndIsActive(userId, true).stream()
-        .map(deviceTokenMapper::toResponse)
-        .collect(Collectors.toList());
   }
 
   public List<String> getActiveTokenStringsByUserId(UUID userId) {
@@ -84,10 +54,5 @@ public class DeviceTokenService {
     return deviceTokenRepository.findByUserId(userId).stream()
         .map(deviceTokenMapper::toResponse)
         .collect(Collectors.toList());
-  }
-
-  @Transactional
-  public void markTokenAsInvalid(String token) {
-    deactivateToken(token);
   }
 }

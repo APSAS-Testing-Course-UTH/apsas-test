@@ -33,17 +33,8 @@ public class NotificationPreferences {
   private Boolean pushEnabled = true;
 
   // Email preferences by type
-  @Column(name = "email_verification", nullable = false)
-  private Boolean emailVerification = true;
-
-  @Column(name = "email_password_reset", nullable = false)
-  private Boolean emailPasswordReset = true;
-
   @Column(name = "email_assignment_published", nullable = false)
   private Boolean emailAssignmentPublished = true;
-
-  @Column(name = "email_assignment_reminder", nullable = false)
-  private Boolean emailAssignmentReminder = true;
 
   @Column(name = "email_submission_evaluated", nullable = false)
   private Boolean emailSubmissionEvaluated = true;
@@ -51,9 +42,6 @@ public class NotificationPreferences {
   // Push preferences by type
   @Column(name = "push_assignment_published", nullable = false)
   private Boolean pushAssignmentPublished = true;
-
-  @Column(name = "push_assignment_reminder", nullable = false)
-  private Boolean pushAssignmentReminder = true;
 
   @Column(name = "push_submission_evaluated", nullable = false)
   private Boolean pushSubmissionEvaluated = true;

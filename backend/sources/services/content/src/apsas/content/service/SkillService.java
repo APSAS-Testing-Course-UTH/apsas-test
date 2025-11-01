@@ -6,34 +6,21 @@ import apsas.content.model.dto.SkillResponse;
 import apsas.content.model.dto.UpdateSkillRequest;
 import apsas.content.model.entity.Skill;
 import apsas.content.repository.SkillRepository;
-import apsas.shared.common.dto.PageResponse;
-import apsas.shared.common.exception.BadRequestException;
-import apsas.shared.common.exception.NotFoundException;
-import java.util.List;
+import apsas.shared.exception.BadRequestException;
+import apsas.shared.exception.NotFoundException;
+import apsas.shared.models.pagination.PageResponse;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class SkillService {
-
   private final SkillRepository skillRepository;
   private final SkillMapper skillMapper;
-
-  public SkillService(SkillRepository skillRepository, SkillMapper skillMapper) {
-    this.skillRepository = skillRepository;
-    this.skillMapper = skillMapper;
-  }
-
-  @Transactional(readOnly = true)
-  public List<SkillResponse> getAllSkills() {
-    return skillRepository.findAll().stream()
-        .map(skillMapper::toResponse)
-        .collect(Collectors.toList());
-  }
 
   @Transactional(readOnly = true)
   public PageResponse<SkillResponse> getAllSkills(Pageable pageable) {

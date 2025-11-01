@@ -8,7 +8,7 @@ import org.springframework.retry.annotation.EnableRetry;
 
 @SpringBootApplication
 @ComponentScan(basePackages = {"apsas"})
-@EnableFeignClients
+@EnableFeignClients(basePackages = {"apsas.feign.client"})
 @EnableRetry
 public class EvaluationServiceApplication {
   public static void main(String[] args) {

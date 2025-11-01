@@ -8,13 +8,12 @@ import apsas.identity.model.dto.UserResponse;
 import apsas.identity.model.entity.User;
 import apsas.identity.model.entity.UserRole;
 import apsas.identity.repository.UserRepository;
-import apsas.shared.common.dto.PageResponse;
-import apsas.shared.common.exception.BadRequestException;
-import apsas.shared.common.exception.NotFoundException;
-import apsas.shared.common.exception.UnauthorizedException;
+import apsas.shared.exception.BadRequestException;
+import apsas.shared.exception.NotFoundException;
+import apsas.shared.exception.UnauthorizedException;
+import apsas.shared.models.pagination.PageResponse;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,24 +38,10 @@ public class UserService {
   }
 
   @Transactional(readOnly = true)
-  public List<UserResponse> getAllUsers() {
-    return userRepository.findAll().stream()
-        .map(userMapper::toUserResponse)
-        .collect(Collectors.toList());
-  }
-
-  @Transactional(readOnly = true)
   public PageResponse<UserResponse> getAllUsers(Pageable pageable) {
     Page<User> userPage = userRepository.findAll(pageable);
     Page<UserResponse> responsePage = userPage.map(userMapper::toUserResponse);
     return PageResponse.of(responsePage);
-  }
-
-  @Transactional(readOnly = true)
-  public List<UserResponse> getUsersByRole(UserRole role) {
-    return userRepository.findByRole(role).stream()
-        .map(userMapper::toUserResponse)
-        .collect(Collectors.toList());
   }
 
   @Transactional(readOnly = true)
@@ -140,5 +125,24 @@ public class UserService {
       throw new NotFoundException("User not found");
     }
     userRepository.deleteById(userId);
+  }
+
+  // Internal service methods for Feign clients
+  @Transactional(readOnly = true)
+  public List<UserResponse> findUsersByIds(List<UUID> ids) {
+    List<User> users = userRepository.findAllById(ids);
+    return users.stream().map(userMapper::toUserResponse).toList();
+  }
+
+  @Transactional(readOnly = true)
+  public List<UserResponse> getUsersByRole(UserRole role) {
+    List<User> users = userRepository.findByRole(role);
+    return users.stream().map(userMapper::toUserResponse).toList();
+  }
+
+  @Transactional(readOnly = true)
+  public List<UserResponse> getUsersByRole(String role) {
+    UserRole userRole = UserRole.valueOf(role);
+    return getUsersByRole(userRole);
   }
 }

@@ -60,9 +60,19 @@ Content Service is a microservice responsible for managing programming assignmen
 - **Assignment-Skill**: Many-to-Many relationship between assignments and skills.
 - **Assignment-Tutorial**: Many-to-Many relationship between assignments and tutorials.
 
+## Port
+
+- **Default**: 8082
+
 ## Integration
 
-- **Notification Service**: To send notifications about assignment updates and deadlines.
+- **Notification Service**: Publishes events for assignment updates and deadlines
+- **Evaluation Service**: Provides assignment details and test cases via internal API (called via Feign Client)
+
+## Events Published
+
+- **AssignmentPublishedEvent**: Published to `assignment.published` routing key when an assignment is published
+- **AssignmentScheduleUpdatedEvent**: Published to `assignment.schedule.updated` routing key when assignment schedule changes
 
 ## API Endpoints
 

@@ -6,19 +6,16 @@ import com.google.firebase.FirebaseOptions;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConditionalOnProperty(name = "firebase.enabled", havingValue = "true", matchIfMissing = false)
+@Slf4j
+@ConditionalOnProperty(name = "firebase.enabled", havingValue = "true")
 public class FirebaseConfig {
-
-  private static final Logger logger = LoggerFactory.getLogger(FirebaseConfig.class);
-
   @Value("${firebase.project-id}")
   private String projectId;
 
@@ -76,10 +73,10 @@ public class FirebaseConfig {
           FirebaseOptions.builder().setCredentials(credentials).setProjectId(projectId).build();
 
       FirebaseApp app = FirebaseApp.initializeApp(options);
-      logger.info("Firebase App initialized successfully for project: {}", projectId);
+      log.info("Firebase App initialized successfully for project: {}", projectId);
       return app;
     } else {
-      logger.info("Firebase App already initialized");
+      log.info("Firebase App already initialized");
       return FirebaseApp.getInstance();
     }
   }

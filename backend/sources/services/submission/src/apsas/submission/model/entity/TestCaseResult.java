@@ -19,5 +19,4 @@ public class TestCaseResult {
   private String errorMessage;
   private Double executionTime;
   private Double memoryUsed;
-
 }

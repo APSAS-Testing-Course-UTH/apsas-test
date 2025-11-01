@@ -2,7 +2,9 @@ package apsas.shared.security;
 
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 
-/** Lớp đại diện cho token xác thực dựa trên thông tin người dùng trong header. */
+/**
+ * Lớp đại diện cho token xác thực dựa trên thông tin người dùng trong header.
+ */
 public class HeaderAuthenticationToken extends AbstractAuthenticationToken {
   private final UserPrincipal principal;
 

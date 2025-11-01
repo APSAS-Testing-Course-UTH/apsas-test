@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>New Assignment Published</title>
+  <title>Bài Tập Mới Được Thêm</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -68,21 +68,21 @@
     <h1>APSAS</h1>
   </div>
   <div class="content">
-    <h2>New Assignment Published</h2>
-    <p>Hi <span th:text="${firstName}">Student</span>,</p>
-    <p>A new assignment has been published for you:</p>
+    <h2>📚 Bài Tập Mới Đã Được Thêm!</h2>
+    <p>Xin chào <span th:text="${firstName}">Student</span>,</p>
+    <p>Một bài tập mới đã được thêm dành cho bạn trên APSAS. Dưới đây là chi tiết về bài tập:</p>
     <div class="info-box">
       <h3 th:text="${assignmentTitle}">Assignment Title</h3>
-      <p><strong>Deadline:</strong> <span th:text="${deadline}">2025-01-31 23:59</span></p>
+      <p><strong>Hạn nộp:</strong> <span th:text="${deadline}">2025-01-31 23:59</span></p>
       <p th:text="${description}">Assignment description here...</p>
     </div>
     <div style="text-align: center;">
-      <a th:href="${assignmentUrl}" class="button">View Assignment</a>
+      <a th:href="${assignmentUrl}" class="button">Xem Bài Tập</a>
     </div>
-    <p>Don't forget to submit your work before the deadline!</p>
+    <p>Đừng quên nộp bài trước hạn chết!</p>
   </div>
   <div class="footer">
-    <p>&copy; 2025 APSAS. All rights reserved.</p>
+    <p>&copy; 2025 APSAS. Bản quyền thuộc về APSAS.</p>
   </div>
 </div>
 </body>

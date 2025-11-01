@@ -1,46 +1,90 @@
 package apsas.notification.listener;
 
-import apsas.messaging.event.SubmissionEvaluatedEvent;
-import apsas.notification.config.MessagingConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import apsas.feign.client.AssignmentFeignClient;
+import apsas.feign.client.SubmissionFeignClient;
+import apsas.feign.client.UserFeignClient;
+import apsas.feign.dto.AssignmentResponse;
+import apsas.feign.dto.SubmissionResponse;
+import apsas.feign.dto.UserResponse;
+import apsas.notification.service.NotificationDispatcher;
+import apsas.shared.messaging.config.RabbitMqConfig;
+import apsas.shared.messaging.event.SubmissionEvaluatedEvent;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
+@Slf4j
 public class SubmissionEventListener {
 
-  private static final Logger logger = LoggerFactory.getLogger(SubmissionEventListener.class);
+  private final NotificationDispatcher notificationDispatcher;
+  private final SubmissionFeignClient submissionFeignClient;
+  private final AssignmentFeignClient assignmentFeignClient;
+  private final UserFeignClient userFeignClient;
 
-  // Note: This is a placeholder implementation
-  // In a real system, you would need to:
-  // 1. Fetch submission details from submission service
-  // 2. Get student user info from identity service
-  // 3. Get assignment details from content service
-  // 4. Check notification preferences
-  // 5. Send email and/or push notifications with results
+  @Value("${notification.url.submission}")
+  private String submissionUrlTemplate;
 
-  @RabbitListener(queues = MessagingConfig.SUBMISSION_EVALUATED_QUEUE)
+  @RabbitListener(queues = RabbitMqConfig.NOTIFICATION_SUBMISSION_EVALUATED_QUEUE)
   public void handleSubmissionEvaluated(SubmissionEvaluatedEvent event) {
     try {
-      logger.info(
-          "Received submission evaluated event for submission: {} with score: {}",
-          event.getSubmissionId(),
-          event.getScore()
+      SubmissionResponse submission = submissionFeignClient.getSubmissionById(event.getSubmissionId());
+      if (submission == null) {
+        return;
+      }
+
+      UserResponse student = userFeignClient.getUserById(submission.getStudentId());
+      if (student == null) {
+        return;
+      }
+
+      AssignmentResponse assignment = assignmentFeignClient.getAssignmentById(submission.getAssignmentId());
+      if (assignment == null) {
+        return;
+      }
+
+      // Calculate test results
+      int totalTests = event.getTestCaseResults() != null ? event.getTestCaseResults().size() : 0;
+      int testsPassed = 0;
+      if (event.getTestCaseResults() != null) {
+        testsPassed = (int) event.getTestCaseResults().stream()
+            .filter(tc -> Boolean.TRUE.equals(tc.getPassed()))
+            .count();
+      }
+
+      // Determine if passed (score >= 70)
+      boolean passed = event.getScore() != null && event.getScore().intValue() >= 70;
+
+      // Generate feedback if not provided
+      String feedback = submission.getFeedback();
+      if (feedback == null || feedback.isEmpty()) {
+        feedback = passed
+            ? "Chúc mừng! Bạn đã hoàn thành bài tập thành công."
+            : "Hãy xem lại kết quả các test case và thử lại.";
+      }
+
+      // Build submission URL
+      String submissionUrl = submissionUrlTemplate.replace("%id%", event.getSubmissionId().toString());
+
+      // Send notification
+      notificationDispatcher.sendSubmissionEvaluatedNotification(
+          student.getId(),
+          student.getEmail(),
+          student.getFirstName(),
+          assignment.getTitle(),
+          event.getScore() != null ? event.getScore().intValue() : 0,
+          passed,
+          testsPassed,
+          totalTests,
+          "N/A", // execution time not in event
+          feedback,
+          submissionUrl
       );
-
-      // TODO: Implement full notification logic
-      // 1. Fetch submission details (student ID, assignment ID) from submission service
-      // 2. Get student user info (email, name) from identity service
-      // 3. Get assignment details (title) from content service
-      // 4. Check notification preferences for the student
-      // 5. Check rate limits
-      // 6. Send email notification with evaluation results
-      // 7. Send push notification if enabled
-
-      logger.info("Submission evaluated notification processed for: {}", event.getSubmissionId());
     } catch (Exception e) {
-      logger.error("Error handling submission evaluated event", e);
+      log.error("Error handling submission evaluated event", e);
     }
   }
 }

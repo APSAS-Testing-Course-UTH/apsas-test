@@ -2,9 +2,13 @@
 
 The Evaluation Service is a microservice responsible for evaluating student submissions for programming assignments. It executes the submitted code against predefined test cases and returns the results to the Submission Service.
 
+## Port
+
+- **Default**: 8084
+
 ## Permissions
 
-- **All Roles**: Access list of supported programming languages and their versions.
+- **All Roles**: Access list of supported programming languages and their versions via `/api/v1/runtimes`
 
 ## Models
 
@@ -36,9 +40,18 @@ The Evaluation Service is a microservice responsible for evaluating student subm
 4. The Evaluation Service processes the results from the Piston API, compares the actual output with the expected output, and calculates the score.
 5. The Evaluation Service sends a message back to the Submission Service with the evaluation results, including test case results and overall score.
 
+## API Endpoints
+
+| Method | Endpoint           | Description                                      | Role          |
+|--------|--------------------|-------------------------------------------------|---------------|
+| GET    | /api/v1/runtimes   | Get list of supported languages and versions    | Authenticated |
+
 ## Other Considerations
 
-- Implement retry logic for handling transient failures when communicating with the Piston API.
+- Implements retry logic for handling transient failures when communicating with the Piston API
+- Uses Spring Retry with exponential backoff for Piston API calls
+- Validates programming language support before executing code
+- Compares actual output with expected output (exact string match) for test case evaluation
 - Implement worker threads or asynchronous processing to handle multiple evaluation requests concurrently. That means the Evaluation Service should be able to process multiple test cases in parallel to improve performance.
 
 ## API Endpoints

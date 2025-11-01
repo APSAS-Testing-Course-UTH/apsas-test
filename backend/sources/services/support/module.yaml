@@ -15,7 +15,9 @@ settings:
 
 dependencies:
   - ../../shared/security
-  - ../../shared/common
+  - ../../shared/exception
+  - ../../shared/models
+  - ../../shared/messaging
   - $spring.boot.starter.web
   - $spring.boot.starter.websocket
   - $spring.boot.starter.data.jpa

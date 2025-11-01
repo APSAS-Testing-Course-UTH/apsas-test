@@ -25,22 +25,41 @@ _Note: Passwords are hashed using bcrypt before storage. Role hierarchy is not e
 
 - **Notification Service**: Sends verification emails and password reset links.
 
-## API Endpoints (outdated)
+## API Endpoints
 
-| Method | Endpoint                | Description            | Role              |
-| ------ | ----------------------- | ---------------------- | ----------------- |
-| POST   | /api/v1/register        | Register a new user    | Public            |
-| POST   | /api/v1/login           | User login             | Public            |
-| POST   | /api/v1/email/verify    | Verify email           | Public            |
-| POST   | /api/v1/password/forgot | Request password reset | Public            |
-| POST   | /api/v1/password/reset  | Reset password         | Public            |
-| GET    | /api/v1/profile         | Get user profile       | Authenticated     |
-| PATCH  | /api/v1/profile         | Update user profile    | Authenticated     |
-| PATCH  | /api/v1/change-password | Change password        | Authenticated     |
-| GET    | /api/v1/users           | List all users         | Admin             |
-| GET    | /api/v1/users/{id}      | Get user by ID         | Admin, Instructor |
-| POST   | /api/v1/users           | Create a new user      | Admin             |
-| PATCH  | /api/v1/users/{id}      | Update user info       | Admin             |
-| PATCH  | /api/v1/users/{id}/role | Update user role       | Admin             |
-| PATCH  | /api/v1/users/{id}/lock | Lock/Unlock user       | Admin             |
-| DELETE | /api/v1/users/{id}      | Delete a user          | Admin             |
+### Authentication Endpoints (`/api/auth`)
+
+| Method | Endpoint                  | Description                        | Role   |
+|--------|---------------------------|------------------------------------|--------|
+| POST   | /api/auth/register        | Register a new user (student role) | Public |
+| POST   | /api/auth/login           | User login                         | Public |
+| POST   | /api/auth/verify-email    | Verify email with token            | Public |
+| POST   | /api/auth/resend-verification | Resend verification email      | Public |
+| POST   | /api/auth/forgot-password | Request password reset             | Public |
+| POST   | /api/auth/reset-password  | Reset password with token          | Public |
+
+### User Management Endpoints (`/api/v1/users`)
+
+| Method | Endpoint                    | Description                      | Role              |
+|--------|-----------------------------|----------------------------------|-------------------|
+| GET    | /api/v1/users/me            | Get current user profile         | Authenticated     |
+| PUT    | /api/v1/users/me            | Update current user profile      | Authenticated     |
+| POST   | /api/v1/users/me/change-password | Change current user password | Authenticated     |
+| GET    | /api/v1/users/{userId}      | Get user by ID                   | Admin, Instructor |
+| GET    | /api/v1/users               | List all users (paginated)       | Admin             |
+| GET    | /api/v1/users/role/{role}   | List users by role (paginated)   | Admin, Instructor |
+| POST   | /api/v1/users               | Create a new user                | Admin             |
+| PUT    | /api/v1/users/{userId}/activate | Activate user account        | Admin             |
+| PUT    | /api/v1/users/{userId}/deactivate | Deactivate user account    | Admin             |
+| DELETE | /api/v1/users/{userId}      | Delete a user                    | Admin             |
+
+## Port
+
+- **Default**: 8081
+
+## Events Published
+
+- **UserRegisteredEvent**: Published to `user.registered` routing key when a new user registers
+  - Consumed by: Notification Service (sends verification email)
+- **PasswordResetRequestedEvent**: Published to `password.reset` routing key when password reset is requested
+  - Consumed by: Notification Service (sends reset email)

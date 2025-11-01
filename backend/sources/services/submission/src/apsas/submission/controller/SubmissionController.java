@@ -1,7 +1,7 @@
 package apsas.submission.controller;
 
-import apsas.shared.common.dto.PageResponse;
-import apsas.shared.common.util.PageRequestParams;
+import apsas.shared.models.pagination.PageRequestParams;
+import apsas.shared.models.pagination.PageResponse;
 import apsas.shared.security.UserPrincipal;
 import apsas.submission.model.dto.CreateSubmissionRequest;
 import apsas.submission.model.dto.SubmissionResponse;
@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,13 +31,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/submissions")
 @Tag(name = "Submission Management", description = "Submission management endpoints")
 @SecurityRequirement(name = "Bearer Authentication")
+@RequiredArgsConstructor
 public class SubmissionController {
-
   private final SubmissionService submissionService;
-
-  public SubmissionController(SubmissionService submissionService) {
-    this.submissionService = submissionService;
-  }
 
   @GetMapping
   @Operation(

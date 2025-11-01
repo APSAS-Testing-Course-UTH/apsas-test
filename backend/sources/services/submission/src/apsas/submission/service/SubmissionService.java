@@ -1,71 +1,35 @@
 package apsas.submission.service;
 
-import apsas.messaging.event.EventPublisher;
-import apsas.messaging.event.RabbitMQConfig;
-import apsas.messaging.event.SubmissionCreatedEvent;
-import apsas.shared.common.dto.PageResponse;
-import apsas.shared.common.exception.NotFoundException;
-import apsas.shared.common.exception.UnauthorizedException;
+import apsas.shared.exception.NotFoundException;
+import apsas.shared.exception.UnauthorizedException;
+import apsas.shared.messaging.config.RabbitMqConfig;
+import apsas.shared.messaging.event.EventPublisher;
+import apsas.shared.messaging.event.SubmissionCreatedEvent;
+import apsas.shared.models.pagination.PageResponse;
+import apsas.submission.mapper.SubmissionEventMapper;
 import apsas.submission.mapper.SubmissionMapper;
 import apsas.submission.model.dto.CreateSubmissionRequest;
 import apsas.submission.model.dto.SubmissionResponse;
 import apsas.submission.model.entity.Submission;
 import apsas.submission.model.entity.SubmissionStatus;
 import apsas.submission.repository.SubmissionRepository;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class SubmissionService {
-
   private final SubmissionRepository submissionRepository;
   private final SubmissionMapper submissionMapper;
+  private final SubmissionEventMapper submissionEventMapper;
   private final EventPublisher eventPublisher;
-
-  public SubmissionService(
-      SubmissionRepository submissionRepository,
-      SubmissionMapper submissionMapper,
-      EventPublisher eventPublisher
-  ) {
-    this.submissionRepository = submissionRepository;
-    this.submissionMapper = submissionMapper;
-    this.eventPublisher = eventPublisher;
-  }
-
-  @Transactional(readOnly = true)
-  public List<SubmissionResponse> getAllSubmissions(
-      UUID studentId,
-      UUID assignmentId,
-      UUID filterStudentId,
-      SubmissionStatus status,
-      boolean isInstructor
-  ) {
-    List<Submission> submissions;
-
-    if (isInstructor) {
-      // Instructors can filter by assignment, student, and status
-      submissions = submissionRepository.findByFilters(assignmentId, filterStudentId, status);
-    } else {
-      // Students can only see their own submissions
-      if (assignmentId != null) {
-        submissions = submissionRepository.findByAssignmentIdAndStudentId(assignmentId, studentId);
-      } else {
-        submissions = submissionRepository.findByStudentId(studentId);
-      }
-      // Apply status filter for students if provided
-      if (status != null) {
-        submissions =
-            submissions.stream().filter(s -> s.getStatus() == status).collect(Collectors.toList());
-      }
-    }
-
-    return submissions.stream().map(submissionMapper::toResponse).collect(Collectors.toList());
-  }
 
   @Transactional(readOnly = true)
   public PageResponse<SubmissionResponse> getAllSubmissions(
@@ -129,30 +93,37 @@ public class SubmissionService {
         savedSubmission.getCode(),
         savedSubmission.getLanguage()
     );
-    eventPublisher.publish(RabbitMQConfig.SUBMISSION_CREATED_ROUTING_KEY, event);
+    eventPublisher.publish(RabbitMqConfig.SUBMISSION_CREATED_ROUTING_KEY, event);
 
     return submissionMapper.toResponse(savedSubmission);
   }
 
   @Transactional
-  public void updateSubmissionEvaluation(UUID submissionId, SubmissionResponse evaluationResult) {
+  public void handleSubmissionEvaluated(
+      UUID submissionId,
+      apsas.shared.messaging.model.SubmissionStatus status,
+      apsas.shared.messaging.model.SubmissionResult result,
+      BigDecimal score,
+      List<apsas.shared.models.submission.TestCaseResultDto> testCaseResults,
+      LocalDateTime evaluatedAt
+  ) {
     Submission submission =
         submissionRepository
             .findById(submissionId)
             .orElseThrow(() -> new NotFoundException(
                 "Submission not found with id: " + submissionId));
 
-    submission.setStatus(evaluationResult.getStatus());
-    submission.setResult(evaluationResult.getResult());
-    submission.setScore(evaluationResult.getScore());
-    submission.setEvaluatedAt(evaluationResult.getEvaluatedAt());
-
-    // Convert TestCaseResultResponse back to TestCaseResult if needed
-    // This is simplified - you might need a proper mapper
-    if (evaluationResult.getTestCaseResults() != null) {
-      // For now, we'll store the results directly
-      // In a real implementation, you'd want to properly map this
-    }
+    submission.setStatus(submissionEventMapper.toEntityStatus(status));
+    submission.setResult(submissionEventMapper.toEntityResult(result));
+    submission.setScore(score);
+    submission.setTestCaseResults(
+        testCaseResults != null
+            ? testCaseResults.stream()
+            .map(submissionEventMapper::toEntityTestCaseResult)
+            .toList()
+            : null
+    );
+    submission.setEvaluatedAt(evaluatedAt != null ? evaluatedAt : LocalDateTime.now());
 
     submissionRepository.save(submission);
   }
