@@ -13,7 +13,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -121,14 +120,14 @@ public class AssignmentController {
       summary = "Delete assignment",
       description = "Delete an assignment (Content Provider only)"
   )
-  public ResponseEntity<Map<String, String>> deleteAssignment(
+  public ResponseEntity<Void> deleteAssignment(
       @PathVariable
       UUID id, Authentication authentication
   ) {
     UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
     UUID userId = userPrincipal.userId();
     assignmentService.deleteAssignment(id, userId);
-    return ResponseEntity.ok(Map.of("message", "Assignment deleted successfully"));
+    return ResponseEntity.noContent().build();
   }
 
   @PostMapping("/{id}/publish")

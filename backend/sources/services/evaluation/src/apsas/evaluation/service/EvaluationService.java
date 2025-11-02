@@ -254,16 +254,18 @@ public class EvaluationService {
 
     long passedCount =
         testCaseResults.stream()
-            .filter(result -> result.getPassed() != null && result.getPassed())
+            .filter(TestCaseResultDto::getPassed)
             .count();
 
     if (passedCount == testCaseResults.size()) {
       return SubmissionResult.PASSED;
-    } else if (passedCount > 0) {
-      return SubmissionResult.PARTIAL;
-    } else {
-      return SubmissionResult.FAILED;
     }
+
+    if (passedCount > 0) {
+      return SubmissionResult.PARTIAL;
+    }
+
+    return SubmissionResult.FAILED;
   }
 
   /**

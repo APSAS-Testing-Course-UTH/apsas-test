@@ -12,4 +12,5 @@ modules:
   - sources/services/support
   - sources/services/notification
   - sources/shared/messaging
+  - sources/shared/test
   - sources/shared/exception

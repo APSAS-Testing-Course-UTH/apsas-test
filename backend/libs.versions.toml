@@ -5,6 +5,7 @@ hypersistence-utils-hibernate = "3.11.0"
 mapstruct = "1.6.3"
 firebase-admin = "9.4.2"
 protobuf = "4.32.1"
+mockito-kotlin = "6.1.0"
 
 [libraries]
 spring-cloud-dependencies = { module = "org.springframework.cloud:spring-cloud-dependencies", version.ref = "spring-cloud" }
@@ -26,6 +27,8 @@ mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "mapstruct" }
 
 firebase-admin = { module = "com.google.firebase:firebase-admin", version.ref = "firebase-admin" }
 protobuf-java-util = { module = "com.google.protobuf:protobuf-java-util", version.ref = "protobuf" }
+
+mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockito-kotlin" }
 
 # Version is managed by Spring Boot
 spring-security-oauth2-jose = "org.springframework.security:spring-security-oauth2-jose"

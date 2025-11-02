@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -100,13 +99,13 @@ public class TutorialController {
   @DeleteMapping("/{id}")
   @PreAuthorize("hasRole('CONTENT_PROVIDER')")
   @Operation(summary = "Delete tutorial", description = "Delete a tutorial (Content Provider only)")
-  public ResponseEntity<Map<String, String>> deleteTutorial(
+  public ResponseEntity<Void> deleteTutorial(
       @PathVariable
       UUID id, Authentication authentication
   ) {
     UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
     UUID userId = userPrincipal.userId();
     tutorialService.deleteTutorial(id, userId);
-    return ResponseEntity.ok(Map.of("message", "Tutorial deleted successfully"));
+    return ResponseEntity.noContent().build();
   }
 }

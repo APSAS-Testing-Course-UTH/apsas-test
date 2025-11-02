@@ -1,7 +1,7 @@
 package apsas.submission.service;
 
+import apsas.shared.exception.ForbiddenException;
 import apsas.shared.exception.NotFoundException;
-import apsas.shared.exception.UnauthorizedException;
 import apsas.shared.messaging.config.RabbitMqConfig;
 import apsas.shared.messaging.event.EventPublisher;
 import apsas.shared.messaging.event.SubmissionCreatedEvent;
@@ -74,7 +74,7 @@ public class SubmissionService {
 
     // Students can only view their own submissions
     if (!isInstructor && !submission.getStudentId().equals(studentId)) {
-      throw new UnauthorizedException("You are not authorized to view this submission");
+      throw new ForbiddenException("You are not authorized to view this submission");
     }
 
     return submissionMapper.toResponse(submission);

@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -89,11 +88,11 @@ public class SkillController {
   @DeleteMapping("/{id}")
   @PreAuthorize("hasRole('CONTENT_PROVIDER')")
   @Operation(summary = "Delete skill", description = "Delete a skill (Content Provider only)")
-  public ResponseEntity<Map<String, String>> deleteSkill(
+  public ResponseEntity<Void> deleteSkill(
       @PathVariable
       UUID id
   ) {
     skillService.deleteSkill(id);
-    return ResponseEntity.ok(Map.of("message", "Skill deleted successfully"));
+    return ResponseEntity.noContent().build();
   }
 }

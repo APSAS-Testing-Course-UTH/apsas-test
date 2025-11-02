@@ -81,3 +81,45 @@ This document provides instructions for using the Submission Service in your pro
 - Allows students to view their own submissions only.
 - Instructors can view all submissions.
 - Instructors can filter submissions by `assignment_id`, `student_id`, `status`.
+
+## Testing
+
+### RabbitMQ Listener Integration Tests
+
+The submission service includes comprehensive integration tests for RabbitMQ event listening in `EventListenerIntegrationTest.kt`. These tests verify that the service correctly processes `SubmissionEvaluatedEvent` messages from the Evaluation Service.
+
+#### Test Coverage
+
+**SubmissionCreatedEvent Tests**:
+- `shouldCreateSubmissionWithValidInput` - Validates submission creation with all required fields
+- `shouldRejectInvalidLanguage` - Ensures unsupported languages are rejected
+- `shouldPublishSubmissionCreatedEvent` - Verifies event is published when submission is created
+
+**SubmissionEvaluatedEvent Handler Tests**:
+- `shouldUpdateSubmissionWithPassedResult` - Updates submission when all tests pass
+- `shouldUpdateSubmissionWithPartialResult` - Updates submission when some tests fail
+- `shouldUpdateSubmissionWithFailedResult` - Updates submission when all tests fail
+- `shouldUpdateEvaluationResults` - Verifies evaluation results are correctly stored
+- `shouldHandleNullTestCaseResults` - Gracefully handles null test case data
+- `shouldPreserveTestCaseMetrics` - Preserves execution time and memory metrics
+- `shouldUpdateEvaluatedAtTimestamp` - Correctly updates the evaluation timestamp with microsecond precision
+- `shouldHandleWeightedTestCases` - Correctly handles weighted test case scoring
+- `shouldHandleHiddenTestCases` - Correctly processes hidden test cases
+- `shouldProcessMultipleEventsSequentially` - Processes multiple events in sequence for different submissions
+
+#### Running Tests
+
+```bash
+# Run all submission service tests
+./amper test -m submission
+
+# Run specific test class
+./amper test -m submission --test EventListenerIntegrationTest
+```
+
+#### Key Testing Considerations
+
+- **Timestamp Precision**: PostgreSQL stores timestamps at microsecond precision. Tests use `LocalDateTime.now().truncatedTo(ChronoUnit.MICROS)` to match database storage behavior
+- **RabbitMQ Integration**: Tests use `@ActiveProfiles("integration")` and require RabbitMQ to be running (via Docker Compose)
+- **Test Data**: Uses `TestDataHelper` to create consistent test submissions
+- **Event Serialization**: Ensures `SubmissionEvaluatedEvent` is correctly deserialized from JSON
