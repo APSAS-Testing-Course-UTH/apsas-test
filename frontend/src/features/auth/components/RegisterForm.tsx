@@ -1,5 +1,5 @@
 import { useForm } from '@mantine/form'
-import { zodResolver } from 'mantine-form-zod-resolver'
+import { zod4Resolver } from 'mantine-form-zod-resolver'
 import { TextInput, PasswordInput, Button, Group, Anchor, Checkbox, Title, Paper, Container, Text } from '@mantine/core'
 import { Link } from '@tanstack/react-router'
 
@@ -8,9 +8,9 @@ import { registerSchema } from '../schemas/registerSchema'
 
 // Component form đăng ký với Mantine UI
 export const RegisterForm = () => {
-  // Khởi tạo form với zodResolver và registerSchema
+  // Khởi tạo form với zod4Resolver và registerSchema
   const form = useForm({
-    validate: zodResolver(registerSchema),
+    validate: zod4Resolver(registerSchema),
     initialValues: {
       email: '',
       password: '',

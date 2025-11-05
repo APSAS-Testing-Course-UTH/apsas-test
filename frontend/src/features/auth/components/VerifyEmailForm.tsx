@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useForm } from '@mantine/form'
-import { zodResolver } from 'mantine-form-zod-resolver'
+import { zod4Resolver } from 'mantine-form-zod-resolver'
 import { TextInput, Button, Title, Paper, Alert, Loader, Center, Container, Stack } from '@mantine/core'
 import { useNavigate } from '@tanstack/react-router'
 
@@ -19,9 +19,9 @@ export const VerifyEmailForm = ({ token }: VerifyEmailFormProps) => {
   // Lấy navigate hook
   const navigate = useNavigate()
 
-  // Khởi tạo form với zodResolver và verifyEmailSchema
+  // Khởi tạo form với zod4Resolver và verifyEmailSchema
   const form = useForm({
-    validate: zodResolver(verifyEmailSchema),
+    validate: zod4Resolver(verifyEmailSchema),
     initialValues: {
       token: token || ''
     }

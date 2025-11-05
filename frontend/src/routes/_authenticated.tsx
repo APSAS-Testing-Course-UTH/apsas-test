@@ -1,6 +1,7 @@
-import { createFileRoute, redirect, Outlet } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useAuthStore } from '../features/auth/stores/useAuthStore'
 import { Loader, Center } from '@mantine/core'
+import { StudentPortalLayout } from '@/layouts/StudentPortalLayout'
 
 // Layout route cho tất cả protected routes
 // Tự động redirect về /login nếu chưa authenticated
@@ -39,6 +40,6 @@ function AuthenticatedLayout() {
     )
   }
 
-  // Render protected content
-  return <Outlet />
+  // Render protected content with StudentPortalLayout
+  return <StudentPortalLayout />
 }

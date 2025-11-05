@@ -3,7 +3,11 @@ import { zIdentityServiceResetPasswordRequest } from '@/api/zod.gen'
 
 // Reset password schema - extend generated schema với confirm password
 export const resetPasswordSchema = zIdentityServiceResetPasswordRequest.extend({
-  // Thêm confirm password field
+  // Add custom Vietnamese messages for generated fields
+  token: z.string().min(1, 'Token là bắt buộc'),
+  newPassword: z.string().min(8, 'Mật khẩu phải có ít nhất 8 ký tự'),
+
+  // Add confirm password field
   confirmPassword: z.string().min(8, 'Mật khẩu xác nhận phải có ít nhất 8 ký tự'),
 }).refine(
   // Validate newPassword === confirmPassword

@@ -2,6 +2,9 @@ import { http, HttpResponse } from 'msw'
 import { withAuth } from '../middleware/withAuth'
 import { UserRole } from '../middleware/withAuth'
 import { errorResponses } from '../middleware/errorHandler'
+import { submissionUrl, MSW_BASE_URL } from '../config'
+
+console.log('[Submission Handlers] Using base URL:', MSW_BASE_URL)
 
 // Define submission-related types based on OpenAPI spec
 export type SubmissionStatus = 'PENDING' | 'EVALUATED' | 'FAILED'
@@ -60,80 +63,21 @@ export type PageResponseSubmissionResponse = {
   hasPrevious: boolean
 }
 
-// Mock submissions database
-const mockSubmissions: Record<string, SubmissionResponse> = {
-  'sub-001': {
-    id: 'sub-001',
-    assignmentId: 'assign-001',
-    studentId: 'student-001',
-    submittedAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
-    status: 'EVALUATED',
-    code: 'function hello() { return "Hello World"; }',
-    language: 'javascript',
-    result: 'PASSED',
-    score: 100,
-    testCaseResults: [
-      {
-        order: 1,
-        description: 'Test basic functionality',
-        hidden: false,
-        weight: 1.0,
-        input: 'hello()',
-        output: 'Hello World',
-        timeout: 5000,
-        memoryLimit: 128,
-        passed: true,
-        actualOutput: 'Hello World',
-        executionTime: 12.5,
-        memoryUsed: 2.3,
-      },
-    ],
-    evaluatedAt: new Date().toISOString(),
-    feedback: 'Great submission! All test cases passed.',
-  },
-  'sub-002': {
-    id: 'sub-002',
-    assignmentId: 'assign-001',
-    studentId: 'student-002',
-    submittedAt: new Date(Date.now() - 43200000).toISOString(), // 12 hours ago
-    status: 'EVALUATED',
-    code: 'function hello() { return "Hello"; }',
-    language: 'javascript',
-    result: 'FAILED',
-    score: 0,
-    testCaseResults: [
-      {
-        order: 1,
-        description: 'Test basic functionality',
-        hidden: false,
-        weight: 1.0,
-        input: 'hello()',
-        output: 'Hello World',
-        timeout: 5000,
-        memoryLimit: 128,
-        passed: false,
-        actualOutput: 'Hello',
-        errorMessage: 'Output does not match expected result',
-        executionTime: 8.2,
-        memoryUsed: 1.8,
-      },
-    ],
-    evaluatedAt: new Date().toISOString(),
-    feedback: 'Your function returns "Hello" but should return "Hello World".',
-  },
-  'sub-003': {
-    id: 'sub-003',
-    assignmentId: 'assign-002',
-    studentId: 'student-001',
-    submittedAt: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
-    status: 'PENDING',
-    code: 'print("Hello World")',
-    language: 'python',
-    // No result/score yet since it's pending
-  },
-}
+// Mock submissions database - use generated mock data with valid UUIDs
+// Import from centralized mock data registry
+import { MOCK_DATA_REGISTRY, getAllStudentSubmissions } from '../factory/mockDataRegistry'
 
-const BASE_URL = 'http://localhost:3000'
+// Convert array to Record for backwards compatibility
+const mockSubmissions: Record<string, SubmissionResponse> = {}
+MOCK_DATA_REGISTRY.submissions.forEach((sub) => {
+  if (sub.id) {
+    mockSubmissions[sub.id] = {
+      ...sub,
+      submittedAt: sub.submittedAt ? sub.submittedAt.toISOString() : new Date().toISOString(),
+      evaluatedAt: sub.evaluatedAt ? sub.evaluatedAt.toISOString() : undefined,
+    } as SubmissionResponse
+  }
+})
 
 export const submissionHandlers = [
   /**
@@ -141,8 +85,7 @@ export const submissionHandlers = [
    * List all submissions with filters and pagination
    * Students see only their own, instructors can filter by assignment and student
    */
-  http.get(
-    `${BASE_URL}/api/v1/submissions`,
+  http.get(`${submissionUrl('submissions')}`,
     withAuth(({ request }: { request: Request }) => {
       const url = new URL(request.url)
       const page = Number(url.searchParams.get('page')) || 0
@@ -157,6 +100,8 @@ export const submissionHandlers = [
                       token?.includes('instructor') ? UserRole.INSTRUCTOR :
                       token?.includes('student') ? UserRole.STUDENT : UserRole.STUDENT
 
+      // Phase 10: Consolidated data - submissions can also be extracted from consolidated assignments
+      // For now, using flat submission array for backward compatibility
       let filtered = Object.values(mockSubmissions)
 
       // Apply filters
@@ -202,9 +147,9 @@ export const submissionHandlers = [
   /**
    * POST /api/v1/submissions
    * Create new submission (Students only)
+   * SDK calls /api/v1/submissions (not /api/v1/submission/submissions)
    */
-  http.post(
-    `${BASE_URL}/api/v1/submissions`,
+  http.post(`${MSW_BASE_URL}/api/v1/submissions`,
     withAuth(async ({ request }: { request: Request }) => {
       const token = request.headers.get('Authorization')?.split(' ')[1]
       const userRole = token?.includes('admin') ? UserRole.ADMIN :
@@ -246,8 +191,7 @@ export const submissionHandlers = [
    * Get submission by ID
    * Students can only view their own, instructors can view all
    */
-  http.get(
-    `${BASE_URL}/api/v1/submissions/:id`,
+  http.get('**/api/v1/submissions/:id',
     withAuth(({ params, request }: { params: { id: string }, request: Request }) => {
       const { id } = params
       const submission = mockSubmissions[id]
@@ -274,8 +218,7 @@ export const submissionHandlers = [
    * POST /api/v1/submissions/{id}/feedback
    * Provide feedback for submission (Instructors only)
    */
-  http.post(
-    `${BASE_URL}/api/v1/submissions/:id/feedback`,
+  http.post('**/api/v1/submissions/:id/feedback',
     withAuth(async ({ request, params }: { request: Request, params: { id: string } }) => {
       const { id } = params
       const token = request.headers.get('Authorization')?.split(' ')[1]

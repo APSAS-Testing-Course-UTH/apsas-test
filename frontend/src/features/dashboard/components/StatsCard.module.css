@@ -1,0 +1,33 @@
+.card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--mantine-shadow-md);
+}
+
+.title {
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.value {
+  line-height: 1.2;
+}
+
+.trendIconUp {
+  color: var(--mantine-color-teal-6);
+}
+
+.trendIconDown {
+  color: var(--mantine-color-red-6);
+}
+
+.trendUp {
+  color: var(--mantine-color-teal-6);
+}
+
+.trendDown {
+  color: var(--mantine-color-red-6);
+}

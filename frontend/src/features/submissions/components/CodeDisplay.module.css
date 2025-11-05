@@ -1,0 +1,216 @@
+.codeDisplay {
+  background-color: var(--mantine-color-gray-0);
+  border: 1px solid var(--mantine-color-gray-2);
+  border-radius: var(--mantine-radius-md);
+  padding: 0;
+  overflow: hidden;
+
+  /* Dark mode support */
+  @media (prefers-color-scheme: dark) {
+    background-color: var(--mantine-color-dark-8);
+    border-color: var(--mantine-color-dark-6);
+  }
+}
+
+.codeBlock {
+  background-color: #f5f5f5;
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  /* Dark mode */
+  @media (prefers-color-scheme: dark) {
+    background-color: var(--mantine-color-dark-7);
+  }
+
+  /* Scrollbar styling */
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--mantine-color-gray-4);
+    border-radius: 4px;
+
+    &:hover {
+      background: var(--mantine-color-gray-5);
+    }
+  }
+}
+
+.pre {
+  margin: 0;
+  padding: 16px;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #333;
+  overflow: visible;
+  word-break: break-word;
+  white-space: pre-wrap;
+
+  /* Dark mode */
+  @media (prefers-color-scheme: dark) {
+    color: #e0e0e0;
+  }
+}
+
+.code {
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.withLineNumbers {
+  /* Support for line number display */
+  counter-reset: line-number;
+
+  .code {
+    /* Counter for line numbers */
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .pre {
+    padding: 12px;
+    font-size: 12px;
+  }
+
+  .code {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pre {
+    padding: 8px;
+    font-size: 11px;
+  }
+
+  .code {
+    font-size: 11px;
+    line-height: 1.4;
+  }
+
+  .codeBlock {
+    max-height: 300px;
+  }
+}
+
+/* Prism syntax highlighting color scheme (light theme) */
+:root {
+  --prism-code-color: #333;
+  --prism-bg-color: #f5f5f5;
+}
+
+/* Dark mode Prism colors */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --prism-code-color: #e0e0e0;
+    --prism-bg-color: var(--mantine-color-dark-7);
+  }
+}
+
+/* Selection styling */
+.code::selection {
+  background-color: rgba(100, 149, 237, 0.3);
+  color: inherit;
+}
+
+.code::-moz-selection {
+  background-color: rgba(100, 149, 237, 0.3);
+  color: inherit;
+}
+
+/* Accessibility: Focus visible */
+.code:focus-visible {
+  outline: 2px solid var(--mantine-color-blue-5);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Token styling for better visibility */
+.token {
+  &.comment {
+    color: #999;
+  }
+
+  &.string {
+    color: #690;
+  }
+
+  &.number {
+    color: #099;
+  }
+
+  &.keyword {
+    color: #0077aa;
+  }
+
+  &.function {
+    color: #990000;
+  }
+
+  &.class-name {
+    color: #990000;
+  }
+}
+
+/* Dark mode token colors */
+@media (prefers-color-scheme: dark) {
+  .token {
+    &.comment {
+      color: #666;
+    }
+
+    &.string {
+      color: #9f9;
+    }
+
+    &.number {
+      color: #0ff;
+    }
+
+    &.keyword {
+      color: #00ffff;
+    }
+
+    &.function {
+      color: #ff6b6b;
+    }
+
+    &.class-name {
+      color: #ff6b6b;
+    }
+  }
+}
+
+/* Accessibility: High contrast mode support */
+@media (prefers-contrast: more) {
+  .pre {
+    border: 1px solid currentColor;
+  }
+
+  .code {
+    font-weight: 500;
+  }
+}
+
+/* Print styles */
+@media print {
+  .codeDisplay {
+    border: 1px solid black;
+    page-break-inside: avoid;
+  }
+
+  .pre {
+    background-color: white;
+    color: black;
+  }
+}

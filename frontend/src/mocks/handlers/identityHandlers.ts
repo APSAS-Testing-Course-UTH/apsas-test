@@ -14,15 +14,18 @@ import type {
   IdentityServiceResendVerificationEmailResponses,
   IdentityServiceUserResponse,
   IdentityServiceUpdateProfileRequest,
-  IdentityServiceChangePasswordRequest,
   IdentityServicePageResponseUserResponse,
   IdentityServiceCreateUserRequest,
 } from '@/api/types.gen'
-import { mockUsers, mockTokens } from '../data/users'
+// Import from centralized mock data registry
+import { MOCK_DATA_REGISTRY, getStudentOverallPerformance } from '../factory/mockDataRegistry'
 import { UserRole, withAuth } from '../middleware/withAuth'
 import type { UserRoleType } from '../middleware/withAuth'
 import { errorResponses } from '../middleware/errorHandler'
 import { factory, primaryKey } from '@mswjs/data'
+import { MSW_BASE_URL } from '../config'
+
+console.log('[Identity Handlers] Using base URL:', MSW_BASE_URL)
 
 // Helper function to map mock user roles to API roles
 const mapRoleToApi = (role: UserRoleType): "ADMIN" | "INSTRUCTOR" | "STUDENT" | "CONTENT_PROVIDER" => {
@@ -40,8 +43,7 @@ const mapRoleToApi = (role: UserRoleType): "ADMIN" | "INSTRUCTOR" | "STUDENT" | 
   }
 }
 
-// Base URL for API endpoints
-const BASE_URL = 'http://localhost:3000'
+// Base URL no longer needed - removed unused variable
 
 // Create MSW Data database for persistent mock data
 const db = factory({
@@ -158,7 +160,7 @@ const getUserByEmail = (email: string) => {
  * Authenticate user and return JWT token
  */
 export const loginHandler = http.post(
-  `${BASE_URL}/api/auth/login`,
+  '**/api/auth/login',
   async ({ request }) => {
     ensureDatabaseInitialized()
     try {
@@ -182,11 +184,11 @@ export const loginHandler = http.post(
       }
 
       // Get user details from mockUsers
-      const mockUser = mockUsers[`${user.role}1` as keyof typeof mockUsers]
+      const mockUser = (MOCK_DATA_REGISTRY.users as any)[`${user.role}1` as keyof typeof MOCK_DATA_REGISTRY.users]
 
       // Return AuthResponse with token
       const response: IdentityServiceLoginResponses[200] = {
-        token: mockTokens[user.role as keyof typeof mockTokens],
+        token: (MOCK_DATA_REGISTRY.tokens as any)[user.role as keyof typeof MOCK_DATA_REGISTRY.tokens],
         type: 'Bearer',
         user: {
           id: mockUser.id,
@@ -203,7 +205,7 @@ export const loginHandler = http.post(
       return HttpResponse.json(response, {
         status: 200,
         headers: {
-          'Set-Cookie': `token=${mockTokens[user.role as keyof typeof mockTokens]}; Path=/; HttpOnly; SameSite=Strict`,
+          'Set-Cookie': `token=${(MOCK_DATA_REGISTRY.tokens as any)[user.role as keyof typeof MOCK_DATA_REGISTRY.tokens]}; Path=/; HttpOnly; SameSite=Strict`,
         },
       })
     } catch (error) {
@@ -216,8 +218,7 @@ export const loginHandler = http.post(
  * POST /api/auth/register
  * Register new user account (Student role by default)
  */
-export const registerHandler = http.post(
-  `${BASE_URL}/api/auth/register`,
+export const registerHandler = http.post('**/api/auth/register',
   async ({ request }) => {
     try {
       const body = await request.json() as IdentityServiceRegisterRequest
@@ -252,7 +253,7 @@ export const registerHandler = http.post(
 
       // Return AuthResponse with the newly created user's details
       const response: IdentityServiceRegisterResponses[200] = {
-        token: mockTokens.student,
+        token: (MOCK_DATA_REGISTRY.tokens as any).student,
         type: 'Bearer',
         user: {
           id: newUserId,
@@ -265,9 +266,9 @@ export const registerHandler = http.post(
       }
 
       return HttpResponse.json(response, {
-        status: 200,
+        status: 201, // HTTP 201 Created for new user registration
         headers: {
-          'Set-Cookie': `token=${mockTokens.student}; Path=/; HttpOnly; SameSite=Strict`,
+          'Set-Cookie': `token=${(MOCK_DATA_REGISTRY.tokens as any).student}; Path=/; HttpOnly; SameSite=Strict`,
         },
       })
     } catch (error) {
@@ -280,8 +281,7 @@ export const registerHandler = http.post(
  * POST /api/auth/forgot-password
  * Send password reset email to user
  */
-export const forgotPasswordHandler = http.post(
-  `${BASE_URL}/api/auth/forgot-password`,
+export const forgotPasswordHandler = http.post('**/api/auth/forgot-password',
   async ({ request }) => {
     try {
       const body = await request.json() as IdentityServiceEmailRequest
@@ -334,8 +334,7 @@ export const forgotPasswordHandler = http.post(
  * POST /api/auth/reset-password
  * Reset user password using reset token
  */
-export const resetPasswordHandler = http.post(
-  `${BASE_URL}/api/auth/reset-password`,
+export const resetPasswordHandler = http.post('**/api/auth/reset-password',
   async ({ request }) => {
     try {
       const body = await request.json() as IdentityServiceResetPasswordRequest
@@ -350,7 +349,39 @@ export const resetPasswordHandler = http.post(
         return errorResponses.badRequest('Password must be at least 8 characters long')
       }
 
-      // Find user by reset token
+      // Check for invalid tokens (explicit test case)
+      if (body.token === 'invalid-token') {
+        return errorResponses.badRequest('Invalid or expired reset token')
+      }
+
+      // Accept known valid test tokens and update the corresponding user
+      if (body.token === 'valid-reset-token' || body.token === 'valid-token') {
+        // For test tokens, assume it's for the student user
+        const studentUser = db.user.findFirst({
+          where: { email: { equals: 'student@apsas.edu.vn' } },
+        })
+
+        if (studentUser) {
+          // Update the student's password
+          db.user.update({
+            where: { id: { equals: studentUser.id } },
+            data: {
+              password: body.newPassword,
+              resetToken: '',
+              resetTokenExpiry: 0,
+              updatedAt: Date.now(),
+            },
+          })
+          persistDatabase()
+        }
+
+        const response: IdentityServiceResetPasswordResponses[200] = {
+          message: 'Password has been reset successfully',
+        }
+        return HttpResponse.json(response, { status: 200 })
+      }
+
+      // Find user by reset token in database
       const user = db.user.findFirst({
         where: { resetToken: { equals: body.token } },
       })
@@ -360,7 +391,7 @@ export const resetPasswordHandler = http.post(
       }
 
       // Check if token is expired
-      if (user.resetTokenExpiry < Date.now()) {
+      if (user.resetTokenExpiry && user.resetTokenExpiry < Date.now()) {
         return errorResponses.badRequest('Reset token has expired')
       }
 
@@ -391,8 +422,7 @@ export const resetPasswordHandler = http.post(
  * POST /api/auth/verify-email
  * Verify user email using verification token
  */
-export const verifyEmailHandler = http.post(
-  `${BASE_URL}/api/auth/verify-email`,
+export const verifyEmailHandler = http.post('**/api/auth/verify-email',
   async ({ request }) => {
     try {
       const body = await request.json() as IdentityServiceTokenRequest
@@ -402,10 +432,17 @@ export const verifyEmailHandler = http.post(
         return errorResponses.badRequest('Verification token is required')
       }
 
-      // In a real implementation, this would validate the token
-      // For mocking, accept any non-empty token
-      // In a real implementation, this would mark the user's email as verified
-      // For mocking, just return success
+      // Check for invalid tokens
+      if (body.token === 'invalid-token') {
+        return errorResponses.badRequest('Invalid verification token')
+      }
+
+      // Check for expired tokens
+      if (body.token === 'expired-token-123') {
+        return errorResponses.unauthorized('Verification token has expired')
+      }
+
+      // Accept valid tokens (like 'valid-verification-token-123')
       const response: IdentityServiceVerifyEmailResponses[200] = {
         message: 'Email has been verified successfully',
       }
@@ -421,8 +458,7 @@ export const verifyEmailHandler = http.post(
  * POST /api/auth/resend-verification
  * Resend email verification to user
  */
-export const resendVerificationHandler = http.post(
-  `${BASE_URL}/api/auth/resend-verification`,
+export const resendVerificationHandler = http.post('**/api/auth/resend-verification',
   async ({ request }) => {
     try {
       const body = await request.json() as IdentityServiceEmailRequest
@@ -433,7 +469,7 @@ export const resendVerificationHandler = http.post(
       }
 
       // Check if email exists in mock users
-      const userExists = Object.values(mockUsers).some(user => user.email === body.email)
+      const userExists = Object.values(MOCK_DATA_REGISTRY.users).some(user => user.email === body.email)
       if (!userExists) {
         // For security, don't reveal if email exists or not
         // Return success message anyway
@@ -464,10 +500,14 @@ export const resendVerificationHandler = http.post(
  * GET /api/v1/users/me
  * Get current user profile (Authenticated users only)
  */
-const getCurrentUserHandler = http.get(
-  `${BASE_URL}/api/v1/users/me`,
+const getCurrentUserHandler = http.get('**/api/v1/users/me',
   withAuth(({ user }: { user: MockUser }) => {
     try {
+      // Phase 10: Add user metadata for dashboard and performance views
+      const metadata = user.role === UserRole.STUDENT 
+        ? getStudentOverallPerformance(user.id)
+        : undefined
+
       const response: IdentityServiceUserResponse = {
         id: user.id,
         email: user.email,
@@ -478,6 +518,12 @@ const getCurrentUserHandler = http.get(
         isEmailVerified: user.isEmailVerified,
         createdAt: user.createdAt ? new Date(user.createdAt) : undefined,
         updatedAt: user.updatedAt ? new Date(user.updatedAt) : undefined,
+        // Phase 10: Metadata for enhanced profile views
+        ...(metadata && {
+          metadata: {
+            performance: metadata
+          }
+        })
       }
 
       return HttpResponse.json(response, { status: 200 })
@@ -491,8 +537,7 @@ const getCurrentUserHandler = http.get(
  * PUT /api/v1/users/me
  * Update current user profile (Authenticated users only)
  */
-const updateCurrentUserHandler = http.put(
-  `${BASE_URL}/api/v1/users/me`,
+const updateCurrentUserHandler = http.put('**/api/v1/users/me',
   withAuth(async ({ request, user }: { request: Request, user: MockUser }) => {
     try {
       // Parse request body
@@ -513,7 +558,7 @@ const updateCurrentUserHandler = http.put(
 
       // Update mock data (in real app, this would be persisted)
       const userKey = `${user.role}1` as keyof typeof mockUsers
-      mockUsers[userKey] = updatedUser
+      (MOCK_DATA_REGISTRY.users as any)[userKey] = updatedUser
 
       const response: IdentityServiceUserResponse = {
         id: updatedUser.id,
@@ -538,8 +583,7 @@ const updateCurrentUserHandler = http.put(
  * POST /api/v1/users/me/change-password
  * Change current user password (Authenticated users only)
  */
-export const changePasswordHandler = http.post(
-  `${BASE_URL}/api/v1/users/me/change-password`,
+export const changePasswordHandler = http.post('**/api/v1/users/me/change-password',
   withAuth(async (context: any) => {
   const { request, user } = context
     
@@ -607,8 +651,7 @@ export const changePasswordHandler = http.post(
  * GET /api/v1/users
  * Get all users with pagination (Admin only)
  */
-const getUsersHandler = http.get(
-  `${BASE_URL}/api/v1/users`,
+const getUsersHandler = http.post('**/api/v1/users',
   withAuth(({ request, user }: { request: Request, user: MockUser }) => {
     try {
       // Check if user is admin
@@ -622,7 +665,7 @@ const getUsersHandler = http.get(
       const size = parseInt(url.searchParams.get('size') || '10', 10)
 
       // Get all users
-      const allUsers = Object.values(mockUsers)
+      const allUsers = Object.values(MOCK_DATA_REGISTRY.users)
       const totalElements = allUsers.length
       const totalPages = Math.ceil(totalElements / size)
 
@@ -659,8 +702,7 @@ const getUsersHandler = http.get(
  * POST /api/v1/users
  * Create new user (Admin only)
  */
-const createUserHandler = http.post(
-  `${BASE_URL}/api/v1/users`,
+const createUserHandler = http.post('**/api/v1/users',
   withAuth(async ({ request, user }: { request: Request, user: MockUser }) => {
     try {
       // Check if user is admin
@@ -677,7 +719,7 @@ const createUserHandler = http.post(
       }
 
       // Check if email already exists
-      const existingUser = Object.values(mockUsers).find(user => user.email === body.email)
+      const existingUser = Object.values(MOCK_DATA_REGISTRY.users).find(user => user.email === body.email)
       if (existingUser) {
         return errorResponses.badRequest('User with this email already exists')
       }
@@ -713,7 +755,7 @@ const createUserHandler = http.post(
  * Get user by ID (Admin only)
  */
 const getUserByIdHandler = http.get<{ userId: string }>(
-  `${BASE_URL}/api/v1/users/:userId`,
+  '/api/v1/users/:userId',
   withAuth(({ params, user: authUser }: { params: { userId: string }, user: MockUser }) => {
     try {
       // Check if user is admin
@@ -724,7 +766,7 @@ const getUserByIdHandler = http.get<{ userId: string }>(
       const { userId } = params
 
       // Find user by ID
-      const user = Object.values(mockUsers).find(u => u.id === userId)
+      const user = Object.values(MOCK_DATA_REGISTRY.users).find(u => u.id === userId)
 
       if (!user) {
         return errorResponses.notFound('User not found')
@@ -750,7 +792,7 @@ const getUserByIdHandler = http.get<{ userId: string }>(
  * Delete user (Admin only)
  */
 const deleteUserHandler = http.delete<{ userId: string }>(
-  `${BASE_URL}/api/v1/users/:userId`,
+  '/api/v1/users/:userId',
   withAuth(({ params, user: authUser }: { params: { userId: string }, user: MockUser }) => {
     try {
       // Check if user is admin
@@ -761,7 +803,7 @@ const deleteUserHandler = http.delete<{ userId: string }>(
       const { userId } = params
 
       // Find user by ID
-      const user = Object.values(mockUsers).find(u => u.id === userId)
+      const user = Object.values(MOCK_DATA_REGISTRY.users).find(u => u.id === userId)
 
       if (!user) {
         return errorResponses.notFound('User not found')
@@ -785,7 +827,7 @@ const deleteUserHandler = http.delete<{ userId: string }>(
  * Activate user (Admin only)
  */
 const activateUserHandler = http.put<{ userId: string }>(
-  `${BASE_URL}/api/v1/users/:userId/activate`,
+  '/api/v1/users/:userId/activate',
   withAuth(({ params, user: authUser }: { params: { userId: string }, user: MockUser }) => {
     try {
       // Check if user is admin
@@ -796,7 +838,7 @@ const activateUserHandler = http.put<{ userId: string }>(
       const { userId } = params
 
       // Find user by ID
-      const user = Object.values(mockUsers).find(u => u.id === userId)
+      const user = Object.values(MOCK_DATA_REGISTRY.users).find(u => u.id === userId)
 
       if (!user) {
         return errorResponses.notFound('User not found')
@@ -823,7 +865,7 @@ const activateUserHandler = http.put<{ userId: string }>(
  * Deactivate user (Admin only)
  */
 const deactivateUserHandler = http.put<{ userId: string }>(
-  `${BASE_URL}/api/v1/users/:userId/deactivate`,
+  '/api/v1/users/:userId/deactivate',
   withAuth(({ params, user: authUser }: { params: { userId: string }, user: MockUser }) => {
     try {
       // Check if user is admin
@@ -834,7 +876,7 @@ const deactivateUserHandler = http.put<{ userId: string }>(
       const { userId } = params
 
       // Find user by ID
-      const user = Object.values(mockUsers).find(u => u.id === userId)
+      const user = Object.values(MOCK_DATA_REGISTRY.users).find(u => u.id === userId)
 
       if (!user) {
         return errorResponses.notFound('User not found')
@@ -874,3 +916,5 @@ export const identityHandlers = [
   activateUserHandler,
   deactivateUserHandler,
 ]
+
+

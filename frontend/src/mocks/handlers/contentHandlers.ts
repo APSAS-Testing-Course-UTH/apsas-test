@@ -16,116 +16,23 @@ import type {
 } from '@/api/types.gen'
 import { withAuth } from '../middleware/withAuth'
 import { UserRole } from '../middleware/withAuth'
+import { MSW_BASE_URL } from '../config'
+import {
+  MOCK_DATA_REGISTRY,
+  getAllAssignments,
+  getAllTutorials,
+  getAllSkills,
+} from '../factory/mockDataRegistry'
 
-const BASE_URL = 'http://localhost:3000'
+console.log('[Content Handlers] Using centralized mock data registry')
+console.log('[Content Handlers] Base URL:', MSW_BASE_URL)
+console.log('[Content Handlers] Loaded assignments:', Object.keys(MOCK_DATA_REGISTRY.assignments).length)
 
-// Mock data for content service
-const mockTutorials: Record<string, ContentServiceTutorialResponse> = {
-  'tut-001': {
-    id: 'tut-001',
-    title: 'JavaScript Fundamentals',
-    content: 'Learn the basics of JavaScript programming language including variables, functions, and control structures.',
-    creatorId: 'provider-001',
-    createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-    updatedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-    tags: ['javascript', 'beginner', 'fundamentals'],
-  },
-  'tut-002': {
-    id: 'tut-002',
-    title: 'Python Data Structures',
-    content: 'Comprehensive guide to Python data structures including lists, dictionaries, sets, and tuples.',
-    creatorId: 'provider-001',
-    createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-    updatedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-    tags: ['python', 'data-structures', 'intermediate'],
-  },
-}
-
-const mockSkills: Record<string, ContentServiceSkillResponse> = {
-  'skill-001': {
-    id: 'skill-001',
-    name: 'JavaScript Functions',
-    description: 'Understanding and implementing functions in JavaScript',
-    createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000), // 10 days ago
-    updatedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
-  },
-  'skill-002': {
-    id: 'skill-002',
-    name: 'Python List Comprehensions',
-    description: 'Mastering list comprehensions for efficient Python code',
-    createdAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
-    updatedAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
-  },
-}
-
-const mockAssignments: Record<string, ContentServiceAssignmentResponse> = {
-  'assign-001': {
-    id: 'assign-001',
-    title: 'Build a Calculator',
-    description: 'Create a simple calculator application that can perform basic arithmetic operations.',
-    difficultyLevel: 'MEDIUM',
-    creatorId: 'provider-001',
-    createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-    updatedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-    startDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-    dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
-    maxScore: 100,
-    status: 'PUBLISHED',
-    languages: ['javascript', 'python'],
-    testCases: [
-      {
-        order: 1,
-        description: 'Test addition: 2 + 3 = 5',
-        hidden: false,
-        weight: 1.0,
-        input: '2+3',
-        output: '5',
-        timeout: 5000,
-        memoryLimit: 128,
-      },
-      {
-        order: 2,
-        description: 'Test subtraction: 10 - 4 = 6',
-        hidden: false,
-        weight: 1.0,
-        input: '10-4',
-        output: '6',
-        timeout: 5000,
-        memoryLimit: 128,
-      },
-    ],
-    skills: [mockSkills['skill-001']],
-    tutorials: [mockTutorials['tut-001']],
-  },
-  'assign-002': {
-    id: 'assign-002',
-    title: 'String Manipulation Challenge',
-    description: 'Implement various string manipulation functions in your preferred programming language.',
-    difficultyLevel: 'HARD',
-    creatorId: 'provider-001',
-    createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-    updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-    startDate: new Date(),
-    dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-    maxScore: 150,
-    status: 'DRAFT',
-    languages: ['javascript', 'python', 'java'],
-    testCases: [
-      {
-        order: 1,
-        description: 'Reverse string test',
-        hidden: true,
-        weight: 2.0,
-        input: 'hello',
-        output: 'olleh',
-        timeout: 3000,
-        memoryLimit: 256,
-      },
-    ],
-    skills: [mockSkills['skill-002']],
-    tutorials: [mockTutorials['tut-002']],
-  },
-}
+// ⚠️ IMPORTANT: All assignment data comes from centralized registry
+// NO extra mock data added here - ensures consistency across all services
+const mockAssignments = MOCK_DATA_REGISTRY.assignments
+const mockTutorials = MOCK_DATA_REGISTRY.tutorials
+const mockSkills = MOCK_DATA_REGISTRY.skills
 
 export const contentHandlers = [
   // ============================================
@@ -136,8 +43,7 @@ export const contentHandlers = [
    * GET /api/v1/tutorials
    * Get all tutorials with pagination and sorting
    */
-  http.get(
-    `${BASE_URL}/api/v1/tutorials`,
+  http.get('**/api/v1/tutorials',
     withAuth(({ request }: { request: Request }) => {
       const url = new URL(request.url)
       const page = Number(url.searchParams.get('page')) || 0
@@ -169,8 +75,7 @@ export const contentHandlers = [
    * POST /api/v1/tutorials
    * Create a new tutorial (Provider only)
    */
-  http.post(
-    `${BASE_URL}/api/v1/tutorials`,
+  http.post('**/api/v1/tutorials',
     withAuth(async ({ request }: { request: Request }) => {
       const token = request.headers.get('Authorization')?.split(' ')[1]
       const userRole = token?.includes('provider') ? UserRole.PROVIDER : UserRole.STUDENT
@@ -193,8 +98,9 @@ export const contentHandlers = [
         )
       }
 
+      const tutorialId = crypto.randomUUID()
       const newTutorial: ContentServiceTutorialResponse = {
-        id: crypto.randomUUID(),
+        id: tutorialId,
         title: body.title,
         content: body.content,
         creatorId: 'provider-001', // In real app, get from token
@@ -203,7 +109,7 @@ export const contentHandlers = [
         tags: body.tags || [],
       }
 
-      mockTutorials[newTutorial.id] = newTutorial
+      mockTutorials[tutorialId] = newTutorial
 
       return HttpResponse.json(newTutorial, { status: 200 })
     })
@@ -213,8 +119,7 @@ export const contentHandlers = [
    * GET /api/v1/tutorials/{id}
    * Get tutorial by ID
    */
-  http.get(
-    `${BASE_URL}/api/v1/tutorials/:id`,
+  http.get('**/api/v1/tutorials/:id',
     withAuth(({ params }: { params: { id: string } }) => {
       if (!params?.id) {
         return HttpResponse.json(
@@ -239,8 +144,7 @@ export const contentHandlers = [
    * PATCH /api/v1/tutorials/{id}
    * Update tutorial (Provider only)
    */
-  http.patch(
-    `${BASE_URL}/api/v1/tutorials/:id`,
+  http.patch('**/api/v1/tutorials/:id',
     withAuth(async ({ request, params }: { request: Request, params: { id: string } }) => {
       const token = request.headers.get('Authorization')?.split(' ')[1]
       const userRole = token?.includes('provider') ? UserRole.PROVIDER : UserRole.STUDENT
@@ -281,8 +185,7 @@ export const contentHandlers = [
    * DELETE /api/v1/tutorials/{id}
    * Delete tutorial (Provider only)
    */
-  http.delete(
-    `${BASE_URL}/api/v1/tutorials/:id`,
+  http.delete('**/api/v1/tutorials/:id',
     withAuth(({ request, params }: { request: Request, params: { id: string } }) => {
       const token = request.headers.get('Authorization')?.split(' ')[1]
       const userRole = token?.includes('provider') ? UserRole.PROVIDER : UserRole.STUDENT
@@ -320,8 +223,7 @@ export const contentHandlers = [
    * GET /api/v1/skills
    * Get all skills with pagination and sorting
    */
-  http.get(
-    `${BASE_URL}/api/v1/skills`,
+  http.get('**/api/v1/skills',
     withAuth(({ request }: { request: Request }) => {
       const url = new URL(request.url)
       const page = Number(url.searchParams.get('page')) || 0
@@ -353,8 +255,7 @@ export const contentHandlers = [
    * POST /api/v1/skills
    * Create a new skill (Provider only)
    */
-  http.post(
-    `${BASE_URL}/api/v1/skills`,
+  http.post('**/api/v1/skills',
     withAuth(async ({ request }: { request: Request }) => {
       const token = request.headers.get('Authorization')?.split(' ')[1]
       const userRole = token?.includes('provider') ? UserRole.PROVIDER : UserRole.STUDENT
@@ -377,15 +278,16 @@ export const contentHandlers = [
         )
       }
 
+      const skillId = crypto.randomUUID()
       const newSkill: ContentServiceSkillResponse = {
-        id: crypto.randomUUID(),
+        id: skillId,
         name: body.name,
         description: body.description || '',
         createdAt: new Date(),
         updatedAt: new Date(),
       }
 
-      mockSkills[newSkill.id] = newSkill
+      mockSkills[skillId] = newSkill
 
       return HttpResponse.json(newSkill, { status: 200 })
     })
@@ -395,8 +297,7 @@ export const contentHandlers = [
    * GET /api/v1/skills/{id}
    * Get skill by ID
    */
-  http.get(
-    `${BASE_URL}/api/v1/skills/:id`,
+  http.get('**/api/v1/skills/:id',
     withAuth(({ params }: { params: { id: string } }) => {
       const skill = mockSkills[params.id]
 
@@ -415,8 +316,7 @@ export const contentHandlers = [
    * PATCH /api/v1/skills/{id}
    * Update skill (Provider only)
    */
-  http.patch(
-    `${BASE_URL}/api/v1/skills/:id`,
+  http.patch('**/api/v1/skills/:id',
     withAuth(async ({ request, params }: { request: Request, params: { id: string } }) => {
       const token = request.headers.get('Authorization')?.split(' ')[1]
       const userRole = token?.includes('provider') ? UserRole.PROVIDER : UserRole.STUDENT
@@ -456,8 +356,7 @@ export const contentHandlers = [
    * DELETE /api/v1/skills/{id}
    * Delete skill (Provider only)
    */
-  http.delete(
-    `${BASE_URL}/api/v1/skills/:id`,
+  http.delete('**/api/v1/skills/:id',
     withAuth(({ request, params }: { request: Request, params: { id: string } }) => {
       const token = request.headers.get('Authorization')?.split(' ')[1]
       const userRole = token?.includes('provider') ? UserRole.PROVIDER : UserRole.STUDENT
@@ -495,8 +394,7 @@ export const contentHandlers = [
    * GET /api/v1/assignments
    * Get all assignments with pagination and sorting
    */
-  http.get(
-    `${BASE_URL}/api/v1/assignments`,
+  http.get('**/api/v1/assignments',
     withAuth(({ request }: { request: Request }) => {
       const url = new URL(request.url)
       const page = Number(url.searchParams.get('page')) || 0
@@ -528,8 +426,7 @@ export const contentHandlers = [
    * POST /api/v1/assignments
    * Create a new assignment (Provider only)
    */
-  http.post(
-    `${BASE_URL}/api/v1/assignments`,
+  http.post('**/api/v1/assignments',
     withAuth(async ({ request }: { request: Request }) => {
       const token = request.headers.get('Authorization')?.split(' ')[1]
       const userRole = token?.includes('provider') ? UserRole.PROVIDER : UserRole.STUDENT
@@ -552,8 +449,9 @@ export const contentHandlers = [
         )
       }
 
+      const assignmentId = crypto.randomUUID()
       const newAssignment: ContentServiceAssignmentResponse = {
-        id: crypto.randomUUID(),
+        id: assignmentId,
         title: body.title,
         description: body.description,
         difficultyLevel: body.difficultyLevel,
@@ -570,7 +468,7 @@ export const contentHandlers = [
         tutorials: body.tutorialIds ? body.tutorialIds.map(id => mockTutorials[id]).filter(Boolean) : [],
       }
 
-      mockAssignments[newAssignment.id] = newAssignment
+      mockAssignments[assignmentId] = newAssignment
 
       return HttpResponse.json(newAssignment, { status: 200 })
     })
@@ -580,9 +478,8 @@ export const contentHandlers = [
    * GET /api/v1/assignments/{id}
    * Get assignment by ID with relationships
    */
-  http.get(
-    `${BASE_URL}/api/v1/assignments/:id`,
-    withAuth(({ params }: { params: { id: string } }) => {
+  http.get('**/api/v1/assignments/:id',
+    ({ params }: { params: { id: string } }) => {
       const assignment = mockAssignments[params.id]
 
       if (!assignment) {
@@ -593,15 +490,14 @@ export const contentHandlers = [
       }
 
       return HttpResponse.json(assignment, { status: 200 })
-    })
+    }
   ),
 
   /**
    * PATCH /api/v1/assignments/{id}
    * Update assignment (Provider only)
    */
-  http.patch(
-    `${BASE_URL}/api/v1/assignments/:id`,
+  http.patch('**/api/v1/assignments/:id',
     withAuth(async ({ request, params }: { request: Request, params: { id: string } }) => {
       const token = request.headers.get('Authorization')?.split(' ')[1]
       const userRole = token?.includes('provider') ? UserRole.PROVIDER : UserRole.STUDENT
@@ -649,8 +545,7 @@ export const contentHandlers = [
    * POST /api/v1/assignments/{id}/publish
    * Publish assignment (Provider only)
    */
-  http.post(
-    `${BASE_URL}/api/v1/assignments/:id/publish`,
+  http.post('**/api/v1/assignments/:id/publish',
     withAuth(({ request, params }: { request: Request, params: { id: string } }) => {
       const token = request.headers.get('Authorization')?.split(' ')[1]
       const userRole = token?.includes('provider') ? UserRole.PROVIDER : UserRole.STUDENT
@@ -687,8 +582,7 @@ export const contentHandlers = [
    * POST /api/v1/assignments/{id}/archive
    * Archive assignment (Provider only)
    */
-  http.post(
-    `${BASE_URL}/api/v1/assignments/:id/archive`,
+  http.post('**/api/v1/assignments/:id/archive',
     withAuth(({ request, params }: { request: Request, params: { id: string } }) => {
       const token = request.headers.get('Authorization')?.split(' ')[1]
       const userRole = token?.includes('provider') ? UserRole.PROVIDER : UserRole.STUDENT
@@ -725,8 +619,7 @@ export const contentHandlers = [
    * PATCH /api/v1/assignments/{id}/schedule
    * Update assignment schedule (Instructor only)
    */
-  http.patch(
-    `${BASE_URL}/api/v1/assignments/:id/schedule`,
+  http.patch('**/api/v1/assignments/:id/schedule',
     withAuth(async ({ request, params }: { request: Request, params: { id: string } }) => {
       const token = request.headers.get('Authorization')?.split(' ')[1]
       const userRole = token?.includes('instructor') ? UserRole.INSTRUCTOR : UserRole.STUDENT

@@ -1,0 +1,46 @@
+/**
+ * StudentPortalLayout Styles
+ * Professional navigation and header styling
+ */
+
+.brand {
+  color: var(--mantine-color-blue-6);
+  user-select: none;
+}
+
+.username {
+  color: var(--mantine-color-gray-7);
+  font-weight: 500;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+.logoutButton {
+  color: var(--mantine-color-red-6);
+  font-weight: 500;
+
+  &:hover {
+    background-color: var(--mantine-color-red-0);
+  }
+}
+
+.navLink {
+  border-radius: var(--mantine-radius-md);
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: var(--mantine-color-gray-0);
+  }
+
+  &[data-active="true"] {
+    background-color: var(--mantine-color-blue-0);
+    color: var(--mantine-color-blue-6);
+    font-weight: 600;
+
+    svg {
+      color: var(--mantine-color-blue-6);
+    }
+  }
+}

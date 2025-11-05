@@ -1,0 +1,32 @@
+.card {
+  background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.name {
+  margin: 0;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.icon {
+  color: #4c6ef5;
+  flex-shrink: 0;
+}
+
+.label {
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.value {
+  margin-top: 2px;
+  word-break: break-word;
+}

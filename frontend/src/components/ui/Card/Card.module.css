@@ -1,0 +1,243 @@
+/**
+ * Card Component Styling
+ * Comprehensive styling for Card, CardHeader, CardBody, CardFooter
+ */
+
+/* Main Card Container */
+.card {
+  background-color: var(--mantine-color-gray-0);
+  border-radius: var(--mantine-radius-md);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+/* Card Shadows */
+.shadow-default {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-sm {
+  box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.05);
+}
+
+.shadow-md {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-lg {
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-xl {
+  box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Card Padding */
+.padding-xs {
+  padding: 0.5rem;
+}
+
+.padding-sm {
+  padding: 0.75rem;
+}
+
+.padding-md {
+  padding: 1rem;
+}
+
+.padding-lg {
+  padding: 1.5rem;
+}
+
+.padding-xl {
+  padding: 2rem;
+}
+
+/* Card Border */
+.with-border {
+  border: 1px solid var(--mantine-color-gray-2);
+}
+
+/* Card Border Radius */
+.radius-xs {
+  border-radius: var(--mantine-radius-xs);
+}
+
+.radius-sm {
+  border-radius: var(--mantine-radius-sm);
+}
+
+.radius-md {
+  border-radius: var(--mantine-radius-md);
+}
+
+.radius-lg {
+  border-radius: var(--mantine-radius-lg);
+}
+
+.radius-xl {
+  border-radius: var(--mantine-radius-xl);
+}
+
+/* Card Header */
+.card-header {
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--mantine-color-gray-1);
+  margin-bottom: 1rem;
+}
+
+.card-header:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.card-header h1,
+.card-header h2,
+.card-header h3,
+.card-header h4,
+.card-header h5,
+.card-header h6 {
+  margin: 0;
+  color: var(--mantine-color-gray-9);
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+/* Card Body */
+.card-body {
+  padding: 0;
+}
+
+.card-body p {
+  margin: 0 0 0.75rem 0;
+  color: var(--mantine-color-gray-7);
+  line-height: 1.6;
+}
+
+.card-body p:last-child {
+  margin-bottom: 0;
+}
+
+.card-body ul,
+.card-body ol {
+  margin: 0 0 0.75rem 0;
+  padding-left: 1.5rem;
+  color: var(--mantine-color-gray-7);
+}
+
+.card-body li {
+  margin-bottom: 0.5rem;
+}
+
+/* Card Footer */
+.card-footer {
+  padding-top: 1rem;
+  border-top: 1px solid var(--mantine-color-gray-1);
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.card-footer:first-child {
+  border-top: none;
+  margin-top: 0;
+}
+
+.card-footer button {
+  padding: 0.5rem 1rem;
+  background-color: var(--mantine-color-blue-6);
+  color: white;
+  border: none;
+  border-radius: var(--mantine-radius-sm);
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.card-footer button:hover {
+  background-color: var(--mantine-color-blue-7);
+}
+
+.card-footer button:disabled {
+  background-color: var(--mantine-color-gray-3);
+  cursor: not-allowed;
+}
+
+/* Card Hover States */
+.card:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* Card Focus State */
+.card:focus-within {
+  outline: 2px solid var(--mantine-color-blue-5);
+  outline-offset: 2px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .padding-lg {
+    padding: 1rem;
+  }
+
+  .padding-xl {
+    padding: 1.5rem;
+  }
+
+  .card-header {
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .card-footer {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .card-footer button {
+    width: 100%;
+  }
+
+  .shadow-lg {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .shadow-xl {
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .card {
+    background-color: var(--mantine-color-dark-7);
+  }
+
+  .card-header {
+    border-bottom-color: var(--mantine-color-dark-6);
+  }
+
+  .card-header h1,
+  .card-header h2,
+  .card-header h3,
+  .card-header h4,
+  .card-header h5,
+  .card-header h6 {
+    color: var(--mantine-color-gray-0);
+  }
+
+  .card-body p,
+  .card-body ul,
+  .card-body ol {
+    color: var(--mantine-color-gray-2);
+  }
+
+  .card-footer {
+    border-top-color: var(--mantine-color-dark-6);
+  }
+
+  .with-border {
+    border-color: var(--mantine-color-dark-5);
+  }
+}

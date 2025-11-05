@@ -6,80 +6,14 @@ import type {
 } from '@/api/types.gen'
 import { withAuth } from '../middleware/withAuth'
 import { UserRole } from '../middleware/withAuth'
+import { SUPPORT_PATHS, supportUrl, MSW_BASE_URL } from '../config'
+// Import from centralized mock data registry
+import { MOCK_DATA_REGISTRY } from '../factory/mockDataRegistry'
+import { MOCK_SUPPORT_USER_IDS } from '../data/supportSessions'
 
-const BASE_URL = 'http://localhost:3000'
-
-// Mock data for support service
-const mockSessions: Record<string, SupportServiceSupportSessionDto> = {
-  'sess-001': {
-    id: 'sess-001',
-    studentId: '00000000-0000-0000-0000-000000000003', // student user
-    instructorId: '00000000-0000-0000-0000-000000000002', // instructor user
-    isClosed: false,
-    createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
-    closedAt: undefined,
-    messages: [
-      {
-        id: 'msg-001',
-        senderId: '00000000-0000-0000-0000-000000000003',
-        content: 'I need help with the JavaScript assignment. I\'m stuck on the array methods.',
-        isInstructor: false,
-        isRead: true,
-        createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
-      },
-      {
-        id: 'msg-002',
-        senderId: '00000000-0000-0000-0000-000000000002',
-        content: 'Sure, I can help you with that. Which specific array method are you having trouble with?',
-        isInstructor: true,
-        isRead: true,
-        createdAt: new Date(Date.now() - 1.5 * 60 * 60 * 1000),
-      },
-      {
-        id: 'msg-003',
-        senderId: '00000000-0000-0000-0000-000000000003',
-        content: 'I\'m confused about map() and filter(). Can you explain the difference?',
-        isInstructor: false,
-        isRead: false,
-        createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000),
-      },
-    ],
-  },
-  'sess-002': {
-    id: 'sess-002',
-    studentId: '00000000-0000-0000-0000-000000000004', // another student
-    instructorId: '00000000-0000-0000-0000-000000000002', // same instructor
-    isClosed: true,
-    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
-    closedAt: new Date(Date.now() - 20 * 60 * 60 * 1000), // closed 20 hours ago
-    messages: [
-      {
-        id: 'msg-004',
-        senderId: '00000000-0000-0000-0000-000000000004',
-        content: 'Hello, I have a question about Python list comprehensions.',
-        isInstructor: false,
-        isRead: true,
-        createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000),
-      },
-      {
-        id: 'msg-005',
-        senderId: '00000000-0000-0000-0000-000000000002',
-        content: 'Hi! List comprehensions are a concise way to create lists. What specifically would you like to know?',
-        isInstructor: true,
-        isRead: true,
-        createdAt: new Date(Date.now() - 23.5 * 60 * 60 * 1000),
-      },
-      {
-        id: 'msg-006',
-        senderId: '00000000-0000-0000-0000-000000000004',
-        content: 'Thanks for the explanation! I think I understand now.',
-        isInstructor: false,
-        isRead: true,
-        createdAt: new Date(Date.now() - 20 * 60 * 60 * 1000),
-      },
-    ],
-  },
-}
+console.log('[Support Handlers] Module loaded and initializing handlers...')
+console.log('[Support Handlers] Using base URL:', MSW_BASE_URL)
+console.log('[Support Handlers] Sessions endpoint:', SUPPORT_PATHS.SESSIONS)
 
 export const supportHandlers = [
   /**
@@ -89,14 +23,15 @@ export const supportHandlers = [
    * - Instructors see all sessions
    * - Supports filters: userId, email, firstName, lastName, role, isActive
    */
-  http.get(
-    `${BASE_URL}/api/v1/support/sessions`,
+  http.get(SUPPORT_PATHS.SESSIONS,
     withAuth(({ request, user }: { request: Request; user: any }) => {
       const url = new URL(request.url)
       const page = Number(url.searchParams.get('page')) || 0
       const size = Number(url.searchParams.get('size')) || 10
 
-      let sessions = Object.values(mockSessions)
+      let sessions = Array.isArray(MOCK_DATA_REGISTRY.supportSessions)
+        ? MOCK_DATA_REGISTRY.supportSessions
+        : Object.values(MOCK_DATA_REGISTRY.supportSessions)
 
       // Filter based on user role
       if (user.role === UserRole.STUDENT) {
@@ -130,8 +65,7 @@ export const supportHandlers = [
    * POST /api/v1/support/sessions
    * Create a new support session (Students only)
    */
-  http.post(
-    `${BASE_URL}/api/v1/support/sessions`,
+  http.post(SUPPORT_PATHS.SESSIONS,
     withAuth(async ({ request, user }: { request: Request; user: any }) => {
       // Only students can create support sessions
       if (user.role !== UserRole.STUDENT) {
@@ -156,7 +90,7 @@ export const supportHandlers = [
       const newSession: SupportServiceSupportSessionDto = {
         id: sessionId,
         studentId: user.id,
-        instructorId: 'instructor-001', // Assign to first available instructor
+        instructorId: MOCK_SUPPORT_USER_IDS.instructor,
         isClosed: false,
         createdAt: new Date(),
         closedAt: undefined,
@@ -172,7 +106,7 @@ export const supportHandlers = [
         ],
       }
 
-      mockSessions[sessionId] = newSession
+      MOCK_DATA_REGISTRY.supportSessions[sessionId] = newSession
 
       return HttpResponse.json(newSession, { status: 201 })
     })
@@ -184,10 +118,9 @@ export const supportHandlers = [
    * - Students can only view their own sessions
    * - Instructors can view all sessions
    */
-  http.get(
-    `${BASE_URL}/api/v1/support/sessions/:id`,
+  http.get(`${supportUrl('sessions')}/:id`,
     withAuth(({ params, user }: { params: { id: string }; user: any }) => {
-      const session = mockSessions[params.id]
+      const session = MOCK_DATA_REGISTRY.supportSessions[params.id]
 
       if (!session) {
         return HttpResponse.json(
@@ -212,10 +145,9 @@ export const supportHandlers = [
    * POST /api/v1/support/sessions/{id}/close
    * Close a support session (Student who created it only)
    */
-  http.post(
-    `${BASE_URL}/api/v1/support/sessions/:id/close`,
+  http.post(`${supportUrl('sessions')}/:id/close`,
     withAuth(({ params, user }: { params: { id: string }; user: any }) => {
-      const session = mockSessions[params.id]
+      const session = MOCK_DATA_REGISTRY.supportSessions[params.id]
 
       if (!session) {
         return HttpResponse.json(
@@ -246,9 +178,114 @@ export const supportHandlers = [
         closedAt: new Date(),
       }
 
-      mockSessions[params.id] = updatedSession
+      MOCK_DATA_REGISTRY.supportSessions[params.id] = updatedSession
 
       return HttpResponse.json(updatedSession, { status: 200 })
     })
   ),
+
+  /**
+   * POST /api/v1/support/sessions/{id}/messages
+   * Send a message in a support session (Students and Instructors)
+   */
+  http.post(`${supportUrl('sessions')}/:id/messages`,
+    withAuth(async ({ params, request, user }: { params: { id: string }; request: Request; user: any }) => {
+      const session = MOCK_DATA_REGISTRY.supportSessions[params.id]
+
+      if (!session) {
+        return HttpResponse.json(
+          { error: 'Not Found', message: 'Support session not found' },
+          { status: 404 }
+        )
+      }
+
+      // Check permissions - only participants of the session can send messages
+      const isStudent = user.role === UserRole.STUDENT && session.studentId === user.id
+      const isInstructor = user.role === UserRole.INSTRUCTOR && session.instructorId === user.id
+      
+      if (!isStudent && !isInstructor) {
+        return HttpResponse.json(
+          { error: 'Forbidden', message: 'Access denied' },
+          { status: 403 }
+        )
+      }
+
+      // Check if session is closed
+      if (session.isClosed) {
+        return HttpResponse.json(
+          { error: 'Bad Request', message: 'Cannot send messages in a closed session' },
+          { status: 400 }
+        )
+      }
+
+      const body: { content: string } = await request.json()
+
+      // Validate required fields
+      if (!body.content || body.content.trim().length === 0) {
+        return HttpResponse.json(
+          { error: 'Bad Request', message: 'Message content is required' },
+          { status: 400 }
+        )
+      }
+
+      // Create new message
+      const newMessage = {
+        id: crypto.randomUUID(),
+        senderId: user.id,
+        content: body.content.trim(),
+        isInstructor: isInstructor,
+        isRead: false,
+        createdAt: new Date(),
+      }
+
+      // Add message to session
+      if (!session.messages) {
+        session.messages = []
+      }
+      session.messages.push(newMessage)
+
+      return HttpResponse.json(newMessage, { status: 201 })
+    })
+  ),
+
+  /**
+   * PATCH /api/v1/support/sessions/{id}/messages/{messageId}/read
+   * Mark a message as read (Instructors only)
+   */
+  http.patch(`${supportUrl('sessions')}/:sessionId/messages/:messageId/read`,
+    withAuth(({ params, user }: { params: { sessionId: string; messageId: string }; user: any }) => {
+      const session = MOCK_DATA_REGISTRY.supportSessions[params.sessionId]
+
+      if (!session) {
+        return HttpResponse.json(
+          { error: 'Not Found', message: 'Support session not found' },
+          { status: 404 }
+        )
+      }
+
+      // Only instructors can mark messages as read
+      if (user.role !== UserRole.INSTRUCTOR || session.instructorId !== user.id) {
+        return HttpResponse.json(
+          { error: 'Forbidden', message: 'Only instructors can mark messages as read' },
+          { status: 403 }
+        )
+      }
+
+      // Find and update message
+      const message = session.messages?.find((m: any) => m.id === params.messageId)
+
+      if (!message) {
+        return HttpResponse.json(
+          { error: 'Not Found', message: 'Message not found' },
+          { status: 404 }
+        )
+      }
+
+      message.isRead = true
+
+      return HttpResponse.json(message, { status: 200 })
+    })
+  ),
 ]
+
+console.log('[Support Handlers] ✅ Exported supportHandlers array with', supportHandlers.length, 'handlers')

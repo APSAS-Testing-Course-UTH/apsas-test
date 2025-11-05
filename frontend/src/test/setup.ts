@@ -1,63 +1,187 @@
-import '@testing-library/jest-dom'
+// vitest setupFiles - runs BEFORE ANY TESTS
 import { expect, afterEach, beforeAll, afterAll, vi } from 'vitest'
 import { cleanup } from '@testing-library/react'
 import * as matchers from '@testing-library/jest-dom/matchers'
-import { server } from '@/mocks/server'
 
-// Mock window.localStorage
-const localStorageMock = {
-  getItem: vi.fn(),
-  setItem: vi.fn(),
-  removeItem: vi.fn(),
-  clear: vi.fn(),
-}
+console.log('🔧 [Test Setup] Loading test configuration...')
 
-beforeAll(() => {
-  // Setup global mocks
-  Object.defineProperty(global, 'window', {
-    value: {
-      localStorage: localStorageMock,
-    },
-    writable: true,
-  })
-
-  // Mock global localStorage for MSW handlers
-  Object.defineProperty(global, 'localStorage', {
-    value: localStorageMock,
-    writable: true,
-  })
-
-  // Mock window.matchMedia for responsive components
-  Object.defineProperty(window, 'matchMedia', {
-    writable: true,
-    value: vi.fn().mockImplementation(query => ({
-      matches: false,
-      media: query,
-      onchange: null,
-      addListener: vi.fn(),
-      removeListener: vi.fn(),
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-      dispatchEvent: vi.fn(),
-    })),
-  })
-
-  // Start MSW server for testing
-  server.listen({
-    onUnhandledRequest: 'error',
-  })
-})
-
-// extends Vitest's expect method with methods from react-testing-library
+// Phase 1: Synchronous setup when module loads
 expect.extend(matchers)
 
-// runs a cleanup after each test case (e.g. clearing jsdom)
+// Ensure DOM environment is available
+declare global {
+  var document: Document
+  var window: Window & typeof globalThis
+  var localStorage: Storage
+}
+
+// Wait for DOM environment to initialize (jsdom or happy-dom)
+if (typeof window === 'undefined') {
+  throw new Error('DOM environment not initialized. Make sure vitest config has a DOM environment (jsdom or happy-dom)')
+}
+
+console.log('✅ [Test Setup] DOM environment ready:', { hasWindow: typeof window !== 'undefined', hasDocument: typeof document !== 'undefined' })
+
+// Mock window.matchMedia for Mantine (required for MantineProvider)
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: vi.fn().mockImplementation(query => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })),
+})
+
+// Mock ResizeObserver for Mantine ScrollArea component
+global.ResizeObserver = vi.fn().mockImplementation(() => ({
+  observe: vi.fn(),
+  unobserve: vi.fn(),
+  disconnect: vi.fn(),
+}))
+
+// Mock localStorage
+const localStorageMock = (() => {
+  let store: Record<string, string> = {}
+
+  return {
+    getItem: (key: string) => store[key] || null,
+    setItem: (key: string, value: string) => {
+      store[key] = value.toString()
+    },
+    removeItem: (key: string) => {
+      delete store[key]
+    },
+    clear: () => {
+      store = {}
+    },
+    key: (index: number) => Object.keys(store)[index] || null,
+    get length() {
+      return Object.keys(store).length
+    },
+  }
+})()
+
+// Make localStorage available globally
+globalThis.localStorage = localStorageMock as any
+Object.defineProperty(window, 'localStorage', {
+  value: localStorageMock,
+  writable: true,
+})
+
+// Add custom matcher for CSS Module classes (which include hash IDs)
+expect.extend({
+  toHaveCSSModuleClass(element: HTMLElement, className: string) {
+    const classList = Array.from(element.classList)
+    const hasClass = classList.some(cls => cls.includes(className))
+
+    return {
+      pass: hasClass,
+      message: () =>
+        `expected element ${hasClass ? 'not ' : ''}to have class containing "${className}"\nReceived: ${element.className}`,
+    }
+  },
+})
+
+// Extend the expect type for the custom matcher (Vitest 3.x syntax)
+interface CustomMatchers<R = unknown> {
+  toHaveCSSModuleClass(className: string): R
+}
+
+declare module 'vitest' {
+  interface Assertion<T = any> extends CustomMatchers<T> {}
+  interface AsymmetricMatchersContaining extends CustomMatchers {}
+}
+
+// CRITICAL: Store MSW server globally so it persists across test suites
+declare global {
+  var __MSW_SERVER__: any
+}
+
+// Phase 3: Setup before all tests (with timeout protection)
+beforeAll(async () => {
+  console.log('[Test Setup] Starting beforeAll hook...')
+  const startTime = Date.now()
+  
+  try {
+    // Step 1: Install undici fetch if needed
+    if (!globalThis.fetch || globalThis.fetch.name !== 'fetch' || globalThis.fetch.toString().includes('native')) {
+      console.log('[Test Setup] Installing undici fetch...')
+      const { fetch: undiciFetch } = await import('undici')
+      globalThis.fetch = undiciFetch as any
+      console.log('[Test Setup] ✅ undici fetch installed')
+    } else {
+      console.log('[Test Setup] Using existing fetch:', globalThis.fetch.name)
+    }
+
+    // Step 2: Initialize MSW server if not already initialized
+    if (!globalThis.__MSW_SERVER__) {
+      console.log('[Test Setup] Initializing MSW server for first time...')
+      const { server } = await import('@/mocks/server')
+      
+      // Start the server
+      server.listen({ onUnhandledRequest: 'warn' })
+      globalThis.__MSW_SERVER__ = server
+      console.log('[Test Setup] ✅ MSW server started and stored globally')
+    } else {
+      console.log('[Test Setup] MSW server already initialized, reusing...')
+      globalThis.__MSW_SERVER__.resetHandlers()
+    }
+
+    // Step 3: Initialize localStorage with test token
+    const testToken = 'student_student-001'
+    localStorage.setItem('apsas_token', testToken)
+    console.log('[Test Setup] ✅ localStorage initialized with test token')
+    
+    // Step 4: Configure SDK client with auth interceptor for tests
+    const { client } = await import('@/api/client.gen')
+    client.interceptors.request.use(async (request) => {
+      const token = localStorage.getItem('apsas_token')
+      if (token) {
+        request.headers.set('Authorization', `Bearer ${token}`)
+        console.log('[Test Setup] ✅ Added Authorization header to request:', request.url)
+      }
+      return request
+    })
+    console.log('[Test Setup] ✅ SDK client auth interceptor configured')
+    
+    const totalDuration = Date.now() - startTime
+    console.log(`[Test Setup] ✅ beforeAll hook completed in ${totalDuration}ms`)
+  } catch (error) {
+    console.error('[Test Setup] ❌ beforeAll hook failed:', error)
+    throw error
+  }
+}, 30000) // Set explicit 30s timeout for this hook
+
+// Phase 4: Cleanup after each test
 afterEach(() => {
   cleanup()
   vi.clearAllMocks()
-  server.resetHandlers()
+  // Don't clear localStorage completely - just ensure token is available for next test
+  const testToken = 'student_student-001'
+  localStorage.setItem('apsas_token', testToken)
+  // Reset MSW handlers for next test
+  if (globalThis.__MSW_SERVER__) {
+    globalThis.__MSW_SERVER__.resetHandlers()
+  }
 })
 
+// Phase 5: Close server after all tests
 afterAll(() => {
-  server.close()
+  if (globalThis.__MSW_SERVER__) {
+    globalThis.__MSW_SERVER__.close()
+  }
 })
+
+// Import the custom render function with providers
+import { render as customRender } from '@/test-utils'
+
+// Export testing utilities for test files
+export * from '@testing-library/react'
+export * from '@testing-library/user-event'
+export { vi } from 'vitest'
+export { customRender as render }

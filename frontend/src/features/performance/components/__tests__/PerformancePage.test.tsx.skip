@@ -1,0 +1,440 @@
+/**
+ * Performance Page Component Tests
+ * Tests for student performance dashboard with new API integration
+ */
+
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { render, screen } from '@testing-library/react'
+import { MantineProvider } from '@mantine/core'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { PerformancePage } from '../PerformancePage'
+import * as performanceHooks from '../../api/hooks'
+import type {
+  PerformanceServiceStudentPerformanceOverview,
+  PerformanceServiceSubmissionHistoryResponse,
+} from '@/api/types.gen'
+
+// Mock the hooks
+vi.mock('../../api/hooks', () => ({
+  useStudentPerformance: vi.fn(),
+  useStudentHistory: vi.fn(),
+}))
+
+// Mock child components to simplify testing
+vi.mock('../PerformanceChart', () => ({
+  PerformanceChart: ({ data, isLoading }: any) => (
+    <div data-testid="performance-chart">{isLoading ? 'Loading...' : `Chart: ${data.length} items`}</div>
+  ),
+  PassRateChart: ({ totalSubmissions, isLoading }: any) => (
+    <div data-testid="pass-rate-chart">{isLoading ? 'Loading...' : `Pass Rate: ${totalSubmissions}`}</div>
+  ),
+}))
+
+vi.mock('../SkillProgress', () => ({
+  SkillProgressComponent: ({ skillProgress, isLoading }: any) => (
+    <div data-testid="skill-progress">{isLoading ? 'Loading...' : `Skills: ${skillProgress.length}`}</div>
+  ),
+}))
+
+vi.mock('../SubmissionHistory', () => ({
+  SubmissionHistory: ({ submissions, isLoading }: any) => (
+    <div data-testid="submission-history">{isLoading ? 'Loading...' : `Submissions: ${submissions.length}`}</div>
+  ),
+}))
+
+describe('PerformancePage', () => {
+  let queryClient: QueryClient
+
+  beforeEach(() => {
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+      },
+    })
+
+    // Reset mocks
+    vi.clearAllMocks()
+  })
+
+  const wrapper = ({ children }: { children: React.ReactNode }) => (
+    <MantineProvider defaultColorScheme="light">
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    </MantineProvider>
+  )
+
+  describe('Loading State', () => {
+    it('should display loading skeletons when data is loading', () => {
+      vi.spyOn(performanceHooks, 'useStudentPerformance').mockReturnValue({
+        data: undefined,
+        isLoading: true,
+        error: null,
+        isError: false,
+        status: 'pending',
+        isPending: true,
+        isPendingError: false,
+        isFetching: false,
+        isFetched: false,
+        isRefetching: false,
+        isLoadingError: false,
+        isPlaceholderData: false,
+        failureCount: 0,
+        failureReason: null,
+      } as any)
+
+      vi.spyOn(performanceHooks, 'useStudentHistory').mockReturnValue({
+        data: undefined,
+        isLoading: true,
+        error: null,
+        isError: false,
+        status: 'pending',
+        isPending: true,
+        isPendingError: false,
+        isFetching: false,
+        isFetched: false,
+        isRefetching: false,
+        isLoadingError: false,
+        isPlaceholderData: false,
+        failureCount: 0,
+        failureReason: null,
+      } as any)
+
+      render(<PerformancePage />, { wrapper })
+
+      expect(screen.getByText('📊 Biểu đồ Hiệu suất')).toBeInTheDocument()
+    })
+  })
+
+  describe('Empty State', () => {
+    it('should display empty state when no submissions', () => {
+      const emptyOverview: PerformanceServiceStudentPerformanceOverview = {
+        studentId: 'student-1',
+        studentName: 'Test Student',
+        totalAssignments: 0,
+        completedAssignments: 0,
+        averageScore: 0,
+        passRate: 0,
+        successfulSubmissions: 0,
+        failedSubmissions: 0,
+      }
+
+      vi.spyOn(performanceHooks, 'useStudentPerformance').mockReturnValue({
+        data: emptyOverview,
+        isLoading: false,
+        error: null,
+        isError: false,
+        status: 'success',
+        isPending: false,
+        isPendingError: false,
+        isFetching: false,
+        isFetched: true,
+        isRefetching: false,
+        isLoadingError: false,
+        isPlaceholderData: false,
+        failureCount: 0,
+        failureReason: null,
+      } as any)
+
+      vi.spyOn(performanceHooks, 'useStudentHistory').mockReturnValue({
+        data: { submissions: [], total: 0, limit: 10, offset: 0 },
+        isLoading: false,
+        error: null,
+        isError: false,
+        status: 'success',
+        isPending: false,
+        isPendingError: false,
+        isFetching: false,
+        isFetched: true,
+        isRefetching: false,
+        isLoadingError: false,
+        isPlaceholderData: false,
+        failureCount: 0,
+        failureReason: null,
+      } as any)
+
+      render(<PerformancePage />, { wrapper })
+
+      expect(screen.getByText('Chưa có dữ liệu hiệu suất')).toBeInTheDocument()
+      expect(screen.getByText('Hãy nộp bài tập để xem hiệu suất của bạn')).toBeInTheDocument()
+    })
+  })
+
+  describe('Data Display', () => {
+    it('should display performance stats correctly', () => {
+      const mockOverview: PerformanceServiceStudentPerformanceOverview = {
+        studentId: 'student-1',
+        studentName: 'Test Student',
+        totalAssignments: 10,
+        completedAssignments: 8,
+        averageScore: 85.5,
+        passRate: 80,
+        successfulSubmissions: 8,
+        failedSubmissions: 2,
+      }
+
+      const mockHistory: PerformanceServiceSubmissionHistoryResponse = {
+        submissions: [
+          {
+            submissionId: 'sub-1',
+            assignmentTitle: 'Assignment 1',
+            submissionDate: '2025-11-03T10:00:00Z',
+            status: 'PASSED' as const,
+            score: 90,
+            testsPassed: 10,
+            testsFailed: 0,
+          },
+          {
+            submissionId: 'sub-2',
+            assignmentTitle: 'Assignment 2',
+            submissionDate: '2025-11-02T10:00:00Z',
+            status: 'FAILED' as const,
+            score: 60,
+            testsPassed: 6,
+            testsFailed: 4,
+          },
+        ],
+        total: 2,
+        limit: 50,
+        offset: 0,
+      }
+
+      vi.spyOn(performanceHooks, 'useStudentPerformance').mockReturnValue({
+        data: mockOverview,
+        isLoading: false,
+        error: null,
+        isError: false,
+        status: 'success',
+        isPending: false,
+        isPendingError: false,
+        isFetching: false,
+        isFetched: true,
+        isRefetching: false,
+        isLoadingError: false,
+        isPlaceholderData: false,
+        failureCount: 0,
+        failureReason: null,
+      } as any)
+
+      vi.spyOn(performanceHooks, 'useStudentHistory').mockReturnValue({
+        data: mockHistory,
+        isLoading: false,
+        error: null,
+        isError: false,
+        status: 'success',
+        isPending: false,
+        isPendingError: false,
+        isFetching: false,
+        isFetched: true,
+        isRefetching: false,
+        isLoadingError: false,
+        isPlaceholderData: false,
+        failureCount: 0,
+        failureReason: null,
+      } as any)
+
+      render(<PerformancePage />, { wrapper })
+
+      // Verify header
+      expect(screen.getByText('📊 Biểu đồ Hiệu suất')).toBeInTheDocument()
+
+      // Verify stats are displayed
+      expect(screen.getByText('10')).toBeInTheDocument() // total submissions
+      expect(screen.getByText('8')).toBeInTheDocument() // passed
+      expect(screen.getByText('2')).toBeInTheDocument() // failed
+      expect(screen.getByText('80%')).toBeInTheDocument() // success rate
+      expect(screen.getByText('86')).toBeInTheDocument() // average score (rounded)
+    })
+
+    it('should display charts', () => {
+      const mockOverview: PerformanceServiceStudentPerformanceOverview = {
+        studentId: 'student-1',
+        studentName: 'Test Student',
+        totalAssignments: 5,
+        completedAssignments: 4,
+        averageScore: 75,
+        passRate: 80,
+        successfulSubmissions: 4,
+        failedSubmissions: 1,
+      }
+
+      const mockHistory: PerformanceServiceSubmissionHistoryResponse = {
+        submissions: [
+          {
+            submissionId: 'sub-1',
+            assignmentTitle: 'Assignment 1',
+            submissionDate: '2025-11-03T10:00:00Z',
+            status: 'PASSED' as const,
+            score: 80,
+            testsPassed: 10,
+            testsFailed: 0,
+          },
+        ],
+        total: 1,
+        limit: 50,
+        offset: 0,
+      }
+
+      vi.spyOn(performanceHooks, 'useStudentPerformance').mockReturnValue({
+        data: mockOverview,
+        isLoading: false,
+        error: null,
+        isError: false,
+        status: 'success',
+        isPending: false,
+        isPendingError: false,
+        isFetching: false,
+        isFetched: true,
+        isRefetching: false,
+        isLoadingError: false,
+        isPlaceholderData: false,
+        failureCount: 0,
+        failureReason: null,
+      } as any)
+
+      vi.spyOn(performanceHooks, 'useStudentHistory').mockReturnValue({
+        data: mockHistory,
+        isLoading: false,
+        error: null,
+        isError: false,
+        status: 'success',
+        isPending: false,
+        isPendingError: false,
+        isFetching: false,
+        isFetched: true,
+        isRefetching: false,
+        isLoadingError: false,
+        isPlaceholderData: false,
+        failureCount: 0,
+        failureReason: null,
+      } as any)
+
+      render(<PerformancePage />, { wrapper })
+
+      expect(screen.getByTestId('performance-chart')).toBeInTheDocument()
+      expect(screen.getByTestId('pass-rate-chart')).toBeInTheDocument()
+    })
+
+    it('should display skill progress component', () => {
+      const mockOverview: PerformanceServiceStudentPerformanceOverview = {
+        studentId: 'student-1',
+        studentName: 'Test Student',
+        totalAssignments: 5,
+        completedAssignments: 4,
+        averageScore: 75,
+        passRate: 80,
+        successfulSubmissions: 4,
+        failedSubmissions: 1,
+      }
+
+      const mockHistory: PerformanceServiceSubmissionHistoryResponse = {
+        submissions: [
+          {
+            submissionId: 'sub-1',
+            assignmentTitle: 'Assignment 1',
+            submissionDate: '2025-11-03T10:00:00Z',
+            status: 'PASSED' as const,
+            score: 80,
+            testsPassed: 10,
+            testsFailed: 0,
+          },
+        ],
+        total: 1,
+        limit: 50,
+        offset: 0,
+      }
+
+      vi.spyOn(performanceHooks, 'useStudentPerformance').mockReturnValue({
+        data: mockOverview,
+        isLoading: false,
+        error: null,
+        isError: false,
+        status: 'success',
+        isPending: false,
+        isPendingError: false,
+        isFetching: false,
+        isFetched: true,
+        isRefetching: false,
+        isLoadingError: false,
+        isPlaceholderData: false,
+        failureCount: 0,
+        failureReason: null,
+      } as any)
+
+      vi.spyOn(performanceHooks, 'useStudentHistory').mockReturnValue({
+        data: mockHistory,
+        isLoading: false,
+        error: null,
+        isError: false,
+        status: 'success',
+        isPending: false,
+        isPendingError: false,
+        isFetching: false,
+        isFetched: true,
+        isRefetching: false,
+        isLoadingError: false,
+        isPlaceholderData: false,
+        failureCount: 0,
+        failureReason: null,
+      } as any)
+
+      render(<PerformancePage />, { wrapper })
+
+      expect(screen.getByTestId('skill-progress')).toBeInTheDocument()
+      expect(screen.getByTestId('submission-history')).toBeInTheDocument()
+    })
+  })
+
+  describe('Header and Navigation', () => {
+    it('should display page header with refresh button', () => {
+      const mockOverview: PerformanceServiceStudentPerformanceOverview = {
+        studentId: 'student-1',
+        studentName: 'Test Student',
+        totalAssignments: 5,
+        completedAssignments: 4,
+        averageScore: 75,
+        passRate: 80,
+        successfulSubmissions: 4,
+        failedSubmissions: 1,
+      }
+
+      vi.spyOn(performanceHooks, 'useStudentPerformance').mockReturnValue({
+        data: mockOverview,
+        isLoading: false,
+        error: null,
+        isError: false,
+        status: 'success',
+        isPending: false,
+        isPendingError: false,
+        isFetching: false,
+        isFetched: true,
+        isRefetching: false,
+        isLoadingError: false,
+        isPlaceholderData: false,
+        failureCount: 0,
+        failureReason: null,
+      } as any)
+
+      vi.spyOn(performanceHooks, 'useStudentHistory').mockReturnValue({
+        data: { submissions: [], total: 0, limit: 50, offset: 0 },
+        isLoading: false,
+        error: null,
+        isError: false,
+        status: 'success',
+        isPending: false,
+        isPendingError: false,
+        isFetching: false,
+        isFetched: true,
+        isRefetching: false,
+        isLoadingError: false,
+        isPlaceholderData: false,
+        failureCount: 0,
+        failureReason: null,
+      } as any)
+
+      render(<PerformancePage />, { wrapper })
+
+      expect(screen.getByText('📊 Biểu đồ Hiệu suất')).toBeInTheDocument()
+      expect(screen.getByText('Xem chi tiết hiệu suất học tập và tiến độ của bạn')).toBeInTheDocument()
+      expect(screen.getByText('Làm mới')).toBeInTheDocument() // Refresh button label
+    })
+  })
+})

@@ -1,0 +1,39 @@
+.leftPanel {
+  border-radius: 8px;
+  padding: 12px 0;
+}
+
+.centerPanel {
+  border-radius: 8px;
+  padding: 12px 0;
+}
+
+.rightPanel {
+  border-radius: 8px;
+  padding: 12px 0;
+}
+
+.testCard {
+  padding: 12px;
+  border-radius: 6px;
+  background-color: var(--mantine-color-gray-0);
+  border: 1px solid var(--mantine-color-gray-2);
+  transition: all 0.2s ease;
+}
+
+.testCard:hover {
+  border-color: var(--mantine-color-gray-3);
+  background-color: var(--mantine-color-gray-1);
+}
+
+@media (max-width: 768px) {
+  .leftPanel,
+  .centerPanel,
+  .rightPanel {
+    padding: 0;
+  }
+
+  .testCard {
+    padding: 10px;
+  }
+}

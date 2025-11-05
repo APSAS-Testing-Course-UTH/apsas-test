@@ -1,0 +1,518 @@
+/* ============================================================================
+   Modal Container & Backdrop
+   ============================================================================ */
+
+.modalContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+}
+
+.modalContainer.isOpen {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: -1;
+  animation: backdropFadeIn 0.3s ease-out;
+}
+
+.backdrop.dark {
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+@media (prefers-color-scheme: dark) {
+  .backdrop {
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+
+  .backdrop.dark {
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+}
+
+/* ============================================================================
+   Modal Dialog
+   ============================================================================ */
+
+.modal {
+  position: relative;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  animation: slideUp 0.3s ease-out;
+  z-index: 1001;
+}
+
+@media (prefers-color-scheme: dark) {
+  .modal {
+    background-color: #1f2937;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+  }
+}
+
+/* ============================================================================
+   Modal Sizes
+   ============================================================================ */
+
+.modal-xs {
+  width: 90%;
+  max-width: 320px;
+}
+
+.modal-sm {
+  width: 90%;
+  max-width: 384px;
+}
+
+.modal-md {
+  width: 90%;
+  max-width: 512px;
+}
+
+.modal-lg {
+  width: 90%;
+  max-width: 640px;
+}
+
+.modal-xl {
+  width: 90%;
+  max-width: 896px;
+}
+
+.modal-full {
+  width: 95%;
+  height: 95vh;
+  max-height: none;
+}
+
+@media (min-width: 640px) {
+  .modal-xs {
+    width: 320px;
+  }
+
+  .modal-sm {
+    width: 384px;
+  }
+
+  .modal-md {
+    width: 512px;
+  }
+
+  .modal-lg {
+    width: 640px;
+  }
+
+  .modal-xl {
+    width: 896px;
+  }
+
+  .modal-full {
+    width: 95vw;
+  }
+}
+
+/* ============================================================================
+   Modal Header
+   ============================================================================ */
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .modalHeader {
+    border-bottom-color: #374151;
+  }
+}
+
+.modalTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+  line-height: 1.5;
+}
+
+@media (prefers-color-scheme: dark) {
+  .modalTitle {
+    color: #f3f4f6;
+  }
+}
+
+/* ============================================================================
+   Close Button
+   ============================================================================ */
+
+.closeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  margin: -4px -4px -4px 12px;
+  background-color: transparent;
+  border: none;
+  color: #6b7280;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.closeButton:hover {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+.closeButton:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.closeButton:active {
+  background-color: #e5e7eb;
+}
+
+@media (prefers-color-scheme: dark) {
+  .closeButton {
+    color: #9ca3af;
+  }
+
+  .closeButton:hover {
+    background-color: #374151;
+    color: #f3f4f6;
+  }
+
+  .closeButton:active {
+    background-color: #4b5563;
+  }
+}
+
+/* ============================================================================
+   Modal Body
+   ============================================================================ */
+
+.modalBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  color: #374151;
+}
+
+@media (prefers-color-scheme: dark) {
+  .modalBody {
+    color: #d1d5db;
+  }
+}
+
+.modalBody p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.modalBody p + p {
+  margin-top: 12px;
+}
+
+/* ============================================================================
+   Dialog Message (for ConfirmDialog)
+   ============================================================================ */
+
+.dialogMessage {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #374151;
+}
+
+@media (prefers-color-scheme: dark) {
+  .dialogMessage {
+    color: #d1d5db;
+  }
+}
+
+/* ============================================================================
+   Modal Footer
+   ============================================================================ */
+
+.modalFooter {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 20px;
+  border-top: 1px solid #e5e7eb;
+  flex-shrink: 0;
+  background-color: #f9fafb;
+}
+
+@media (prefers-color-scheme: dark) {
+  .modalFooter {
+    border-top-color: #374151;
+    background-color: #111827;
+  }
+}
+
+@media (max-width: 640px) {
+  .modalFooter {
+    flex-direction: column-reverse;
+  }
+
+  .modalFooter .button {
+    width: 100%;
+  }
+}
+
+/* ============================================================================
+   Buttons
+   ============================================================================ */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.button:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* ============================================================================
+   Button Variants
+   ============================================================================ */
+
+.buttonSecondary {
+  background-color: #e5e7eb;
+  color: #111827;
+  border-color: transparent;
+}
+
+.buttonSecondary:hover:not(:disabled) {
+  background-color: #d1d5db;
+}
+
+.buttonSecondary:active:not(:disabled) {
+  background-color: #9ca3af;
+}
+
+@media (prefers-color-scheme: dark) {
+  .buttonSecondary {
+    background-color: #374151;
+    color: #f3f4f6;
+  }
+
+  .buttonSecondary:hover:not(:disabled) {
+    background-color: #4b5563;
+  }
+
+  .buttonSecondary:active:not(:disabled) {
+    background-color: #6b7280;
+  }
+}
+
+/* Primary variant */
+.variant-primary {
+  background-color: #3b82f6;
+  color: #ffffff;
+  border-color: transparent;
+}
+
+.variant-primary:hover:not(:disabled) {
+  background-color: #2563eb;
+}
+
+.variant-primary:active:not(:disabled) {
+  background-color: #1d4ed8;
+}
+
+@media (prefers-color-scheme: dark) {
+  .variant-primary {
+    background-color: #2563eb;
+  }
+
+  .variant-primary:hover:not(:disabled) {
+    background-color: #1d4ed8;
+  }
+
+  .variant-primary:active:not(:disabled) {
+    background-color: #1e40af;
+  }
+}
+
+/* Danger variant */
+.variant-danger {
+  background-color: #ef4444;
+  color: #ffffff;
+  border-color: transparent;
+}
+
+.variant-danger:hover:not(:disabled) {
+  background-color: #dc2626;
+}
+
+.variant-danger:active:not(:disabled) {
+  background-color: #b91c1c;
+}
+
+@media (prefers-color-scheme: dark) {
+  .variant-danger {
+    background-color: #dc2626;
+  }
+
+  .variant-danger:hover:not(:disabled) {
+    background-color: #b91c1c;
+  }
+
+  .variant-danger:active:not(:disabled) {
+    background-color: #991b1b;
+  }
+}
+
+/* Secondary variant */
+.variant-secondary {
+  background-color: #f3f4f6;
+  color: #111827;
+  border-color: #d1d5db;
+}
+
+.variant-secondary:hover:not(:disabled) {
+  background-color: #e5e7eb;
+}
+
+.variant-secondary:active:not(:disabled) {
+  background-color: #d1d5db;
+}
+
+@media (prefers-color-scheme: dark) {
+  .variant-secondary {
+    background-color: #374151;
+    color: #f3f4f6;
+    border-color: #4b5563;
+  }
+
+  .variant-secondary:hover:not(:disabled) {
+    background-color: #4b5563;
+  }
+
+  .variant-secondary:active:not(:disabled) {
+    background-color: #6b7280;
+  }
+}
+
+/* ============================================================================
+   Animations
+   ============================================================================ */
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes backdropFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* ============================================================================
+   Print Styles
+   ============================================================================ */
+
+@media print {
+  .modalContainer {
+    position: static;
+    display: block;
+  }
+
+  .backdrop {
+    display: none;
+  }
+
+  .modal {
+    box-shadow: none;
+    max-height: none;
+  }
+
+  .closeButton {
+    display: none;
+  }
+
+  .modalHeader {
+    page-break-after: avoid;
+  }
+
+  .modalFooter {
+    display: none;
+  }
+}
+
+/* ============================================================================
+   Accessibility - Reduced Motion
+   ============================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .modal,
+  .backdrop {
+    animation: none;
+    transition: none;
+  }
+
+  .modalContainer,
+  .closeButton,
+  .button {
+    transition: none;
+  }
+}

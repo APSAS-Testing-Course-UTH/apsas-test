@@ -1,0 +1,25 @@
+/**
+ * AssignmentsFilterBar Styles
+ * Responsive filter UI with grid layout
+ */
+
+.filterBar {
+  width: 100%;
+  padding: 1rem;
+  background: var(--mantine-color-gray-0);
+  border-radius: var(--mantine-radius-md);
+  border: 1px solid var(--mantine-color-gray-200);
+  margin-bottom: 1.5rem;
+
+  @media (max-width: 768px) {
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .filterBar {
+    padding: 0.5rem;
+    border-radius: var(--mantine-radius-sm);
+  }
+}

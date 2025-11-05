@@ -1,0 +1,143 @@
+/* ==================== FORM GROUP ====================  */
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* ==================== FORM INPUT ====================  */
+.formInput {
+  width: 100%;
+}
+
+.formInput input {
+  transition: all 0.2s ease;
+}
+
+.formInput input:focus {
+  outline: 2px solid var(--mantine-color-blue-6);
+  outline-offset: 2px;
+}
+
+.formInput input:disabled {
+  background-color: var(--mantine-color-gray-1);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ==================== ERROR MESSAGE ====================  */
+.errorMessage {
+  color: var(--mantine-color-red-6);
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin: 0;
+  padding: 0.25rem 0;
+  line-height: 1.4;
+}
+
+/* ==================== FORM SELECT ====================  */
+.formSelect {
+  width: 100%;
+}
+
+.formSelect select {
+  transition: all 0.2s ease;
+}
+
+.formSelect select:focus {
+  outline: 2px solid var(--mantine-color-blue-6);
+  outline-offset: 2px;
+}
+
+.formSelect select:disabled {
+  background-color: var(--mantine-color-gray-1);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ==================== FORM TEXTAREA ====================  */
+.formTextarea {
+  width: 100%;
+}
+
+.formTextarea textarea {
+  transition: all 0.2s ease;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.formTextarea textarea:focus {
+  outline: 2px solid var(--mantine-color-blue-6);
+  outline-offset: 2px;
+}
+
+.formTextarea textarea:disabled {
+  background-color: var(--mantine-color-gray-1);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ==================== CHARACTER COUNT ====================  */
+.charCount {
+  font-size: 0.75rem;
+  color: var(--mantine-color-gray-6);
+  text-align: right;
+  margin-top: 0.25rem;
+}
+
+.charCount.warning {
+  color: var(--mantine-color-yellow-6);
+  font-weight: 600;
+}
+
+.charCount.error {
+  color: var(--mantine-color-red-6);
+  font-weight: 600;
+}
+
+/* ==================== REQUIRED INDICATOR ====================  */
+.requiredIndicator {
+  color: var(--mantine-color-red-6);
+  font-weight: bold;
+  margin-left: 0.25rem;
+}
+
+/* ==================== LABEL ====================  */
+.label {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--mantine-color-gray-9);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* ==================== HELP TEXT ====================  */
+.helpText {
+  font-size: 0.75rem;
+  color: var(--mantine-color-gray-6);
+  margin-top: 0.25rem;
+  line-height: 1.4;
+}
+
+/* ==================== RESPONSIVE ====================  */
+@media (max-width: 768px) {
+  .formGroup {
+    gap: 0.375rem;
+    margin-bottom: 0.875rem;
+  }
+
+  .label {
+    font-size: 0.8125rem;
+  }
+
+  .errorMessage {
+    font-size: 0.8125rem;
+  }
+
+  .helpText {
+    font-size: 0.6875rem;
+  }
+}

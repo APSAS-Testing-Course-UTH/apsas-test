@@ -1,15 +1,9 @@
 import { HttpResponse } from 'msw'
 import { mockUsers } from '../data/users'
+import { UserRole, type UserRoleType } from '../types/userRole'
 
-// Mock user roles
-export const UserRole = {
-  ADMIN: 'admin',
-  INSTRUCTOR: 'instructor',
-  STUDENT: 'student',
-  PROVIDER: 'provider',
-} as const
-
-export type UserRoleType = typeof UserRole[keyof typeof UserRole]
+// Re-export for backward compatibility
+export { UserRole, type UserRoleType }
 
 // Mock user interface
 export interface MockUser {
@@ -20,6 +14,7 @@ export interface MockUser {
   role: UserRoleType
   isActive: boolean
   isEmailVerified?: boolean
+  password?: string
   createdAt?: string
   updatedAt?: string
 }
@@ -36,6 +31,36 @@ export const extractToken = (request: Request): string | null => {
 // Validate token format and extract user info
 export const validateToken = (token: string): MockUser | null => {
   try {
+    // Handle JWT format tokens (base64url encoded)
+    if (token.includes('.') && token.split('.').length === 3) {
+      // JWT format: header.payload.signature
+      try {
+        const payloadBase64 = token.split('.')[1]
+        // Decode base64url payload
+        const payloadStr = atob(payloadBase64.replace(/-/g, '+').replace(/_/g, '/'))
+        const payload = JSON.parse(payloadStr)
+        
+        // Extract user ID and role from JWT payload
+        const userId = payload.id || payload.sub
+        const role = payload.role
+        
+        if (!userId || !role) {
+          // JWT payload missing required fields, fall through to legacy formats
+          throw new Error('JWT missing id or role')
+        }
+        if (!Object.values(UserRole).includes(role as UserRoleType)) {
+          throw new Error('JWT has invalid role')
+        }
+        
+        // Return the actual mock user from the data
+        const user = Object.values(mockUsers).find((u: MockUser) => u.id === userId)
+        return user || null
+      } catch (jwtError) {
+        // If JWT parsing fails, fall through to legacy token formats
+        // This is expected for malformed JWTs or expired tokens
+      }
+    }
+
     // Handle different token formats for backward compatibility
     let role: string
     let userId: string

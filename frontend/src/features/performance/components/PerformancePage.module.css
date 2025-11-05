@@ -1,0 +1,82 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 0;
+  border-bottom: 2px solid #f0f0f0;
+  margin-bottom: 24px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+}
+
+.errorMessage {
+  background-color: #fff5f5;
+  border-left: 4px solid #f5222d;
+}
+
+.emptyState {
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  background-color: #fafafa;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.statCard {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    border-color: #1890ff;
+    transform: translateY(-2px);
+  }
+
+  &.statCardblue {
+    border-left: 4px solid #1890ff;
+  }
+
+  &.statCardgreen {
+    border-left: 4px solid #52c41a;
+  }
+
+  &.statCardred {
+    border-left: 4px solid #f5222d;
+  }
+
+  &.statCardcyan {
+    border-left: 4px solid #13c2c2;
+  }
+}
+
+.infoCard {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  }
+}
+
+@media (max-width: 768px) {
+  .statCard {
+    padding: 16px !important;
+  }
+
+  .infoCard {
+    padding: 16px !important;
+  }
+}

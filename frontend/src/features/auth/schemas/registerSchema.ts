@@ -7,10 +7,16 @@ import { USER_ROLES } from '@/constants/roles'
  * Extends generated schema with custom validation
  */
 export const registerSchema = zIdentityServiceRegisterRequest.extend({
-  // Thêm confirm password field
+  // Add custom Vietnamese messages for generated fields
+  email: z.string().email('Email không hợp lệ').min(1, 'Email là bắt buộc'),
+  password: z.string().min(8, 'Mật khẩu phải có ít nhất 8 ký tự'),
+  firstName: z.string().min(1, 'Họ là bắt buộc').max(100, 'Họ không được quá 100 ký tự'),
+  lastName: z.string().min(1, 'Tên là bắt buộc').max(100, 'Tên không được quá 100 ký tự'),
+
+  // Add confirm password field
   confirmPassword: z.string().min(8, 'Mật khẩu xác nhận phải có ít nhất 8 ký tự'),
 
-  // Thêm terms agreement
+  // Add terms agreement
   agreeToTerms: z.boolean().refine(
     (val) => val === true,
     'Bạn phải đồng ý với điều khoản sử dụng'

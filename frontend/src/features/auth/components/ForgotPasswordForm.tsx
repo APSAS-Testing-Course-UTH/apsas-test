@@ -1,5 +1,5 @@
 import { useForm } from '@mantine/form'
-import { zodResolver } from 'mantine-form-zod-resolver'
+import { zod4Resolver } from 'mantine-form-zod-resolver'
 import { TextInput, Button, Anchor, Title, Paper, Container, Stack } from '@mantine/core'
 import { Link } from '@tanstack/react-router'
 
@@ -8,9 +8,9 @@ import { forgotPasswordSchema } from '../schemas/forgotPasswordSchema'
 
 // Component form quên mật khẩu với Mantine UI
 export const ForgotPasswordForm = () => {
-  // Khởi tạo form với zodResolver và forgotPasswordSchema
+  // Khởi tạo form với zod4Resolver và forgotPasswordSchema
   const form = useForm({
-    validate: zodResolver(forgotPasswordSchema),
+    validate: zod4Resolver(forgotPasswordSchema),
     initialValues: {
       email: ''
     }

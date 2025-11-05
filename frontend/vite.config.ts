@@ -12,9 +12,12 @@ export default defineConfig({
   plugins: [
     tanstackRouter({
       target: "react",
-      autoCodeSplitting: true,
+      autoCodeSplitting: false,  // Disable code splitting to fix module resolution issues
       quoteStyle: "double",
       semicolons: false,
+      routesDirectory: "./src/routes",
+      generatedRouteTree: "./src/routeTree.gen.ts",
+      routeFileIgnorePattern: ".test.",
     }),
     react(),
     // Bundle analyzer - chỉ enable khi chạy với --mode analyze
@@ -38,10 +41,47 @@ export default defineConfig({
     __API_TIMEOUT__: JSON.stringify(process.env.VITE_API_TIMEOUT),   // API timeout (ms) từ .env
     __APP_NAME__: JSON.stringify(process.env.VITE_APP_NAME),         // Tên app từ .env
     __APP_VERSION__: JSON.stringify(process.env.VITE_APP_VERSION),   // Version app từ .env
+    global: 'globalThis', // Polyfill for global object (needed for sockjs-client and @stomp/stompjs)
   },
   test: {
-    environment: "jsdom",
-    setupFiles: ["./src/test/setup.ts"],
+    environment: "happy-dom",
+    // Use globals to ensure describe/it/expect are available
     globals: true,
+    setupFiles: ["./src/test/setup.ts"],
+    hookTimeout: 30000,
+    testTimeout: 30000,
+    include: ["src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
+    exclude: ["node_modules", "dist"],
+    // Set environment variables for tests
+    env: {
+      VITE_API_BASE_URL: "http://localhost:3000",
+    },
+    // Ensure jsdom is properly initialized before tests run
+    environmentOptions: {
+      jsdom: {
+        beforeParse() {
+          // jsdom will create window/document here
+        },
+      },
+    },
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "json", "html", "lcov"],
+      include: ["src/**/*.tsx", "src/**/*.ts"],
+      exclude: [
+        "node_modules",
+        "dist",
+        "**/*.test.tsx",
+        "**/*.test.ts",
+        "**/*.spec.tsx",
+        "**/*.spec.ts",
+      ],
+      thresholds: {
+        lines: 90,
+        functions: 90,
+        branches: 85,
+        statements: 90,
+      },
+    },
   },
 })

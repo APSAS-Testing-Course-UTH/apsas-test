@@ -7,6 +7,7 @@ import { router } from "@/router"
 import { env } from "@/configs/env"
 import "@mantine/core/styles.css"
 import "@mantine/notifications/styles.css"
+import "@mantine/dates/styles.css"
 
 // Validate environment variables khi app khởi động
 if (env.VITE_APP_ENV === 'development') {

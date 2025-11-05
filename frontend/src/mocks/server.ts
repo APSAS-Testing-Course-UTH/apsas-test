@@ -1,6 +1,8 @@
 import { setupServer } from 'msw/node'
 import { handlers } from './handlers'
 
+console.log(`[MSW Server] Initializing with ${handlers?.length || 0} handlers`)
+
 export const server = setupServer(...handlers)
 
 export const startServer = () => {

@@ -1,9 +1,20 @@
 // Export all MSW handlers
+console.log('[Handlers] Loading handler modules...')
+
 import { identityHandlers } from './identityHandlers'
+console.log('[Handlers] ✅ Loaded identityHandlers:', identityHandlers?.length || 0)
+
 import { submissionHandlers } from './submissionHandlers'
+console.log('[Handlers] ✅ Loaded submissionHandlers:', submissionHandlers?.length || 0)
+
 import { evaluationHandlers } from './evaluationHandlers'
+console.log('[Handlers] ✅ Loaded evaluationHandlers:', evaluationHandlers?.length || 0)
+
 import { contentHandlers } from './contentHandlers'
+console.log('[Handlers] ✅ Loaded contentHandlers:', contentHandlers?.length || 0)
+
 import { supportHandlers } from './supportHandlers'
+console.log('[Handlers] ✅ Loaded supportHandlers:', supportHandlers?.length || 0)
 
 export const handlers = [
   // Identity Service handlers
@@ -21,3 +32,5 @@ export const handlers = [
   // Support Service handlers
   ...supportHandlers,
 ]
+
+console.log('[Handlers] ✅ Total handlers exported:', handlers?.length || 0)

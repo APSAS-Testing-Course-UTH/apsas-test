@@ -1,0 +1,25 @@
+/* TestCaseResults Component Styles */
+
+.expandedDetails {
+  background-color: var(--mantine-color-gray-0);
+}
+
+.codeBlock {
+  border-radius: 4px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.codeBlock code {
+  font-family: 'Courier New', monospace;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+/* Ensure table is responsive */
+@media (max-width: 768px) {
+  .expandedDetails {
+    padding: 0.5rem;
+  }
+}

@@ -1,0 +1,155 @@
+/**
+ * AssignmentsList Component Styles
+ * Responsive table layout with mobile optimization
+ */
+
+.container {
+  width: 100%;
+  padding: 1rem;
+}
+
+.filterBar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: var(--mantine-color-gray-0);
+  border-radius: var(--mantine-radius-md);
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 150px;
+}
+
+.filterSelect {
+  min-width: 140px;
+}
+
+.tableWrapper {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: var(--mantine-radius-md);
+  border: 1px solid var(--mantine-color-gray-200);
+
+  @media (max-width: 768px) {
+    font-size: 0.875rem;
+  }
+}
+
+.titleCol {
+  width: 30%;
+  min-width: 200px;
+
+  @media (max-width: 768px) {
+    width: 50%;
+    min-width: 150px;
+  }
+}
+
+.titleContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.difficultyCol {
+  width: 15%;
+  min-width: 100px;
+  text-align: center !important;
+  vertical-align: middle;
+
+  @media (max-width: 1024px) {
+    display: none;
+  }
+}
+
+.dueCol {
+  width: 15%;
+  min-width: 120px;
+  text-align: center !important;
+  vertical-align: middle;
+
+  @media (max-width: 1024px) {
+    width: 25%;
+  }
+}
+
+.statusCol {
+  width: 15%;
+  min-width: 100px;
+  text-align: center !important;
+  vertical-align: middle;
+
+  @media (max-width: 1024px) {
+    display: none;
+  }
+}
+
+.actionCol {
+  width: 10%;
+  min-width: 60px;
+  text-align: center;
+}
+
+.row {
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: var(--mantine-color-gray-50);
+  }
+}
+
+/* Responsive table: Show as cards on mobile */
+@media (max-width: 640px) {
+  .tableWrapper {
+    border: none;
+  }
+
+  .tableWrapper table,
+  .tableWrapper tbody,
+  .tableWrapper tr,
+  .tableWrapper td {
+    display: block;
+    width: 100%;
+  }
+
+  .tableWrapper thead {
+    display: none;
+  }
+
+  .tableWrapper tr {
+    margin-bottom: 1rem;
+    border: 1px solid var(--mantine-color-gray-200);
+    border-radius: var(--mantine-radius-md);
+    overflow: hidden;
+  }
+
+  .tableWrapper td {
+    text-align: left;
+    padding-left: 50% !important;
+    padding-right: 1rem !important;
+    position: relative;
+    border-bottom: 1px solid var(--mantine-color-gray-100);
+
+    &::before {
+      content: attr(data-label);
+      position: absolute;
+      left: 0;
+      width: 48%;
+      padding-left: 1rem;
+      font-weight: 600;
+      text-align: left;
+    }
+  }
+
+  .row {
+    display: block;
+  }
+}

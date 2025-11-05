@@ -20,6 +20,7 @@ const envSchema = z.object({
   // Feature Flags
   VITE_ENABLE_AUTH: z.string().transform(val => val === 'true'),
   VITE_ENABLE_NOTIFICATIONS: z.string().transform(val => val === 'true'),
+  VITE_ENABLE_WEBSOCKET: z.string().transform(val => val === 'true').optional().default(false),
 
   // Security
   VITE_CSP_ENABLED: z.string().transform(val => val === 'true'),

@@ -1,0 +1,157 @@
+/**
+ * Button Component Styles
+ * CSS module for Button component styling
+ */
+
+/* Variants */
+.variant-primary {
+  background-color: var(--mantine-color-blue-6);
+  color: white;
+
+  &:hover {
+    background-color: var(--mantine-color-blue-7);
+  }
+
+  &:active {
+    background-color: var(--mantine-color-blue-8);
+  }
+
+  &:disabled {
+    background-color: var(--mantine-color-gray-3);
+    color: var(--mantine-color-gray-6);
+    cursor: not-allowed;
+  }
+}
+
+.variant-secondary {
+  background-color: var(--mantine-color-gray-1);
+  color: var(--mantine-color-gray-9);
+  border: 1px solid var(--mantine-color-gray-3);
+
+  &:hover {
+    background-color: var(--mantine-color-gray-2);
+  }
+
+  &:disabled {
+    background-color: var(--mantine-color-gray-1);
+    color: var(--mantine-color-gray-5);
+    cursor: not-allowed;
+  }
+}
+
+.variant-outline {
+  background-color: transparent;
+  color: var(--mantine-color-blue-6);
+  border: 2px solid var(--mantine-color-blue-6);
+
+  &:hover {
+    background-color: var(--mantine-color-blue-0);
+  }
+
+  &:disabled {
+    color: var(--mantine-color-gray-5);
+    border-color: var(--mantine-color-gray-3);
+    cursor: not-allowed;
+  }
+}
+
+.variant-danger {
+  background-color: var(--mantine-color-red-6);
+  color: white;
+
+  &:hover {
+    background-color: var(--mantine-color-red-7);
+  }
+
+  &:active {
+    background-color: var(--mantine-color-red-8);
+  }
+
+  &:disabled {
+    background-color: var(--mantine-color-gray-3);
+    color: var(--mantine-color-gray-6);
+    cursor: not-allowed;
+  }
+}
+
+.variant-subtle {
+  background-color: transparent;
+  color: var(--mantine-color-gray-7);
+
+  &:hover {
+    background-color: var(--mantine-color-gray-1);
+  }
+
+  &:disabled {
+    color: var(--mantine-color-gray-5);
+    cursor: not-allowed;
+  }
+}
+
+/* Sizes */
+.size-xs {
+  padding: 4px 8px;
+  font-size: 12px;
+  height: 24px;
+  min-width: 60px;
+}
+
+.size-sm {
+  padding: 6px 12px;
+  font-size: 13px;
+  height: 32px;
+  min-width: 80px;
+}
+
+.size-md {
+  padding: 8px 16px;
+  font-size: 14px;
+  height: 40px;
+  min-width: 100px;
+}
+
+.size-lg {
+  padding: 10px 20px;
+  font-size: 16px;
+  height: 48px;
+  min-width: 120px;
+}
+
+.size-xl {
+  padding: 12px 24px;
+  font-size: 18px;
+  height: 56px;
+  min-width: 140px;
+}
+
+/* Full Width */
+.full-width {
+  width: 100%;
+}
+
+/* Loading State */
+.loading {
+  position: relative;
+  pointer-events: none;
+}
+
+.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-right-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useForm } from '@mantine/form'
-import { zodResolver } from 'mantine-form-zod-resolver'
+import { zod4Resolver } from 'mantine-form-zod-resolver'
 import { PasswordInput, Button, Title, Paper, Alert, Container, Stack } from '@mantine/core'
 
 import { useResetPassword } from '../hooks/useResetPassword'
@@ -12,9 +12,9 @@ interface ResetPasswordFormProps {
 }
 
 export const ResetPasswordForm = ({ token }: ResetPasswordFormProps) => {
-  // Khởi tạo form với zodResolver và resetPasswordSchema
+  // Khởi tạo form với zod4Resolver và resetPasswordSchema
   const form = useForm({
-    validate: zodResolver(resetPasswordSchema),
+    validate: zod4Resolver(resetPasswordSchema),
     initialValues: {
       token: token || '',
       newPassword: '',

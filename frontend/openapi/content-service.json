@@ -1,1 +1,1395 @@
-{"openapi":"3.1.0","info":{"title":"Content Service API","description":"API documentation for the Content Service","version":"1.0"},"servers":[{"url":"http://localhost:8080","description":"Local server"}],"tags":[{"name":"Assignment Management","description":"Assignment management endpoints"},{"name":"Skill Management","description":"Skill management endpoints"},{"name":"Tutorial Management","description":"Tutorial management endpoints"}],"paths":{"/api/v1/tutorials":{"get":{"tags":["Tutorial Management"],"summary":"Get all tutorials","description":"Get all available tutorials with pagination and sorting","operationId":"getAllTutorials","parameters":[{"name":"page","in":"query","description":"Page number (0-indexed)","required":false,"schema":{"type":"string","minimum":0},"example":0},{"name":"size","in":"query","description":"Number of items per page","required":false,"schema":{"type":"string","maximum":100,"minimum":1},"example":10},{"name":"sort","in":"query","description":"Sort by field(s). Format: field1,direction;field2,direction. Direction can be 'asc' or 'desc'. Multiple sort criteria separated by semicolon.","required":false,"schema":{"type":"string"},"example":"createdAt,desc;name,asc"}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/PageResponseTutorialResponse"}}}}},"security":[{"Bearer Authentication":[]}]},"post":{"tags":["Tutorial Management"],"summary":"Create a new tutorial","description":"Create a new tutorial (Content Provider only)","operationId":"createTutorial","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateTutorialRequest"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/TutorialResponse"}}}}},"security":[{"Bearer Authentication":[]}]}},"/api/v1/skills":{"get":{"tags":["Skill Management"],"summary":"Get all skills","description":"Get all available skills with pagination and sorting","operationId":"getAllSkills","parameters":[{"name":"page","in":"query","description":"Page number (0-indexed)","required":false,"schema":{"type":"string","minimum":0},"example":0},{"name":"size","in":"query","description":"Number of items per page","required":false,"schema":{"type":"string","maximum":100,"minimum":1},"example":10},{"name":"sort","in":"query","description":"Sort by field(s). Format: field1,direction;field2,direction. Direction can be 'asc' or 'desc'. Multiple sort criteria separated by semicolon.","required":false,"schema":{"type":"string"},"example":"createdAt,desc;name,asc"}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/PageResponseSkillResponse"}}}}},"security":[{"Bearer Authentication":[]}]},"post":{"tags":["Skill Management"],"summary":"Create a new skill","description":"Create a new skill (Content Provider only)","operationId":"createSkill","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateSkillRequest"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/SkillResponse"}}}}},"security":[{"Bearer Authentication":[]}]}},"/api/v1/assignments":{"get":{"tags":["Assignment Management"],"summary":"Get all assignments","description":"Get all available assignments with pagination and sorting","operationId":"getAllAssignments","parameters":[{"name":"page","in":"query","description":"Page number (0-indexed)","required":false,"schema":{"type":"string","minimum":0},"example":0},{"name":"size","in":"query","description":"Number of items per page","required":false,"schema":{"type":"string","maximum":100,"minimum":1},"example":10},{"name":"sort","in":"query","description":"Sort by field(s). Format: field1,direction;field2,direction. Direction can be 'asc' or 'desc'. Multiple sort criteria separated by semicolon.","required":false,"schema":{"type":"string"},"example":"createdAt,desc;name,asc"}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/PageResponseAssignmentResponse"}}}}},"security":[{"Bearer Authentication":[]}]},"post":{"tags":["Assignment Management"],"summary":"Create a new assignment","description":"Create a new assignment (Content Provider only)","operationId":"createAssignment","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateAssignmentRequest"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/AssignmentResponse"}}}}},"security":[{"Bearer Authentication":[]}]}},"/api/v1/assignments/{id}/publish":{"post":{"tags":["Assignment Management"],"summary":"Publish an assignment","description":"Publish a draft assignment (Content Provider only)","operationId":"publishAssignment","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string","format":"uuid"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/AssignmentResponse"}}}}},"security":[{"Bearer Authentication":[]}]}},"/api/v1/assignments/{id}/archive":{"post":{"tags":["Assignment Management"],"summary":"Archive an assignment","description":"Archive an assignment (Content Provider only)","operationId":"archiveAssignment","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string","format":"uuid"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/AssignmentResponse"}}}}},"security":[{"Bearer Authentication":[]}]}},"/api/v1/tutorials/{id}":{"get":{"tags":["Tutorial Management"],"summary":"Get tutorial by ID","description":"Get tutorial details by ID","operationId":"getTutorialById","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string","format":"uuid"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/TutorialResponse"}}}}},"security":[{"Bearer Authentication":[]}]},"delete":{"tags":["Tutorial Management"],"summary":"Delete tutorial","description":"Delete a tutorial (Content Provider only)","operationId":"deleteTutorial","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string","format":"uuid"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"object","additionalProperties":{"type":"string"}}}}}},"security":[{"Bearer Authentication":[]}]},"patch":{"tags":["Tutorial Management"],"summary":"Update tutorial","description":"Update tutorial details (Content Provider only)","operationId":"updateTutorial","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string","format":"uuid"}}],"requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/UpdateTutorialRequest"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/TutorialResponse"}}}}},"security":[{"Bearer Authentication":[]}]}},"/api/v1/skills/{id}":{"get":{"tags":["Skill Management"],"summary":"Get skill by ID","description":"Get skill details by ID","operationId":"getSkillById","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string","format":"uuid"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/SkillResponse"}}}}},"security":[{"Bearer Authentication":[]}]},"delete":{"tags":["Skill Management"],"summary":"Delete skill","description":"Delete a skill (Content Provider only)","operationId":"deleteSkill","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string","format":"uuid"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"object","additionalProperties":{"type":"string"}}}}}},"security":[{"Bearer Authentication":[]}]},"patch":{"tags":["Skill Management"],"summary":"Update skill","description":"Update skill details (Content Provider only)","operationId":"updateSkill","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string","format":"uuid"}}],"requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/UpdateSkillRequest"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/SkillResponse"}}}}},"security":[{"Bearer Authentication":[]}]}},"/api/v1/assignments/{id}":{"get":{"tags":["Assignment Management"],"summary":"Get assignment by ID","description":"Get assignment details by ID","operationId":"getAssignmentById","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string","format":"uuid"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/AssignmentResponse"}}}}},"security":[{"Bearer Authentication":[]}]},"delete":{"tags":["Assignment Management"],"summary":"Delete assignment","description":"Delete an assignment (Content Provider only)","operationId":"deleteAssignment","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string","format":"uuid"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"object","additionalProperties":{"type":"string"}}}}}},"security":[{"Bearer Authentication":[]}]},"patch":{"tags":["Assignment Management"],"summary":"Update assignment","description":"Update assignment details (Content Provider only)","operationId":"updateAssignment","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string","format":"uuid"}}],"requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/UpdateAssignmentRequest"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/AssignmentResponse"}}}}},"security":[{"Bearer Authentication":[]}]}},"/api/v1/assignments/{id}/schedule":{"patch":{"tags":["Assignment Management"],"summary":"Update assignment schedule","description":"Update assignment schedule (start_date, due_date) (Instructor only)","operationId":"updateAssignmentSchedule","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string","format":"uuid"}}],"requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/UpdateAssignmentScheduleRequest"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/AssignmentResponse"}}}}},"security":[{"Bearer Authentication":[]}]}}},"components":{"schemas":{"CreateTutorialRequest":{"type":"object","properties":{"title":{"type":"string","maxLength":255,"minLength":0},"content":{"type":"string","minLength":1},"tags":{"type":"array","items":{"type":"string"}}},"required":["content","title"]},"TutorialResponse":{"type":"object","properties":{"id":{"type":"string","format":"uuid"},"title":{"type":"string"},"content":{"type":"string"},"creatorId":{"type":"string","format":"uuid"},"createdAt":{"type":"string","format":"date-time"},"updatedAt":{"type":"string","format":"date-time"},"tags":{"type":"array","items":{"type":"string"}}}},"CreateSkillRequest":{"type":"object","properties":{"name":{"type":"string","maxLength":255,"minLength":0},"description":{"type":"string"}},"required":["name"]},"SkillResponse":{"type":"object","properties":{"id":{"type":"string","format":"uuid"},"name":{"type":"string"},"description":{"type":"string"},"createdAt":{"type":"string","format":"date-time"},"updatedAt":{"type":"string","format":"date-time"}}},"CreateAssignmentRequest":{"type":"object","properties":{"title":{"type":"string","maxLength":255,"minLength":0},"description":{"type":"string","minLength":1},"difficultyLevel":{"type":"string","enum":["EASY","MEDIUM","HARD"]},"startDate":{"type":"string","format":"date-time"},"dueDate":{"type":"string","format":"date-time"},"maxScore":{"type":"number","maximum":999.99,"minimum":0.0},"languages":{"type":"array","items":{"type":"string"},"maxItems":2147483647,"minItems":1},"testCases":{"type":"array","items":{"$ref":"#/components/schemas/TestCase"},"maxItems":2147483647,"minItems":1},"skillIds":{"type":"array","items":{"type":"string","format":"uuid"},"uniqueItems":true},"tutorialIds":{"type":"array","items":{"type":"string","format":"uuid"},"uniqueItems":true}},"required":["description","difficultyLevel","languages","maxScore","testCases","title"]},"TestCase":{"type":"object","properties":{"order":{"type":"integer","format":"int32"},"description":{"type":"string"},"hidden":{"type":"boolean"},"weight":{"type":"number","format":"double"},"input":{"type":"string"},"output":{"type":"string"},"timeout":{"type":"integer","format":"int32"},"memoryLimit":{"type":"integer","format":"int32"}}},"AssignmentResponse":{"type":"object","properties":{"id":{"type":"string","format":"uuid"},"title":{"type":"string"},"description":{"type":"string"},"difficultyLevel":{"type":"string","enum":["EASY","MEDIUM","HARD"]},"creatorId":{"type":"string","format":"uuid"},"createdAt":{"type":"string","format":"date-time"},"updatedAt":{"type":"string","format":"date-time"},"startDate":{"type":"string","format":"date-time"},"dueDate":{"type":"string","format":"date-time"},"maxScore":{"type":"number"},"status":{"type":"string","enum":["DRAFT","PUBLISHED","ARCHIVED"]},"languages":{"type":"array","items":{"type":"string"}},"testCases":{"type":"array","items":{"$ref":"#/components/schemas/TestCase"}},"skills":{"type":"array","items":{"$ref":"#/components/schemas/SkillResponse"},"uniqueItems":true},"tutorials":{"type":"array","items":{"$ref":"#/components/schemas/TutorialResponse"},"uniqueItems":true}}},"UpdateTutorialRequest":{"type":"object","properties":{"title":{"type":"string","maxLength":255,"minLength":0},"content":{"type":"string"},"tags":{"type":"array","items":{"type":"string"}}}},"UpdateSkillRequest":{"type":"object","properties":{"name":{"type":"string","maxLength":255,"minLength":0},"description":{"type":"string"}}},"UpdateAssignmentRequest":{"type":"object","properties":{"title":{"type":"string","maxLength":255,"minLength":0},"description":{"type":"string"},"difficultyLevel":{"type":"string","enum":["EASY","MEDIUM","HARD"]},"startDate":{"type":"string","format":"date-time"},"dueDate":{"type":"string","format":"date-time"},"maxScore":{"type":"number","maximum":999.99,"minimum":0.0},"languages":{"type":"array","items":{"type":"string"},"maxItems":2147483647,"minItems":1},"testCases":{"type":"array","items":{"$ref":"#/components/schemas/TestCase"},"maxItems":2147483647,"minItems":1},"skillIds":{"type":"array","items":{"type":"string","format":"uuid"},"uniqueItems":true},"tutorialIds":{"type":"array","items":{"type":"string","format":"uuid"},"uniqueItems":true}}},"UpdateAssignmentScheduleRequest":{"type":"object","properties":{"startDate":{"type":"string","format":"date-time"},"dueDate":{"type":"string","format":"date-time"}},"required":["dueDate","startDate"]},"PageResponseTutorialResponse":{"type":"object","description":"Paginated response wrapper","properties":{"content":{"type":"array","description":"List of items in the current page","items":{"$ref":"#/components/schemas/TutorialResponse"}},"pageNumber":{"type":"integer","format":"int32","description":"Current page number (0-indexed)","example":0},"pageSize":{"type":"integer","format":"int32","description":"Number of items per page","example":10},"totalElements":{"type":"integer","format":"int64","description":"Total number of items across all pages","example":100},"totalPages":{"type":"integer","format":"int32","description":"Total number of pages","example":10},"first":{"type":"boolean","description":"Whether this is the first page","example":true},"last":{"type":"boolean","description":"Whether this is the last page","example":false},"hasNext":{"type":"boolean","description":"Whether there is a next page","example":true},"hasPrevious":{"type":"boolean","description":"Whether there is a previous page","example":false}}},"PageResponseSkillResponse":{"type":"object","description":"Paginated response wrapper","properties":{"content":{"type":"array","description":"List of items in the current page","items":{"$ref":"#/components/schemas/SkillResponse"}},"pageNumber":{"type":"integer","format":"int32","description":"Current page number (0-indexed)","example":0},"pageSize":{"type":"integer","format":"int32","description":"Number of items per page","example":10},"totalElements":{"type":"integer","format":"int64","description":"Total number of items across all pages","example":100},"totalPages":{"type":"integer","format":"int32","description":"Total number of pages","example":10},"first":{"type":"boolean","description":"Whether this is the first page","example":true},"last":{"type":"boolean","description":"Whether this is the last page","example":false},"hasNext":{"type":"boolean","description":"Whether there is a next page","example":true},"hasPrevious":{"type":"boolean","description":"Whether there is a previous page","example":false}}},"PageResponseAssignmentResponse":{"type":"object","description":"Paginated response wrapper","properties":{"content":{"type":"array","description":"List of items in the current page","items":{"$ref":"#/components/schemas/AssignmentResponse"}},"pageNumber":{"type":"integer","format":"int32","description":"Current page number (0-indexed)","example":0},"pageSize":{"type":"integer","format":"int32","description":"Number of items per page","example":10},"totalElements":{"type":"integer","format":"int64","description":"Total number of items across all pages","example":100},"totalPages":{"type":"integer","format":"int32","description":"Total number of pages","example":10},"first":{"type":"boolean","description":"Whether this is the first page","example":true},"last":{"type":"boolean","description":"Whether this is the last page","example":false},"hasNext":{"type":"boolean","description":"Whether there is a next page","example":true},"hasPrevious":{"type":"boolean","description":"Whether there is a previous page","example":false}}}},"securitySchemes":{"Bearer Authentication":{"type":"http","scheme":"bearer","bearerFormat":"JWT"}}}}
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "Content Service API",
+        "description": "API documentation for the Content Service",
+        "version": "1.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8080",
+            "description": "Local server"
+        }
+    ],
+    "tags": [
+        {
+            "name": "Assignment Management",
+            "description": "Assignment management endpoints"
+        },
+        {
+            "name": "Skill Management",
+            "description": "Skill management endpoints"
+        },
+        {
+            "name": "Tutorial Management",
+            "description": "Tutorial management endpoints"
+        }
+    ],
+    "paths": {
+        "/api/v1/tutorials": {
+            "get": {
+                "tags": [
+                    "Tutorial Management"
+                ],
+                "summary": "Get all tutorials",
+                "description": "Get all available tutorials with pagination and sorting",
+                "operationId": "getAllTutorials",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number (0-indexed)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "minimum": 0
+                        },
+                        "example": 0
+                    },
+                    {
+                        "name": "size",
+                        "in": "query",
+                        "description": "Number of items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "maximum": 100,
+                            "minimum": 1
+                        },
+                        "example": 10
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sort by field(s). Format: field1,direction;field2,direction. Direction can be 'asc' or 'desc'. Multiple sort criteria separated by semicolon.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "createdAt,desc;name,asc"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PageResponseTutorialResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer Authentication": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Tutorial Management"
+                ],
+                "summary": "Create a new tutorial",
+                "description": "Create a new tutorial (Content Provider only)",
+                "operationId": "createTutorial",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateTutorialRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TutorialResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer Authentication": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/skills": {
+            "get": {
+                "tags": [
+                    "Skill Management"
+                ],
+                "summary": "Get all skills",
+                "description": "Get all available skills with pagination and sorting",
+                "operationId": "getAllSkills",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number (0-indexed)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "minimum": 0
+                        },
+                        "example": 0
+                    },
+                    {
+                        "name": "size",
+                        "in": "query",
+                        "description": "Number of items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "maximum": 100,
+                            "minimum": 1
+                        },
+                        "example": 10
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sort by field(s). Format: field1,direction;field2,direction. Direction can be 'asc' or 'desc'. Multiple sort criteria separated by semicolon.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "createdAt,desc;name,asc"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PageResponseSkillResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer Authentication": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Skill Management"
+                ],
+                "summary": "Create a new skill",
+                "description": "Create a new skill (Content Provider only)",
+                "operationId": "createSkill",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateSkillRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SkillResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer Authentication": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/assignments": {
+            "get": {
+                "tags": [
+                    "Assignment Management"
+                ],
+                "summary": "Get all assignments",
+                "description": "Get all available assignments with pagination and sorting",
+                "operationId": "getAllAssignments",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number (0-indexed)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "minimum": 0
+                        },
+                        "example": 0
+                    },
+                    {
+                        "name": "size",
+                        "in": "query",
+                        "description": "Number of items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "maximum": 100,
+                            "minimum": 1
+                        },
+                        "example": 10
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sort by field(s). Format: field1,direction;field2,direction. Direction can be 'asc' or 'desc'. Multiple sort criteria separated by semicolon.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "createdAt,desc;name,asc"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PageResponseAssignmentResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer Authentication": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Assignment Management"
+                ],
+                "summary": "Create a new assignment",
+                "description": "Create a new assignment (Content Provider only)",
+                "operationId": "createAssignment",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateAssignmentRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AssignmentResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer Authentication": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/assignments/{id}/publish": {
+            "post": {
+                "tags": [
+                    "Assignment Management"
+                ],
+                "summary": "Publish an assignment",
+                "description": "Publish a draft assignment (Content Provider only)",
+                "operationId": "publishAssignment",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AssignmentResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer Authentication": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/assignments/{id}/archive": {
+            "post": {
+                "tags": [
+                    "Assignment Management"
+                ],
+                "summary": "Archive an assignment",
+                "description": "Archive an assignment (Content Provider only)",
+                "operationId": "archiveAssignment",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AssignmentResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer Authentication": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/tutorials/{id}": {
+            "get": {
+                "tags": [
+                    "Tutorial Management"
+                ],
+                "summary": "Get tutorial by ID",
+                "description": "Get tutorial details by ID",
+                "operationId": "getTutorialById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TutorialResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer Authentication": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Tutorial Management"
+                ],
+                "summary": "Delete tutorial",
+                "description": "Delete a tutorial (Content Provider only)",
+                "operationId": "deleteTutorial",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer Authentication": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Tutorial Management"
+                ],
+                "summary": "Update tutorial",
+                "description": "Update tutorial details (Content Provider only)",
+                "operationId": "updateTutorial",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateTutorialRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TutorialResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer Authentication": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/skills/{id}": {
+            "get": {
+                "tags": [
+                    "Skill Management"
+                ],
+                "summary": "Get skill by ID",
+                "description": "Get skill details by ID",
+                "operationId": "getSkillById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SkillResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer Authentication": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Skill Management"
+                ],
+                "summary": "Delete skill",
+                "description": "Delete a skill (Content Provider only)",
+                "operationId": "deleteSkill",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer Authentication": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Skill Management"
+                ],
+                "summary": "Update skill",
+                "description": "Update skill details (Content Provider only)",
+                "operationId": "updateSkill",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateSkillRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SkillResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer Authentication": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/assignments/{id}": {
+            "get": {
+                "tags": [
+                    "Assignment Management"
+                ],
+                "summary": "Get assignment by ID",
+                "description": "Get assignment details by ID",
+                "operationId": "getAssignmentById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AssignmentResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer Authentication": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Assignment Management"
+                ],
+                "summary": "Delete assignment",
+                "description": "Delete an assignment (Content Provider only)",
+                "operationId": "deleteAssignment",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer Authentication": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Assignment Management"
+                ],
+                "summary": "Update assignment",
+                "description": "Update assignment details (Content Provider only)",
+                "operationId": "updateAssignment",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateAssignmentRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AssignmentResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer Authentication": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/assignments/{id}/schedule": {
+            "patch": {
+                "tags": [
+                    "Assignment Management"
+                ],
+                "summary": "Update assignment schedule",
+                "description": "Update assignment schedule (start_date, due_date) (Instructor only)",
+                "operationId": "updateAssignmentSchedule",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateAssignmentScheduleRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AssignmentResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer Authentication": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "CreateTutorialRequest": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "minLength": 0
+                    },
+                    "content": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "tags": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "required": [
+                    "content",
+                    "title"
+                ]
+            },
+            "TutorialResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "content": {
+                        "type": "string"
+                    },
+                    "creatorId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "tags": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "CreateSkillRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "minLength": 0
+                    },
+                    "description": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "name"
+                ]
+            },
+            "SkillResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "CreateAssignmentRequest": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "minLength": 0
+                    },
+                    "description": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "difficultyLevel": {
+                        "type": "string",
+                        "enum": [
+                            "EASY",
+                            "MEDIUM",
+                            "HARD"
+                        ]
+                    },
+                    "startDate": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "dueDate": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "maxScore": {
+                        "type": "number",
+                        "maximum": 999.99,
+                        "minimum": 0.0
+                    },
+                    "languages": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "maxItems": 2147483647,
+                        "minItems": 1
+                    },
+                    "testCases": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TestCase"
+                        },
+                        "maxItems": 2147483647,
+                        "minItems": 1
+                    },
+                    "skillIds": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "uniqueItems": true
+                    },
+                    "tutorialIds": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "uniqueItems": true
+                    }
+                },
+                "required": [
+                    "description",
+                    "difficultyLevel",
+                    "languages",
+                    "maxScore",
+                    "testCases",
+                    "title"
+                ]
+            },
+            "TestCase": {
+                "type": "object",
+                "properties": {
+                    "order": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "hidden": {
+                        "type": "boolean"
+                    },
+                    "weight": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "input": {
+                        "type": "string"
+                    },
+                    "output": {
+                        "type": "string"
+                    },
+                    "timeout": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "memoryLimit": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                }
+            },
+            "AssignmentResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "difficultyLevel": {
+                        "type": "string",
+                        "enum": [
+                            "EASY",
+                            "MEDIUM",
+                            "HARD"
+                        ]
+                    },
+                    "creatorId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "startDate": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "dueDate": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "maxScore": {
+                        "type": "number"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "DRAFT",
+                            "PUBLISHED",
+                            "ARCHIVED"
+                        ]
+                    },
+                    "languages": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "testCases": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TestCase"
+                        }
+                    },
+                    "skills": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SkillResponse"
+                        },
+                        "uniqueItems": true
+                    },
+                    "tutorials": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TutorialResponse"
+                        },
+                        "uniqueItems": true
+                    }
+                }
+            },
+            "UpdateTutorialRequest": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "minLength": 0
+                    },
+                    "content": {
+                        "type": "string"
+                    },
+                    "tags": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "UpdateSkillRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "minLength": 0
+                    },
+                    "description": {
+                        "type": "string"
+                    }
+                }
+            },
+            "UpdateAssignmentRequest": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "minLength": 0
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "difficultyLevel": {
+                        "type": "string",
+                        "enum": [
+                            "EASY",
+                            "MEDIUM",
+                            "HARD"
+                        ]
+                    },
+                    "startDate": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "dueDate": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "maxScore": {
+                        "type": "number",
+                        "maximum": 999.99,
+                        "minimum": 0.0
+                    },
+                    "languages": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "maxItems": 2147483647,
+                        "minItems": 1
+                    },
+                    "testCases": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TestCase"
+                        },
+                        "maxItems": 2147483647,
+                        "minItems": 1
+                    },
+                    "skillIds": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "uniqueItems": true
+                    },
+                    "tutorialIds": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "uniqueItems": true
+                    }
+                }
+            },
+            "UpdateAssignmentScheduleRequest": {
+                "type": "object",
+                "properties": {
+                    "startDate": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "dueDate": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "required": [
+                    "dueDate",
+                    "startDate"
+                ]
+            },
+            "PageResponseTutorialResponse": {
+                "type": "object",
+                "description": "Paginated response wrapper",
+                "properties": {
+                    "content": {
+                        "type": "array",
+                        "description": "List of items in the current page",
+                        "items": {
+                            "$ref": "#/components/schemas/TutorialResponse"
+                        }
+                    },
+                    "pageNumber": {
+                        "type": "integer",
+                        "format": "int32",
+                        "description": "Current page number (0-indexed)",
+                        "example": 0
+                    },
+                    "pageSize": {
+                        "type": "integer",
+                        "format": "int32",
+                        "description": "Number of items per page",
+                        "example": 10
+                    },
+                    "totalElements": {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "Total number of items across all pages",
+                        "example": 100
+                    },
+                    "totalPages": {
+                        "type": "integer",
+                        "format": "int32",
+                        "description": "Total number of pages",
+                        "example": 10
+                    },
+                    "first": {
+                        "type": "boolean",
+                        "description": "Whether this is the first page",
+                        "example": true
+                    },
+                    "last": {
+                        "type": "boolean",
+                        "description": "Whether this is the last page",
+                        "example": false
+                    },
+                    "hasNext": {
+                        "type": "boolean",
+                        "description": "Whether there is a next page",
+                        "example": true
+                    },
+                    "hasPrevious": {
+                        "type": "boolean",
+                        "description": "Whether there is a previous page",
+                        "example": false
+                    }
+                }
+            },
+            "PageResponseSkillResponse": {
+                "type": "object",
+                "description": "Paginated response wrapper",
+                "properties": {
+                    "content": {
+                        "type": "array",
+                        "description": "List of items in the current page",
+                        "items": {
+                            "$ref": "#/components/schemas/SkillResponse"
+                        }
+                    },
+                    "pageNumber": {
+                        "type": "integer",
+                        "format": "int32",
+                        "description": "Current page number (0-indexed)",
+                        "example": 0
+                    },
+                    "pageSize": {
+                        "type": "integer",
+                        "format": "int32",
+                        "description": "Number of items per page",
+                        "example": 10
+                    },
+                    "totalElements": {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "Total number of items across all pages",
+                        "example": 100
+                    },
+                    "totalPages": {
+                        "type": "integer",
+                        "format": "int32",
+                        "description": "Total number of pages",
+                        "example": 10
+                    },
+                    "first": {
+                        "type": "boolean",
+                        "description": "Whether this is the first page",
+                        "example": true
+                    },
+                    "last": {
+                        "type": "boolean",
+                        "description": "Whether this is the last page",
+                        "example": false
+                    },
+                    "hasNext": {
+                        "type": "boolean",
+                        "description": "Whether there is a next page",
+                        "example": true
+                    },
+                    "hasPrevious": {
+                        "type": "boolean",
+                        "description": "Whether there is a previous page",
+                        "example": false
+                    }
+                }
+            },
+            "PageResponseAssignmentResponse": {
+                "type": "object",
+                "description": "Paginated response wrapper",
+                "properties": {
+                    "content": {
+                        "type": "array",
+                        "description": "List of items in the current page",
+                        "items": {
+                            "$ref": "#/components/schemas/AssignmentResponse"
+                        }
+                    },
+                    "pageNumber": {
+                        "type": "integer",
+                        "format": "int32",
+                        "description": "Current page number (0-indexed)",
+                        "example": 0
+                    },
+                    "pageSize": {
+                        "type": "integer",
+                        "format": "int32",
+                        "description": "Number of items per page",
+                        "example": 10
+                    },
+                    "totalElements": {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "Total number of items across all pages",
+                        "example": 100
+                    },
+                    "totalPages": {
+                        "type": "integer",
+                        "format": "int32",
+                        "description": "Total number of pages",
+                        "example": 10
+                    },
+                    "first": {
+                        "type": "boolean",
+                        "description": "Whether this is the first page",
+                        "example": true
+                    },
+                    "last": {
+                        "type": "boolean",
+                        "description": "Whether this is the last page",
+                        "example": false
+                    },
+                    "hasNext": {
+                        "type": "boolean",
+                        "description": "Whether there is a next page",
+                        "example": true
+                    },
+                    "hasPrevious": {
+                        "type": "boolean",
+                        "description": "Whether there is a previous page",
+                        "example": false
+                    }
+                }
+            }
+        },
+        "securitySchemes": {
+            "Bearer Authentication": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        }
+    }
+}

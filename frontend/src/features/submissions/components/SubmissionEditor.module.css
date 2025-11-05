@@ -1,0 +1,24 @@
+.submissionTabs {
+  width: 100%;
+}
+
+.submissionTabs :global(.mantine-Tabs-list) {
+  border-bottom: 2px solid var(--mantine-color-gray-2);
+}
+
+.submissionTabs :global(.mantine-Tabs-tab) {
+  padding: var(--mantine-spacing-md) var(--mantine-spacing-lg);
+  font-weight: 500;
+  border: none;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.submissionTabs :global(.mantine-Tabs-tab[data-active='true']) {
+  border-bottom-color: var(--mantine-color-blue-6);
+  color: var(--mantine-color-blue-6);
+}
+
+.submissionTabs :global(.mantine-Tabs-panel) {
+  min-height: 400px;
+}

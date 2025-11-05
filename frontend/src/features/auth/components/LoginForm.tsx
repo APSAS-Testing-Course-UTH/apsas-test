@@ -1,20 +1,20 @@
 import { useForm } from '@mantine/form'
-import { zodResolver } from 'mantine-form-zod-resolver'
+import { zod4Resolver } from 'mantine-form-zod-resolver'
 import { TextInput, PasswordInput, Button, Checkbox, Text, Title, Anchor, Paper, Stack } from '@mantine/core'
 import { Link } from '@tanstack/react-router'
 
 import { useLogin } from '../hooks/useLogin'
 import { loginSchema } from '../schemas/loginSchema'
 
-// Component form đăng nhậpd
+// Component form đăng nhập
 interface LoginFormProps {
   redirectTo?: string
 }
 
 export const LoginForm = ({ redirectTo }: LoginFormProps) => {
-  // Khởi tạo form với zodResolver và loginSchema
+  // Khởi tạo form với zod4Resolver và loginSchema
   const form = useForm({
-    validate: zodResolver(loginSchema),
+    validate: zod4Resolver(loginSchema),
     initialValues: {
       email: '',
       password: ''
@@ -42,7 +42,7 @@ export const LoginForm = ({ redirectTo }: LoginFormProps) => {
           <form onSubmit={form.onSubmit(handleSubmit)}>
             <TextInput
               label="Email"
-              placeholder="hello@gmail.com"
+              placeholder="Nhập email của bạn"
               size="md"
               radius="md"
               mb="md"
@@ -51,7 +51,7 @@ export const LoginForm = ({ redirectTo }: LoginFormProps) => {
 
             <PasswordInput
               label="Mật khẩu"
-              placeholder="Tối thiểu 8 ký tự"
+              placeholder="Nhập mật khẩu của bạn"
               size="md"
               radius="md"
               mb="xl"

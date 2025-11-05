@@ -14,12 +14,26 @@ import { Route as ResetPasswordRouteImport } from "./routes/reset-password"
 import { Route as RegisterRouteImport } from "./routes/register"
 import { Route as LoginRouteImport } from "./routes/login"
 import { Route as ForgotPasswordRouteImport } from "./routes/forgot-password"
+import { Route as DevRouteImport } from "./routes/dev"
 import { Route as AuthenticatedRouteImport } from "./routes/_authenticated"
 import { Route as IndexRouteImport } from "./routes/index"
-import { Route as StudentDashboardRouteImport } from "./routes/student/dashboard"
-import { Route as ProviderDashboardRouteImport } from "./routes/provider/dashboard"
-import { Route as LecturerDashboardRouteImport } from "./routes/lecturer/dashboard"
-import { Route as AdminDashboardRouteImport } from "./routes/admin/dashboard"
+import { Route as AuthenticatedStudentIndexRouteImport } from "./routes/_authenticated/student/index"
+import { Route as AuthenticatedStudentSupportRouteImport } from "./routes/_authenticated/student/support"
+import { Route as AuthenticatedStudentSubmissionsRouteImport } from "./routes/_authenticated/student/submissions"
+import { Route as AuthenticatedStudentSettingsRouteImport } from "./routes/_authenticated/student/settings"
+import { Route as AuthenticatedStudentResourcesRouteImport } from "./routes/_authenticated/student/resources"
+import { Route as AuthenticatedStudentProfileRouteImport } from "./routes/_authenticated/student/profile"
+import { Route as AuthenticatedStudentPerformanceRouteImport } from "./routes/_authenticated/student/performance"
+import { Route as AuthenticatedStudentDashboardRouteImport } from "./routes/_authenticated/student/dashboard"
+import { Route as AuthenticatedStudentAssignmentsRouteImport } from "./routes/_authenticated/student/assignments"
+import { Route as AuthenticatedProviderDashboardRouteImport } from "./routes/_authenticated/provider/dashboard"
+import { Route as AuthenticatedLecturerDashboardRouteImport } from "./routes/_authenticated/lecturer/dashboard"
+import { Route as AuthenticatedAdminDashboardRouteImport } from "./routes/_authenticated/admin/dashboard"
+import { Route as AuthenticatedStudentSubmissionsIndexRouteImport } from "./routes/_authenticated/student/submissions/index"
+import { Route as AuthenticatedStudentAssignmentsIndexRouteImport } from "./routes/_authenticated/student/assignments/index"
+import { Route as AuthenticatedStudentSubmissionsIdRouteImport } from "./routes/_authenticated/student/submissions/$id"
+import { Route as AuthenticatedStudentSubmissionIdRouteImport } from "./routes/_authenticated/student/submission/$id"
+import { Route as AuthenticatedStudentAssignmentsIdRouteImport } from "./routes/_authenticated/student/assignments/$id"
 
 const VerifyEmailRoute = VerifyEmailRouteImport.update({
   id: "/verify-email",
@@ -46,6 +60,11 @@ const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   path: "/forgot-password",
   getParentRoute: () => rootRouteImport,
 } as any)
+const DevRoute = DevRouteImport.update({
+  id: "/dev",
+  path: "/dev",
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: "/_authenticated",
   getParentRoute: () => rootRouteImport,
@@ -55,69 +74,192 @@ const IndexRoute = IndexRouteImport.update({
   path: "/",
   getParentRoute: () => rootRouteImport,
 } as any)
-const StudentDashboardRoute = StudentDashboardRouteImport.update({
-  id: "/student/dashboard",
-  path: "/student/dashboard",
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProviderDashboardRoute = ProviderDashboardRouteImport.update({
-  id: "/provider/dashboard",
-  path: "/provider/dashboard",
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LecturerDashboardRoute = LecturerDashboardRouteImport.update({
-  id: "/lecturer/dashboard",
-  path: "/lecturer/dashboard",
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminDashboardRoute = AdminDashboardRouteImport.update({
-  id: "/admin/dashboard",
-  path: "/admin/dashboard",
-  getParentRoute: () => rootRouteImport,
-} as any)
+const AuthenticatedStudentIndexRoute =
+  AuthenticatedStudentIndexRouteImport.update({
+    id: "/student/",
+    path: "/student/",
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedStudentSupportRoute =
+  AuthenticatedStudentSupportRouteImport.update({
+    id: "/student/support",
+    path: "/student/support",
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedStudentSubmissionsRoute =
+  AuthenticatedStudentSubmissionsRouteImport.update({
+    id: "/student/submissions",
+    path: "/student/submissions",
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedStudentSettingsRoute =
+  AuthenticatedStudentSettingsRouteImport.update({
+    id: "/student/settings",
+    path: "/student/settings",
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedStudentResourcesRoute =
+  AuthenticatedStudentResourcesRouteImport.update({
+    id: "/student/resources",
+    path: "/student/resources",
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedStudentProfileRoute =
+  AuthenticatedStudentProfileRouteImport.update({
+    id: "/student/profile",
+    path: "/student/profile",
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedStudentPerformanceRoute =
+  AuthenticatedStudentPerformanceRouteImport.update({
+    id: "/student/performance",
+    path: "/student/performance",
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedStudentDashboardRoute =
+  AuthenticatedStudentDashboardRouteImport.update({
+    id: "/student/dashboard",
+    path: "/student/dashboard",
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedStudentAssignmentsRoute =
+  AuthenticatedStudentAssignmentsRouteImport.update({
+    id: "/student/assignments",
+    path: "/student/assignments",
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedProviderDashboardRoute =
+  AuthenticatedProviderDashboardRouteImport.update({
+    id: "/provider/dashboard",
+    path: "/provider/dashboard",
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedLecturerDashboardRoute =
+  AuthenticatedLecturerDashboardRouteImport.update({
+    id: "/lecturer/dashboard",
+    path: "/lecturer/dashboard",
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedAdminDashboardRoute =
+  AuthenticatedAdminDashboardRouteImport.update({
+    id: "/admin/dashboard",
+    path: "/admin/dashboard",
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedStudentSubmissionsIndexRoute =
+  AuthenticatedStudentSubmissionsIndexRouteImport.update({
+    id: "/",
+    path: "/",
+    getParentRoute: () => AuthenticatedStudentSubmissionsRoute,
+  } as any)
+const AuthenticatedStudentAssignmentsIndexRoute =
+  AuthenticatedStudentAssignmentsIndexRouteImport.update({
+    id: "/",
+    path: "/",
+    getParentRoute: () => AuthenticatedStudentAssignmentsRoute,
+  } as any)
+const AuthenticatedStudentSubmissionsIdRoute =
+  AuthenticatedStudentSubmissionsIdRouteImport.update({
+    id: "/$id",
+    path: "/$id",
+    getParentRoute: () => AuthenticatedStudentSubmissionsRoute,
+  } as any)
+const AuthenticatedStudentSubmissionIdRoute =
+  AuthenticatedStudentSubmissionIdRouteImport.update({
+    id: "/student/submission/$id",
+    path: "/student/submission/$id",
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedStudentAssignmentsIdRoute =
+  AuthenticatedStudentAssignmentsIdRouteImport.update({
+    id: "/$id",
+    path: "/$id",
+    getParentRoute: () => AuthenticatedStudentAssignmentsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   "/": typeof IndexRoute
+  "/dev": typeof DevRoute
   "/forgot-password": typeof ForgotPasswordRoute
   "/login": typeof LoginRoute
   "/register": typeof RegisterRoute
   "/reset-password": typeof ResetPasswordRoute
   "/verify-email": typeof VerifyEmailRoute
-  "/admin/dashboard": typeof AdminDashboardRoute
-  "/lecturer/dashboard": typeof LecturerDashboardRoute
-  "/provider/dashboard": typeof ProviderDashboardRoute
-  "/student/dashboard": typeof StudentDashboardRoute
+  "/admin/dashboard": typeof AuthenticatedAdminDashboardRoute
+  "/lecturer/dashboard": typeof AuthenticatedLecturerDashboardRoute
+  "/provider/dashboard": typeof AuthenticatedProviderDashboardRoute
+  "/student/assignments": typeof AuthenticatedStudentAssignmentsRouteWithChildren
+  "/student/dashboard": typeof AuthenticatedStudentDashboardRoute
+  "/student/performance": typeof AuthenticatedStudentPerformanceRoute
+  "/student/profile": typeof AuthenticatedStudentProfileRoute
+  "/student/resources": typeof AuthenticatedStudentResourcesRoute
+  "/student/settings": typeof AuthenticatedStudentSettingsRoute
+  "/student/submissions": typeof AuthenticatedStudentSubmissionsRouteWithChildren
+  "/student/support": typeof AuthenticatedStudentSupportRoute
+  "/student": typeof AuthenticatedStudentIndexRoute
+  "/student/assignments/$id": typeof AuthenticatedStudentAssignmentsIdRoute
+  "/student/submission/$id": typeof AuthenticatedStudentSubmissionIdRoute
+  "/student/submissions/$id": typeof AuthenticatedStudentSubmissionsIdRoute
+  "/student/assignments/": typeof AuthenticatedStudentAssignmentsIndexRoute
+  "/student/submissions/": typeof AuthenticatedStudentSubmissionsIndexRoute
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute
+  "/dev": typeof DevRoute
   "/forgot-password": typeof ForgotPasswordRoute
   "/login": typeof LoginRoute
   "/register": typeof RegisterRoute
   "/reset-password": typeof ResetPasswordRoute
   "/verify-email": typeof VerifyEmailRoute
-  "/admin/dashboard": typeof AdminDashboardRoute
-  "/lecturer/dashboard": typeof LecturerDashboardRoute
-  "/provider/dashboard": typeof ProviderDashboardRoute
-  "/student/dashboard": typeof StudentDashboardRoute
+  "/admin/dashboard": typeof AuthenticatedAdminDashboardRoute
+  "/lecturer/dashboard": typeof AuthenticatedLecturerDashboardRoute
+  "/provider/dashboard": typeof AuthenticatedProviderDashboardRoute
+  "/student/dashboard": typeof AuthenticatedStudentDashboardRoute
+  "/student/performance": typeof AuthenticatedStudentPerformanceRoute
+  "/student/profile": typeof AuthenticatedStudentProfileRoute
+  "/student/resources": typeof AuthenticatedStudentResourcesRoute
+  "/student/settings": typeof AuthenticatedStudentSettingsRoute
+  "/student/support": typeof AuthenticatedStudentSupportRoute
+  "/student": typeof AuthenticatedStudentIndexRoute
+  "/student/assignments/$id": typeof AuthenticatedStudentAssignmentsIdRoute
+  "/student/submission/$id": typeof AuthenticatedStudentSubmissionIdRoute
+  "/student/submissions/$id": typeof AuthenticatedStudentSubmissionsIdRoute
+  "/student/assignments": typeof AuthenticatedStudentAssignmentsIndexRoute
+  "/student/submissions": typeof AuthenticatedStudentSubmissionsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   "/": typeof IndexRoute
-  "/_authenticated": typeof AuthenticatedRoute
+  "/_authenticated": typeof AuthenticatedRouteWithChildren
+  "/dev": typeof DevRoute
   "/forgot-password": typeof ForgotPasswordRoute
   "/login": typeof LoginRoute
   "/register": typeof RegisterRoute
   "/reset-password": typeof ResetPasswordRoute
   "/verify-email": typeof VerifyEmailRoute
-  "/admin/dashboard": typeof AdminDashboardRoute
-  "/lecturer/dashboard": typeof LecturerDashboardRoute
-  "/provider/dashboard": typeof ProviderDashboardRoute
-  "/student/dashboard": typeof StudentDashboardRoute
+  "/_authenticated/admin/dashboard": typeof AuthenticatedAdminDashboardRoute
+  "/_authenticated/lecturer/dashboard": typeof AuthenticatedLecturerDashboardRoute
+  "/_authenticated/provider/dashboard": typeof AuthenticatedProviderDashboardRoute
+  "/_authenticated/student/assignments": typeof AuthenticatedStudentAssignmentsRouteWithChildren
+  "/_authenticated/student/dashboard": typeof AuthenticatedStudentDashboardRoute
+  "/_authenticated/student/performance": typeof AuthenticatedStudentPerformanceRoute
+  "/_authenticated/student/profile": typeof AuthenticatedStudentProfileRoute
+  "/_authenticated/student/resources": typeof AuthenticatedStudentResourcesRoute
+  "/_authenticated/student/settings": typeof AuthenticatedStudentSettingsRoute
+  "/_authenticated/student/submissions": typeof AuthenticatedStudentSubmissionsRouteWithChildren
+  "/_authenticated/student/support": typeof AuthenticatedStudentSupportRoute
+  "/_authenticated/student/": typeof AuthenticatedStudentIndexRoute
+  "/_authenticated/student/assignments/$id": typeof AuthenticatedStudentAssignmentsIdRoute
+  "/_authenticated/student/submission/$id": typeof AuthenticatedStudentSubmissionIdRoute
+  "/_authenticated/student/submissions/$id": typeof AuthenticatedStudentSubmissionsIdRoute
+  "/_authenticated/student/assignments/": typeof AuthenticatedStudentAssignmentsIndexRoute
+  "/_authenticated/student/submissions/": typeof AuthenticatedStudentSubmissionsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | "/"
+    | "/dev"
     | "/forgot-password"
     | "/login"
     | "/register"
@@ -126,10 +268,24 @@ export interface FileRouteTypes {
     | "/admin/dashboard"
     | "/lecturer/dashboard"
     | "/provider/dashboard"
+    | "/student/assignments"
     | "/student/dashboard"
+    | "/student/performance"
+    | "/student/profile"
+    | "/student/resources"
+    | "/student/settings"
+    | "/student/submissions"
+    | "/student/support"
+    | "/student"
+    | "/student/assignments/$id"
+    | "/student/submission/$id"
+    | "/student/submissions/$id"
+    | "/student/assignments/"
+    | "/student/submissions/"
   fileRoutesByTo: FileRoutesByTo
   to:
     | "/"
+    | "/dev"
     | "/forgot-password"
     | "/login"
     | "/register"
@@ -139,33 +295,55 @@ export interface FileRouteTypes {
     | "/lecturer/dashboard"
     | "/provider/dashboard"
     | "/student/dashboard"
+    | "/student/performance"
+    | "/student/profile"
+    | "/student/resources"
+    | "/student/settings"
+    | "/student/support"
+    | "/student"
+    | "/student/assignments/$id"
+    | "/student/submission/$id"
+    | "/student/submissions/$id"
+    | "/student/assignments"
+    | "/student/submissions"
   id:
     | "__root__"
     | "/"
     | "/_authenticated"
+    | "/dev"
     | "/forgot-password"
     | "/login"
     | "/register"
     | "/reset-password"
     | "/verify-email"
-    | "/admin/dashboard"
-    | "/lecturer/dashboard"
-    | "/provider/dashboard"
-    | "/student/dashboard"
+    | "/_authenticated/admin/dashboard"
+    | "/_authenticated/lecturer/dashboard"
+    | "/_authenticated/provider/dashboard"
+    | "/_authenticated/student/assignments"
+    | "/_authenticated/student/dashboard"
+    | "/_authenticated/student/performance"
+    | "/_authenticated/student/profile"
+    | "/_authenticated/student/resources"
+    | "/_authenticated/student/settings"
+    | "/_authenticated/student/submissions"
+    | "/_authenticated/student/support"
+    | "/_authenticated/student/"
+    | "/_authenticated/student/assignments/$id"
+    | "/_authenticated/student/submission/$id"
+    | "/_authenticated/student/submissions/$id"
+    | "/_authenticated/student/assignments/"
+    | "/_authenticated/student/submissions/"
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AuthenticatedRoute: typeof AuthenticatedRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  DevRoute: typeof DevRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
-  AdminDashboardRoute: typeof AdminDashboardRoute
-  LecturerDashboardRoute: typeof LecturerDashboardRoute
-  ProviderDashboardRoute: typeof ProviderDashboardRoute
-  StudentDashboardRoute: typeof StudentDashboardRoute
 }
 
 declare module "@tanstack/react-router" {
@@ -205,6 +383,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    "/dev": {
+      id: "/dev"
+      path: "/dev"
+      fullPath: "/dev"
+      preLoaderRoute: typeof DevRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     "/_authenticated": {
       id: "/_authenticated"
       path: ""
@@ -219,49 +404,211 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/student/dashboard": {
-      id: "/student/dashboard"
+    "/_authenticated/student/": {
+      id: "/_authenticated/student/"
+      path: "/student"
+      fullPath: "/student"
+      preLoaderRoute: typeof AuthenticatedStudentIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    "/_authenticated/student/support": {
+      id: "/_authenticated/student/support"
+      path: "/student/support"
+      fullPath: "/student/support"
+      preLoaderRoute: typeof AuthenticatedStudentSupportRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    "/_authenticated/student/submissions": {
+      id: "/_authenticated/student/submissions"
+      path: "/student/submissions"
+      fullPath: "/student/submissions"
+      preLoaderRoute: typeof AuthenticatedStudentSubmissionsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    "/_authenticated/student/settings": {
+      id: "/_authenticated/student/settings"
+      path: "/student/settings"
+      fullPath: "/student/settings"
+      preLoaderRoute: typeof AuthenticatedStudentSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    "/_authenticated/student/resources": {
+      id: "/_authenticated/student/resources"
+      path: "/student/resources"
+      fullPath: "/student/resources"
+      preLoaderRoute: typeof AuthenticatedStudentResourcesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    "/_authenticated/student/profile": {
+      id: "/_authenticated/student/profile"
+      path: "/student/profile"
+      fullPath: "/student/profile"
+      preLoaderRoute: typeof AuthenticatedStudentProfileRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    "/_authenticated/student/performance": {
+      id: "/_authenticated/student/performance"
+      path: "/student/performance"
+      fullPath: "/student/performance"
+      preLoaderRoute: typeof AuthenticatedStudentPerformanceRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    "/_authenticated/student/dashboard": {
+      id: "/_authenticated/student/dashboard"
       path: "/student/dashboard"
       fullPath: "/student/dashboard"
-      preLoaderRoute: typeof StudentDashboardRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedStudentDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    "/provider/dashboard": {
-      id: "/provider/dashboard"
+    "/_authenticated/student/assignments": {
+      id: "/_authenticated/student/assignments"
+      path: "/student/assignments"
+      fullPath: "/student/assignments"
+      preLoaderRoute: typeof AuthenticatedStudentAssignmentsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    "/_authenticated/provider/dashboard": {
+      id: "/_authenticated/provider/dashboard"
       path: "/provider/dashboard"
       fullPath: "/provider/dashboard"
-      preLoaderRoute: typeof ProviderDashboardRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedProviderDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    "/lecturer/dashboard": {
-      id: "/lecturer/dashboard"
+    "/_authenticated/lecturer/dashboard": {
+      id: "/_authenticated/lecturer/dashboard"
       path: "/lecturer/dashboard"
       fullPath: "/lecturer/dashboard"
-      preLoaderRoute: typeof LecturerDashboardRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedLecturerDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    "/admin/dashboard": {
-      id: "/admin/dashboard"
+    "/_authenticated/admin/dashboard": {
+      id: "/_authenticated/admin/dashboard"
       path: "/admin/dashboard"
       fullPath: "/admin/dashboard"
-      preLoaderRoute: typeof AdminDashboardRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedAdminDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    "/_authenticated/student/submissions/": {
+      id: "/_authenticated/student/submissions/"
+      path: "/"
+      fullPath: "/student/submissions/"
+      preLoaderRoute: typeof AuthenticatedStudentSubmissionsIndexRouteImport
+      parentRoute: typeof AuthenticatedStudentSubmissionsRoute
+    }
+    "/_authenticated/student/assignments/": {
+      id: "/_authenticated/student/assignments/"
+      path: "/"
+      fullPath: "/student/assignments/"
+      preLoaderRoute: typeof AuthenticatedStudentAssignmentsIndexRouteImport
+      parentRoute: typeof AuthenticatedStudentAssignmentsRoute
+    }
+    "/_authenticated/student/submissions/$id": {
+      id: "/_authenticated/student/submissions/$id"
+      path: "/$id"
+      fullPath: "/student/submissions/$id"
+      preLoaderRoute: typeof AuthenticatedStudentSubmissionsIdRouteImport
+      parentRoute: typeof AuthenticatedStudentSubmissionsRoute
+    }
+    "/_authenticated/student/submission/$id": {
+      id: "/_authenticated/student/submission/$id"
+      path: "/student/submission/$id"
+      fullPath: "/student/submission/$id"
+      preLoaderRoute: typeof AuthenticatedStudentSubmissionIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    "/_authenticated/student/assignments/$id": {
+      id: "/_authenticated/student/assignments/$id"
+      path: "/$id"
+      fullPath: "/student/assignments/$id"
+      preLoaderRoute: typeof AuthenticatedStudentAssignmentsIdRouteImport
+      parentRoute: typeof AuthenticatedStudentAssignmentsRoute
     }
   }
 }
 
+interface AuthenticatedStudentAssignmentsRouteChildren {
+  AuthenticatedStudentAssignmentsIdRoute: typeof AuthenticatedStudentAssignmentsIdRoute
+  AuthenticatedStudentAssignmentsIndexRoute: typeof AuthenticatedStudentAssignmentsIndexRoute
+}
+
+const AuthenticatedStudentAssignmentsRouteChildren: AuthenticatedStudentAssignmentsRouteChildren =
+  {
+    AuthenticatedStudentAssignmentsIdRoute:
+      AuthenticatedStudentAssignmentsIdRoute,
+    AuthenticatedStudentAssignmentsIndexRoute:
+      AuthenticatedStudentAssignmentsIndexRoute,
+  }
+
+const AuthenticatedStudentAssignmentsRouteWithChildren =
+  AuthenticatedStudentAssignmentsRoute._addFileChildren(
+    AuthenticatedStudentAssignmentsRouteChildren,
+  )
+
+interface AuthenticatedStudentSubmissionsRouteChildren {
+  AuthenticatedStudentSubmissionsIdRoute: typeof AuthenticatedStudentSubmissionsIdRoute
+  AuthenticatedStudentSubmissionsIndexRoute: typeof AuthenticatedStudentSubmissionsIndexRoute
+}
+
+const AuthenticatedStudentSubmissionsRouteChildren: AuthenticatedStudentSubmissionsRouteChildren =
+  {
+    AuthenticatedStudentSubmissionsIdRoute:
+      AuthenticatedStudentSubmissionsIdRoute,
+    AuthenticatedStudentSubmissionsIndexRoute:
+      AuthenticatedStudentSubmissionsIndexRoute,
+  }
+
+const AuthenticatedStudentSubmissionsRouteWithChildren =
+  AuthenticatedStudentSubmissionsRoute._addFileChildren(
+    AuthenticatedStudentSubmissionsRouteChildren,
+  )
+
+interface AuthenticatedRouteChildren {
+  AuthenticatedAdminDashboardRoute: typeof AuthenticatedAdminDashboardRoute
+  AuthenticatedLecturerDashboardRoute: typeof AuthenticatedLecturerDashboardRoute
+  AuthenticatedProviderDashboardRoute: typeof AuthenticatedProviderDashboardRoute
+  AuthenticatedStudentAssignmentsRoute: typeof AuthenticatedStudentAssignmentsRouteWithChildren
+  AuthenticatedStudentDashboardRoute: typeof AuthenticatedStudentDashboardRoute
+  AuthenticatedStudentPerformanceRoute: typeof AuthenticatedStudentPerformanceRoute
+  AuthenticatedStudentProfileRoute: typeof AuthenticatedStudentProfileRoute
+  AuthenticatedStudentResourcesRoute: typeof AuthenticatedStudentResourcesRoute
+  AuthenticatedStudentSettingsRoute: typeof AuthenticatedStudentSettingsRoute
+  AuthenticatedStudentSubmissionsRoute: typeof AuthenticatedStudentSubmissionsRouteWithChildren
+  AuthenticatedStudentSupportRoute: typeof AuthenticatedStudentSupportRoute
+  AuthenticatedStudentIndexRoute: typeof AuthenticatedStudentIndexRoute
+  AuthenticatedStudentSubmissionIdRoute: typeof AuthenticatedStudentSubmissionIdRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAdminDashboardRoute: AuthenticatedAdminDashboardRoute,
+  AuthenticatedLecturerDashboardRoute: AuthenticatedLecturerDashboardRoute,
+  AuthenticatedProviderDashboardRoute: AuthenticatedProviderDashboardRoute,
+  AuthenticatedStudentAssignmentsRoute:
+    AuthenticatedStudentAssignmentsRouteWithChildren,
+  AuthenticatedStudentDashboardRoute: AuthenticatedStudentDashboardRoute,
+  AuthenticatedStudentPerformanceRoute: AuthenticatedStudentPerformanceRoute,
+  AuthenticatedStudentProfileRoute: AuthenticatedStudentProfileRoute,
+  AuthenticatedStudentResourcesRoute: AuthenticatedStudentResourcesRoute,
+  AuthenticatedStudentSettingsRoute: AuthenticatedStudentSettingsRoute,
+  AuthenticatedStudentSubmissionsRoute:
+    AuthenticatedStudentSubmissionsRouteWithChildren,
+  AuthenticatedStudentSupportRoute: AuthenticatedStudentSupportRoute,
+  AuthenticatedStudentIndexRoute: AuthenticatedStudentIndexRoute,
+  AuthenticatedStudentSubmissionIdRoute: AuthenticatedStudentSubmissionIdRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AuthenticatedRoute: AuthenticatedRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  DevRoute: DevRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   VerifyEmailRoute: VerifyEmailRoute,
-  AdminDashboardRoute: AdminDashboardRoute,
-  LecturerDashboardRoute: LecturerDashboardRoute,
-  ProviderDashboardRoute: ProviderDashboardRoute,
-  StudentDashboardRoute: StudentDashboardRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
