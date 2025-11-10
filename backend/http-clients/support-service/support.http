@@ -1,0 +1,51 @@
+### Get all support sessions
+GET {{BASE_URL}}/api/v1/support/sessions
+Authorization: Bearer {{auth_token}}
+
+> {%
+  client.test("Fetched all support sessions successfully", function () {
+    client.assert(response.status === 200);
+    client.assert(Array.isArray(response.body));
+  });
+%}
+
+### Create a support session (Student)
+POST {{BASE_URL}}/api/v1/support/sessions
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "initialMessage": "I need help with my assignment."
+}
+
+> {%
+  client.test("Support session created successfully", function () {
+    client.assert(response.status === 201);
+    client.assert(response.body.id !== undefined);
+  });
+  client.global.set("support_session_id", response.body.id);
+%}
+
+### Get support session by ID
+@support_session_id = {{support_session_id}}
+GET {{BASE_URL}}/api/v1/support/sessions/{{support_session_id}}
+Authorization: Bearer {{auth_token}}
+
+> {%
+  client.test("Fetched support session by ID successfully", function () {
+    client.assert(response.status === 200);
+    client.assert(response.body.id === "{{support_session_id}}");
+  });
+%}
+
+### Close support session (Student)
+POST {{BASE_URL}}/api/v1/support/sessions/{{support_session_id}}/close
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+> {%
+  client.test("Support session closed successfully", function () {
+    client.assert(response.status === 200);
+    client.assert(response.body.isClosed === true);
+  });
+%}

@@ -1,0 +1,34 @@
+[versions]
+spring-boot = "3.5.7"
+spring-dependency-management = "1.1.7"
+kotlin = "2.2.21"
+#noinspection UnusedVersionCatalogEntry
+spring-cloud = "2025.0.0"
+
+springdoc = "2.8.14"
+hypersistence-utils-hibernate = "3.11.0"
+mapstruct = "1.6.3"
+firebase-admin = "9.4.2"
+mockito-kotlin = "6.1.0"
+
+[libraries]
+springdoc-openapi-starter-webflux-ui = { module = "org.springdoc:springdoc-openapi-starter-webflux-ui", version.ref = "springdoc" }
+springdoc-openapi-starter-webmvc-api = { module = "org.springdoc:springdoc-openapi-starter-webmvc-api", version.ref = "springdoc" }
+
+hypersistence-utils-hibernate63 = { module = "io.hypersistence:hypersistence-utils-hibernate-63", version.ref = "hypersistence-utils-hibernate" }
+
+#noinspection UnusedVersionCatalogEntry
+mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "mapstruct" }
+#noinspection UnusedVersionCatalogEntry
+mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "mapstruct" }
+
+firebase-admin = { module = "com.google.firebase:firebase-admin", version.ref = "firebase-admin" }
+
+mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockito-kotlin" }
+
+[plugins]
+spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
+spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
+kotlin-jpa = { id = "org.jetbrains.kotlin.plugin.jpa", version.ref = "kotlin" }

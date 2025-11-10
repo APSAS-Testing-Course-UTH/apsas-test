@@ -1,0 +1,10 @@
+### Get all runtimes
+GET {{BASE_URL}}/api/v1/runtimes
+Authorization: Bearer {{auth_token}}
+
+> {%
+  client.test("Get all runtimes successful", function () {
+    client.assert(response.status === 200);
+    client.assert(Array.isArray(response.body));
+  });
+%}

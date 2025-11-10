@@ -6,11 +6,15 @@ import apsas.content.model.dto.TutorialResponse;
 import apsas.content.model.dto.UpdateTutorialRequest;
 import apsas.content.model.entity.Tutorial;
 import apsas.content.repository.TutorialRepository;
+import apsas.shared.cache.CacheConfig;
 import apsas.shared.exception.NotFoundException;
 import apsas.shared.exception.UnauthorizedException;
 import apsas.shared.models.pagination.PageResponse;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -29,6 +33,7 @@ public class TutorialService {
     return PageResponse.of(responsePage);
   }
 
+  @Cacheable(value = CacheConfig.TUTORIALS_CACHE, key = "#id", unless = "#result == null")
   @Transactional(readOnly = true)
   public TutorialResponse getTutorialById(UUID id) {
     Tutorial tutorial =
@@ -45,6 +50,7 @@ public class TutorialService {
     return tutorialMapper.toResponse(savedTutorial);
   }
 
+  @CachePut(value = CacheConfig.TUTORIALS_CACHE, key = "#id")
   @Transactional
   public TutorialResponse updateTutorial(UUID id, UpdateTutorialRequest request, UUID userId) {
     Tutorial tutorial =
@@ -61,6 +67,7 @@ public class TutorialService {
     return tutorialMapper.toResponse(updatedTutorial);
   }
 
+  @CacheEvict(value = CacheConfig.TUTORIALS_CACHE, key = "#id")
   @Transactional
   public void deleteTutorial(UUID id, UUID userId) {
     Tutorial tutorial =

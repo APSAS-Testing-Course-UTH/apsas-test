@@ -6,11 +6,15 @@ import apsas.content.model.dto.SkillResponse;
 import apsas.content.model.dto.UpdateSkillRequest;
 import apsas.content.model.entity.Skill;
 import apsas.content.repository.SkillRepository;
+import apsas.shared.cache.CacheConfig;
 import apsas.shared.exception.BadRequestException;
 import apsas.shared.exception.NotFoundException;
 import apsas.shared.models.pagination.PageResponse;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -29,6 +33,7 @@ public class SkillService {
     return PageResponse.of(responsePage);
   }
 
+  @Cacheable(value = CacheConfig.SKILLS_CACHE, key = "#id", unless = "#result == null")
   @Transactional(readOnly = true)
   public SkillResponse getSkillById(UUID id) {
     Skill skill =
@@ -38,6 +43,7 @@ public class SkillService {
     return skillMapper.toResponse(skill);
   }
 
+  @CacheEvict(value = CacheConfig.ALL_SKILLS_CACHE, allEntries = true)
   @Transactional
   public SkillResponse createSkill(CreateSkillRequest request) {
     if (skillRepository.existsByName(request.getName())) {
@@ -49,6 +55,8 @@ public class SkillService {
     return skillMapper.toResponse(savedSkill);
   }
 
+  @CachePut(value = CacheConfig.SKILLS_CACHE, key = "#id")
+  @CacheEvict(value = CacheConfig.ALL_SKILLS_CACHE, allEntries = true)
   @Transactional
   public SkillResponse updateSkill(UUID id, UpdateSkillRequest request) {
     Skill skill =
@@ -67,6 +75,7 @@ public class SkillService {
     return skillMapper.toResponse(updatedSkill);
   }
 
+  @CacheEvict(value = {CacheConfig.SKILLS_CACHE, CacheConfig.ALL_SKILLS_CACHE}, allEntries = true)
   @Transactional
   public void deleteSkill(UUID id) {
     if (!skillRepository.existsById(id)) {

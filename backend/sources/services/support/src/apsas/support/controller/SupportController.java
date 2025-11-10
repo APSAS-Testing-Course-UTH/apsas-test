@@ -1,15 +1,12 @@
 package apsas.support.controller;
 
-import apsas.shared.models.pagination.PageResponse;
 import apsas.shared.models.pagination.PageRequestParams;
+import apsas.shared.models.pagination.PageResponse;
 import apsas.shared.security.UserPrincipal;
-import apsas.support.mapper.SupportSessionMapper;
 import apsas.support.model.dto.CreateSupportSessionRequest;
 import apsas.support.model.dto.SupportSessionDto;
-import apsas.support.model.entity.SupportSession;
 import apsas.support.service.SupportService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -38,7 +35,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class SupportController {
   private final SupportService supportService;
-  private final SupportSessionMapper sessionMapper;
 
   @GetMapping
   @PreAuthorize("hasAnyRole('STUDENT', 'INSTRUCTOR')")
@@ -50,7 +46,6 @@ public class SupportController {
       value = {@ApiResponse(responseCode = "200", description = "Successfully retrieved sessions")}
   )
   public ResponseEntity<PageResponse<SupportSessionDto>> listSessions(
-      @Parameter
       PageRequestParams pageParams,
       @AuthenticationPrincipal
       UserPrincipal principal
@@ -86,13 +81,13 @@ public class SupportController {
       UserPrincipal principal
   ) {
 
-    SupportSession session = supportService.getSessionById(id);
+    var session = supportService.getSessionById(id);
     supportService.validateUserAccess(session, principal.userId(), principal.role());
 
     // Mark messages as read when viewing the session
     supportService.markMessagesAsRead(id, principal.userId());
 
-    return ResponseEntity.ok(sessionMapper.toDto(session));
+    return ResponseEntity.ok(session);
   }
 
   @PostMapping
@@ -116,14 +111,15 @@ public class SupportController {
   ) {
 
     String studentName = principal.firstName() + " " + principal.lastName();
-    SupportSession session =
+    var session =
         supportService.createSession(
             principal.userId(),
             principal.email(),
             studentName,
-            request.initialMessage());
+            request.initialMessage()
+        );
 
-    return ResponseEntity.status(HttpStatus.CREATED).body(sessionMapper.toDto(session));
+    return ResponseEntity.status(HttpStatus.CREATED).body(session);
   }
 
   @PostMapping("/{id}/close")
@@ -147,8 +143,8 @@ public class SupportController {
       UserPrincipal principal
   ) {
 
-    SupportSession session = supportService.closeSession(id, principal.userId());
+    var session = supportService.closeSession(id, principal.userId());
 
-    return ResponseEntity.ok(sessionMapper.toDto(session));
+    return ResponseEntity.ok(session);
   }
 }

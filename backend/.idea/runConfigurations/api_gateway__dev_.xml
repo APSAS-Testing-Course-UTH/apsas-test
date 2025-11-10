@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="api-gateway [dev]" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" folderName="infra">
+    <option name="ACTIVE_PROFILES" value="dev" />
+    <module name="apsas-backend.sources.gateway.main" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="apsas.gateway.ApiGatewayApplication" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

@@ -7,7 +7,6 @@ import apsas.content.service.SkillService;
 import apsas.shared.models.pagination.PageRequestParams;
 import apsas.shared.models.pagination.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -39,7 +38,6 @@ public class SkillController {
       description = "Get all available skills with pagination and sorting"
   )
   public ResponseEntity<PageResponse<SkillResponse>> getAllSkills(
-      @Parameter
       PageRequestParams pageParams
   ) {
     PageResponse<SkillResponse> skills = skillService.getAllSkills(pageParams.toPageable());

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  * Feign client for calling Content Service internal endpoints. This client is used by Evaluation
  * Service to fetch assignment details.
  */
+@SuppressWarnings("SpringMvcPathVariableDeclarationInspection")
 @FeignClient(name = "content-service", path = "/internal/assignments")
 public interface AssignmentFeignClient {
 
@@ -24,7 +25,7 @@ public interface AssignmentFeignClient {
    */
   @GetMapping("/{id}")
   AssignmentResponse getAssignmentById(
-      @PathVariable
+      @PathVariable("id")
       UUID id
   );
 

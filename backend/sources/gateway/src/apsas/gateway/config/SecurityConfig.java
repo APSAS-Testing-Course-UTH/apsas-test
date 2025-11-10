@@ -5,25 +5,39 @@ import apsas.shared.security.JwtClaims;
 import apsas.shared.security.UserPrincipal;
 import java.util.UUID;
 import javax.crypto.spec.SecretKeySpec;
+import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.config.web.server.ServerHttpSecurity.CsrfSpec;
+import org.springframework.security.config.web.server.ServerHttpSecurity.FormLoginSpec;
+import org.springframework.security.config.web.server.ServerHttpSecurity.HttpBasicSpec;
+import org.springframework.security.core.userdetails.MapReactiveUserDetailsService;
+import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.util.matcher.PathPatternParserServerWebExchangeMatcher;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 @Configuration
 @EnableWebFluxSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+  private final SecurityProperties securityProperties;
+
   @Value("${jwt.secret}")
   private String jwtSecret;
 
@@ -34,6 +48,31 @@ public class SecurityConfig {
   }
 
   @Bean
+  @Order(1)
+  public SecurityWebFilterChain actuatorSecurityWebFilterChain(ServerHttpSecurity http) {
+    return http.securityMatcher(new PathPatternParserServerWebExchangeMatcher("/actuator/**"))
+        .authorizeExchange(
+            exchanges ->
+                exchanges
+                    .anyExchange()
+                    .hasRole("ADMIN"))
+        .httpBasic(Customizer.withDefaults())
+        .csrf(CsrfSpec::disable)
+        .formLogin(FormLoginSpec::disable)
+        .build();
+  }
+
+  @Bean
+  public ReactiveUserDetailsService reactiveUserDetailsService() {
+    var user = User.withUsername(securityProperties.getUser().getName())
+        .password("{noop}" + securityProperties.getUser().getPassword())
+        .roles("ADMIN")
+        .build();
+    return new MapReactiveUserDetailsService(user);
+  }
+
+  @Bean
+  @Order(2)
   public SecurityWebFilterChain securityWebFilterChain(
       ServerHttpSecurity http, JwtToAuthenticationTokenConverter jwtConverter) {
     return http.authorizeExchange(
@@ -47,9 +86,9 @@ public class SecurityConfig {
                     .authenticated())
         .oauth2ResourceServer(
             oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtConverter)))
-        .csrf(ServerHttpSecurity.CsrfSpec::disable)
-        .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
-        .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
+        .csrf(CsrfSpec::disable)
+        .httpBasic(HttpBasicSpec::disable)
+        .formLogin(FormLoginSpec::disable)
         .build();
   }
 

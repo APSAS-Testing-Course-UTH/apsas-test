@@ -2,3 +2,21 @@ spring:
   threads:
     virtual:
       enabled: true
+
+  mvc:
+    problemdetails:
+      enabled: true
+
+  webflux:
+    problemdetails:
+      enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+  endpoint:
+    health:
+      show-details: always

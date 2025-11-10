@@ -1,3 +1,6 @@
+server:
+  port: 8888
+
 spring:
   application:
     name: configserver
@@ -9,7 +12,11 @@ spring:
     config:
       server:
         native:
-          search-locations: file:./config
+          fail-on-error: true
 
-server:
-  port: 8888
+eureka:
+  instance:
+    hostname: ${HOSTNAME:localhost}
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}

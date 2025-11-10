@@ -1,5 +1,6 @@
 package apsas.submission.service;
 
+import apsas.shared.cache.CacheConfig;
 import apsas.shared.exception.ForbiddenException;
 import apsas.shared.exception.NotFoundException;
 import apsas.shared.messaging.config.RabbitMqConfig;
@@ -18,6 +19,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -65,6 +69,7 @@ public class SubmissionService {
     return PageResponse.of(responsePage);
   }
 
+  @Cacheable(value = CacheConfig.SUBMISSIONS_CACHE, key = "#id", unless = "#result == null")
   @Transactional(readOnly = true)
   public SubmissionResponse getSubmissionById(UUID id, UUID studentId, boolean isInstructor) {
     Submission submission =
@@ -98,6 +103,7 @@ public class SubmissionService {
     return submissionMapper.toResponse(savedSubmission);
   }
 
+  @CacheEvict(value = CacheConfig.SUBMISSIONS_CACHE, key = "#submissionId")
   @Transactional
   public void handleSubmissionEvaluated(
       UUID submissionId,
@@ -128,6 +134,7 @@ public class SubmissionService {
     submissionRepository.save(submission);
   }
 
+  @CachePut(value = CacheConfig.SUBMISSIONS_CACHE, key = "#submissionId")
   @Transactional
   public SubmissionResponse provideFeedback(UUID submissionId, String feedback) {
     Submission submission =

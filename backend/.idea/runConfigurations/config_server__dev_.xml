@@ -1,30 +1,10 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="config-server [dev]" type="AmperGenericRunConfigurationType" factoryName="Amper" folderName="infra">
-    <ExternalSystemSettings>
-      <option name="env">
-        <map>
-          <entry key="SPRING_PROFILES_ACTIVE" value="dev" />
-        </map>
-      </option>
-      <option name="executionName" />
-      <option name="externalProjectPath" value="$PROJECT_DIR$" />
-      <option name="externalSystemIdString" value="AMPER" />
-      <option name="scriptParameters" />
-      <option name="taskDescriptions">
-        <list />
-      </option>
-      <option name="taskNames">
-        <list>
-          <option value="run" />
-          <option value="-m" />
-          <option value="config-server" />
-        </list>
-      </option>
-      <option name="vmOptions" />
-    </ExternalSystemSettings>
-    <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
-    <ExternalSystemReattachDebugProcess>false</ExternalSystemReattachDebugProcess>
-    <ExternalSystemDebugDisabled>false</ExternalSystemDebugDisabled>
-    <method v="2" />
+  <configuration default="false" name="config-server [dev]" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" folderName="infra">
+    <option name="ACTIVE_PROFILES" value="dev" />
+    <module name="apsas-backend.sources.config-server.main" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="apsas.configserver.ConfigServerApplication" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
   </configuration>
 </component>

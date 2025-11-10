@@ -1,0 +1,3 @@
+### Open support websocket connection
+WEBSOCKET ws://localhost:8086/ws/support
+Authorization: Bearer {{auth_token}}

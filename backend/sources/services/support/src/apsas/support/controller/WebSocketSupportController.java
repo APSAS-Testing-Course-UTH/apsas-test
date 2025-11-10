@@ -5,7 +5,6 @@ import apsas.support.mapper.SupportMessageMapper;
 import apsas.support.model.dto.SendMessageRequest;
 import apsas.support.model.dto.WebSocketMessage;
 import apsas.support.model.entity.SupportMessage;
-import apsas.support.model.entity.SupportSession;
 import apsas.support.service.SupportService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +37,7 @@ public class WebSocketSupportController {
   ) {
 
     // Validate access to the session
-    SupportSession session = supportService.getSessionById(sessionId);
+    var session = supportService.getSessionById(sessionId);
     supportService.validateUserAccess(session, userPrincipal.userId(), userPrincipal.role());
 
     // Notify other users that someone joined
@@ -59,7 +58,7 @@ public class WebSocketSupportController {
   ) {
 
     // Validate access to the session
-    SupportSession session = supportService.getSessionById(sessionId);
+    var session = supportService.getSessionById(sessionId);
     supportService.validateUserAccess(session, userPrincipal.userId(), userPrincipal.role());
 
     boolean isInstructor = "INSTRUCTOR".equals(userPrincipal.role());

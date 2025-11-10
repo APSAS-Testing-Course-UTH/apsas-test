@@ -1,0 +1,81 @@
+### Get All Users (Admin)
+GET {{BASE_URL}}/api/v1/users
+Authorization: Bearer {{auth_token}}
+
+> {%
+  client.test("Fetched all users successfully", function () {
+    client.assert(response.status === 200);
+    client.assert(Array.isArray(response.body.content));
+  });
+%}
+
+### Get All Users by Role (Admin)
+@role = STUDENT
+GET {{BASE_URL}}/api/v1/users/role/{{role}}
+Authorization: Bearer {{auth_token}}
+
+> {%
+  client.test("Fetched users by role successfully", function () {
+    client.assert(response.status === 200);
+    client.assert(Array.isArray(response.body.content));
+  });
+%}
+
+### Create new user (Admin)
+POST {{BASE_URL}}/api/v1/users
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "email": "userb@apsas",
+  "password": "UserBSecurePassword!",
+  "firstName": "User",
+  "lastName": "B",
+  "role": "INSTRUCTOR",
+  "isActive": true,
+  "isEmailVerified": true
+}
+
+> {%
+  client.test("Admin created new user successfully", function () {
+    client.assert(response.status === 201);
+    client.assert(response.body.email === "userb@apsas");
+  });
+  // Store the created user's ID for later use
+  client.global.set("admin_created_user_id", response.body.id);
+%}
+
+### Get User by ID (Admin)
+GET {{BASE_URL}}/api/v1/users/{{admin_created_user_id}}
+Authorization: Bearer {{auth_token}}
+
+> {%
+  client.test("Admin fetched user by ID successfully", function () {
+    client.assert(response.status === 200);
+    client.assert(response.body.id === client.global.get("admin_created_user_id"));
+  });
+%}
+
+### Activate a User (Admin)
+PUT {{BASE_URL}}/api/v1/users/{{admin_created_user_id}}/activate
+Authorization: Bearer {{auth_token}}
+
+> {%
+  client.test("Admin activated user successfully", function () {
+    client.assert(response.status === 200);
+  });
+%}
+
+### Deactivate a User (Admin)
+PUT {{BASE_URL}}/api/v1/users/{{admin_created_user_id}}/deactivate
+Authorization: Bearer {{auth_token}}
+
+> {%
+  client.test("Admin deactivated user successfully", function () {
+    client.assert(response.status === 200);
+  });
+%}
+
+### Delete User by ID (Admin)
+DELETE {{BASE_URL}}/api/v1/users/{{admin_created_user_id}}
+Authorization: Bearer {{auth_token}}

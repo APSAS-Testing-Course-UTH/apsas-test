@@ -1,0 +1,20 @@
+spring:
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD:}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+
+  cache:
+    type: redis
+    redis:
+      time-to-live: 900000  # 15 minutes default (in milliseconds)
+      cache-null-values: false
+      use-key-prefix: true

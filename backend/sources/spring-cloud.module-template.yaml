@@ -1,6 +1,0 @@
-settings:
-  springBoot:
-    enabled: true
-
-dependencies:
-  - bom: $libs.spring.cloud.dependencies

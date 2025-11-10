@@ -9,7 +9,6 @@ import apsas.shared.models.pagination.PageRequestParams;
 import apsas.shared.models.pagination.PageResponse;
 import apsas.shared.security.UserPrincipal;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -42,7 +41,6 @@ public class AssignmentController {
       description = "Get all available assignments with pagination and sorting"
   )
   public ResponseEntity<PageResponse<AssignmentResponse>> getAllAssignments(
-      @Parameter
       PageRequestParams pageParams
   ) {
     PageResponse<AssignmentResponse> assignments =

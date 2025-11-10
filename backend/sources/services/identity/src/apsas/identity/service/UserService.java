@@ -8,6 +8,7 @@ import apsas.identity.model.dto.UserResponse;
 import apsas.identity.model.entity.User;
 import apsas.identity.model.entity.UserRole;
 import apsas.identity.repository.UserRepository;
+import apsas.shared.cache.CacheConfig;
 import apsas.shared.exception.BadRequestException;
 import apsas.shared.exception.NotFoundException;
 import apsas.shared.exception.UnauthorizedException;
@@ -15,6 +16,10 @@ import apsas.shared.models.pagination.PageResponse;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,6 +33,7 @@ public class UserService {
   private final PasswordEncoder passwordEncoder;
   private final UserMapper userMapper;
 
+  @Cacheable(value = CacheConfig.USERS_CACHE, key = "#userId", unless = "#result == null")
   @Transactional(readOnly = true)
   public UserResponse getUserById(UUID userId) {
     User user =
@@ -51,6 +57,7 @@ public class UserService {
     return PageResponse.of(responsePage);
   }
 
+  @CacheEvict(value = CacheConfig.USERS_BY_ROLE_CACHE, allEntries = true)
   @Transactional
   public UserResponse createUser(CreateUserRequest request) {
     if (userRepository.existsByEmail(request.getEmail())) {
@@ -63,6 +70,7 @@ public class UserService {
     return userMapper.toUserResponse(user);
   }
 
+  @CachePut(value = CacheConfig.USERS_CACHE, key = "#userId")
   @Transactional
   public UserResponse updateProfile(UUID userId, UpdateProfileRequest request) {
     User user =
@@ -82,6 +90,7 @@ public class UserService {
     return userMapper.toUserResponse(user);
   }
 
+  @CacheEvict(value = CacheConfig.USERS_CACHE, key = "#userId")
   @Transactional
   public void changePassword(UUID userId, ChangePasswordRequest request) {
     User user =
@@ -97,6 +106,7 @@ public class UserService {
     userRepository.save(user);
   }
 
+  @CacheEvict(value = CacheConfig.USERS_CACHE, key = "#userId")
   @Transactional
   public void deactivateUser(UUID userId) {
     User user =
@@ -108,6 +118,7 @@ public class UserService {
     userRepository.save(user);
   }
 
+  @CacheEvict(value = CacheConfig.USERS_CACHE, key = "#userId")
   @Transactional
   public void activateUser(UUID userId) {
     User user =
@@ -119,6 +130,12 @@ public class UserService {
     userRepository.save(user);
   }
 
+  @Caching(
+      evict = {
+          @CacheEvict(value = CacheConfig.USERS_CACHE, key = "#userId"),
+          @CacheEvict(value = CacheConfig.USERS_BY_ROLE_CACHE, allEntries = true)
+      }
+  )
   @Transactional
   public void deleteUser(UUID userId) {
     if (!userRepository.existsById(userId)) {
@@ -134,15 +151,10 @@ public class UserService {
     return users.stream().map(userMapper::toUserResponse).toList();
   }
 
-  @Transactional(readOnly = true)
-  public List<UserResponse> getUsersByRole(UserRole role) {
-    List<User> users = userRepository.findByRole(role);
-    return users.stream().map(userMapper::toUserResponse).toList();
-  }
-
+  @Cacheable(value = CacheConfig.USERS_BY_ROLE_CACHE, key = "#role")
   @Transactional(readOnly = true)
   public List<UserResponse> getUsersByRole(String role) {
-    UserRole userRole = UserRole.valueOf(role);
-    return getUsersByRole(userRole);
+    List<User> users = userRepository.findByRole(UserRole.valueOf(role));
+    return users.stream().map(userMapper::toUserResponse).toList();
   }
 }

@@ -1,6 +1,0 @@
-settings:
-  jvm:
-    release: 21
-
-  lombok:
-    enabled: true

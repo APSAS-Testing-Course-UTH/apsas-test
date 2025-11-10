@@ -1,0 +1,68 @@
+### Get all tutorials
+GET {{BASE_URL}}/api/v1/tutorials
+Authorization: Bearer {{auth_token}}
+
+> {%
+  client.test("Fetched all tutorials successfully", function () {
+    client.assert(response.status === 200);
+    client.assert(Array.isArray(response.body.content));
+  });
+%}
+
+### Create new tutorial (Content Provider)
+POST {{BASE_URL}}/api/v1/tutorials
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "title": "Introduction to HTTP Clients",
+  "description": "A comprehensive guide on using HTTP clients for API testing.",
+  "content": "This tutorial covers various aspects of HTTP clients..."
+}
+
+> {%
+  client.test("Tutorial created successfully", function () {
+    client.assert(response.status === 201);
+    client.assert(response.body.id !== undefined);
+  });
+  client.global.set("tutorial_id", response.body.id);
+%}
+
+### Get tutorial by ID
+@tutorial_id = {{tutorial_id}}
+GET {{BASE_URL}}/api/v1/tutorials/{{tutorial_id}}
+Authorization: Bearer {{auth_token}}
+
+> {%
+  client.test("Fetched tutorial by ID successfully", function () {
+    client.assert(response.status === 200);
+  });
+%}
+
+### Update tutorial by ID (Content Provider)
+PATCH {{BASE_URL}}/api/v1/tutorials/{{tutorial_id}}
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "title": "Updated: Introduction to HTTP Clients",
+  "description": "An updated comprehensive guide on using HTTP clients for API testing.",
+  "content": "This tutorial now includes advanced topics on HTTP clients..."
+}
+
+> {%
+  client.test("Tutorial updated successfully", function () {
+    client.assert(response.status === 200);
+    client.assert(response.body.title === "Updated: Introduction to HTTP Clients");
+  });
+%}
+
+### Delete tutorial by ID (Content Provider)
+DELETE {{BASE_URL}}/api/v1/tutorials/{{tutorial_id}}
+Authorization: Bearer {{auth_token}}
+
+> {%
+  client.test("Tutorial deleted successfully", function () {
+    client.assert(response.status === 204);
+  });
+%}

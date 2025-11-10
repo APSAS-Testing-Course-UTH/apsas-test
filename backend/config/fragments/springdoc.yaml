@@ -1,4 +1,8 @@
 springdoc:
   default-flat-param-object: true
   api-docs:
+    enabled: ${API_DOCS_ENABLED:true}
     path: /api-docs
+
+  swagger-ui:
+    enabled: ${API_DOCS_ENABLED:true}

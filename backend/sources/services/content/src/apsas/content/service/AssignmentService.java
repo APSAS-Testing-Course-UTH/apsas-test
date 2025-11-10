@@ -12,6 +12,7 @@ import apsas.content.model.entity.Tutorial;
 import apsas.content.repository.AssignmentRepository;
 import apsas.content.repository.SkillRepository;
 import apsas.content.repository.TutorialRepository;
+import apsas.shared.cache.CacheConfig;
 import apsas.shared.exception.BadRequestException;
 import apsas.shared.exception.NotFoundException;
 import apsas.shared.exception.UnauthorizedException;
@@ -25,6 +26,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -46,6 +50,7 @@ public class AssignmentService {
     return PageResponse.of(responsePage);
   }
 
+  @Cacheable(value = CacheConfig.ASSIGNMENTS_CACHE, key = "#id", unless = "#result == null")
   @Transactional(readOnly = true)
   public AssignmentResponse getAssignmentById(UUID id) {
     Assignment assignment =
@@ -85,6 +90,7 @@ public class AssignmentService {
     return assignmentMapper.toResponse(savedAssignment);
   }
 
+  @CachePut(value = CacheConfig.ASSIGNMENTS_CACHE, key = "#id")
   @Transactional
   public AssignmentResponse updateAssignment(
       UUID id, UpdateAssignmentRequest request, UUID userId) {
@@ -133,6 +139,7 @@ public class AssignmentService {
     return assignmentMapper.toResponse(updatedAssignment);
   }
 
+  @CachePut(value = CacheConfig.ASSIGNMENTS_CACHE, key = "#id")
   @Transactional
   public AssignmentResponse updateAssignmentSchedule(
       UUID id, UpdateAssignmentScheduleRequest request) {
@@ -159,6 +166,7 @@ public class AssignmentService {
   }
 
   @Transactional
+  @CacheEvict(value = CacheConfig.ASSIGNMENTS_CACHE, key = "#id")
   public void deleteAssignment(UUID id, UUID userId) {
     Assignment assignment =
         assignmentRepository
@@ -173,6 +181,7 @@ public class AssignmentService {
     assignmentRepository.deleteById(id);
   }
 
+  @CachePut(value = CacheConfig.ASSIGNMENTS_CACHE, key = "#id")
   @Transactional
   public AssignmentResponse publishAssignment(UUID id, UUID userId) {
     Assignment assignment =
@@ -201,6 +210,7 @@ public class AssignmentService {
     return assignmentMapper.toResponse(publishedAssignment);
   }
 
+  @CachePut(value = CacheConfig.ASSIGNMENTS_CACHE, key = "#id")
   @Transactional
   public AssignmentResponse archiveAssignment(UUID id, UUID userId) {
     Assignment assignment =

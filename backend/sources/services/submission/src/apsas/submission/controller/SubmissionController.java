@@ -51,7 +51,6 @@ public class SubmissionController {
       @Parameter(description = "Filter by status")
       @RequestParam(required = false)
       SubmissionStatus status,
-      @Parameter
       PageRequestParams pageParams,
       Authentication authentication
   ) {

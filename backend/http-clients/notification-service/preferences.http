@@ -1,0 +1,27 @@
+### Get preference settings
+GET {{BASE_URL}}/api/v1/preferences
+Authorization: Bearer {{auth_token}}
+
+> {%
+  client.test("Fetched preference settings successfully", function () {
+    client.assert(response.status === 200);
+  });
+%}
+
+### Update preference settings
+PATCH {{BASE_URL}}/api/v1/preferences
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "emailEnabled": true,
+  "pushEnabled": false
+}
+
+> {%
+  client.test("Updated preference settings successfully", function () {
+    client.assert(response.status === 200);
+    client.assert(response.body.emailEnabled === true);
+    client.assert(response.body.pushEnabled === false);
+  });
+%}

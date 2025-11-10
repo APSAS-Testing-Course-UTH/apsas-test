@@ -1,9 +1,0 @@
-settings:
-  springBoot:
-    enabled: true
-
-dependencies:
-  - $spring.boot.starter
-  - bom: $libs.spring.cloud.dependencies
-  - $libs.spring.cloud.starter.netflix.eureka.client
-  - $libs.spring.cloud.starter.config

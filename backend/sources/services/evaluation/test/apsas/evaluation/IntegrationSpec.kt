@@ -1,5 +1,6 @@
 package apsas.evaluation
 
+import com.redis.testcontainers.RedisContainer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
@@ -13,7 +14,7 @@ import org.testcontainers.containers.RabbitMQContainer
 import org.testcontainers.utility.DockerImageName
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(RabbitMqConfiguration::class)
+@Import(RabbitMqConfiguration::class, RedisConfiguration::class)
 @ActiveProfiles("integration")
 @ContextConfiguration(classes = [EvaluationServiceApplication::class])
 abstract class IntegrationSpec {
@@ -30,4 +31,11 @@ class RabbitMqConfiguration {
             withAdminUser("apsas")
             withAdminPassword("apsas")
         }
+}
+
+@TestConfiguration(proxyBeanMethods = false)
+class RedisConfiguration {
+    @Bean
+    @ServiceConnection
+    fun redisContainer(): RedisContainer = RedisContainer(DockerImageName.parse("redis:8.2-alpine"))
 }

@@ -1,5 +1,6 @@
 package apsas.shared.test
 
+import com.redis.testcontainers.RedisContainer
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.context.annotation.Bean
@@ -28,4 +29,11 @@ class RabbitMqConfiguration {
             withAdminUser("apsas")
             withAdminPassword("apsas")
         }
+}
+
+@TestConfiguration(proxyBeanMethods = false)
+class RedisConfiguration {
+    @Bean
+    @ServiceConnection
+    fun redisContainer(): RedisContainer = RedisContainer(DockerImageName.parse("redis:8.2-alpine"))
 }

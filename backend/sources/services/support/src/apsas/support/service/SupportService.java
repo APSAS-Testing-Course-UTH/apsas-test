@@ -30,7 +30,7 @@ public class SupportService {
   private final EventPublisher eventPublisher;
 
   @Transactional
-  public SupportSession createSession(
+  public SupportSessionDto createSession(
       UUID studentId, String studentEmail, String studentName, String initialMessage) {
     SupportSession session = new SupportSession();
     session.setStudentId(studentId);
@@ -52,13 +52,14 @@ public class SupportService {
             savedSession.getId(), studentId, studentEmail, studentName, initialMessage);
     eventPublisher.publish(RabbitMqConfig.SUPPORT_REQUESTED_ROUTING_KEY, event);
 
-    return savedSession;
+    return sessionMapper.toDto(savedSession);
   }
 
   @Transactional(readOnly = true)
-  public SupportSession getSessionById(UUID sessionId) {
+  public SupportSessionDto getSessionById(UUID sessionId) {
     return sessionRepository
         .findById(sessionId)
+        .map(sessionMapper::toDto)
         .orElseThrow(() -> new NotFoundException("Support session not found"));
   }
 
@@ -78,8 +79,8 @@ public class SupportService {
   }
 
   @Transactional
-  public SupportSession closeSession(UUID sessionId, UUID userId) {
-    SupportSession session = getSessionById(sessionId);
+  public SupportSessionDto closeSession(UUID sessionId, UUID userId) {
+    SupportSession session = getSessionById0(sessionId);
 
     if (session.getIsClosed()) {
       throw new BadRequestException("Session is already closed");
@@ -93,13 +94,13 @@ public class SupportService {
     session.setIsClosed(true);
     session.setClosedAt(LocalDateTime.now());
 
-    return sessionRepository.save(session);
+    return sessionMapper.toDto(sessionRepository.save(session));
   }
 
   @Transactional
   public SupportMessage sendMessage(
       UUID sessionId, UUID senderId, String content, boolean isInstructor) {
-    SupportSession session = getSessionById(sessionId);
+    SupportSession session = getSessionById0(sessionId);
 
     if (session.getIsClosed()) {
       throw new BadRequestException("Cannot send message to a closed session");
@@ -125,7 +126,7 @@ public class SupportService {
 
   @Transactional
   public void markMessagesAsRead(UUID sessionId, UUID userId) {
-    SupportSession session = getSessionById(sessionId);
+    SupportSession session = getSessionById0(sessionId);
 
     session.getMessages().stream()
         .filter(msg -> !msg.getSenderId().equals(userId))
@@ -137,16 +138,22 @@ public class SupportService {
             });
   }
 
-  public void validateUserAccess(SupportSession session, UUID userId, String userRole) {
+  public void validateUserAccess(SupportSessionDto session, UUID userId, String userRole) {
     boolean isStudent = "STUDENT".equals(userRole);
     boolean isInstructor = "INSTRUCTOR".equals(userRole);
 
-    if (isStudent && !session.getStudentId().equals(userId)) {
+    if (isStudent && !session.studentId().equals(userId)) {
       throw new ForbiddenException("You don't have access to this session");
     }
 
     if (!isStudent && !isInstructor) {
       throw new ForbiddenException("You don't have permission to access support sessions");
     }
+  }
+
+  private SupportSession getSessionById0(UUID sessionId) {
+    return sessionRepository
+        .findById(sessionId)
+        .orElseThrow(() -> new NotFoundException("Support session not found"));
   }
 }

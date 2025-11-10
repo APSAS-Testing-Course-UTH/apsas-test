@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * Feign client for calling Identity Service internal endpoints. This client is used by other
  * microservices to fetch user details.
  */
+@SuppressWarnings("SpringMvcPathVariableDeclarationInspection")
 @FeignClient(name = "identity-service", path = "/internal/users")
 public interface UserFeignClient {
 
@@ -25,7 +26,7 @@ public interface UserFeignClient {
    */
   @GetMapping("/{id}")
   UserResponse getUserById(
-      @PathVariable
+      @PathVariable("id")
       UUID id
   );
 

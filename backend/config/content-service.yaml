@@ -8,6 +8,7 @@ spring:
       - file:./config/fragments/springdoc.yaml
       - file:./config/fragments/rabbitmq.yaml
       - file:./config/fragments/eureka-client.yaml
+      - file:./config/fragments/redis.yaml
 
 database:
   schema: content

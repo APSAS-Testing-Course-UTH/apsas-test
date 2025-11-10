@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * Feign client for calling Submission Service internal endpoints. This client is used by Evaluation
  * Service to fetch submission details.
  */
+@SuppressWarnings("SpringMvcPathVariableDeclarationInspection")
 @FeignClient(name = "submission-service", path = "/internal/submissions")
 public interface SubmissionFeignClient {
 
@@ -25,7 +26,7 @@ public interface SubmissionFeignClient {
    */
   @GetMapping("/{id}")
   SubmissionResponse getSubmissionById(
-      @PathVariable
+      @PathVariable("id")
       UUID id
   );
 

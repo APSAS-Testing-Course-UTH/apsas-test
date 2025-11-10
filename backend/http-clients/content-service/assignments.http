@@ -1,0 +1,125 @@
+### Get all assignments
+GET {{BASE_URL}}/api/v1/assignments
+Authorization: Bearer {{auth_token}}
+
+> {%
+  client.test("Fetched all assignments successfully", function () {
+    client.assert(response.status === 200);
+    client.assert(Array.isArray(response.body.content));
+  });
+%}
+
+### Create new assignment (Content Provider)
+POST {{BASE_URL}}/api/v1/assignments
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "title": "Introduction to Algorithms",
+  "description": "Learn basic algorithms and data structures",
+  "skills": [
+    "550e8400-e29b-41d4-a716-446655440000"
+  ],
+  "languages": [
+    "java"
+  ],
+  "startDate": "2025-01-01T00:00:00Z",
+  "dueDate": "2025-12-31T23:59:59Z",
+  "testCases": [
+    {
+      "order": 1,
+      "description": "Test case for sorting algorithm",
+      "input": "5 3 8 6 2",
+      "output": "2 3 5 6 8",
+      "weight": 50,
+      "isHidden": false,
+      "timeout": 1000,
+      "memoryLimit": 256
+    }
+  ],
+  "difficultyLevel": "EASY",
+  "maxScore": 100
+}
+
+> {%
+  client.test("Assignment created successfully", function () {
+    client.assert(response.status === 200);
+    client.assert(response.body.id !== undefined);
+  });
+  client.global.set("assignment_id", response.body.id);
+%}
+
+### Get assignment by ID
+@assignment_id = {{assignment_id}}
+GET {{BASE_URL}}/api/v1/assignments/{{assignment_id}}
+Authorization: Bearer {{auth_token}}
+
+> {%
+  client.test("Fetched assignment by ID successfully", function () {
+    client.assert(response.status === 200);
+  });
+%}
+
+### Update assignment by ID (Content Provider)
+PATCH {{BASE_URL}}/api/v1/assignments/{{assignment_id}}
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "title": "Updated: Introduction to Algorithms",
+  "description": "Updated description for algorithms assignment",
+  "dueDate": "2025-11-30T23:59:59Z"
+}
+
+> {%
+  client.test("Assignment updated successfully", function () {
+    client.assert(response.status === 200);
+    client.assert(response.body.title === "Updated: Introduction to Algorithms");
+  });
+%}
+
+### Delete assignment by ID (Content Provider)
+DELETE {{BASE_URL}}/api/v1/assignments/{{assignment_id}}
+Authorization: Bearer {{auth_token}}
+
+> {%
+  client.test("Assignment deleted successfully", function () {
+    client.assert(response.status === 204);
+  });
+%}
+
+### Archive an assignment (Content Provider)
+POST {{BASE_URL}}/api/v1/assignments/{{assignment_id}}/archive
+Authorization: Bearer {{auth_token}}
+
+> {%
+  client.test("Assignment archived successfully", function () {
+    client.assert(response.status === 200);
+  });
+%}
+
+### Publish an assignment (Content Provider)
+POST {{BASE_URL}}/api/v1/assignments/{{assignment_id}}/publish
+Authorization: Bearer {{auth_token}}
+
+> {%
+  client.test("Assignment published successfully", function () {
+    client.assert(response.status === 200);
+  });
+%}
+
+### Update assignment schedule (Instructor)
+PATCH {{BASE_URL}}/api/v1/assignments/{{assignment_id}}/schedule
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "startDate": "2025-01-15T00:00:00Z",
+  "dueDate": "2025-11-15T23:59:59Z"
+}
+
+> {%
+  client.test("Assignment schedule updated successfully", function () {
+    client.assert(response.status === 200);
+  });
+%}

@@ -9,6 +9,7 @@ import apsas.evaluation.model.dto.RuntimeResponse;
 import apsas.feign.client.AssignmentFeignClient;
 import apsas.feign.dto.AssignmentResponse;
 import apsas.feign.dto.TestCaseDto;
+import apsas.shared.cache.CacheConfig;
 import apsas.shared.messaging.config.RabbitMqConfig;
 import apsas.shared.messaging.event.EventPublisher;
 import apsas.shared.messaging.event.SubmissionCreatedEvent;
@@ -26,6 +27,7 @@ import java.util.concurrent.CompletableFuture;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -48,6 +50,7 @@ public class EvaluationService {
    *
    * @return List of supported runtimes
    */
+  @Cacheable(value = CacheConfig.RUNTIMES_CACHE)
   public List<RuntimeResponse> getSupportedRuntimes() {
     return pistonApiClient.getRuntimes();
   }

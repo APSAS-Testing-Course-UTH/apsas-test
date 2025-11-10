@@ -5,7 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import org.jetbrains.annotations.NotNull;
+import lombok.NonNull;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -15,9 +15,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class HeaderAuthenticationFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(
-      @NotNull HttpServletRequest request,
-      @NotNull HttpServletResponse response,
-      @NotNull FilterChain filterChain
+      @NonNull
+      HttpServletRequest request,
+      @NonNull
+      HttpServletResponse response,
+      FilterChain filterChain
   )
       throws ServletException, IOException {
     UserPrincipals.fromHeader(request)

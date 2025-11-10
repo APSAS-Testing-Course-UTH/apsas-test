@@ -1,10 +1,8 @@
 package apsas.submission.model.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Setter
-@Getter
+@Data
 public class TestCaseResult {
   private Integer order;
   private String description;

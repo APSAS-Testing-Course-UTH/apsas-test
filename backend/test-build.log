@@ -1,6 +1,0 @@
-00:06.615 INFO                            Compiling modules: support
-00:23.660 INFO  :test:compileJvm          Compiling module 'test' for platform 'jvm'...
-[38;2;229;192;123m00:32.990 WARN  :test:compileJvm          Lombok Kotlin compiler plugin is an experimental feature. See: https://kotlinlang.org/docs/components-stability.html.[39m
-00:38.993 INFO  :support:compileJvmTest   Compiling module 'support' for platform 'jvm'...
-[38;2;229;192;123m00:43.300 WARN  :support:compileJvmTest   Lombok Kotlin compiler plugin is an experimental feature. See: https://kotlinlang.org/docs/components-stability.html.[39m
-[38;2;152;195;121mBuild successful[39m

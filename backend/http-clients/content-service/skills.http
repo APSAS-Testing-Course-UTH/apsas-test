@@ -1,0 +1,66 @@
+### Get all skills
+GET {{BASE_URL}}/api/v1/skills
+Authorization: Bearer {{auth_token}}
+
+> {%
+  client.test("Fetched all skills successfully", function () {
+    client.assert(response.status === 200);
+    client.assert(Array.isArray(response.body.content));
+  });
+%}
+
+### Create new skill (Content Provider)
+POST {{BASE_URL}}/api/v1/skills
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "name": "Java Programming",
+  "description": "Learn the fundamentals of Java programming language"
+}
+
+> {%
+  client.test("Skill created successfully", function () {
+    client.assert(response.status === 201);
+    client.assert(response.body.id !== undefined);
+  });
+  client.global.set("skill_id", response.body.id);
+%}
+
+### Get skill by ID
+@skill_id = {{skill_id}}
+GET {{BASE_URL}}/api/v1/skills/{{skill_id}}
+Authorization: Bearer {{auth_token}}
+
+> {%
+  client.test("Fetched skill by ID successfully", function () {
+    client.assert(response.status === 200);
+  });
+%}
+
+### Update skill by ID (Content Provider)
+PATCH {{BASE_URL}}/api/v1/skills/{{skill_id}}
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "name": "Advanced Java Programming",
+  "description": "Advanced concepts in Java programming"
+}
+
+> {%
+  client.test("Skill updated successfully", function () {
+    client.assert(response.status === 200);
+    client.assert(response.body.name === "Advanced Java Programming");
+  });
+%}
+
+### Delete skill by ID (Content Provider)
+DELETE {{BASE_URL}}/api/v1/skills/{{skill_id}}
+Authorization: Bearer {{auth_token}}
+
+> {%
+  client.test("Skill deleted successfully", function () {
+    client.assert(response.status === 204);
+  });
+%}

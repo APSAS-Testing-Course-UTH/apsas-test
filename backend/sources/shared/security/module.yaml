@@ -1,9 +1,0 @@
-product: jvm/lib
-apply:
-  - ../../jvm.module-template.yaml
-  - ../spring-lib.module-template.yaml
-
-dependencies:
-  - $spring.boot.starter.web: compile-only
-  - $spring.boot.starter.webflux: compile-only
-  - $spring.boot.starter.security: exported

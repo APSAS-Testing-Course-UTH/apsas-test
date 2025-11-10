@@ -1,0 +1,136 @@
+### Register User
+POST {{BASE_URL}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "newuser@apsas.net",
+  "password": "SecurePassword123!",
+  "firstName": "New",
+  "lastName": "User"
+}
+
+> {%
+  client.test("User registered successfully", function () {
+    client.assert(response.status === 201);
+    client.assert(response.body.email === "newuser@apsas.net");
+  });
+%}
+
+### Login User
+POST {{BASE_URL}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "newuser@apsas.net",
+  "password": "SecurePassword123!"
+}
+
+> {%
+  client.test("User logged in successfully", function () {
+    client.assert(response.status === 200);
+    client.assert(response.body.token !== undefined);
+  });
+  client.global.set("auth_token", response.body.token);
+%}
+
+### Resend Verification Email
+POST {{BASE_URL}}/api/auth/resend-verification
+Content-Type: application/json
+
+{
+  "email": "newuser@apsas.net"
+}
+
+> {%
+  client.test("Verification email resent successfully", function () {
+    client.assert(response.status === 200);
+  });
+%}
+
+### Verify Email
+@verification_token = 73552a00-0e0e-4909-9f75-ab36e353373a
+POST {{BASE_URL}}/api/auth/verify-email
+Content-Type: application/json
+
+{
+  "token": "{{verification_token}}"
+}
+
+> {%
+  client.test("Email verified successfully", function () {
+    client.assert(response.status === 200);
+  });
+%}
+
+### Forgot Password
+POST {{BASE_URL}}/api/auth/forgot-password
+Content-Type: application/json
+
+{
+  "email": "newuser@apsas.net"
+}
+
+> {%
+  client.test("Forgot password email sent successfully", function () {
+    client.assert(response.status === 200);
+  });
+%}
+
+### Reset Password
+@reset_token = d4f5e6a7-b8c9-4d0e-9f1a-2b3c4d5e6f70
+POST {{BASE_URL}}/api/auth/reset-password
+Content-Type: application/json
+
+{
+  "token": "{{reset_token}}"
+}
+
+> {%
+  client.test("Password reset successfully", function () {
+    client.assert(response.status === 200);
+  });
+%}
+
+### Get User Profile
+GET {{BASE_URL}}/api/v1/users/me
+Authorization: Bearer {{auth_token}}
+
+> {%
+  client.test("Fetched user profile successfully", function () {
+    client.assert(response.status === 200);
+  });
+%}
+
+### Update User Profile
+PUT {{BASE_URL}}/api/v1/users/me
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "firstName": "Updated",
+  "lastName": "User"
+}
+
+> {%
+  client.test("Profile updated successfully", function () {
+    client.assert(response.status === 200);
+    client.assert(response.body.firstName === "Updated");
+    client.assert(response.body.lastName === "User");
+  });
+%}
+
+### Change Password
+POST {{BASE_URL}}/api/v1/users/me/change-password
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "currentPassword": "SecurePassword123!",
+  "newPassword": "SecurePassword123!"
+}
+
+> {%
+  client.test("Password changed successfully", function () {
+    client.assert(response.status === 200);
+  });
+%}

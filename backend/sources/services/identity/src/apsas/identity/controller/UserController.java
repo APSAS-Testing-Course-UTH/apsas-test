@@ -6,11 +6,10 @@ import apsas.identity.model.dto.UpdateProfileRequest;
 import apsas.identity.model.dto.UserResponse;
 import apsas.identity.model.entity.UserRole;
 import apsas.identity.service.UserService;
-import apsas.shared.models.pagination.PageResponse;
 import apsas.shared.models.pagination.PageRequestParams;
+import apsas.shared.models.pagination.PageResponse;
 import apsas.shared.security.UserPrincipal;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -105,7 +104,6 @@ public class UserController {
       description = "Get all users with pagination and sorting (Admin only)"
   )
   public ResponseEntity<PageResponse<UserResponse>> getAllUsers(
-      @Parameter
       PageRequestParams pageParams
   ) {
     PageResponse<UserResponse> response = userService.getAllUsers(pageParams.toPageable());
@@ -121,7 +119,6 @@ public class UserController {
   public ResponseEntity<PageResponse<UserResponse>> getUsersByRole(
       @PathVariable
       UserRole role,
-      @Parameter
       PageRequestParams pageParams
   ) {
     PageResponse<UserResponse> response = userService.getUsersByRole(role, pageParams.toPageable());

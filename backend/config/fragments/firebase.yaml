@@ -1,5 +1,5 @@
 firebase:
-  enabled: true
+  enabled: ${FIREBASE_ENABLED:true}
   project-id: ${FIREBASE_PROJECT_ID}
   credentials:
     type: ${FIREBASE_CREDENTIALS_TYPE:service_account}

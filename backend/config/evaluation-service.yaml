@@ -7,3 +7,7 @@ spring:
       - file:./config/fragments/springdoc.yaml
       - file:./config/fragments/rabbitmq.yaml
       - file:./config/fragments/eureka-client.yaml
+
+piston:
+  api:
+    url: ${PISTON_API_URL:http://localhost:2000}

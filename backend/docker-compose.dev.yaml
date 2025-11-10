@@ -3,7 +3,6 @@ services:
   # Infrastructure Services
   postgres:
     image: postgres:17-alpine
-    container_name: apsas-db
     environment:
       POSTGRES_USER: apsas
       POSTGRES_PASSWORD: apsas
@@ -17,7 +16,6 @@ services:
 
   rabbitmq:
     image: rabbitmq:4.1-management-alpine
-    container_name: apsas-rabbitmq
     environment:
       RABBITMQ_DEFAULT_USER: apsas
       RABBITMQ_DEFAULT_PASS: apsas
@@ -39,6 +37,16 @@ services:
       - "8025:8025"
       - "1025:1025"
 
+  redis:
+    image: redis:8.2-alpine
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - apsas-backend
+
 networks:
   apsas-backend:
     driver: bridge
@@ -47,3 +55,4 @@ volumes:
   postgres_data:
   rabbitmq_data:
   mailpit_data:
+  redis_data:

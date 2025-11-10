@@ -39,7 +39,7 @@ dependencies:
   - $spring.boot.starter.thymeleaf
   - $spring.boot.starter.validation
   - $spring.boot.starter.amqp
-  - $libs.postgresql
+  - $"org.postgresql:postgresql"
   - $libs.springdoc.openapi.starter.webmvc.api
 ```
 

@@ -8,10 +8,14 @@ spring:
   sql:
     init:
       mode: always
+      data-locations:
+        - optional:classpath*:data.sql
+        - optional:classpath*:${SEED_DATA:data-none.sql}
 
   jpa:
     hibernate:
       ddl-auto: validate
+    open-in-view: false
     show-sql: ${JPA_SHOW_SQL:false}
     properties:
       hibernate:

@@ -1,0 +1,102 @@
+### Login Admin
+POST {{BASE_URL}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@apsas",
+  "password": "{{DEFAULT_ADMIN_PASSWORD}}"
+}
+
+> {%
+  client.test("Admin logged in successfully", function () {
+    client.assert(response.status === 200);
+    client.assert(response.body.token !== undefined);
+  });
+  client.global.set("auth_token", response.body.token);
+%}
+
+### Login Content Provider 1
+POST {{BASE_URL}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "contentprovider1@apsas",
+  "password": "{{DEFAULT_USER_PASSWORD}}"
+}
+
+> {%
+  client.test("Content Provider 2 logged in successfully", function () {
+    client.assert(response.status === 200);
+    client.assert(response.body.token !== undefined);
+  });
+  client.global.set("auth_token", response.body.token);
+%}
+
+### Login Content Provider 2
+POST {{BASE_URL}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "contentprovider1@apsas",
+  "password": "{{DEFAULT_USER_PASSWORD}}"
+}
+
+> {%
+  client.test("Content Provider 2 logged in successfully", function () {
+    client.assert(response.status === 200);
+    client.assert(response.body.token !== undefined);
+  });
+  client.global.set("auth_token", response.body.token);
+%}
+
+### Login Instructor 1
+POST {{BASE_URL}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "instructor1@apsas",
+  "password": "{{DEFAULT_USER_PASSWORD}}"
+}
+
+> {%
+  client.global.set("auth_token", response.body.token);
+%}
+
+### Login Instructor 2
+POST {{BASE_URL}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "instructor2@apsas",
+  "password": "{{DEFAULT_USER_PASSWORD}}"
+}
+
+> {%
+  client.global.set("auth_token", response.body.token);
+%}
+
+### Login Student 1
+POST {{BASE_URL}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "student1@apsas",
+  "password": "{{DEFAULT_USER_PASSWORD}}"
+}
+
+> {%
+  client.global.set("auth_token", response.body.token);
+%}
+
+### Login Student 2
+POST {{BASE_URL}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "student2@apsas",
+  "password": "{{DEFAULT_USER_PASSWORD}}"
+}
+
+> {%
+  client.global.set("auth_token", response.body.token);
+%}

@@ -9,7 +9,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import(PostgresConfiguration::class, RabbitMqConfiguration::class)
+@Import(PostgresConfiguration::class, RabbitMqConfiguration::class, RedisConfiguration::class)
 @ActiveProfiles("integration")
 abstract class IntegrationSpec {
     @Autowired

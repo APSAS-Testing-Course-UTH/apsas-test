@@ -1,0 +1,70 @@
+### Get all submissions
+GET {{BASE_URL}}/api/v1/submissions
+#    ?
+#    assignmentId={{$random.uuid}}&
+#    studentId={{$random.uuid}}&
+#    status={{$random.alphanumeric(8)}}
+Authorization: Bearer {{auth_token}}
+
+> {%
+  client.test("Get all submissions successful", function () {
+    client.assert(response.status === 200);
+    client.assert(Array.isArray(response.body.content));
+  });
+%}
+
+### Submit an assignment (Student)
+@assignment_id = 550e8400-e29b-41d4-a716-446655440001
+@language = javascript
+< {%
+  const code = `console.log("Hello, World!");`;
+  // base64 encode the code
+  request.variables.set("submission_code", btoa(code));
+%}
+POST {{BASE_URL}}/api/v1/submissions
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "assignmentId": "{{assignment_id}}",
+  "code": "{{submission_code}}",
+  "language": "{{language}}"
+}
+
+> {%
+  client.test("Submit assignment successful", function () {
+    client.assert(response.status === 201);
+    client.assert(response.body.assignmentId === "{{assignment_id}}");
+    client.assert(response.body.language === "{{language}}");
+  });
+  client.global.set("submission_id", response.body.id);
+%}
+
+### Get submission by ID
+@submission_id = {{submission_id}}
+GET {{BASE_URL}}/api/v1/submissions/{{submission_id}}
+Authorization: Bearer {{auth_token}}
+
+> {%
+  client.test("Get submission by ID successful", function () {
+    client.assert(response.status === 200);
+    client.assert(response.body.id === "{{submission_id}}");
+  });
+%}
+
+### Feedback to submission (Instructor)
+POST {{BASE_URL}}/api/v1/submissions/{{submission_id}}/feedback
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "feedback": "Good job on the assignment! Please improve code efficiency."
+}
+
+> {%
+  client.test("Feedback to submission successful", function () {
+    client.assert(response.status === 200);
+    client.assert(
+        response.body.feedback === "Good job on the assignment! Please improve code efficiency.");
+  });
+%}
