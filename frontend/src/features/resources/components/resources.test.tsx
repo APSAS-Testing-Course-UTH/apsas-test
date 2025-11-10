@@ -118,11 +118,13 @@ describe('Resources Feature', () => {
     })
 
     it('should display loading state', () => {
-      render(
+      const { container } = render(
         <ResourcesList resources={undefined} isLoading={true} />
       )
 
-      expect(screen.getByText('Đang tải tài nguyên...')).toBeInTheDocument()
+      // Component renders Skeleton loaders, not text
+      const skeletonLoaders = container.querySelectorAll('[class*="mantine-Skeleton"]')
+      expect(skeletonLoaders.length).toBeGreaterThan(0)
     })
 
     it('should display empty state when no resources', () => {

@@ -26,6 +26,8 @@ import {
 import { IconArrowRight } from '@tabler/icons-react'
 import { useAssignmentsFiltered, type AssignmentFilters } from '../hooks/useAssignmentsFiltered'
 import { AssignmentsFilterBar } from './AssignmentsFilterBar'
+import { getUrgencyLevel, getUrgencyLabel, formatDateShort, getDeadlineStatusText } from '@/utils/dateUtils'
+import { mapUrgencyToBadgeColor } from '@/components/utils/badgeColorUtils'
 import styles from './AssignmentsList.module.css'
 
 interface AssignmentsListProps {
@@ -122,6 +124,7 @@ export function AssignmentsList({ onSelectAssignment }: AssignmentsListProps) {
               <Table.Th className={styles.difficultyCol}>Độ khó</Table.Th>
               <Table.Th className={styles.dueCol}>Hạn chót</Table.Th>
               <Table.Th className={styles.statusCol}>Trạng thái</Table.Th>
+              <Table.Th className={styles.statusCol}>Độ ưu tiên</Table.Th>
               <Table.Th className={styles.actionCol}>Hành động</Table.Th>
             </Table.Tr>
           </Table.Thead>
@@ -158,9 +161,17 @@ export function AssignmentsList({ onSelectAssignment }: AssignmentsListProps) {
                 </Table.Td>
 
                 <Table.Td className={styles.dueCol}>
-                  <Text size="sm">
-                    {assignment.dueDate ? new Date(assignment.dueDate).toLocaleDateString('vi-VN') : 'N/A'}
-                  </Text>
+                  <div>
+                    <Text size="sm">
+                      {assignment.dueDate ? formatDateShort(new Date(assignment.dueDate)) : 'N/A'}
+                    </Text>
+                    <Text size="xs" c="dimmed">
+                      {assignment.dueDate && getDeadlineStatusText(
+                        assignment.startDate ? new Date(assignment.startDate) : undefined,
+                        new Date(assignment.dueDate)
+                      )}
+                    </Text>
+                  </div>
                 </Table.Td>
 
                 <Table.Td className={styles.statusCol}>
@@ -180,6 +191,28 @@ export function AssignmentsList({ onSelectAssignment }: AssignmentsListProps) {
                         ? 'Đã công bố'
                         : 'Đã lưu trữ'}
                   </Badge>
+                </Table.Td>
+
+                <Table.Td className={styles.statusCol}>
+                  {assignment.dueDate && (
+                    <Badge
+                      color={mapUrgencyToBadgeColor(
+                        getUrgencyLevel(
+                          assignment.startDate ? new Date(assignment.startDate) : undefined,
+                          new Date(assignment.dueDate),
+                          assignment.status
+                        )
+                      )}
+                    >
+                      {getUrgencyLabel(
+                        getUrgencyLevel(
+                          assignment.startDate ? new Date(assignment.startDate) : undefined,
+                          new Date(assignment.dueDate),
+                          assignment.status
+                        )
+                      )}
+                    </Badge>
+                  )}
                 </Table.Td>
 
                 <Table.Td className={styles.actionCol}>

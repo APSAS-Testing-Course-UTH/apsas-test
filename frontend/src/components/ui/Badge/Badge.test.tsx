@@ -74,6 +74,47 @@ describe('Badge Component', () => {
       const badge = screen.getByText('Secondary');
       expect(badge).toHaveCSSModuleClass('badge-secondary');
     });
+
+    it('should render badge with red urgency color', () => {
+      render(<Badge label="Quá hạn" color="red" />);
+      const badge = screen.getByText('Quá hạn');
+      expect(badge).toHaveCSSModuleClass('badge-red');
+    });
+
+    it('should render badge with orange urgency color', () => {
+      render(<Badge label="Sắp hết hạn" color="orange" />);
+      const badge = screen.getByText('Sắp hết hạn');
+      expect(badge).toHaveCSSModuleClass('badge-orange');
+    });
+
+    it('should render badge with yellow urgency color', () => {
+      render(<Badge label="Còn thời gian" color="yellow" />);
+      const badge = screen.getByText('Còn thời gian');
+      expect(badge).toHaveCSSModuleClass('badge-yellow');
+    });
+
+    it('should render badge with green urgency color', () => {
+      render(<Badge label="Đầy đủ thời gian" color="green" />);
+      const badge = screen.getByText('Đầy đủ thời gian');
+      expect(badge).toHaveCSSModuleClass('badge-green');
+    });
+
+    it('should render urgency badge with all variants', () => {
+      const { rerender } = render(<Badge label="Urgent" color="orange" variant="solid" />);
+      let badge = screen.getByText('Urgent');
+      expect(badge).toHaveCSSModuleClass('badge-orange');
+      expect(badge).toHaveCSSModuleClass('variant-solid');
+
+      rerender(<Badge label="Urgent" color="orange" variant="outline" />);
+      badge = screen.getByText('Urgent');
+      expect(badge).toHaveCSSModuleClass('badge-orange');
+      expect(badge).toHaveCSSModuleClass('variant-outline');
+
+      rerender(<Badge label="Urgent" color="orange" variant="light" />);
+      badge = screen.getByText('Urgent');
+      expect(badge).toHaveCSSModuleClass('badge-orange');
+      expect(badge).toHaveCSSModuleClass('variant-light');
+    });
   });
 
   describe('Variants', () => {

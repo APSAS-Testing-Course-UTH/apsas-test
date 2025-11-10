@@ -12,6 +12,7 @@ import { Container, Stack, Text, Button, Group, Loader, Center, Alert } from '@m
 import { IconArrowLeft, IconAlertCircle } from '@tabler/icons-react'
 import { useAssignmentDetailQuery } from '../api/useAssignmentDetailQuery'
 import { AssignmentMetadata } from './AssignmentMetadata'
+import { AssignmentTimeline } from './AssignmentTimeline'
 import { TestCaseList } from './TestCaseList'
 import { SkillBadges } from './SkillBadges'
 import { TutorialLinks } from './TutorialLinks'
@@ -131,6 +132,9 @@ export function AssignmentDetail() {
 
         {/* Metadata */}
         <AssignmentMetadata assignment={assignment} />
+
+        {/* Timeline & Scheduling */}
+        <AssignmentTimeline assignment={assignment} />
 
         {/* Description */}
         {assignment.description && (

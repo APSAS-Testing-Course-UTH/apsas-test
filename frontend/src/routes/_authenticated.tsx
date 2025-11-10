@@ -6,8 +6,21 @@ import { StudentPortalLayout } from '@/layouts/StudentPortalLayout'
 // Layout route cho tất cả protected routes
 // Tự động redirect về /login nếu chưa authenticated
 export const Route = createFileRoute('/_authenticated')({
-  beforeLoad: ({ location }) => {
-    const { isAuthenticated, isLoading } = useAuthStore.getState()
+  beforeLoad: ({ context, location }) => {
+    // DEFENSIVE: Check if context and auth exist (safety guard)
+    if (!context || !context.auth) {
+      console.warn('[_authenticated] Auth context not ready, redirecting to login')
+      throw redirect({
+        to: '/login',
+        search: {
+          redirect: location.href,
+        },
+      })
+    }
+    
+    // Use context.auth instead of useAuthStore directly
+    // This ensures consistency with TanStack Router patterns
+    const { isAuthenticated, isLoading } = context.auth
 
     // Nếu đang loading, không redirect (để tránh flash)
     if (isLoading) {

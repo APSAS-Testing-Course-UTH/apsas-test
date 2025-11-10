@@ -4,8 +4,9 @@
  * Vietnamese labels throughout
  */
 
-import { Stack, Text, List, ThemeIcon, Anchor } from '@mantine/core'
+import { Stack, Text, List, ThemeIcon, Button } from '@mantine/core'
 import { IconBook } from '@tabler/icons-react'
+import { useNavigate } from '@tanstack/react-router'
 import type { ContentServiceTutorialResponse } from '@/api/types.gen'
 
 interface TutorialLinksProps {
@@ -18,6 +19,8 @@ const labels = {
 }
 
 export function TutorialLinks({ tutorials }: TutorialLinksProps) {
+  const navigate = useNavigate()
+
   if (!tutorials || tutorials.length === 0) {
     return (
       <Stack gap="md">
@@ -47,15 +50,21 @@ export function TutorialLinks({ tutorials }: TutorialLinksProps) {
         }
       >
         {tutorials.map((tutorial) => (
-          <List.Item key={tutorial.id}>
-            <Anchor
-              href={`#tutorial/${tutorial.id}`}
+          <List.Item key={tutorial.id || 'unknown'}>
+            <Button
+              variant="subtle"
+              onClick={() =>
+                tutorial.id &&
+                navigate({
+                  to: '/student/resources/tutorials/$id',
+                  params: { id: tutorial.id },
+                })
+              }
               title={tutorial.content}
-              target="_blank"
-              rel="noopener noreferrer"
+              disabled={!tutorial.id}
             >
               {tutorial.title}
-            </Anchor>
+            </Button>
           </List.Item>
         ))}
       </List>

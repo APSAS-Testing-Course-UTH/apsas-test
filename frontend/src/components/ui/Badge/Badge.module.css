@@ -243,6 +243,107 @@
   background-color: var(--mantine-color-violet-6);
 }
 
+/* Urgency Level Color Schemes (for assignment scheduling) */
+/* Red - Overdue */
+.badge-red {
+  --color: var(--mantine-color-red-6);
+  color: var(--color);
+}
+
+.variant-solid.badge-red {
+  background-color: var(--mantine-color-red-6);
+  color: white;
+}
+
+.variant-light.badge-red {
+  background-color: var(--mantine-color-red-1);
+  color: var(--mantine-color-red-8);
+}
+
+.variant-outline.badge-red {
+  border-color: var(--mantine-color-red-6);
+  color: var(--mantine-color-red-6);
+}
+
+.variant-dot.badge-red::before {
+  background-color: var(--mantine-color-red-6);
+}
+
+/* Orange - Urgent */
+.badge-orange {
+  --color: var(--mantine-color-orange-6);
+  color: var(--color);
+}
+
+.variant-solid.badge-orange {
+  background-color: var(--mantine-color-orange-6);
+  color: white;
+}
+
+.variant-light.badge-orange {
+  background-color: var(--mantine-color-orange-1);
+  color: var(--mantine-color-orange-8);
+}
+
+.variant-outline.badge-orange {
+  border-color: var(--mantine-color-orange-6);
+  color: var(--mantine-color-orange-6);
+}
+
+.variant-dot.badge-orange::before {
+  background-color: var(--mantine-color-orange-6);
+}
+
+/* Yellow - Soon */
+.badge-yellow {
+  --color: var(--mantine-color-yellow-7);
+  color: var(--color);
+}
+
+.variant-solid.badge-yellow {
+  background-color: var(--mantine-color-yellow-6);
+  color: white;
+}
+
+.variant-light.badge-yellow {
+  background-color: var(--mantine-color-yellow-1);
+  color: var(--mantine-color-yellow-8);
+}
+
+.variant-outline.badge-yellow {
+  border-color: var(--mantine-color-yellow-6);
+  color: var(--mantine-color-yellow-7);
+}
+
+.variant-dot.badge-yellow::before {
+  background-color: var(--mantine-color-yellow-6);
+}
+
+/* Green - Upcoming */
+.badge-green {
+  --color: var(--mantine-color-green-6);
+  color: var(--color);
+}
+
+.variant-solid.badge-green {
+  background-color: var(--mantine-color-green-6);
+  color: white;
+}
+
+.variant-light.badge-green {
+  background-color: var(--mantine-color-green-1);
+  color: var(--mantine-color-green-8);
+}
+
+.variant-outline.badge-green {
+  border-color: var(--mantine-color-green-6);
+  color: var(--mantine-color-green-6);
+}
+
+.variant-dot.badge-green::before {
+  background-color: var(--mantine-color-green-6);
+}
+
 /* Hover and Focus States */
 .badge {
   cursor: default;

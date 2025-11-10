@@ -1,23 +1,25 @@
 import { SimpleGrid, Skeleton, Center, Text, Group, Pagination, Stack } from '@mantine/core'
-import type { ContentServiceTutorialResponse } from '@/api/types.gen'
+import type { ContentServiceTutorialResponse, ContentServiceSkillResponse } from '@/api/types.gen'
 import { ResourceCard } from './ResourceCard'
 
 interface ResourcesListProps {
-  resources: ContentServiceTutorialResponse[] | undefined
+  items?: ContentServiceTutorialResponse[] | ContentServiceSkillResponse[]
   isLoading: boolean
   totalPages?: number
   currentPage?: number
   onPageChange?: (page: number) => void
-  onDownload?: (resource: ContentServiceTutorialResponse) => void
+  onDownload?: (resource: any) => void
+  type?: 'tutorials' | 'skills'
 }
 
 export function ResourcesList({
-  resources,
+  items,
   isLoading,
   totalPages = 1,
   currentPage = 1,
   onPageChange,
   onDownload,
+  type = 'tutorials',
 }: ResourcesListProps) {
   if (isLoading) {
     return (
@@ -37,7 +39,7 @@ export function ResourcesList({
     )
   }
 
-  if (!resources || resources.length === 0) {
+  if (!items || items.length === 0) {
     return (
       <Center py="xl">
         <Text c="dimmed">Không tìm thấy tài nguyên nào</Text>
@@ -52,11 +54,12 @@ export function ResourcesList({
         spacing="md"
         verticalSpacing="md"
       >
-        {resources.map((resource) => (
+        {items.map((resource) => (
           <ResourceCard
             key={resource.id}
-            resource={resource}
+            resource={resource as ContentServiceTutorialResponse}
             onDownload={onDownload}
+            type={type}
           />
         ))}
       </SimpleGrid>

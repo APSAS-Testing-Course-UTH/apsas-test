@@ -14,7 +14,7 @@ export default defineConfig({
   },
   test: {
     environment: 'jsdom',  // Use jsdom for React component testing + MSW compatibility
-    setupFiles: ['./src/test/msw-init.ts', './src/test/setup.ts'],
+    setupFiles: ['./src/test/msw-init.ts', './src/test/setup.ts'],  // Run setup after jsdom created
     globals: true,
     include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
     exclude: ['node_modules', 'dist'],

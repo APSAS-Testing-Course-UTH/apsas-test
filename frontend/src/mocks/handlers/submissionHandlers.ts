@@ -65,7 +65,7 @@ export type PageResponseSubmissionResponse = {
 
 // Mock submissions database - use generated mock data with valid UUIDs
 // Import from centralized mock data registry
-import { MOCK_DATA_REGISTRY, getAllStudentSubmissions } from '../factory/mockDataRegistry'
+import { MOCK_DATA_REGISTRY } from '../factory/mockDataRegistry'
 
 // Convert array to Record for backwards compatibility
 const mockSubmissions: Record<string, SubmissionResponse> = {}

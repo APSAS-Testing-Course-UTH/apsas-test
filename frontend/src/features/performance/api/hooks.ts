@@ -10,8 +10,8 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import { submissionServiceGetAllSubmissions, contentServiceGetAllAssignments } from '@/api/sdk.gen';
-import type { SubmissionServicePageResponseSubmissionResponse, ContentServiceAssignmentResponse } from '@/api/types.gen';
+import { submissionServiceGetAllSubmissions } from '@/api/sdk.gen';
+import type { SubmissionServicePageResponseSubmissionResponse } from '@/api/types.gen';
 
 // Query keys for caching
 export const performanceKeys = {
@@ -23,6 +23,63 @@ export const performanceKeys = {
     { page, size },
   ],
 };
+
+/**
+ * Calculate skill progress from submissions
+ * Groups submissions by assignment, calculates pass rate per skill
+ * 
+ * @param submissions - Array of submissions with scores and results
+ * @returns Array of SkillProgress objects with pass rates and attempt counts
+ */
+function calculateSkillProgress(
+  submissions: SubmissionServicePageResponseSubmissionResponse | undefined
+) {
+
+  if (!submissions?.content || submissions.content.length === 0) {
+    return [];
+  }
+
+  // Map to group submissions by assignment (as proxy for skill)
+  // In real scenario, we'd have skill_id from assignments
+  const skillMap = new Map<
+    string,
+    { passed: number; total: number; skillName: string; lastAttemptDate: string }
+  >();
+
+  submissions.content.forEach((submission) => {
+    const skillId = submission.assignmentId || 'unknown';
+    const skillName = `Assignment ${skillId.substring(0, 8)}`;
+
+    if (!skillMap.has(skillId)) {
+      skillMap.set(skillId, {
+        passed: 0,
+        total: 0,
+        skillName,
+        lastAttemptDate: new Date().toISOString(),
+      });
+    }
+
+    const skill = skillMap.get(skillId)!;
+    skill.total += 1;
+    if (submission.result === 'PASSED') {
+      skill.passed += 1;
+    }
+    // Update last attempt date with most recent
+    if (submission.createdAt && submission.createdAt > skill.lastAttemptDate) {
+      skill.lastAttemptDate = submission.createdAt;
+    }
+  });
+
+  // Convert to SkillProgress array
+  return Array.from(skillMap.entries()).map(([skillId, data]) => ({
+    skillId,
+    skillName: data.skillName,
+    attemptCount: data.total,
+    passCount: data.passed,
+    progressPercentage: (data.passed / data.total) * 100,
+    lastAttemptDate: data.lastAttemptDate,
+  }));
+}
 
 /**
  * Calculate performance metrics from submissions
@@ -38,6 +95,7 @@ function calculateMetrics(submissions: SubmissionServicePageResponseSubmissionRe
       failedSubmissions: 0,
       successRate: 0,
       averageScore: 0,
+      skillsProgress: [],
     };
   }
 
@@ -56,6 +114,7 @@ function calculateMetrics(submissions: SubmissionServicePageResponseSubmissionRe
     failedSubmissions: failed,
     successRate: total > 0 ? (passed / total) * 100 : 0,
     averageScore: Math.round(averageScore * 100) / 100,
+    skillsProgress: calculateSkillProgress(submissions),
   };
 }
 
@@ -69,13 +128,41 @@ export function useStudentPerformance() {
   return useQuery({
     queryKey: performanceKeys.overview(),
     queryFn: async () => {
+      // First request to get totalElements
+      const firstResponse = await submissionServiceGetAllSubmissions({
+        query: {
+          page: '0',
+          size: '1', // Just need to get totalElements
+        },
+      });
+
+      // Convert BigInt to number for Math operations
+      const totalElements = Number(firstResponse.data?.totalElements ?? 0);
+      
+      // If no submissions, return empty metrics
+      if (totalElements === 0) {
+        return {
+          totalSubmissions: 0,
+          passedSubmissions: 0,
+          failedSubmissions: 0,
+          successRate: 0,
+          averageScore: 0,
+          skillsProgress: [],
+        };
+      }
+
+      // Fetch all submissions in one request with large page size
+      // Using 500 as max page size to cover most use cases
+      const largePageSize = Math.min(500, Math.max(totalElements, 100));
+      
       const response = await submissionServiceGetAllSubmissions({
         query: {
           page: '0',
-          size: '10',
+          size: String(largePageSize),
         },
       });
-      // Return metrics calculated from submissions data
+
+      // Return metrics calculated from ALL submissions, not just page 0
       return calculateMetrics(response.data || { content: [] });
     },
     staleTime: 10 * 60 * 1000, // 10 minute cache

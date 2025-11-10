@@ -1,38 +1,61 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import { useAuthStore } from '../features/auth/stores/useAuthStore'
-import { ROLE_REDIRECTS } from '../constants/roles'
+import { useAuthStore } from '@/features/auth/stores/useAuthStore'
+import { USER_ROLES } from '@/constants/roles'
 
-export const Route = createFileRoute("/")({
-  beforeLoad: () => {
-    const { isAuthenticated, user, isLoading } = useAuthStore.getState()
+/**
+ * Root route handler for "/"
+ * Redirects to appropriate page based on auth status:
+ * - If authenticated: Redirect to role-based dashboard route
+ * - If not authenticated: Redirect to /login
+ */
+export const Route = createFileRoute('/')({
+  beforeLoad: ({ context }) => {
+    // Check if auth context is available
+    if (!context || !context.auth) {
+      // No context, redirect to login (safe default)
+      throw redirect({
+        to: '/login',
+        search: {
+          redirect: undefined,
+        },
+      })
+    }
 
-    // Nếu đang loading, không redirect
+    const { isAuthenticated, isLoading } = context.auth
+
+    // While loading, don't redirect (let auth complete)
     if (isLoading) {
       return
     }
 
-    // Nếu đã authenticated, redirect về dashboard theo role
-    if (isAuthenticated && user?.role) {
-      const dashboardUrl = ROLE_REDIRECTS[user.role as keyof typeof ROLE_REDIRECTS] || '/login'
-      throw redirect({
-        to: dashboardUrl,
-        replace: true,
-      })
+    // If authenticated, redirect to appropriate dashboard based on role
+    if (isAuthenticated) {
+      // Get user info from Zustand store for role-based routing
+      const { user } = useAuthStore.getState()
+
+      // Route based on user role (API roles are uppercase: STUDENT, INSTRUCTOR, ADMIN, CONTENT_PROVIDER)
+      if (user?.role === USER_ROLES.STUDENT) {
+        throw redirect({ to: '/student/dashboard' })
+      } else if (user?.role === USER_ROLES.INSTRUCTOR) {
+        throw redirect({ to: '/lecturer/dashboard' })
+      } else if (user?.role === USER_ROLES.ADMIN) {
+        throw redirect({ to: '/admin/dashboard' })
+      } else if (user?.role === USER_ROLES.CONTENT_PROVIDER) {
+        throw redirect({ to: '/provider/dashboard' })
+      }
+
+      // Fallback: redirect to student dashboard if role unknown
+      throw redirect({ to: '/student/dashboard' })
     }
 
-    // Nếu chưa authenticated, redirect về login
-    if (!isAuthenticated) {
-      throw redirect({
-        to: '/login',
-        search: { redirect: undefined },
-        replace: true,
-      })
-    }
+    // Not authenticated, redirect to login
+    throw redirect({
+      to: '/login',
+      search: {
+        redirect: undefined,
+      },
+    })
   },
-  component: RouteComponent,
+  // Component that won't be rendered (always redirects in beforeLoad)
+  component: () => null,
 })
-
-function RouteComponent() {
-  // Component này sẽ không bao giờ được render vì beforeLoad luôn redirect
-  return null
-}

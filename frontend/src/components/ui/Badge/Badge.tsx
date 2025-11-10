@@ -14,8 +14,8 @@ import styles from './Badge.module.css';
 export interface BadgeComponentProps {
   /** Badge label text (Vietnamese) */
   label?: ReactNode;
-  /** Badge color: primary, success, warning, error, info, gray, secondary */
-  color?: 'primary' | 'success' | 'warning' | 'error' | 'info' | 'gray' | 'secondary';
+  /** Badge color: primary, success, warning, error, info, gray, secondary, or urgency levels: red, orange, yellow, green */
+  color?: 'primary' | 'success' | 'warning' | 'error' | 'info' | 'gray' | 'secondary' | 'red' | 'orange' | 'yellow' | 'green';
   /** Badge variant: solid, outline, light, dot */
   variant?: 'solid' | 'outline' | 'light' | 'dot';
   /** Badge size: sm, md, lg */

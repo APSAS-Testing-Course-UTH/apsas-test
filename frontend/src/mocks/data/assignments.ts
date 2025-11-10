@@ -46,8 +46,20 @@ export const enhancedMockAssignments: Record<string, ContentServiceAssignmentRes
         memoryLimit: 128,
       },
     ],
-    skills: [],
-    tutorials: [],
+    skills: [
+      {
+        id: '123e4567-e89b-12d3-a456-426614174100',
+        name: 'JavaScript Functions',
+        description: 'Các hàm cơ bản trong JavaScript',
+      },
+    ],
+    tutorials: [
+      {
+        id: '223e4567-e89b-12d3-a456-426614174000',
+        title: 'JavaScript Fundamentals',
+        content: 'Learn the basics of JavaScript programming language including variables, functions, and control structures.',
+      },
+    ],
   },
 
   // ===== DUE TODAY =====
@@ -86,8 +98,25 @@ export const enhancedMockAssignments: Record<string, ContentServiceAssignmentRes
         memoryLimit: 256,
       },
     ],
-    skills: [],
-    tutorials: [],
+    skills: [
+      {
+        id: '123e4567-e89b-12d3-a456-426614174100',
+        name: 'JavaScript Functions',
+        description: 'Các hàm cơ bản trong JavaScript',
+      },
+      {
+        id: '223e4567-e89b-12d3-a456-426614174100',
+        name: 'Python List Comprehensions',
+        description: 'Hiểu sâu về list comprehensions trong Python',
+      },
+    ],
+    tutorials: [
+      {
+        id: '323e4567-e89b-12d3-a456-426614174000',
+        title: 'Python Data Structures',
+        content: 'Comprehensive guide to Python data structures including lists, dictionaries, sets, and tuples.',
+      },
+    ],
   },
 
   // ===== DUE TOMORROW =====
@@ -126,8 +155,20 @@ export const enhancedMockAssignments: Record<string, ContentServiceAssignmentRes
         memoryLimit: 128,
       },
     ],
-    skills: [],
-    tutorials: [],
+    skills: [
+      {
+        id: '123e4567-e89b-12d3-a456-426614174100',
+        name: 'JavaScript Functions',
+        description: 'Các hàm cơ bản trong JavaScript',
+      },
+    ],
+    tutorials: [
+      {
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        title: 'Hướng dẫn React Hooks',
+        content: 'Hướng dẫn React Hooks: Sử dụng useState để quản lý state',
+      },
+    ],
   },
 
   // ===== NEXT WEEK =====

@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from '@mantine/form'
 import { zod4Resolver } from 'mantine-form-zod-resolver'
-import { TextInput, Button, Title, Paper, Alert, Loader, Center, Container, Stack } from '@mantine/core'
+import { TextInput, Button, Title, Paper, Alert, Loader, Center, Container, Stack, Group } from '@mantine/core'
 import { useNavigate } from '@tanstack/react-router'
 
 import { useVerifyEmail } from '../hooks/useVerifyEmail'
+import { useResendVerificationEmail } from '../hooks/useResendVerificationEmail'
 import { verifyEmailSchema } from '../schemas/verifyEmailSchema'
 
 // Component form xác minh email với Mantine UI
@@ -15,6 +16,7 @@ interface VerifyEmailFormProps {
 export const VerifyEmailForm = ({ token }: VerifyEmailFormProps) => {
   // State để track trạng thái xác minh
   const [isAutoVerifying, setIsAutoVerifying] = useState(false)
+  const [email, setEmail] = useState('')
 
   // Lấy navigate hook
   const navigate = useNavigate()
@@ -29,6 +31,7 @@ export const VerifyEmailForm = ({ token }: VerifyEmailFormProps) => {
 
   // Sử dụng hook useVerifyEmail để handle logic xác minh
   const verifyEmailMutation = useVerifyEmail()
+  const resendEmailMutation = useResendVerificationEmail()
 
   // Auto-verify khi component mount nếu có token
   useEffect(() => {
@@ -43,6 +46,15 @@ export const VerifyEmailForm = ({ token }: VerifyEmailFormProps) => {
   // Hàm xử lý submit form manual
   const handleSubmit = (values: typeof form.values) => {
     verifyEmailMutation.mutate({ body: values })
+  }
+
+  // Hàm xử lý gửi lại email
+  const handleResendEmail = () => {
+    if (!email) {
+      alert('Vui lòng nhập email của bạn')
+      return
+    }
+    resendEmailMutation.mutate({ body: { email } })
   }
 
   // Hiển thị loading khi đang auto-verify
@@ -82,6 +94,32 @@ export const VerifyEmailForm = ({ token }: VerifyEmailFormProps) => {
           </Alert>
         )}
 
+        {!token && (
+          <Stack mb="lg">
+            <TextInput
+              label="Email"
+              placeholder="Nhập email của bạn"
+              type="email"
+              size="md"
+              radius="md"
+              value={email}
+              onChange={(e) => setEmail(e.currentTarget.value)}
+              mb="md"
+            />
+            <Group grow>
+              <Button
+                size="md"
+                radius="md"
+                variant="light"
+                onClick={handleResendEmail}
+                loading={resendEmailMutation.isPending}
+              >
+                Gửi lại email xác minh
+              </Button>
+            </Group>
+          </Stack>
+        )}
+
         <form onSubmit={form.onSubmit(handleSubmit)}>
           <TextInput
             label="Token xác minh"
@@ -106,7 +144,7 @@ export const VerifyEmailForm = ({ token }: VerifyEmailFormProps) => {
 
         {/* Hiển thị lỗi nếu có */}
         {verifyEmailMutation.isError && (
-          <Alert color="red" title="Lỗi">
+          <Alert color="red" title="Lỗi" mb="md">
             {verifyEmailMutation.error?.message || 'Có lỗi xảy ra khi xác minh email'}
           </Alert>
         )}

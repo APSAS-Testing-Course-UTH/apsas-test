@@ -1,0 +1,147 @@
+/**
+ * AdvancedFilter Component Styles
+ * Responsive design with mobile-first approach
+ */
+
+.filterContainer {
+  background: var(--mantine-color-gray-0);
+  border: 1px solid var(--mantine-color-gray-2);
+  margin-bottom: 1.5rem;
+
+  @media (max-width: 768px) {
+    padding: 1rem !important;
+    margin-bottom: 1rem;
+  }
+}
+
+.filterHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.filterTitle {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--mantine-color-gray-9);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  @media (max-width: 480px) {
+    font-size: 0.95rem;
+  }
+}
+
+/* Input Fields */
+.filterInput {
+  width: 100%;
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+}
+
+.selectField {
+  width: 100%;
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+}
+
+/* Group Layout */
+.filterGroup {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+}
+
+/* Buttons */
+.buttonGroup {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    justify-content: stretch;
+    gap: 0.5rem;
+  }
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+.buttonPrimary {
+  min-width: 120px;
+
+  @media (max-width: 480px) {
+    min-width: auto;
+    width: 100%;
+  }
+}
+
+.buttonSecondary {
+  min-width: 100px;
+
+  @media (max-width: 480px) {
+    min-width: auto;
+    width: 100%;
+  }
+}
+
+/* Loading State */
+.filterContainerLoading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Clear Button Disabled State */
+.clearButtonDisabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1024px) {
+  .filterContainer {
+    padding: 1rem !important;
+  }
+
+  .filterTitle {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .filterContainer {
+    padding: 0.75rem !important;
+    margin-bottom: 0.75rem;
+  }
+
+  .filterHeader {
+    margin-bottom: 0.75rem;
+  }
+
+  .filterTitle {
+    font-size: 0.9rem;
+  }
+}

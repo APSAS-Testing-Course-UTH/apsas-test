@@ -1,10 +1,22 @@
+/// <reference types="vitest" />
+
+// @vitest-environment jsdom
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+// Import setup module FIRST to initialize DOM environment
+import '../../../test/setup'
+// Now we can safely import from @testing-library/react (which will use jsdom)
+import { render as renderFromLib, screen as screenFromLib, fireEvent as fireEventFromLib, waitFor as waitForFromLib } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { MantineProvider } from '@mantine/core'
 import { LoginForm } from './LoginForm'
 import { createElement } from 'react'
+
+// Use the functions with their original names
+const render = renderFromLib
+const screen = screenFromLib
+const fireEvent = fireEventFromLib
+const waitFor = waitForFromLib
 
 // Mock useNavigate from react-router
 const mockNavigate = vi.fn()

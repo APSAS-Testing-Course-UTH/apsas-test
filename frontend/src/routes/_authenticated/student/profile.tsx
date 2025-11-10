@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useAuthStore } from '@/features/auth/stores/useAuthStore';
 import { USER_ROLES, ROLE_REDIRECTS } from '@/constants/roles';
 import { checkRoleAccess, logRoleAccessAttempt } from '@/features/auth/utils/roleGuards';
+import { useCurrentUser } from '@/features/profile/api/hooks';
 import { ProfileView, ChangePasswordModal, ProfileEditModal } from '@/features/profile/components';
 
 /**
@@ -19,6 +20,7 @@ import { ProfileView, ChangePasswordModal, ProfileEditModal } from '@/features/p
 function ProfilePage() {
   const [changePasswordOpened, setChangePasswordOpened] = useState(false);
   const [editProfileOpened, setEditProfileOpened] = useState(false);
+  const { data: user } = useCurrentUser();
 
   return (
     <Container size="lg" py="xl">
@@ -37,6 +39,7 @@ function ProfilePage() {
       <ProfileEditModal
         opened={editProfileOpened}
         onClose={() => setEditProfileOpened(false)}
+        user={user}
       />
     </Container>
   );

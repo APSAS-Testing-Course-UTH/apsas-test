@@ -3,30 +3,9 @@
 }
 
 .contentWrapper {
-  max-height: 60vh;
-  overflow-y: auto;
   padding: 0 var(--mantine-spacing-md);
   margin: 0 calc(var(--mantine-spacing-md) * -1);
   padding-right: var(--mantine-spacing-md);
-
-  /* Custom scrollbar styling */
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: var(--mantine-color-gray-1);
-    border-radius: 4px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: var(--mantine-color-gray-4);
-    border-radius: 4px;
-
-    &:hover {
-      background: var(--mantine-color-gray-5);
-    }
-  }
 }
 
 /* Heading styles */
@@ -163,4 +142,57 @@
     text-decoration: underline;
     color: var(--mantine-color-blue-7);
   }
+}
+
+/* Table of Contents Scrollbar Styles */
+.tableOfContents {
+  scrollbar-width: thin;
+  scrollbar-color: var(--mantine-color-gray-4) var(--mantine-color-gray-0);
+}
+
+.tableOfContents::-webkit-scrollbar {
+  width: 6px;
+}
+
+.tableOfContents::-webkit-scrollbar-track {
+  background: var(--mantine-color-gray-0);
+  border-radius: 10px;
+}
+
+.tableOfContents::-webkit-scrollbar-thumb {
+  background: var(--mantine-color-gray-4);
+  border-radius: 10px;
+  transition: background-color 200ms ease;
+}
+
+.tableOfContents::-webkit-scrollbar-thumb:hover {
+  background: var(--mantine-color-gray-6);
+}
+
+/* TOC Link Styles */
+.tocLink {
+  display: block;
+  text-decoration: none;
+  color: var(--mantine-color-gray-8);
+  line-height: 1.5;
+  font-size: 0.9rem;
+  padding: 0.5rem 0.75rem;
+  padding-left: 0.5rem;
+  border-radius: 4px;
+  transition: all 200ms ease;
+  border-left: 3px solid transparent;
+  text-align: left;
+  word-break: break-word;
+}
+
+.tocLink:hover {
+  background-color: var(--mantine-color-blue-0);
+  color: var(--mantine-color-blue-7);
+}
+
+.tocLinkActive {
+  font-weight: 600;
+  color: var(--mantine-color-blue-7);
+  background-color: var(--mantine-color-blue-0);
+  border-left-color: var(--mantine-color-blue-6);
 }

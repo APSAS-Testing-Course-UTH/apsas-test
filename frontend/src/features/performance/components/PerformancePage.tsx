@@ -7,6 +7,7 @@ import { Container, Grid, Stack, Group, Text, ThemeIcon, Paper, Skeleton, Button
 import { IconTrendingUp, IconTarget, IconCheck, IconX } from '@tabler/icons-react'
 import { useStudentPerformance, useStudentHistory, useAllAssignments } from '../api/hooks'
 import { PerformanceChart, PassRateChart } from './PerformanceChart'
+import { ScoreDistributionChart } from './ScoreDistributionChart'
 import { SubmissionHistory } from './SubmissionHistory'
 import { PERFORMANCE_LABELS } from '../types'
 import styles from './PerformancePage.module.css'
@@ -257,6 +258,21 @@ export function PerformancePage() {
                   passedSubmissions={stats.passedSubmissions}
                   failedSubmissions={stats.failedSubmissions}
                   isLoading={isLoading}
+                />
+              </Grid.Col>
+            </Grid>
+
+            {/* Score Distribution Chart */}
+            <Grid gutter="md">
+              <Grid.Col span={{ base: 12, md: 12 }}>
+                <ScoreDistributionChart
+                  submissions={
+                    historyData && Array.isArray(historyData.content)
+                      ? historyData.content
+                      : []
+                  }
+                  isLoading={isLoading}
+                  isEmpty={isEmpty}
                 />
               </Grid.Col>
             </Grid>

@@ -19,6 +19,19 @@ export interface PerformanceStats {
 }
 
 /**
+ * Performance metrics returned from useStudentPerformance hook
+ * Includes calculated stats and skills progress
+ */
+export interface PerformanceMetrics {
+  totalSubmissions: number
+  passedSubmissions: number
+  failedSubmissions: number
+  successRate: number // 0-100
+  averageScore: number // 0-100
+  skillsProgress: SkillProgress[]
+}
+
+/**
  * Performance trend data point for charting
  */
 export interface PerformanceTrendPoint {

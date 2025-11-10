@@ -1,6 +1,7 @@
 // Performance feature exports
 export { PerformancePage } from './components/PerformancePage'
 export { PerformanceChart, PassRateChart } from './components/PerformanceChart'
+export { ScoreDistributionChart } from './components/ScoreDistributionChart'
 export { SubmissionHistory } from './components/SubmissionHistory'
 export { usePerformanceData } from './hooks/usePerformanceData'
 

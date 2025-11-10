@@ -1,7 +1,15 @@
-import { useQuery, useMutation } from '@tanstack/react-query'
-import { evaluationServiceGetSupportedRuntimes, submissionServiceGetSubmissionById } from '@/api/sdk.gen'
-import type { SubmissionServiceSubmissionResponse } from '@/api/types.gen'
-import axios from 'axios'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import {
+  evaluationServiceGetSupportedRuntimes,
+  submissionServiceGetSubmissionById,
+  submissionServiceCreateSubmission,
+  contentServiceGetAssignmentById,
+} from '@/api/sdk.gen'
+import type {
+  SubmissionServiceSubmissionResponse,
+  ContentServiceAssignmentResponse,
+} from '@/api/types.gen'
+import { mapApiError } from '@/configs/api-error-handler'
 
 /**
  * Hook to fetch supported programming language runtimes
@@ -51,7 +59,11 @@ export function useRuntimesQuery() {
       // Use generated SDK client (type-safe)
       // This automatically handles API errors and response validation
       const response = await evaluationServiceGetSupportedRuntimes()
-      return response
+      // SDK returns { data: [...], error: ..., ... }, extract just the array
+      if (response.error) {
+        throw response.error
+      }
+      return response.data || []
     },
     // Caching strategy:
     // - staleTime: 5 minutes - data is considered fresh for 5 minutes
@@ -103,44 +115,93 @@ export function useRuntimesQuery() {
  * ```
  */
 export function useFileUploadMutation() {
+  const queryClient = useQueryClient()
+
   return useMutation<
     SubmissionServiceSubmissionResponse,
     Error,
     {
       assignmentId: string
-      file: File
+      code: string
       language: string
     }
   >({
-    mutationFn: async ({ assignmentId, file, language }) => {
-      const formData = new FormData()
-      formData.append('assignmentId', assignmentId)
-      formData.append('file', file)
-      formData.append('language', language)
-
-      // Upload file via multipart/form-data
-      const response = await axios.post<SubmissionServiceSubmissionResponse>(
-        '/api/v1/submissions/upload',
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
+    mutationFn: async ({ assignmentId, code, language }) => {
+      try {
+        // Use SDK function for type-safe API call with proper error handling
+        const result = await submissionServiceCreateSubmission({
+          body: {
+            assignmentId,
+            code,
+            language,
           },
-        }
-      )
+        })
 
-      return response.data
+        if (result.error) {
+          throw result.error
+        }
+
+        if (!result.data) {
+          throw new Error('No response data from API')
+        }
+
+        return result.data
+      } catch (error) {
+        // Map error to user-friendly Vietnamese message using centralized error handler
+        const mappedError = mapApiError(error)
+        // Preserve error code and details for retry logic in component
+        const enhancedError = new Error(mappedError.message)
+        ;(enhancedError as any).code = mappedError.code
+        ;(enhancedError as any).isRetryable = isRetryableError(mappedError.code)
+        throw enhancedError
+      }
+    },
+    // Retry logic for transient errors
+    retry: (failureCount, error) => {
+      const isRetryable = (error as any)?.isRetryable
+
+      // Don't retry if already attempted 3 times
+      if (failureCount >= 3) {
+        return false
+      }
+
+      // Retry on network errors and 5xx server errors
+      if (isRetryable) {
+        return true
+      }
+
+      // Don't retry on 4xx client errors (validation, auth, etc)
+      return false
+    },
+    // Exponential backoff for retries: 1s, 2s, 4s
+    retryDelay: (attemptIndex) => {
+      return Math.min(1000 * Math.pow(2, attemptIndex), 4000)
     },
     onSuccess: () => {
       // Invalidate submissions cache after successful upload
-      // This will trigger a refetch of submissions list
-      // Note: Requires queryClient access - can be added if needed
+      // This triggers a refetch of submissions list
+      queryClient.invalidateQueries({
+        queryKey: ['submissions'],
+      })
     },
     onError: (error) => {
-      // Error handling is delegated to component level
-      console.error('File upload failed:', error)
+      // Error handling logged for debugging
+      console.error('[useFileUploadMutation] Error:', error.message)
     },
   })
+}
+
+/**
+ * Helper function to determine if an error is retryable
+ * Retryable errors: network errors, server errors (5xx)
+ * Non-retryable errors: validation errors (400/422), auth errors (401), not found (404)
+ */
+function isRetryableError(errorCode: string | undefined): boolean {
+  if (!errorCode) return false
+  if (errorCode === 'NETWORK_ERROR') return true
+  if (errorCode === 'HTTP_502' || errorCode === 'HTTP_503' || errorCode === 'HTTP_504') return true
+  if (errorCode?.startsWith('HTTP_5')) return true
+  return false
 }
 
 
@@ -173,24 +234,31 @@ export function useFileUploadMutation() {
  * ```
  */
 export function useAssignmentDetails(assignmentId?: string) {
-  return useQuery<any>({
+  return useQuery<ContentServiceAssignmentResponse | null, Error>({
     queryKey: ['assignment', assignmentId],
     queryFn: async () => {
       if (!assignmentId) return null
-      
+
       try {
-        // Direct fetch to ensure we hit MSW handlers correctly
-        const response = await fetch(`/api/v1/assignments/${assignmentId}`)
-        
-        if (!response.ok) {
-          console.warn(`[useAssignmentDetails] Failed to fetch assignment ${assignmentId}:`, response.status)
+        // Use SDK function for type-safe API call with proper error handling
+        const result = await contentServiceGetAssignmentById({
+          path: { id: assignmentId },
+        })
+
+        if (result.error) {
+          console.warn(`[useAssignmentDetails] API error for assignment ${assignmentId}:`, result.error)
+          throw result.error
+        }
+
+        if (!result.data) {
+          console.warn(`[useAssignmentDetails] No data returned for assignment ${assignmentId}`)
           return null
         }
-        
-        return await response.json()
+
+        return result.data
       } catch (error) {
         console.error(`[useAssignmentDetails] Error fetching assignment ${assignmentId}:`, error)
-        return null
+        throw error
       }
     },
     // Caching strategy:
@@ -245,6 +313,12 @@ export function useSubmissionDetails(submissionId?: string) {
           const response = await submissionServiceGetSubmissionById({
             path: { id: submissionId }
           })
+          
+          // Check for errors from SDK response
+          if (response.error) {
+            throw response.error
+          }
+          
           return response.data || null
         } catch (error) {
           console.error(`[useSubmissionDetails] Error fetching submission ${submissionId}:`, error)

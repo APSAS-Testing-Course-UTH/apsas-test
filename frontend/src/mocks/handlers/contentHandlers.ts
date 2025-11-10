@@ -19,9 +19,6 @@ import { UserRole } from '../middleware/withAuth'
 import { MSW_BASE_URL } from '../config'
 import {
   MOCK_DATA_REGISTRY,
-  getAllAssignments,
-  getAllTutorials,
-  getAllSkills,
 } from '../factory/mockDataRegistry'
 
 console.log('[Content Handlers] Using centralized mock data registry')

@@ -9,7 +9,7 @@
  * - SupportMessage: Individual chat messages with metadata
  */
 
-import type { SupportServiceSupportSessionDto, SupportServiceSupportMessageDto } from '@/api/types.gen'
+import type { SupportServiceSupportSessionDto } from '@/api/types.gen'
 
 // Mock UUIDs for sessions
 const SESSION_ID_001 = '550e8400-e29b-41d4-a716-446655440001'

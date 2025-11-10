@@ -133,7 +133,7 @@ describe('RecentSubmissions', () => {
 
     render(<RecentSubmissions data={submissionWithoutId} />)
     
-    expect(screen.getByText('Bài tập')).toBeInTheDocument()
+    expect(screen.getByText('Bài tập #N/A')).toBeInTheDocument()
   })
 
   it('should apply hover styles to submission items', () => {

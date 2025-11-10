@@ -10,7 +10,7 @@ import type { ContentServiceAssignmentResponse, SubmissionServiceSubmissionRespo
 import { StatsCard, RecentSubmissions, UpcomingDeadlines, QuickActions, StudentInfoCard, CalendarWidget } from '@/features/dashboard/components'
 
 // Component dashboard cho sinh viên
-const StudentDashboard = () => {
+export const StudentDashboard = () => {
   const { user } = useAuthStore()
 
   // Fetch assignments (reduced from 100 to 20 for better performance)
@@ -32,7 +32,6 @@ const StudentDashboard = () => {
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 30 * 60 * 1000, // 30 minutes
   })
-
   const isLoading = assignmentsLoading || submissionsLoading
 
   // Extract data with type guards
@@ -42,7 +41,10 @@ const StudentDashboard = () => {
   // Create assignment map for quickly looking up assignment names
   const assignmentMap = new Map<string, string>()
   assignments.forEach(assignment => {
-    assignmentMap.set(assignment.id!, assignment.title)
+    const id = assignment.id
+    if (id !== undefined) {
+      assignmentMap.set(id, assignment.title ?? '')
+    }
   })
 
   // Calculate stats

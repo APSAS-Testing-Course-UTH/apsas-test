@@ -94,14 +94,15 @@ describe('SubmissionsList', () => {
   })
 
   it('should display loading state initially', () => {
-    render(
+    const { container } = render(
       <TestWrapper>
         <SubmissionsList />
       </TestWrapper>
     )
 
-    // Loading indicator should appear
-    expect(screen.getByText('Đang tải danh sách bài nộp')).toBeInTheDocument()
+    // When loading, skeleton placeholders are shown
+    const skeletons = container.querySelectorAll('.mantine-Skeleton-root')
+    expect(skeletons.length).toBeGreaterThan(0)
   })
 
   it('should accept assignmentId prop', async () => {

@@ -75,7 +75,7 @@ export const useAuthStore = create<AuthStore>()(
         const fullUser: User = {
           ...user,
           fullName: `${user.firstName} ${user.lastName}`.trim(),
-          displayName: user.lastName || user.email || 'Unknown User',
+          displayName: user.firstName || user.email || 'Unknown User',
         };
 
         // Update state
@@ -120,7 +120,7 @@ export const useAuthStore = create<AuthStore>()(
           user: {
             ...user,
             fullName: `${user.firstName} ${user.lastName}`.trim(),
-            displayName: user.lastName || user.email || 'Unknown User',
+            displayName: user.firstName || user.email || 'Unknown User',
           },
         }));
       },

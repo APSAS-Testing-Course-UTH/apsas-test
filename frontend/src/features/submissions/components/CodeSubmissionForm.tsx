@@ -13,6 +13,7 @@ import {
 } from '@mantine/core';
 import { IconAlertCircle, IconCheck } from '@tabler/icons-react';
 import type { SubmissionServiceSubmissionResponse, EvaluationServiceRuntimeResponse } from '@/api/types.gen';
+import { validateSubmission } from '../schemas';
 import { useFormAutoSave, AUTO_SAVE_LABELS } from '../hooks';
 import { AdvancedCodeEditor } from './AdvancedCodeEditor';
 import styles from './CodeSubmissionForm.module.css';
@@ -113,45 +114,57 @@ export function CodeSubmissionForm({
   const isSubmitDisabled = isLoading || isSubmitting;
 
   const validate = useCallback((): boolean => {
-    const newErrors: Record<string, string> = {};
+    // Use Zod schema for validation
+    const result = validateSubmission({
+      assignmentId,
+      code,
+      language: selectedRuntimeId,
+    })
 
-    if (!selectedRuntimeId) {
-      newErrors.runtime = UI_LABELS.errors.selectLanguage;
+    if (result.success) {
+      setErrors({})
+      return true
+    } else {
+      // Map schema validation errors to form field errors
+      const newErrors: Record<string, string> = {}
+      if (result.errors.assignmentId) {
+        newErrors.assignmentId = result.errors.assignmentId
+      }
+      if (result.errors.code) {
+        newErrors.code = result.errors.code
+      }
+      if (result.errors.language) {
+        newErrors.runtime = result.errors.language
+      }
+      setErrors(newErrors)
+      return false
     }
-
-    if (!code.trim()) {
-      newErrors.code = UI_LABELS.errors.codeEmpty;
-    }
-
-    if (code.length > maxCharacters) {
-      newErrors.code = UI_LABELS.errors.codeTooLong;
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  }, [selectedRuntimeId, code]);
+  }, [assignmentId, code, selectedRuntimeId])
 
   const validateField = useCallback((field: 'runtime' | 'code') => {
-    const newErrors = { ...errors };
+    // Per-field validation using schema
+    const newErrors = { ...errors }
 
-    if (field === 'runtime' && !selectedRuntimeId) {
-      newErrors.runtime = UI_LABELS.errors.selectLanguage;
-    } else if (field === 'runtime' && selectedRuntimeId) {
-      delete newErrors.runtime;
+    if (field === 'runtime') {
+      if (!selectedRuntimeId) {
+        newErrors.runtime = UI_LABELS.errors.selectLanguage
+      } else {
+        delete newErrors.runtime
+      }
     }
 
     if (field === 'code') {
       if (!code.trim()) {
-        newErrors.code = UI_LABELS.errors.codeEmpty;
+        newErrors.code = UI_LABELS.errors.codeEmpty
       } else if (code.length > maxCharacters) {
-        newErrors.code = UI_LABELS.errors.codeTooLong;
+        newErrors.code = UI_LABELS.errors.codeTooLong
       } else {
-        delete newErrors.code;
+        delete newErrors.code
       }
     }
 
-    setErrors(newErrors);
-  }, [selectedRuntimeId, code, errors]);
+    setErrors(newErrors)
+  }, [selectedRuntimeId, code, errors, maxCharacters, UI_LABELS.errors.selectLanguage, UI_LABELS.errors.codeEmpty, UI_LABELS.errors.codeTooLong])
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {

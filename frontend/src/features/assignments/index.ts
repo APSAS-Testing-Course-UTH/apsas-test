@@ -11,6 +11,7 @@ export { AssignmentMetadata } from './components/AssignmentMetadata'
 export { TestCaseList } from './components/TestCaseList'
 export { SkillBadges } from './components/SkillBadges'
 export { TutorialLinks } from './components/TutorialLinks'
+export { TutorialDetailModal } from './components/TutorialDetailModal'
 
 // Hooks
 export {
@@ -21,6 +22,7 @@ export {
   assignmentKeys,
 } from './api/useAssignmentsQuery'
 export { useAssignmentDetailQuery, assignmentDetailKeys } from './api/useAssignmentDetailQuery'
+export { useTutorialDetail, tutorialKeys } from './api/useTutorialDetail'
 export { useAssignmentsFiltered } from './hooks/useAssignmentsFiltered'
 export type { AssignmentFilters, UseAssignmentsFilteredOptions } from './hooks/useAssignmentsFiltered'
 

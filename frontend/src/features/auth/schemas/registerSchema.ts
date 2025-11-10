@@ -10,8 +10,8 @@ export const registerSchema = zIdentityServiceRegisterRequest.extend({
   // Add custom Vietnamese messages for generated fields
   email: z.string().email('Email không hợp lệ').min(1, 'Email là bắt buộc'),
   password: z.string().min(8, 'Mật khẩu phải có ít nhất 8 ký tự'),
-  firstName: z.string().min(1, 'Họ là bắt buộc').max(100, 'Họ không được quá 100 ký tự'),
-  lastName: z.string().min(1, 'Tên là bắt buộc').max(100, 'Tên không được quá 100 ký tự'),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
 
   // Add confirm password field
   confirmPassword: z.string().min(8, 'Mật khẩu xác nhận phải có ít nhất 8 ký tự'),

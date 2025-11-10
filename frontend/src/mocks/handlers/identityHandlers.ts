@@ -547,7 +547,6 @@ const updateCurrentUserHandler = http.put('**/api/v1/users/me',
       if (!body.firstName && !body.lastName) {
         return errorResponses.badRequest('At least one field (firstName or lastName) must be provided')
       }
-
       // Update user profile
       const updatedUser = {
         ...user,
@@ -557,7 +556,7 @@ const updateCurrentUserHandler = http.put('**/api/v1/users/me',
       }
 
       // Update mock data (in real app, this would be persisted)
-      const userKey = `${user.role}1` as keyof typeof mockUsers
+      const userKey = `${user.role}1` as keyof typeof MOCK_DATA_REGISTRY.users
       (MOCK_DATA_REGISTRY.users as any)[userKey] = updatedUser
 
       const response: IdentityServiceUserResponse = {

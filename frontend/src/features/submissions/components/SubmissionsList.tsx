@@ -29,11 +29,14 @@ import {
   Skeleton,
   Center,
   Loader,
+  Tooltip,
 } from '@mantine/core'
 import { IconSearch, IconX, IconEye } from '@tabler/icons-react'
 import { useDebouncedValue } from '@mantine/hooks'
 import { submissionServiceGetAllSubmissionsOptions } from '@/api/@tanstack/react-query.gen'
 import { useAssignmentDetails } from '../api/hooks'
+import { useSubmissionPolling } from '../hooks'
+import { showInfoNotification } from '@/utils/notifications'
 import type { SubmissionServiceSubmissionResponse } from '@/api/types.gen'
 
 interface SubmissionsListProps {
@@ -64,6 +67,9 @@ const STATUS_COLORS: Record<string, string> = {
  * - ✅ Shows loading state while fetching assignment name
  * - ✅ Displays assignment name instead of UUID
  * - ✅ Handles errors gracefully
+ * - ✅ Real-time status polling for PENDING submissions
+ * - ✅ Visual indicator (spinner) when polling
+ * - ✅ Status change callbacks with notifications
  */
 interface SubmissionTableRowProps {
   submission: SubmissionServiceSubmissionResponse
@@ -76,6 +82,24 @@ function SubmissionTableRow({ submission, onRowClick }: SubmissionTableRowProps)
   const { data: assignment, isLoading: isLoadingAssignment } = useAssignmentDetails(
     submission.assignmentId
   )
+
+  // Poll submission status for real-time updates
+  const { submission: liveSubmission, isPolling } = useSubmissionPolling({
+    submissionId: submission.id!,
+    enabled: submission.status === 'PENDING', // Only poll while pending
+    interval: 5000, // Poll every 5 seconds
+    onStatusChange: (newStatus) => {
+      // Show notification when status changes
+      if (newStatus === 'EVALUATED') {
+        showInfoNotification('Bài nộp đã được chấm!', 'Kết quả đánh giá')
+      } else if (newStatus === 'FAILED') {
+        showInfoNotification('Có lỗi xảy ra trong quá trình đánh giá', 'Lỗi đánh giá')
+      }
+    },
+  })
+
+  // Use live submission if available, otherwise use static submission
+  const currentSubmission = liveSubmission || submission
 
   // Format date to Vietnamese format
   const formatDate = (date: Date | string) => {
@@ -104,24 +128,33 @@ function SubmissionTableRow({ submission, onRowClick }: SubmissionTableRowProps)
   return (
     <Table.Tr
       style={{ cursor: 'pointer' }}
-      onClick={() => onRowClick(submission.id!)}
+      onClick={() => onRowClick(currentSubmission.id!)}
     >
       <Table.Td>{assignmentTitle}</Table.Td>
       <Table.Td>
-        <Badge variant="light">{submission.language}</Badge>
+        <Badge variant="light">{currentSubmission.language}</Badge>
       </Table.Td>
       <Table.Td>
-        <Badge color={STATUS_COLORS[submission.status!]}>
-          {STATUS_LABELS[submission.status!]}
-        </Badge>
+        <Tooltip
+          label={isPolling ? 'Đang chờ kết quả đánh giá (cập nhật mỗi 5 giây)...' : undefined}
+          disabled={!isPolling}
+        >
+          <Badge
+            color={STATUS_COLORS[currentSubmission.status!]}
+            variant={isPolling ? 'filled' : 'light'}
+            leftSection={isPolling ? <Loader size="xs" /> : undefined}
+          >
+            {STATUS_LABELS[currentSubmission.status!]}
+          </Badge>
+        </Tooltip>
       </Table.Td>
       <Table.Td>
         <Text fw={600}>
-          {submission.score !== undefined ? submission.score : 'N/A'}
+          {currentSubmission.score !== undefined ? currentSubmission.score : 'N/A'}
         </Text>
       </Table.Td>
       <Table.Td>
-        {submission.submittedAt && formatDate(submission.submittedAt)}
+        {currentSubmission.submittedAt && formatDate(currentSubmission.submittedAt)}
       </Table.Td>
       <Table.Td>
         <Button
@@ -130,7 +163,7 @@ function SubmissionTableRow({ submission, onRowClick }: SubmissionTableRowProps)
           leftSection={<IconEye size={14} />}
           onClick={(e) => {
             e.stopPropagation()
-            onRowClick(submission.id!)
+            onRowClick(currentSubmission.id!)
           }}
         >
           Xem chi tiết

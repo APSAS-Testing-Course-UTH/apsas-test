@@ -26,9 +26,15 @@ vi.mock('../hooks/useVerifyEmail', () => ({
 
 // CRITICAL FIX: Mock the Zod resolver to avoid validation framework crashes
 vi.mock('mantine-form-zod-resolver', () => ({
-  zodResolver: () => {
-    return () => ({
-      values: {},
+  zod4Resolver: (_schema: any) => {
+    return (values: any) => ({
+      values,
+      errors: {},
+    })
+  },
+  zodResolver: (_schema: any) => {
+    return (values: any) => ({
+      values,
       errors: {},
     })
   },

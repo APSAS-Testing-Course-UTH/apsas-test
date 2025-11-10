@@ -11,9 +11,8 @@ import { Grid, Container, Stack, Text, Badge, Group, Loader, Center, Alert } fro
 import { IconAlertCircle } from '@tabler/icons-react'
 import { useParams } from '@tanstack/react-router'
 import { useCallback } from 'react'
-import { useSubmissionDetails, useAssignmentDetails } from '../api/hooks'
+import { useAssignmentDetails, useRuntimesQuery } from '../api/hooks'
 import { SubmissionEditor } from './SubmissionEditor'
-import { useRuntimesQuery } from '../api/hooks'
 import { submissionServiceCreateSubmission } from '@/api/sdk.gen'
 import { mapApiError } from '@/configs/api-error-handler'
 import { showSuccessNotification, showErrorNotification } from '@/utils/notifications'
@@ -59,7 +58,7 @@ export function CodeSubmissionPage() {
   // Fetch assignment details to show problem description and test information
   const { data: assignment, isLoading, error } = useAssignmentDetails(assignmentId)
   const runtimesResult = useRuntimesQuery()
-  const runtimes = runtimesResult.data?.data || []
+  const runtimes = runtimesResult.data || []
 
   // Form submission handler
   const handleSubmit = useCallback(async (data: {

@@ -43,7 +43,9 @@ export function SkillBadges({ skills }: SkillBadgesProps) {
             color="blue"
             size="lg"
             title={skill.description}
-            style={{ cursor: 'default' }}
+            style={{ cursor: 'pointer' }}
+            component="a"
+            href={`/student/resources/skills/${skill.id}`}
           >
             {skill.name}
           </Badge>
