@@ -9,10 +9,11 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,9 +23,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Bộ điều khiển REST cho các API quản lý thiết bị và token FCM của người dùng.
+ */
 @RestController
-@RequestMapping("/api/v1/devices")
-@Tag(name = "Device Management", description = "FCM device token management endpoints")
+@RequestMapping(
+  value = "/api/v1/devices",
+  consumes = MediaType.APPLICATION_JSON_VALUE,
+  produces = MediaType.APPLICATION_JSON_VALUE
+)
+@Tag(name = "Quản lý thiết bị", description = "Quản lý token thiết bị FCM cho thông báo đẩy")
 @SecurityRequirement(name = "Bearer Authentication")
 public class DeviceTokenController {
 
@@ -34,11 +42,19 @@ public class DeviceTokenController {
     this.deviceTokenService = deviceTokenService;
   }
 
+  /**
+   * Đăng ký token thiết bị FCM cho thông báo đẩy.
+   *
+   * @param request Thông tin đăng ký thiết bị
+   * @param authentication Thông tin xác thực người dùng
+   * @return Thông tin token thiết bị đã đăng ký
+   */
   @PostMapping("/register")
   @Operation(
-      summary = "Register FCM device token",
-      description = "Register a Firebase Cloud Messaging device token for push notifications"
+      summary = "Đăng ký token thiết bị FCM",
+      description = "Đăng ký token thiết bị Firebase Cloud Messaging để nhận thông báo đẩy"
   )
+  @ResponseStatus(HttpStatus.CREATED)
   public ResponseEntity<DeviceTokenResponse> registerDevice(
       @Valid
       @RequestBody
@@ -50,20 +66,33 @@ public class DeviceTokenController {
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
+  /**
+   * Xóa token thiết bị FCM đã đăng ký.
+   *
+   * @param token Token thiết bị cần xóa
+   * @param authentication Thông tin xác thực người dùng
+   * @return Thông báo xóa thành công
+   */
   @DeleteMapping("/{token}")
-  @Operation(summary = "Remove device token", description = "Remove a registered FCM device token")
-  public ResponseEntity<Map<String, String>> removeDevice(
+  @Operation(summary = "Xóa token thiết bị", description = "Xóa token thiết bị FCM đã đăng ký")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void removeDevice(
       @PathVariable
       String token, Authentication authentication
   ) {
     deviceTokenService.removeToken(token);
-    return ResponseEntity.ok(Map.of("message", "Device token removed successfully"));
   }
 
+  /**
+   * Lấy danh sách thiết bị đã đăng ký của người dùng hiện tại.
+   *
+   * @param authentication Thông tin xác thực người dùng
+   * @return Danh sách thiết bị đã đăng ký
+   */
   @GetMapping
   @Operation(
-      summary = "Get user devices",
-      description = "Get all registered devices for the current user"
+      summary = "Lấy danh sách thiết bị",
+      description = "Lấy tất cả thiết bị đã đăng ký của người dùng hiện tại"
   )
   public ResponseEntity<List<DeviceTokenResponse>> getUserDevices(Authentication authentication) {
     UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();

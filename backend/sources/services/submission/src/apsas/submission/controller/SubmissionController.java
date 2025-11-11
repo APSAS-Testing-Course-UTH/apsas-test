@@ -16,6 +16,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -25,30 +26,40 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Bộ điều khiển REST cho các API quản lý bài nộp của sinh viên.
+ */
 @RestController
-@RequestMapping("/api/v1/submissions")
-@Tag(name = "Submission Management", description = "Submission management endpoints")
+@RequestMapping(
+    value = "/api/v1/submissions",
+    consumes = MediaType.APPLICATION_JSON_VALUE,
+    produces = MediaType.APPLICATION_JSON_VALUE
+)
+@Tag(name = "Quản lý bài nộp", description = "Quản lý và xử lý bài nộp của sinh viên")
 @SecurityRequirement(name = "Bearer Authentication")
 @RequiredArgsConstructor
 public class SubmissionController {
   private final SubmissionService submissionService;
 
+  /**
+   * Lấy danh sách bài nộp với phân trang và sắp xếp. Sinh viên chỉ xem bài của mình, giảng viên có thể lọc theo bài tập và sinh viên.
+   */
   @GetMapping
   @Operation(
-      summary = "Get all submissions",
-      description =
-          "Get all submissions with pagination and sorting. Students see only their own, instructors can filter by assignment and student"
+      summary = "Lấy tất cả bài nộp",
+      description = "Lấy danh sách bài nộp với phân trang và sắp xếp. Sinh viên chỉ xem bài của mình, giảng viên có thể lọc theo bài tập và sinh viên."
   )
   public ResponseEntity<PageResponse<SubmissionResponse>> getAllSubmissions(
-      @Parameter(description = "Filter by assignment ID (instructors only)")
+      @Parameter(description = "Lọc theo ID bài tập (chỉ giảng viên)")
       @RequestParam(required = false)
       UUID assignmentId,
-      @Parameter(description = "Filter by student ID (instructors only)")
+      @Parameter(description = "Lọc theo ID sinh viên (chỉ giảng viên)")
       @RequestParam(required = false)
       UUID studentId,
-      @Parameter(description = "Filter by status")
+      @Parameter(description = "Lọc theo trạng thái")
       @RequestParam(required = false)
       SubmissionStatus status,
       PageRequestParams pageParams,
@@ -70,11 +81,13 @@ public class SubmissionController {
     return ResponseEntity.ok(submissions);
   }
 
+  /**
+   * Lấy chi tiết bài nộp theo ID. Sinh viên chỉ xem bài của mình, giảng viên xem được tất cả.
+   */
   @GetMapping("/{id}")
   @Operation(
-      summary = "Get submission by ID",
-      description =
-          "Get submission details by ID. Students can only view their own, instructors can view all"
+      summary = "Lấy bài nộp theo ID",
+      description = "Lấy chi tiết bài nộp theo ID. Sinh viên chỉ xem bài của mình, giảng viên xem được tất cả."
   )
   public ResponseEntity<SubmissionResponse> getSubmissionById(
       @PathVariable
@@ -89,12 +102,16 @@ public class SubmissionController {
     return ResponseEntity.ok(submission);
   }
 
+  /**
+   * Tạo bài nộp mới cho bài tập (chỉ sinh viên).
+   */
   @PostMapping
   @PreAuthorize("hasRole('STUDENT')")
   @Operation(
-      summary = "Create a new submission",
-      description = "Submit a solution for an assignment (Students only)"
+      summary = "Tạo bài nộp mới",
+      description = "Nộp bài giải cho một bài tập (chỉ sinh viên)"
   )
+  @ResponseStatus(HttpStatus.CREATED)
   public ResponseEntity<SubmissionResponse> createSubmission(
       @Valid
       @RequestBody
@@ -106,20 +123,23 @@ public class SubmissionController {
     return new ResponseEntity<>(submission, HttpStatus.CREATED);
   }
 
-  @PostMapping("/{id}/feedback")
-  @PreAuthorize("hasRole('INSTRUCTOR')")
-  @Operation(
-      summary = "Provide feedback for a submission",
-      description = "Add instructor feedback to a submission (Instructors only)"
-  )
-  public ResponseEntity<SubmissionResponse> provideFeedback(
-      @PathVariable
-      UUID id,
-      @Valid
-      @RequestBody
-      apsas.submission.model.dto.SubmissionFeedbackRequest request
-  ) {
-    SubmissionResponse submission = submissionService.provideFeedback(id, request.getFeedback());
-    return ResponseEntity.ok(submission);
-  }
+    /**
+     * Thêm nhận xét của giảng viên cho bài nộp (chỉ giảng viên).
+     */
+    @PostMapping("/{id}/feedback")
+    @PreAuthorize("hasRole('INSTRUCTOR')")
+    @Operation(
+            summary = "Thêm nhận xét cho bài nộp",
+            description = "Thêm nhận xét của giảng viên cho bài nộp (chỉ giảng viên)"
+    )
+    public ResponseEntity<SubmissionResponse> provideFeedback(
+            @PathVariable
+            UUID id,
+            @Valid
+            @RequestBody
+            apsas.submission.model.dto.SubmissionFeedbackRequest request
+    ) {
+        SubmissionResponse submission = submissionService.provideFeedback(id, request.getFeedback());
+        return ResponseEntity.ok(submission);
+    }
 }

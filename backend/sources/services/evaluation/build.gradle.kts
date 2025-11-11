@@ -8,6 +8,7 @@ dependencies {
     implementation(projects.sources.shared.models)
     implementation(projects.sources.shared.feignClients)
     implementation(projects.sources.shared.cache)
+    implementation(projects.sources.shared.apiDocs)
 
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-aop")

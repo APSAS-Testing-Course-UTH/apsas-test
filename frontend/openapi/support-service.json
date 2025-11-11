@@ -1,36 +1,36 @@
 {
     "openapi": "3.1.0",
     "info": {
-        "title": "Support Service API",
-        "description": "API documentation for the Support Service - Real-time chat support system",
+        "title": "API APSAS support-service",
+        "description": "Tài liệu API cho APSAS support-service",
         "version": "1.0"
     },
     "servers": [
         {
-            "url": "http://localhost:8080",
-            "description": "Local server"
+            "url": "/",
+            "description": "mặc định"
         }
     ],
     "tags": [
         {
-            "name": "Support",
-            "description": "Support session management endpoints"
+            "name": "Quản lý hỗ trợ",
+            "description": "Quản lý phiên hỗ trợ giữa sinh viên và giảng viên"
         }
     ],
     "paths": {
         "/api/v1/support/sessions": {
             "get": {
                 "tags": [
-                    "Support"
+                    "Quản lý hỗ trợ"
                 ],
-                "summary": "List all support sessions",
-                "description": "Instructors view all sessions with pagination, students view their own",
+                "summary": "Lấy danh sách phiên hỗ trợ",
+                "description": "Giảng viên xem tất cả phiên hỗ trợ với phân trang, sinh viên chỉ xem phiên của mình",
                 "operationId": "listSessions",
                 "parameters": [
                     {
                         "name": "page",
                         "in": "query",
-                        "description": "Page number (0-indexed)",
+                        "description": "Số trang (bắt đầu từ 0)",
                         "required": false,
                         "schema": {
                             "type": "string",
@@ -41,7 +41,7 @@
                     {
                         "name": "size",
                         "in": "query",
-                        "description": "Number of items per page",
+                        "description": "Số lượng phần tử mỗi trang",
                         "required": false,
                         "schema": {
                             "type": "string",
@@ -49,16 +49,6 @@
                             "minimum": 1
                         },
                         "example": 10
-                    },
-                    {
-                        "name": "sort",
-                        "in": "query",
-                        "description": "Sort by field(s). Format: field1,direction;field2,direction. Direction can be 'asc' or 'desc'. Multiple sort criteria separated by semicolon.",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "example": "createdAt,desc;name,asc"
                     },
                     {
                         "name": "userId",
@@ -112,11 +102,21 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Successfully retrieved sessions",
+                        "description": "OK",
                         "content": {
-                            "*/*": {
+                            "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/PageResponseSupportSessionDto"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Phản hồi lỗi mặc định",
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetail"
                                 }
                             }
                         }
@@ -130,10 +130,10 @@
             },
             "post": {
                 "tags": [
-                    "Support"
+                    "Quản lý hỗ trợ"
                 ],
-                "summary": "Create a new support session",
-                "description": "Students can create support sessions",
+                "summary": "Tạo phiên hỗ trợ mới",
+                "description": "Sinh viên có thể tạo phiên hỗ trợ mới",
                 "operationId": "createSession",
                 "parameters": [
                     {
@@ -198,21 +198,21 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Session created successfully",
+                        "description": "Created",
                         "content": {
-                            "*/*": {
+                            "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/SupportSessionDto"
                                 }
                             }
                         }
                     },
-                    "400": {
-                        "description": "Invalid request",
+                    "default": {
+                        "description": "Phản hồi lỗi mặc định",
                         "content": {
-                            "*/*": {
+                            "application/problem+json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/SupportSessionDto"
+                                    "$ref": "#/components/schemas/ProblemDetail"
                                 }
                             }
                         }
@@ -228,10 +228,10 @@
         "/api/v1/support/sessions/{id}/close": {
             "post": {
                 "tags": [
-                    "Support"
+                    "Quản lý hỗ trợ"
                 ],
-                "summary": "Close a support session",
-                "description": "Only the student who created the session can close it",
+                "summary": "Đóng phiên hỗ trợ",
+                "description": "Chỉ sinh viên tạo phiên mới được đóng phiên hỗ trợ",
                 "operationId": "closeSession",
                 "parameters": [
                     {
@@ -295,41 +295,21 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Session closed successfully",
+                        "description": "OK",
                         "content": {
-                            "*/*": {
+                            "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/SupportSessionDto"
                                 }
                             }
                         }
                     },
-                    "404": {
-                        "description": "Session not found",
+                    "default": {
+                        "description": "Phản hồi lỗi mặc định",
                         "content": {
-                            "*/*": {
+                            "application/problem+json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/SupportSessionDto"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Access denied",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/SupportSessionDto"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Session already closed",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/SupportSessionDto"
+                                    "$ref": "#/components/schemas/ProblemDetail"
                                 }
                             }
                         }
@@ -345,10 +325,10 @@
         "/api/v1/support/sessions/{id}": {
             "get": {
                 "tags": [
-                    "Support"
+                    "Quản lý hỗ trợ"
                 ],
-                "summary": "Get support session by ID",
-                "description": "Instructors can view all, students can view their own",
+                "summary": "Lấy phiên hỗ trợ theo ID",
+                "description": "Giảng viên xem được tất cả, sinh viên chỉ xem phiên của mình",
                 "operationId": "getSessionById",
                 "parameters": [
                     {
@@ -412,31 +392,21 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Successfully retrieved session",
+                        "description": "OK",
                         "content": {
-                            "*/*": {
+                            "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/SupportSessionDto"
                                 }
                             }
                         }
                     },
-                    "404": {
-                        "description": "Session not found",
+                    "default": {
+                        "description": "Phản hồi lỗi mặc định",
                         "content": {
-                            "*/*": {
+                            "application/problem+json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/SupportSessionDto"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Access denied",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/SupportSessionDto"
+                                    "$ref": "#/components/schemas/ProblemDetail"
                                 }
                             }
                         }
@@ -526,11 +496,11 @@
             },
             "PageResponseSupportSessionDto": {
                 "type": "object",
-                "description": "Paginated response wrapper",
+                "description": "Lớp bọc phản hồi phân trang",
                 "properties": {
                     "content": {
                         "type": "array",
-                        "description": "List of items in the current page",
+                        "description": "Danh sách phần tử trong trang hiện tại",
                         "items": {
                             "$ref": "#/components/schemas/SupportSessionDto"
                         }
@@ -538,46 +508,69 @@
                     "pageNumber": {
                         "type": "integer",
                         "format": "int32",
-                        "description": "Current page number (0-indexed)",
+                        "description": "Số trang hiện tại (bắt đầu từ 0)",
                         "example": 0
                     },
                     "pageSize": {
                         "type": "integer",
                         "format": "int32",
-                        "description": "Number of items per page",
+                        "description": "Số lượng phần tử mỗi trang",
                         "example": 10
                     },
                     "totalElements": {
                         "type": "integer",
                         "format": "int64",
-                        "description": "Total number of items across all pages",
+                        "description": "Tổng số phần tử trên tất cả các trang",
                         "example": 100
                     },
                     "totalPages": {
                         "type": "integer",
                         "format": "int32",
-                        "description": "Total number of pages",
+                        "description": "Tổng số trang",
                         "example": 10
                     },
                     "first": {
                         "type": "boolean",
-                        "description": "Whether this is the first page",
+                        "description": "Có phải trang đầu tiên không",
                         "example": true
                     },
                     "last": {
                         "type": "boolean",
-                        "description": "Whether this is the last page",
+                        "description": "Có phải trang cuối cùng không",
                         "example": false
                     },
                     "hasNext": {
                         "type": "boolean",
-                        "description": "Whether there is a next page",
+                        "description": "Có trang tiếp theo không",
                         "example": true
                     },
                     "hasPrevious": {
                         "type": "boolean",
-                        "description": "Whether there is a previous page",
+                        "description": "Có trang trước đó không",
                         "example": false
+                    }
+                }
+            },
+            "ProblemDetail": {
+                "description": "Chi tiết lỗi theo chuẩn RFC 9457",
+                "properties": {
+                    "type": {
+                        "format": "uri",
+                        "description": "Loại lỗi (URI)"
+                    },
+                    "title": {
+                        "description": "Tiêu đề lỗi"
+                    },
+                    "status": {
+                        "format": "int32",
+                        "description": "Mã trạng thái HTTP"
+                    },
+                    "detail": {
+                        "description": "Mô tả chi tiết lỗi"
+                    },
+                    "instance": {
+                        "format": "uri",
+                        "description": "Đường dẫn instance lỗi"
                     }
                 }
             }

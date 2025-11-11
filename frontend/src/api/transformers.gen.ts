@@ -24,6 +24,10 @@ import type {
   IdentityServiceLoginResponse,
   IdentityServiceRegisterResponse,
   IdentityServiceUpdateCurrentUserProfileResponse,
+  NotificationServiceGetPreferencesResponse,
+  NotificationServiceGetUserDevicesResponse,
+  NotificationServiceRegisterDeviceResponse,
+  NotificationServiceUpdatePreferencesResponse,
   SubmissionServiceCreateSubmissionResponse,
   SubmissionServiceGetAllSubmissionsResponse,
   SubmissionServiceGetSubmissionByIdResponse,
@@ -413,5 +417,55 @@ export const supportServiceGetSessionByIdResponseTransformer = async (
   data: any,
 ): Promise<SupportServiceGetSessionByIdResponse> => {
   data = supportServiceSupportSessionDtoSchemaResponseTransformer(data)
+  return data
+}
+
+export const notificationServiceGetPreferencesResponseTransformer = async (
+  data: any,
+): Promise<NotificationServiceGetPreferencesResponse> => {
+  data = notificationServiceNotificationPreferencesResponseSchemaResponseTransformer(data)
+  return data
+}
+
+const notificationServiceNotificationPreferencesResponseSchemaResponseTransformer = (data: any) => {
+  if (data.createdAt) {
+    data.createdAt = new Date(data.createdAt)
+  }
+  if (data.updatedAt) {
+    data.updatedAt = new Date(data.updatedAt)
+  }
+  return data
+}
+
+export const notificationServiceUpdatePreferencesResponseTransformer = async (
+  data: any,
+): Promise<NotificationServiceUpdatePreferencesResponse> => {
+  data = notificationServiceNotificationPreferencesResponseSchemaResponseTransformer(data)
+  return data
+}
+
+export const notificationServiceRegisterDeviceResponseTransformer = async (
+  data: any,
+): Promise<NotificationServiceRegisterDeviceResponse> => {
+  data = notificationServiceDeviceTokenResponseSchemaResponseTransformer(data)
+  return data
+}
+
+const notificationServiceDeviceTokenResponseSchemaResponseTransformer = (data: any) => {
+  if (data.createdAt) {
+    data.createdAt = new Date(data.createdAt)
+  }
+  if (data.updatedAt) {
+    data.updatedAt = new Date(data.updatedAt)
+  }
+  return data
+}
+
+export const notificationServiceGetUserDevicesResponseTransformer = async (
+  data: any,
+): Promise<NotificationServiceGetUserDevicesResponse> => {
+  data = data.map((item: any) => {
+    return notificationServiceDeviceTokenResponseSchemaResponseTransformer(item)
+  })
   return data
 }

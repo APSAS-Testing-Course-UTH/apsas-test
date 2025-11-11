@@ -10,28 +10,46 @@ import apsas.identity.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/auth")
-@Tag(name = "Authentication", description = "Authentication and authorization endpoints")
+@RequestMapping(
+    path = "/api/auth",
+    consumes = MediaType.APPLICATION_JSON_VALUE,
+    produces = MediaType.APPLICATION_JSON_VALUE
+)
+/**
+ * Bộ điều khiển xác thực cho hệ thống APSAS.
+ * Cung cấp các API đăng ký, đăng nhập, xác thực email và quản lý mật khẩu.
+ */
+@Tag(
+  name = "Xác thực",
+  description = "Các API xác thực và phân quyền"
+)
 @RequiredArgsConstructor
 public class AuthController {
 
   private final AuthService authService;
 
+  /**
+   * Đăng ký tài khoản mới với vai trò sinh viên.
+   * @param request Thông tin đăng ký
+   * @return Thông tin xác thực
+   */
   @PostMapping("/register")
   @Operation(
-      summary = "Register a new user",
-      description = "Register a new user account with student role"
+      summary = "Đăng ký người dùng mới",
+      description = "Đăng ký tài khoản mới với vai trò sinh viên"
   )
+  @ResponseStatus(HttpStatus.CREATED)
   public ResponseEntity<AuthResponse> register(
       @Valid
       @RequestBody
@@ -41,8 +59,16 @@ public class AuthController {
     return new ResponseEntity<>(response, HttpStatus.CREATED);
   }
 
+  /**
+   * Đăng nhập và nhận JWT token.
+   * @param request Thông tin đăng nhập
+   * @return Thông tin xác thực
+   */
   @PostMapping("/login")
-  @Operation(summary = "Login", description = "Authenticate user and return JWT token")
+  @Operation(
+      summary = "Đăng nhập",
+      description = "Xác thực người dùng và trả về JWT token"
+  )
   public ResponseEntity<AuthResponse> login(
       @Valid
       @RequestBody
@@ -52,47 +78,79 @@ public class AuthController {
     return ResponseEntity.ok(response);
   }
 
+  /**
+   * Xác thực email người dùng bằng mã token.
+   * @param request Token xác thực email
+   */
   @PostMapping("/verify-email")
-  @Operation(summary = "Verify email", description = "Verify user email with token")
-  public ResponseEntity<Map<String, String>> verifyEmail(
+  @Operation(
+      summary = "Xác thực email",
+      description = "Xác thực email người dùng bằng mã token"
+  )
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public ResponseEntity<Void> verifyEmail(
       @Valid
       @RequestBody
       TokenRequest request
   ) {
     authService.verifyEmail(request.getToken());
-    return ResponseEntity.ok(Map.of("message", "Email verified successfully"));
+    return ResponseEntity.noContent().build();
   }
 
+  /**
+   * Gửi lại email xác thực tài khoản.
+   * @param request Thông tin email
+   */
   @PostMapping("/resend-verification")
-  @Operation(summary = "Resend verification email", description = "Resend email verification link")
-  public ResponseEntity<Map<String, String>> resendVerificationEmail(
+  @Operation(
+      summary = "Gửi lại email xác thực",
+      description = "Gửi lại liên kết xác thực email"
+  )
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public ResponseEntity<Void> resendVerificationEmail(
       @Valid
       @RequestBody
       EmailRequest request
   ) {
     authService.resendVerificationEmail(request);
-    return ResponseEntity.ok(Map.of("message", "Verification email sent"));
+    return ResponseEntity.noContent().build();
   }
 
+  /**
+   * Yêu cầu gửi email đặt lại mật khẩu.
+   * @param request Thông tin email
+   */
   @PostMapping("/forgot-password")
-  @Operation(summary = "Request password reset", description = "Request password reset link")
-  public ResponseEntity<Map<String, String>> requestPasswordReset(
+  @Operation(
+      summary = "Yêu cầu đặt lại mật khẩu",
+      description = "Yêu cầu gửi liên kết đặt lại mật khẩu qua email"
+  )
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public ResponseEntity<Void> requestPasswordReset(
       @Valid
       @RequestBody
       EmailRequest request
   ) {
     authService.requestPasswordReset(request);
-    return ResponseEntity.ok(Map.of("message", "Password reset email sent"));
+    return ResponseEntity.noContent().build();
   }
 
+  /**
+   * Đặt lại mật khẩu bằng mã token.
+   * @param request Thông tin đặt lại mật khẩu
+   */
   @PostMapping("/reset-password")
-  @Operation(summary = "Reset password", description = "Reset password with token")
-  public ResponseEntity<Map<String, String>> resetPassword(
+  @Operation(
+      summary = "Đặt lại mật khẩu",
+      description = "Đặt lại mật khẩu bằng mã token"
+  )
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public ResponseEntity<Void> resetPassword(
       @Valid
       @RequestBody
       ResetPasswordRequest request
   ) {
     authService.resetPassword(request);
-    return ResponseEntity.ok(Map.of("message", "Password reset successfully"));
+    return ResponseEntity.noContent().build();
   }
 }

@@ -15,8 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Internal API controller for inter-service communication. Not exposed through API Gateway - only
- * accessible within the service mesh. Used by Evaluation Service to retrieve submission details.
+ * Bộ điều khiển API nội bộ dùng cho giao tiếp giữa các dịch vụ. Không công khai qua API Gateway, chỉ truy cập trong service mesh. Được Evaluation Service sử dụng để lấy thông tin bài nộp.
  */
 @Hidden
 @RestController
@@ -27,10 +26,10 @@ public class InternalSubmissionController {
   private final FeignSubmissionMapper feignSubmissionMapper;
 
   /**
-   * Internal endpoint to get submission details by ID
+   * API nội bộ lấy chi tiết bài nộp theo ID
    *
-   * @param id Submission ID
-   * @return Submission details
+   * @param id ID bài nộp
+   * @return Thông tin chi tiết bài nộp
    */
   @GetMapping("/{id}")
   public apsas.feign.dto.SubmissionResponse getSubmissionById(
@@ -41,10 +40,10 @@ public class InternalSubmissionController {
   }
 
   /**
-   * Internal endpoint to get multiple submissions by IDs
+   * API nội bộ lấy nhiều bài nộp theo danh sách ID
    *
-   * @param ids List of submission IDs
-   * @return List of submission details
+   * @param ids Danh sách ID bài nộp
+   * @return Danh sách thông tin chi tiết bài nộp
    */
   @PostMapping("/batch")
   public List<apsas.feign.dto.SubmissionResponse> getBatchSubmissions(
@@ -58,10 +57,10 @@ public class InternalSubmissionController {
   }
 
   /**
-   * Internal endpoint to get submissions by student ID
+   * API nội bộ lấy bài nộp theo ID sinh viên
    *
-   * @param studentId Student ID
-   * @return List of submissions
+   * @param studentId ID sinh viên
+   * @return Danh sách bài nộp
    */
   @GetMapping("/by-student")
   public List<apsas.feign.dto.SubmissionResponse> getSubmissionsByStudent(
@@ -77,10 +76,10 @@ public class InternalSubmissionController {
   }
 
   /**
-   * Internal endpoint to get submissions by assignment ID
+   * API nội bộ lấy bài nộp theo ID bài tập
    *
-   * @param assignmentId Assignment ID
-   * @return List of submissions
+   * @param assignmentId ID bài tập
+   * @return Danh sách bài nộp
    */
   @GetMapping("/by-assignment")
   public List<apsas.feign.dto.SubmissionResponse> getSubmissionsByAssignment(

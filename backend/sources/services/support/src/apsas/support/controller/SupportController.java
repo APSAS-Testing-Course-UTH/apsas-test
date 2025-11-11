@@ -7,8 +7,6 @@ import apsas.support.model.dto.CreateSupportSessionRequest;
 import apsas.support.model.dto.SupportSessionDto;
 import apsas.support.service.SupportService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -16,6 +14,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,56 +22,55 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Controller quản lý các endpoint liên quan đến phiên hỗ trợ
+ * Bộ điều khiển REST cho các API quản lý phiên hỗ trợ giữa sinh viên và giảng viên.
  */
 @RestController
-@RequestMapping("/api/v1/support/sessions")
-@Tag(name = "Support", description = "Support session management endpoints")
+@RequestMapping(
+    value = "/api/v1/support/sessions",
+    consumes = MediaType.APPLICATION_JSON_VALUE,
+    produces = MediaType.APPLICATION_JSON_VALUE
+)
+@Tag(name = "Quản lý hỗ trợ", description = "Quản lý phiên hỗ trợ giữa sinh viên và giảng viên")
 @SecurityRequirement(name = "Bearer Authentication")
 @RequiredArgsConstructor
 public class SupportController {
   private final SupportService supportService;
 
-  @GetMapping
-  @PreAuthorize("hasAnyRole('STUDENT', 'INSTRUCTOR')")
-  @Operation(
-      summary = "List all support sessions",
-      description = "Instructors view all sessions with pagination, students view their own"
-  )
-  @ApiResponses(
-      value = {@ApiResponse(responseCode = "200", description = "Successfully retrieved sessions")}
-  )
-  public ResponseEntity<PageResponse<SupportSessionDto>> listSessions(
-      PageRequestParams pageParams,
-      @AuthenticationPrincipal
-      UserPrincipal principal
-  ) {
-
-    PageResponse<SupportSessionDto> sessions;
-    if ("INSTRUCTOR".equals(principal.role())) {
-      sessions = supportService.getAllSessions(pageParams.toPageable());
-    } else {
-      sessions = supportService.getSessionsForStudent(principal.userId(), pageParams.toPageable());
+    /**
+     * Lấy danh sách phiên hỗ trợ. Giảng viên xem tất cả, sinh viên chỉ xem phiên của mình.
+     */
+    @GetMapping
+    @PreAuthorize("hasAnyRole('STUDENT', 'INSTRUCTOR')")
+    @Operation(
+            summary = "Lấy danh sách phiên hỗ trợ",
+            description = "Giảng viên xem tất cả phiên hỗ trợ với phân trang, sinh viên chỉ xem phiên của mình"
+    )
+    public ResponseEntity<PageResponse<SupportSessionDto>> listSessions(
+            PageRequestParams pageParams,
+            @AuthenticationPrincipal
+            UserPrincipal principal
+    ) {
+        PageResponse<SupportSessionDto> sessions;
+        if ("INSTRUCTOR".equals(principal.role())) {
+            sessions = supportService.getAllSessions(pageParams.toPageable());
+        } else {
+            sessions = supportService.getSessionsForStudent(principal.userId(), pageParams.toPageable());
+        }
+        return ResponseEntity.ok(sessions);
     }
 
-    return ResponseEntity.ok(sessions);
-  }
-
+  /**
+   * Lấy chi tiết phiên hỗ trợ theo ID. Giảng viên xem được tất cả, sinh viên chỉ xem phiên của mình.
+   */
   @GetMapping("/{id}")
   @PreAuthorize("hasAnyRole('STUDENT', 'INSTRUCTOR')")
   @Operation(
-      summary = "Get support session by ID",
-      description = "Instructors can view all, students can view their own"
-  )
-  @ApiResponses(
-      value = {
-          @ApiResponse(responseCode = "200", description = "Successfully retrieved session"),
-          @ApiResponse(responseCode = "404", description = "Session not found"),
-          @ApiResponse(responseCode = "403", description = "Access denied")
-      }
+      summary = "Lấy phiên hỗ trợ theo ID",
+      description = "Giảng viên xem được tất cả, sinh viên chỉ xem phiên của mình"
   )
   public ResponseEntity<SupportSessionDto> getSessionById(
       @PathVariable
@@ -83,25 +81,22 @@ public class SupportController {
 
     var session = supportService.getSessionById(id);
     supportService.validateUserAccess(session, principal.userId(), principal.role());
-
-    // Mark messages as read when viewing the session
+    // Đánh dấu tin nhắn đã đọc khi xem phiên hỗ trợ
     supportService.markMessagesAsRead(id, principal.userId());
 
     return ResponseEntity.ok(session);
   }
 
+  /**
+   * Tạo phiên hỗ trợ mới (chỉ sinh viên).
+   */
   @PostMapping
   @PreAuthorize("hasRole('STUDENT')")
   @Operation(
-      summary = "Create a new support session",
-      description = "Students can create support sessions"
+      summary = "Tạo phiên hỗ trợ mới",
+      description = "Sinh viên có thể tạo phiên hỗ trợ mới"
   )
-  @ApiResponses(
-      value = {
-          @ApiResponse(responseCode = "201", description = "Session created successfully"),
-          @ApiResponse(responseCode = "400", description = "Invalid request")
-      }
-  )
+  @ResponseStatus(HttpStatus.CREATED)
   public ResponseEntity<SupportSessionDto> createSession(
       @Valid
       @RequestBody
@@ -109,7 +104,6 @@ public class SupportController {
       @AuthenticationPrincipal
       UserPrincipal principal
   ) {
-
     String studentName = principal.firstName() + " " + principal.lastName();
     var session =
         supportService.createSession(
@@ -122,19 +116,14 @@ public class SupportController {
     return ResponseEntity.status(HttpStatus.CREATED).body(session);
   }
 
+  /**
+   * Đóng phiên hỗ trợ (chỉ sinh viên tạo phiên mới được đóng).
+   */
   @PostMapping("/{id}/close")
   @PreAuthorize("hasRole('STUDENT')")
   @Operation(
-      summary = "Close a support session",
-      description = "Only the student who created the session can close it"
-  )
-  @ApiResponses(
-      value = {
-          @ApiResponse(responseCode = "200", description = "Session closed successfully"),
-          @ApiResponse(responseCode = "404", description = "Session not found"),
-          @ApiResponse(responseCode = "403", description = "Access denied"),
-          @ApiResponse(responseCode = "400", description = "Session already closed")
-      }
+      summary = "Đóng phiên hỗ trợ",
+      description = "Chỉ sinh viên tạo phiên mới được đóng phiên hỗ trợ"
   )
   public ResponseEntity<SupportSessionDto> closeSession(
       @PathVariable

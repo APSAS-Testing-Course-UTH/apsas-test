@@ -7,19 +7,19 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 /**
- * Utility class for creating pagination and sorting parameters. This class provides helper methods
- * to convert request parameters into Spring Data Pageable objects.
+ * Lớp tiện ích để tạo tham số phân trang và sắp xếp.
+ * Cung cấp phương thức hỗ trợ chuyển đổi tham số request thành đối tượng Pageable của Spring Data.
  */
 public record PageRequestParams(
     @Parameter(
-        description = "Page number (0-indexed)",
+        description = "Số trang (bắt đầu từ 0)",
         example = "0",
         schema = @Schema(defaultValue = "0", minimum = "0")
     )
     @RequestParam(defaultValue = "0", required = false)
     Integer page,
     @Parameter(
-        description = "Number of items per page",
+        description = "Số lượng phần tử mỗi trang",
         example = "10",
         schema = @Schema(defaultValue = "10", minimum = "1", maximum = "100")
     )
@@ -27,9 +27,9 @@ public record PageRequestParams(
     Integer size
 ) {
   /**
-   * Converts the request parameters to a Spring Data Pageable object.
+   * Chuyển đổi tham số request thành đối tượng Pageable của Spring Data.
    *
-   * @return Pageable instance
+   * @return Đối tượng Pageable
    */
   public Pageable toPageable() {
     return PageRequest.of(

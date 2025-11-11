@@ -13,11 +13,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,19 +28,33 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
+/**
+ * Bộ điều khiển quản lý người dùng cho hệ thống APSAS.
+ * Cung cấp các API quản lý tài khoản, hồ sơ, phân quyền và bảo mật.
+ */
 @RestController
-@RequestMapping("/api/v1/users")
-@Tag(name = "User Management", description = "User management endpoints")
+@RequestMapping(
+  value = "/api/v1/users",
+  consumes = MediaType.APPLICATION_JSON_VALUE,
+  produces = MediaType.APPLICATION_JSON_VALUE
+)
+@Tag(name = "Quản lý người dùng", description = "Các API quản lý người dùng")
 @SecurityRequirement(name = "Bearer Authentication")
 @RequiredArgsConstructor
 public class UserController {
   private final UserService userService;
 
+  /**
+   * Lấy thông tin hồ sơ người dùng hiện tại.
+   * @param authentication Thông tin xác thực
+   * @return Hồ sơ người dùng
+   */
   @GetMapping("/me")
   @Operation(
-      summary = "Get current user profile",
-      description = "Get the profile of the currently authenticated user"
+      summary = "Lấy hồ sơ người dùng hiện tại",
+      description = "Lấy thông tin hồ sơ của người dùng đang đăng nhập"
   )
   public ResponseEntity<UserResponse> getCurrentUser(Authentication authentication) {
     UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
@@ -49,10 +63,16 @@ public class UserController {
     return ResponseEntity.ok(response);
   }
 
+  /**
+   * Cập nhật hồ sơ người dùng hiện tại.
+   * @param authentication Thông tin xác thực
+   * @param request Dữ liệu cập nhật hồ sơ
+   * @return Hồ sơ người dùng đã cập nhật
+   */
   @PutMapping("/me")
   @Operation(
-      summary = "Update current user profile",
-      description = "Update the profile of the currently authenticated user"
+      summary = "Cập nhật hồ sơ người dùng",
+      description = "Cập nhật thông tin hồ sơ của người dùng đang đăng nhập"
   )
   public ResponseEntity<UserResponse> updateCurrentUserProfile(
       Authentication authentication,
@@ -66,12 +86,19 @@ public class UserController {
     return ResponseEntity.ok(response);
   }
 
+  /**
+   * Đổi mật khẩu cho người dùng hiện tại.
+   * @param authentication Thông tin xác thực
+   * @param request Dữ liệu đổi mật khẩu
+   * @return Thông báo đổi mật khẩu thành công
+   */
   @PostMapping("/me/change-password")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
   @Operation(
-      summary = "Change password",
-      description = "Change password for the currently authenticated user"
+      summary = "Đổi mật khẩu",
+      description = "Đổi mật khẩu cho người dùng đang đăng nhập"
   )
-  public ResponseEntity<Map<String, String>> changePassword(
+  public ResponseEntity<Void> changePassword(
       Authentication authentication,
       @Valid
       @RequestBody
@@ -80,14 +107,19 @@ public class UserController {
     UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
     UUID userId = userPrincipal.userId();
     userService.changePassword(userId, request);
-    return ResponseEntity.ok(Map.of("message", "Password changed successfully"));
+    return ResponseEntity.noContent().build();
   }
 
-  @GetMapping("/{userId}")
+  /**
+   * Lấy thông tin người dùng theo ID (chỉ Admin và Giảng viên).
+   * @param userId ID người dùng
+   * @return Thông tin người dùng
+   */
+  @GetMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("hasAnyRole('ADMIN', 'INSTRUCTOR')")
   @Operation(
-      summary = "Get user by ID",
-      description = "Get user details by ID (Admin and Instructor only)"
+      summary = "Lấy người dùng theo ID",
+      description = "Lấy thông tin người dùng theo ID (chỉ Admin và Giảng viên)"
   )
   public ResponseEntity<UserResponse> getUserById(
       @PathVariable
@@ -97,11 +129,16 @@ public class UserController {
     return ResponseEntity.ok(response);
   }
 
-  @GetMapping
+  /**
+   * Lấy danh sách tất cả người dùng (chỉ Admin).
+   * @param pageParams Tham số phân trang
+   * @return Danh sách người dùng
+   */
+  @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("hasRole('ADMIN')")
   @Operation(
-      summary = "Get all users",
-      description = "Get all users with pagination and sorting (Admin only)"
+      summary = "Lấy tất cả người dùng",
+      description = "Lấy danh sách người dùng có phân trang và sắp xếp (chỉ Admin)"
   )
   public ResponseEntity<PageResponse<UserResponse>> getAllUsers(
       PageRequestParams pageParams
@@ -110,11 +147,17 @@ public class UserController {
     return ResponseEntity.ok(response);
   }
 
-  @GetMapping("/role/{role}")
+  /**
+   * Lấy danh sách người dùng theo vai trò (chỉ Admin và Giảng viên).
+   * @param role Vai trò người dùng
+   * @param pageParams Tham số phân trang
+   * @return Danh sách người dùng
+   */
+  @GetMapping(value = "/role/{role}", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("hasAnyRole('ADMIN', 'INSTRUCTOR')")
   @Operation(
-      summary = "Get users by role",
-      description = "Get users by role with pagination and sorting (Admin and Instructor only)"
+      summary = "Lấy người dùng theo vai trò",
+      description = "Lấy danh sách người dùng theo vai trò có phân trang và sắp xếp (chỉ Admin và Giảng viên)"
   )
   public ResponseEntity<PageResponse<UserResponse>> getUsersByRole(
       @PathVariable
@@ -125,48 +168,72 @@ public class UserController {
     return ResponseEntity.ok(response);
   }
 
-  @PostMapping
+  /**
+   * Tạo mới người dùng (chỉ Admin).
+   * @param request Dữ liệu người dùng mới
+   * @return Thông tin người dùng vừa tạo
+   */
+  @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("hasRole('ADMIN')")
-  @Operation(summary = "Create user", description = "Create a new user (Admin only)")
+  @Operation(summary = "Tạo người dùng", description = "Tạo mới người dùng (chỉ Admin)")
+  @ResponseStatus(HttpStatus.CREATED)
   public ResponseEntity<UserResponse> createUser(
       @Valid
       @RequestBody
       CreateUserRequest request
   ) {
     UserResponse response = userService.createUser(request);
-    return new ResponseEntity<>(response, HttpStatus.CREATED);
+    return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
+  /**
+   * Vô hiệu hóa tài khoản người dùng (chỉ Admin).
+   * @param userId ID người dùng
+   * @return Thông báo vô hiệu hóa thành công
+   */
   @PutMapping("/{userId}/deactivate")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
   @PreAuthorize("hasRole('ADMIN')")
-  @Operation(summary = "Deactivate user", description = "Deactivate a user account (Admin only)")
-  public ResponseEntity<Map<String, String>> deactivateUser(
+  @Operation(summary = "Vô hiệu hóa người dùng", description = "Vô hiệu hóa tài khoản người dùng (chỉ Admin)")
+  public ResponseEntity<Void> deactivateUser(
       @PathVariable
       UUID userId
   ) {
     userService.deactivateUser(userId);
-    return ResponseEntity.ok(Map.of("message", "User deactivated successfully"));
+    return ResponseEntity.noContent().build();
   }
 
+  /**
+   * Kích hoạt tài khoản người dùng (chỉ Admin).
+   * @param userId ID người dùng
+   * @return Thông báo kích hoạt thành công
+   */
   @PutMapping("/{userId}/activate")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
   @PreAuthorize("hasRole('ADMIN')")
-  @Operation(summary = "Activate user", description = "Activate a user account (Admin only)")
-  public ResponseEntity<Map<String, String>> activateUser(
+  @Operation(summary = "Kích hoạt người dùng", description = "Kích hoạt tài khoản người dùng (chỉ Admin)")
+  public ResponseEntity<Void> activateUser(
       @PathVariable
       UUID userId
   ) {
     userService.activateUser(userId);
-    return ResponseEntity.ok(Map.of("message", "User activated successfully"));
+    return ResponseEntity.noContent().build();
   }
 
+  /**
+   * Xóa tài khoản người dùng (chỉ Admin).
+   * @param userId ID người dùng
+   * @return Thông báo xóa thành công
+   */
   @DeleteMapping("/{userId}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
   @PreAuthorize("hasRole('ADMIN')")
-  @Operation(summary = "Delete user", description = "Delete a user account (Admin only)")
-  public ResponseEntity<Map<String, String>> deleteUser(
+  @Operation(summary = "Xóa người dùng", description = "Xóa tài khoản người dùng (chỉ Admin)")
+  public ResponseEntity<Void> deleteUser(
       @PathVariable
       UUID userId
   ) {
     userService.deleteUser(userId);
-    return ResponseEntity.ok(Map.of("message", "User deleted successfully"));
+    return ResponseEntity.noContent().build();
   }
 }

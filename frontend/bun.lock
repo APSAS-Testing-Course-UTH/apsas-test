@@ -1,5 +1,6 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "frontend",
@@ -37,7 +38,7 @@
       },
       "devDependencies": {
         "@eslint/js": "^9.37.0",
-        "@hey-api/openapi-ts": "^0.85.1",
+        "@hey-api/openapi-ts": "^0.85.2",
         "@mswjs/data": "^0.16.2",
         "@prettier/plugin-oxc": "^0.0.4",
         "@tanstack/eslint-plugin-query": "^5.91.0",
@@ -250,7 +251,7 @@
 
     "@hey-api/json-schema-ref-parser": ["@hey-api/json-schema-ref-parser@1.2.0", "", { "dependencies": { "@jsdevtools/ono": "^7.1.3", "@types/json-schema": "^7.0.15", "js-yaml": "^4.1.0", "lodash": "^4.17.21" } }, "sha512-BMnIuhVgNmSudadw1GcTsP18Yk5l8FrYrg/OSYNxz0D2E0vf4D5e4j5nUbuY8MU6p1vp7ev0xrfP6A/NWazkzQ=="],
 
-    "@hey-api/openapi-ts": ["@hey-api/openapi-ts@0.85.1", "", { "dependencies": { "@hey-api/codegen-core": "^0.2.0", "@hey-api/json-schema-ref-parser": "1.2.0", "ansi-colors": "4.1.3", "c12": "3.3.0", "color-support": "1.1.3", "commander": "13.0.0", "handlebars": "4.7.8", "open": "10.1.2", "semver": "7.7.2" }, "peerDependencies": { "typescript": ">=5.5.3" }, "bin": { "openapi-ts": "bin/index.cjs" } }, "sha512-1pWQzOO/MXiE6BhyIZ88xJAVt82WJ775wNwRKjvQesNdUsFOJm4SKxzKEu/rn6mlpfiDkdxWlEHJ0SrcM2CUXQ=="],
+    "@hey-api/openapi-ts": ["@hey-api/openapi-ts@0.85.2", "", { "dependencies": { "@hey-api/codegen-core": "^0.2.0", "@hey-api/json-schema-ref-parser": "1.2.0", "ansi-colors": "4.1.3", "c12": "3.3.0", "color-support": "1.1.3", "commander": "13.0.0", "handlebars": "4.7.8", "open": "10.1.2", "semver": "7.7.2" }, "peerDependencies": { "typescript": ">=5.5.3" }, "bin": { "openapi-ts": "bin/index.cjs" } }, "sha512-pNu+DOtjeXiGhMqSQ/mYadh6BuKR/QiucVunyA2P7w2uyxkfCJ9sHS20Y72KHXzB3nshKJ9r7JMirysoa50SJg=="],
 
     "@humanfs/core": ["@humanfs/core@0.19.1", "", {}, "sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA=="],
 

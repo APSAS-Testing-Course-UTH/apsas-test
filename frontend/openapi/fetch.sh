@@ -7,6 +7,7 @@ SERVICES=(
   "submission-service"
   "evaluation-service"
   "support-service"
+  "notification-service"
 )
 for SERVICE in "${SERVICES[@]}"; do
   echo "Fetching OpenAPI spec for $SERVICE..."

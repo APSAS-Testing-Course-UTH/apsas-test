@@ -1,0 +1,380 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "API APSAS notification-service",
+        "description": "Tài liệu API cho APSAS notification-service",
+        "version": "1.0"
+    },
+    "servers": [
+        {
+            "url": "/",
+            "description": "mặc định"
+        }
+    ],
+    "tags": [
+        {
+            "name": "Tùy chọn thông báo",
+            "description": "Quản lý tùy chọn nhận thông báo của người dùng"
+        },
+        {
+            "name": "Quản lý thiết bị",
+            "description": "Quản lý token thiết bị FCM cho thông báo đẩy"
+        }
+    ],
+    "paths": {
+        "/api/v1/preferences": {
+            "get": {
+                "tags": [
+                    "Tùy chọn thông báo"
+                ],
+                "summary": "Lấy tùy chọn thông báo",
+                "description": "Lấy tùy chọn nhận thông báo của người dùng hiện tại",
+                "operationId": "getPreferences",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NotificationPreferencesResponse"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Phản hồi lỗi mặc định",
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetail"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer Authentication": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Tùy chọn thông báo"
+                ],
+                "summary": "Cập nhật tùy chọn thông báo",
+                "description": "Cập nhật tùy chọn nhận thông báo của người dùng hiện tại",
+                "operationId": "updatePreferences",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/NotificationPreferencesRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NotificationPreferencesResponse"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Phản hồi lỗi mặc định",
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetail"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer Authentication": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/devices/register": {
+            "post": {
+                "tags": [
+                    "Quản lý thiết bị"
+                ],
+                "summary": "Đăng ký token thiết bị FCM",
+                "description": "Đăng ký token thiết bị Firebase Cloud Messaging để nhận thông báo đẩy",
+                "operationId": "registerDevice",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RegisterDeviceRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeviceTokenResponse"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Phản hồi lỗi mặc định",
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetail"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer Authentication": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/devices": {
+            "get": {
+                "tags": [
+                    "Quản lý thiết bị"
+                ],
+                "summary": "Lấy danh sách thiết bị",
+                "description": "Lấy tất cả thiết bị đã đăng ký của người dùng hiện tại",
+                "operationId": "getUserDevices",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/DeviceTokenResponse"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Phản hồi lỗi mặc định",
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetail"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer Authentication": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/devices/{token}": {
+            "delete": {
+                "tags": [
+                    "Quản lý thiết bị"
+                ],
+                "summary": "Xóa token thiết bị",
+                "description": "Xóa token thiết bị FCM đã đăng ký",
+                "operationId": "removeDevice",
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "default": {
+                        "description": "Phản hồi lỗi mặc định",
+                        "content": {
+                            "application/problem+json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetail"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer Authentication": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "NotificationPreferencesRequest": {
+                "type": "object",
+                "properties": {
+                    "emailEnabled": {
+                        "type": "boolean"
+                    },
+                    "pushEnabled": {
+                        "type": "boolean"
+                    },
+                    "emailAssignmentPublished": {
+                        "type": "boolean"
+                    },
+                    "emailSubmissionEvaluated": {
+                        "type": "boolean"
+                    },
+                    "pushAssignmentPublished": {
+                        "type": "boolean"
+                    },
+                    "pushSubmissionEvaluated": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "NotificationPreferencesResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "userId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "emailEnabled": {
+                        "type": "boolean"
+                    },
+                    "pushEnabled": {
+                        "type": "boolean"
+                    },
+                    "emailAssignmentPublished": {
+                        "type": "boolean"
+                    },
+                    "emailSubmissionEvaluated": {
+                        "type": "boolean"
+                    },
+                    "pushAssignmentPublished": {
+                        "type": "boolean"
+                    },
+                    "pushSubmissionEvaluated": {
+                        "type": "boolean"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "RegisterDeviceRequest": {
+                "type": "object",
+                "properties": {
+                    "token": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "deviceType": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "userAgent": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "deviceType",
+                    "token"
+                ]
+            },
+            "DeviceTokenResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "token": {
+                        "type": "string"
+                    },
+                    "deviceType": {
+                        "type": "string"
+                    },
+                    "userAgent": {
+                        "type": "string"
+                    },
+                    "isActive": {
+                        "type": "boolean"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "ProblemDetail": {
+                "description": "Chi tiết lỗi theo chuẩn RFC 9457",
+                "properties": {
+                    "type": {
+                        "format": "uri",
+                        "description": "Loại lỗi (URI)"
+                    },
+                    "title": {
+                        "description": "Tiêu đề lỗi"
+                    },
+                    "status": {
+                        "format": "int32",
+                        "description": "Mã trạng thái HTTP"
+                    },
+                    "detail": {
+                        "description": "Mô tả chi tiết lỗi"
+                    },
+                    "instance": {
+                        "format": "uri",
+                        "description": "Đường dẫn instance lỗi"
+                    }
+                }
+            }
+        },
+        "securitySchemes": {
+            "Bearer Authentication": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        }
+    }
+}

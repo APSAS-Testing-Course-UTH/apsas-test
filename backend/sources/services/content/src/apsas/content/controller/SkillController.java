@@ -13,7 +13,9 @@ import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,18 +26,31 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Bộ điều khiển quản lý kỹ năng cho hệ thống APSAS.
+ * Cung cấp các API tạo, cập nhật, xóa và phân trang kỹ năng.
+ */
 @RestController
-@RequestMapping("/api/v1/skills")
-@Tag(name = "Skill Management", description = "Skill management endpoints")
+@RequestMapping(
+  value = "/api/v1/skills",
+  consumes = MediaType.APPLICATION_JSON_VALUE,
+  produces = MediaType.APPLICATION_JSON_VALUE
+)
+@Tag(name = "Quản lý kỹ năng", description = "Các API quản lý kỹ năng")
 @SecurityRequirement(name = "Bearer Authentication")
 @RequiredArgsConstructor
 public class SkillController {
   private final SkillService skillService;
 
+  /**
+   * Lấy danh sách tất cả kỹ năng có phân trang và sắp xếp.
+   * @param pageParams Tham số phân trang
+   * @return Danh sách kỹ năng
+   */
   @GetMapping
   @Operation(
-      summary = "Get all skills",
-      description = "Get all available skills with pagination and sorting"
+      summary = "Lấy tất cả kỹ năng",
+      description = "Lấy danh sách kỹ năng có phân trang và sắp xếp"
   )
   public ResponseEntity<PageResponse<SkillResponse>> getAllSkills(
       PageRequestParams pageParams
@@ -44,8 +59,13 @@ public class SkillController {
     return ResponseEntity.ok(skills);
   }
 
+  /**
+   * Lấy chi tiết kỹ năng theo ID.
+   * @param id ID kỹ năng
+   * @return Thông tin kỹ năng
+   */
   @GetMapping("/{id}")
-  @Operation(summary = "Get skill by ID", description = "Get skill details by ID")
+  @Operation(summary = "Lấy kỹ năng theo ID", description = "Lấy chi tiết kỹ năng theo ID")
   public ResponseEntity<SkillResponse> getSkillById(
       @PathVariable
       UUID id
@@ -54,24 +74,36 @@ public class SkillController {
     return ResponseEntity.ok(skill);
   }
 
+  /**
+   * Tạo mới kỹ năng (chỉ Content Provider).
+   * @param request Dữ liệu kỹ năng mới
+   * @return Thông tin kỹ năng vừa tạo
+   */
   @PostMapping
   @PreAuthorize("hasRole('CONTENT_PROVIDER')")
   @Operation(
-      summary = "Create a new skill",
-      description = "Create a new skill (Content Provider only)"
+      summary = "Tạo kỹ năng mới",
+      description = "Tạo mới kỹ năng (chỉ Content Provider)"
   )
+  @ResponseStatus(HttpStatus.CREATED)
   public ResponseEntity<SkillResponse> createSkill(
       @Valid
       @RequestBody
       CreateSkillRequest request
   ) {
     SkillResponse skill = skillService.createSkill(request);
-    return new ResponseEntity<>(skill, HttpStatus.CREATED);
+    return ResponseEntity.status(HttpStatus.CREATED).body(skill);
   }
 
+  /**
+   * Cập nhật thông tin kỹ năng (chỉ Content Provider).
+   * @param id ID kỹ năng
+   * @param request Dữ liệu cập nhật
+   * @return Thông tin kỹ năng đã cập nhật
+   */
   @PatchMapping("/{id}")
   @PreAuthorize("hasRole('CONTENT_PROVIDER')")
-  @Operation(summary = "Update skill", description = "Update skill details (Content Provider only)")
+  @Operation(summary = "Cập nhật kỹ năng", description = "Cập nhật thông tin kỹ năng (chỉ Content Provider)")
   public ResponseEntity<SkillResponse> updateSkill(
       @PathVariable
       UUID id,
@@ -83,9 +115,14 @@ public class SkillController {
     return ResponseEntity.ok(skill);
   }
 
+  /**
+   * Xóa kỹ năng (chỉ Content Provider).
+   * @param id ID kỹ năng
+   */
   @DeleteMapping("/{id}")
   @PreAuthorize("hasRole('CONTENT_PROVIDER')")
-  @Operation(summary = "Delete skill", description = "Delete a skill (Content Provider only)")
+  @Operation(summary = "Xóa kỹ năng", description = "Xóa kỹ năng (chỉ Content Provider)")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
   public ResponseEntity<Void> deleteSkill(
       @PathVariable
       UUID id

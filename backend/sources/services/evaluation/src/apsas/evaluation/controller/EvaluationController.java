@@ -3,48 +3,40 @@ package apsas.evaluation.controller;
 import apsas.evaluation.model.dto.RuntimeResponse;
 import apsas.evaluation.service.EvaluationService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * REST controller for evaluation-related endpoints
+ * Bộ điều khiển REST cho các API liên quan đến đánh giá mã nguồn.
  */
 @RestController
-@RequestMapping("/api/v1")
-@Tag(name = "Evaluation", description = "Code evaluation management")
+@RequestMapping(
+  value = "/api/v1",
+  consumes = MediaType.APPLICATION_JSON_VALUE,
+  produces = MediaType.APPLICATION_JSON_VALUE
+)
+@Tag(name = "Đánh giá mã nguồn", description = "Quản lý đánh giá và kiểm thử mã nguồn")
 @AllArgsConstructor
 public class EvaluationController {
-  private static final Logger logger = LoggerFactory.getLogger(EvaluationController.class);
-
   private final EvaluationService evaluationService;
 
   /**
-   * Get list of supported programming languages and their versions
+   * Lấy danh sách ngôn ngữ lập trình và phiên bản được hỗ trợ.
    *
-   * @return List of supported runtimes
+   * @return Danh sách runtime hỗ trợ
    */
   @GetMapping("/runtimes")
   @Operation(
-      summary = "Get supported runtimes",
-      description = "Returns list of all supported programming languages and their versions"
-  )
-  @ApiResponses(
-      value = {
-          @ApiResponse(responseCode = "200", description = "Successfully retrieved runtimes"),
-          @ApiResponse(responseCode = "500", description = "Internal server error")
-      }
+      summary = "Lấy danh sách runtime hỗ trợ",
+      description = "Trả về danh sách tất cả ngôn ngữ lập trình và phiên bản được hỗ trợ"
   )
   public ResponseEntity<List<RuntimeResponse>> getSupportedRuntimes() {
-    logger.debug("Fetching supported runtimes");
     List<RuntimeResponse> runtimes = evaluationService.getSupportedRuntimes();
     return ResponseEntity.ok(runtimes);
   }

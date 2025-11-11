@@ -8,6 +8,7 @@ dependencies {
     implementation(projects.sources.shared.exception)
     implementation(projects.sources.shared.models)
     implementation(projects.sources.shared.messaging)
+    implementation(projects.sources.shared.apiDocs)
 
     implementation("org.springframework.boot:spring-boot-starter-websocket")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")

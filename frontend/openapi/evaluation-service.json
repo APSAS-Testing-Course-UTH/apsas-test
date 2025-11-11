@@ -1,36 +1,36 @@
 {
     "openapi": "3.1.0",
     "info": {
-        "title": "Evaluation Service API",
-        "description": "API for evaluating student code submissions against predefined test cases",
-        "version": "v1.0"
+        "title": "API APSAS evaluation-service",
+        "description": "Tài liệu API cho APSAS evaluation-service",
+        "version": "1.0"
     },
     "servers": [
         {
-            "url": "http://localhost:8085",
-            "description": "Generated server url"
+            "url": "/",
+            "description": "mặc định"
         }
     ],
     "tags": [
         {
-            "name": "Evaluation",
-            "description": "Code evaluation management"
+            "name": "Đánh giá mã nguồn",
+            "description": "Quản lý đánh giá và kiểm thử mã nguồn"
         }
     ],
     "paths": {
         "/api/v1/runtimes": {
             "get": {
                 "tags": [
-                    "Evaluation"
+                    "Đánh giá mã nguồn"
                 ],
-                "summary": "Get supported runtimes",
-                "description": "Returns list of all supported programming languages and their versions",
+                "summary": "Lấy danh sách runtime hỗ trợ",
+                "description": "Trả về danh sách tất cả ngôn ngữ lập trình và phiên bản được hỗ trợ",
                 "operationId": "getSupportedRuntimes",
                 "responses": {
                     "200": {
-                        "description": "Successfully retrieved runtimes",
+                        "description": "OK",
                         "content": {
-                            "*/*": {
+                            "application/json": {
                                 "schema": {
                                     "type": "array",
                                     "items": {
@@ -40,15 +40,12 @@
                             }
                         }
                     },
-                    "500": {
-                        "description": "Internal server error",
+                    "default": {
+                        "description": "Phản hồi lỗi mặc định",
                         "content": {
-                            "*/*": {
+                            "application/problem+json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/RuntimeResponse"
-                                    }
+                                    "$ref": "#/components/schemas/ProblemDetail"
                                 }
                             }
                         }
@@ -61,21 +58,21 @@
         "schemas": {
             "RuntimeResponse": {
                 "type": "object",
-                "description": "Supported programming language runtime information",
+                "description": "Thông tin runtime của ngôn ngữ lập trình được hỗ trợ",
                 "properties": {
                     "language": {
                         "type": "string",
-                        "description": "Name of the programming language",
+                        "description": "Tên ngôn ngữ lập trình",
                         "example": "java"
                     },
                     "version": {
                         "type": "string",
-                        "description": "Version of the runtime",
+                        "description": "Phiên bản của runtime",
                         "example": "21.0.0"
                     },
                     "aliases": {
                         "type": "array",
-                        "description": "List of alternative names for the language",
+                        "description": "Danh sách tên thay thế cho ngôn ngữ",
                         "example": [
                             "java",
                             "java-21"
@@ -86,10 +83,40 @@
                     },
                     "runtime": {
                         "type": "string",
-                        "description": "Name of the runtime, only provided if alternative runtimes exist",
+                        "description": "Tên runtime, chỉ cung cấp nếu có nhiều runtime thay thế",
                         "example": "openjdk"
                     }
                 }
+            },
+            "ProblemDetail": {
+                "description": "Chi tiết lỗi theo chuẩn RFC 9457",
+                "properties": {
+                    "type": {
+                        "format": "uri",
+                        "description": "Loại lỗi (URI)"
+                    },
+                    "title": {
+                        "description": "Tiêu đề lỗi"
+                    },
+                    "status": {
+                        "format": "int32",
+                        "description": "Mã trạng thái HTTP"
+                    },
+                    "detail": {
+                        "description": "Mô tả chi tiết lỗi"
+                    },
+                    "instance": {
+                        "format": "uri",
+                        "description": "Đường dẫn instance lỗi"
+                    }
+                }
+            }
+        },
+        "securitySchemes": {
+            "Bearer Authentication": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
             }
         }
     }

@@ -31,6 +31,7 @@ sequenceOf(
     "sources:shared:feign-clients",
     "sources:shared:cache",
     "sources:shared:test",
+    "sources:shared:api-docs",
     // Services
     "sources:services:identity",
     "sources:services:content",

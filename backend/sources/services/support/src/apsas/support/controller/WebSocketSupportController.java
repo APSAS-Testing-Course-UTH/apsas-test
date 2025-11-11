@@ -18,7 +18,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 
 /**
- * Controller xử lý các kết nối WebSocket cho hỗ trợ trực tiếp
+ * Bộ điều khiển xử lý các kết nối WebSocket cho chức năng hỗ trợ trực tuyến giữa sinh viên và giảng viên.
  */
 @Controller
 @RequiredArgsConstructor
@@ -27,6 +27,12 @@ public class WebSocketSupportController {
   private final SupportMessageMapper messageMapper;
   private final SimpMessagingTemplate messagingTemplate;
 
+  /**
+   * Xử lý sự kiện người dùng subscribe vào một phiên hỗ trợ qua WebSocket.
+   *
+   * @param sessionId ID phiên hỗ trợ
+   * @param userPrincipal Thông tin người dùng
+   */
   @SubscribeMapping("/support/sessions/{sessionId}")
   @PreAuthorize("hasAnyRole('STUDENT', 'INSTRUCTOR')")
   public void handleSubscribe(
@@ -39,16 +45,22 @@ public class WebSocketSupportController {
     // Validate access to the session
     var session = supportService.getSessionById(sessionId);
     supportService.validateUserAccess(session, userPrincipal.userId(), userPrincipal.role());
-
-    // Notify other users that someone joined
+    // Thông báo cho các người dùng khác khi có người tham gia
     WebSocketMessage joinMessage =
         WebSocketMessage.sessionJoined(sessionId, userPrincipal.userId());
     messagingTemplate.convertAndSend("/topic/support/" + sessionId, joinMessage);
   }
 
-  @MessageMapping("/support/sessions/{sessionId}/message")
-  @PreAuthorize("hasAnyRole('STUDENT', 'INSTRUCTOR')")
-  public void handleMessage(
+    /**
+     * Xử lý sự kiện gửi tin nhắn trong phiên hỗ trợ qua WebSocket.
+     *
+     * @param sessionId ID phiên hỗ trợ
+     * @param request Nội dung tin nhắn gửi
+     * @param userPrincipal Thông tin người dùng
+     */
+    @MessageMapping("/support/sessions/{sessionId}/message")
+    @PreAuthorize("hasAnyRole('STUDENT', 'INSTRUCTOR')")
+    public void handleMessage(
       @DestinationVariable
       UUID sessionId,
       @Payload
@@ -60,20 +72,23 @@ public class WebSocketSupportController {
     // Validate access to the session
     var session = supportService.getSessionById(sessionId);
     supportService.validateUserAccess(session, userPrincipal.userId(), userPrincipal.role());
-
     boolean isInstructor = "INSTRUCTOR".equals(userPrincipal.role());
-
-    // Save the message
+    // Lưu tin nhắn
     SupportMessage message =
-        supportService.sendMessage(
-            sessionId, userPrincipal.userId(), request.content(), isInstructor);
-
-    // Broadcast the message to all subscribers of this session
+      supportService.sendMessage(
+        sessionId, userPrincipal.userId(), request.content(), isInstructor);
+    // Phát tin nhắn đến tất cả người dùng trong phiên
     WebSocketMessage wsMessage =
-        WebSocketMessage.newMessage(sessionId, messageMapper.toDto(message));
+      WebSocketMessage.newMessage(sessionId, messageMapper.toDto(message));
     messagingTemplate.convertAndSend("/topic/support/" + sessionId, wsMessage);
-  }
+    }
 
+  /**
+   * Xử lý sự kiện người dùng rời khỏi phiên hỗ trợ qua WebSocket.
+   *
+   * @param sessionId ID phiên hỗ trợ
+   * @param userPrincipal Thông tin người dùng
+   */
   @MessageMapping("/support/sessions/{sessionId}/leave")
   @PreAuthorize("hasAnyRole('STUDENT', 'INSTRUCTOR')")
   public void handleLeave(
@@ -82,8 +97,7 @@ public class WebSocketSupportController {
       @AuthenticationPrincipal
       UserPrincipal userPrincipal
   ) {
-
-    // Notify other users that someone left
+    // Thông báo cho các người dùng khác khi có người rời khỏi phiên
     WebSocketMessage leaveMessage = WebSocketMessage.sessionLeft(sessionId, userPrincipal.userId());
     messagingTemplate.convertAndSend("/topic/support/" + sessionId, leaveMessage);
   }

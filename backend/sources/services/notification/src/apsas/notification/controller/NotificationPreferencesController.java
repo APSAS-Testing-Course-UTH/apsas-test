@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -17,11 +18,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Bộ điều khiển REST cho các API quản lý tùy chọn thông báo của người dùng.
+ */
 @RestController
-@RequestMapping("/api/v1/preferences")
+@RequestMapping(
+  value = "/api/v1/preferences",
+  consumes = MediaType.APPLICATION_JSON_VALUE,
+  produces = MediaType.APPLICATION_JSON_VALUE
+)
 @Tag(
-    name = "Notification Preferences",
-    description = "Notification preferences management endpoints"
+  name = "Tùy chọn thông báo",
+  description = "Quản lý tùy chọn nhận thông báo của người dùng"
 )
 @SecurityRequirement(name = "Bearer Authentication")
 public class NotificationPreferencesController {
@@ -32,10 +40,16 @@ public class NotificationPreferencesController {
     this.preferencesService = preferencesService;
   }
 
+  /**
+   * Lấy tùy chọn nhận thông báo của người dùng hiện tại.
+   *
+   * @param authentication Thông tin xác thực người dùng
+   * @return Tùy chọn nhận thông báo
+   */
   @GetMapping
   @Operation(
-      summary = "Get notification preferences",
-      description = "Get notification preferences for the current user"
+      summary = "Lấy tùy chọn thông báo",
+      description = "Lấy tùy chọn nhận thông báo của người dùng hiện tại"
   )
   public ResponseEntity<NotificationPreferencesResponse> getPreferences(
       Authentication authentication
@@ -46,20 +60,27 @@ public class NotificationPreferencesController {
     return ResponseEntity.ok(response);
   }
 
-  @PatchMapping
-  @Operation(
-      summary = "Update notification preferences",
-      description = "Update notification preferences for the current user"
-  )
-  public ResponseEntity<NotificationPreferencesResponse> updatePreferences(
+    /**
+     * Cập nhật tùy chọn nhận thông báo của người dùng hiện tại.
+     *
+     * @param request Yêu cầu cập nhật tùy chọn
+     * @param authentication Thông tin xác thực người dùng
+     * @return Tùy chọn nhận thông báo đã cập nhật
+     */
+    @PatchMapping
+    @Operation(
+      summary = "Cập nhật tùy chọn thông báo",
+      description = "Cập nhật tùy chọn nhận thông báo của người dùng hiện tại"
+    )
+    public ResponseEntity<NotificationPreferencesResponse> updatePreferences(
       @Valid
       @RequestBody
       NotificationPreferencesRequest request, Authentication authentication
-  ) {
+    ) {
     UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
     UUID userId = userPrincipal.userId();
     NotificationPreferencesResponse response =
-        preferencesService.updatePreferences(userId, request);
+      preferencesService.updatePreferences(userId, request);
     return ResponseEntity.ok(response);
-  }
+    }
 }

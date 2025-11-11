@@ -26,6 +26,10 @@ import {
   identityServiceLoginResponseTransformer,
   identityServiceRegisterResponseTransformer,
   identityServiceUpdateCurrentUserProfileResponseTransformer,
+  notificationServiceGetPreferencesResponseTransformer,
+  notificationServiceGetUserDevicesResponseTransformer,
+  notificationServiceRegisterDeviceResponseTransformer,
+  notificationServiceUpdatePreferencesResponseTransformer,
   submissionServiceCreateSubmissionResponseTransformer,
   submissionServiceGetAllSubmissionsResponseTransformer,
   submissionServiceGetSubmissionByIdResponseTransformer,
@@ -37,83 +41,136 @@ import {
 } from "./transformers.gen"
 import type {
   ContentServiceArchiveAssignmentData,
+  ContentServiceArchiveAssignmentErrors,
   ContentServiceArchiveAssignmentResponses,
   ContentServiceCreateAssignmentData,
+  ContentServiceCreateAssignmentErrors,
   ContentServiceCreateAssignmentResponses,
   ContentServiceCreateSkillData,
+  ContentServiceCreateSkillErrors,
   ContentServiceCreateSkillResponses,
   ContentServiceCreateTutorialData,
+  ContentServiceCreateTutorialErrors,
   ContentServiceCreateTutorialResponses,
   ContentServiceDeleteAssignmentData,
+  ContentServiceDeleteAssignmentErrors,
   ContentServiceDeleteAssignmentResponses,
   ContentServiceDeleteSkillData,
+  ContentServiceDeleteSkillErrors,
   ContentServiceDeleteSkillResponses,
   ContentServiceDeleteTutorialData,
+  ContentServiceDeleteTutorialErrors,
   ContentServiceDeleteTutorialResponses,
   ContentServiceGetAllAssignmentsData,
+  ContentServiceGetAllAssignmentsErrors,
   ContentServiceGetAllAssignmentsResponses,
   ContentServiceGetAllSkillsData,
+  ContentServiceGetAllSkillsErrors,
   ContentServiceGetAllSkillsResponses,
   ContentServiceGetAllTutorialsData,
+  ContentServiceGetAllTutorialsErrors,
   ContentServiceGetAllTutorialsResponses,
   ContentServiceGetAssignmentByIdData,
+  ContentServiceGetAssignmentByIdErrors,
   ContentServiceGetAssignmentByIdResponses,
   ContentServiceGetSkillByIdData,
+  ContentServiceGetSkillByIdErrors,
   ContentServiceGetSkillByIdResponses,
   ContentServiceGetTutorialByIdData,
+  ContentServiceGetTutorialByIdErrors,
   ContentServiceGetTutorialByIdResponses,
   ContentServicePublishAssignmentData,
+  ContentServicePublishAssignmentErrors,
   ContentServicePublishAssignmentResponses,
   ContentServiceUpdateAssignmentData,
+  ContentServiceUpdateAssignmentErrors,
   ContentServiceUpdateAssignmentResponses,
   ContentServiceUpdateAssignmentScheduleData,
+  ContentServiceUpdateAssignmentScheduleErrors,
   ContentServiceUpdateAssignmentScheduleResponses,
   ContentServiceUpdateSkillData,
+  ContentServiceUpdateSkillErrors,
   ContentServiceUpdateSkillResponses,
   ContentServiceUpdateTutorialData,
+  ContentServiceUpdateTutorialErrors,
   ContentServiceUpdateTutorialResponses,
   EvaluationServiceGetSupportedRuntimesData,
   EvaluationServiceGetSupportedRuntimesErrors,
   EvaluationServiceGetSupportedRuntimesResponses,
   IdentityServiceActivateUserData,
+  IdentityServiceActivateUserErrors,
   IdentityServiceActivateUserResponses,
   IdentityServiceChangePasswordData,
+  IdentityServiceChangePasswordErrors,
   IdentityServiceChangePasswordResponses,
   IdentityServiceCreateUserData,
+  IdentityServiceCreateUserErrors,
   IdentityServiceCreateUserResponses,
   IdentityServiceDeactivateUserData,
+  IdentityServiceDeactivateUserErrors,
   IdentityServiceDeactivateUserResponses,
   IdentityServiceDeleteUserData,
+  IdentityServiceDeleteUserErrors,
   IdentityServiceDeleteUserResponses,
   IdentityServiceGetAllUsersData,
+  IdentityServiceGetAllUsersErrors,
   IdentityServiceGetAllUsersResponses,
   IdentityServiceGetCurrentUserData,
+  IdentityServiceGetCurrentUserErrors,
   IdentityServiceGetCurrentUserResponses,
   IdentityServiceGetUserByIdData,
+  IdentityServiceGetUserByIdErrors,
   IdentityServiceGetUserByIdResponses,
   IdentityServiceGetUsersByRoleData,
+  IdentityServiceGetUsersByRoleErrors,
   IdentityServiceGetUsersByRoleResponses,
   IdentityServiceLoginData,
+  IdentityServiceLoginErrors,
   IdentityServiceLoginResponses,
   IdentityServiceRegisterData,
+  IdentityServiceRegisterErrors,
   IdentityServiceRegisterResponses,
   IdentityServiceRequestPasswordResetData,
+  IdentityServiceRequestPasswordResetErrors,
   IdentityServiceRequestPasswordResetResponses,
   IdentityServiceResendVerificationEmailData,
+  IdentityServiceResendVerificationEmailErrors,
   IdentityServiceResendVerificationEmailResponses,
   IdentityServiceResetPasswordData,
+  IdentityServiceResetPasswordErrors,
   IdentityServiceResetPasswordResponses,
   IdentityServiceUpdateCurrentUserProfileData,
+  IdentityServiceUpdateCurrentUserProfileErrors,
   IdentityServiceUpdateCurrentUserProfileResponses,
   IdentityServiceVerifyEmailData,
+  IdentityServiceVerifyEmailErrors,
   IdentityServiceVerifyEmailResponses,
+  NotificationServiceGetPreferencesData,
+  NotificationServiceGetPreferencesErrors,
+  NotificationServiceGetPreferencesResponses,
+  NotificationServiceGetUserDevicesData,
+  NotificationServiceGetUserDevicesErrors,
+  NotificationServiceGetUserDevicesResponses,
+  NotificationServiceRegisterDeviceData,
+  NotificationServiceRegisterDeviceErrors,
+  NotificationServiceRegisterDeviceResponses,
+  NotificationServiceRemoveDeviceData,
+  NotificationServiceRemoveDeviceErrors,
+  NotificationServiceRemoveDeviceResponses,
+  NotificationServiceUpdatePreferencesData,
+  NotificationServiceUpdatePreferencesErrors,
+  NotificationServiceUpdatePreferencesResponses,
   SubmissionServiceCreateSubmissionData,
+  SubmissionServiceCreateSubmissionErrors,
   SubmissionServiceCreateSubmissionResponses,
   SubmissionServiceGetAllSubmissionsData,
+  SubmissionServiceGetAllSubmissionsErrors,
   SubmissionServiceGetAllSubmissionsResponses,
   SubmissionServiceGetSubmissionByIdData,
+  SubmissionServiceGetSubmissionByIdErrors,
   SubmissionServiceGetSubmissionByIdResponses,
   SubmissionServiceProvideFeedbackData,
+  SubmissionServiceProvideFeedbackErrors,
   SubmissionServiceProvideFeedbackResponses,
   SupportServiceCloseSessionData,
   SupportServiceCloseSessionErrors,
@@ -125,6 +182,7 @@ import type {
   SupportServiceGetSessionByIdErrors,
   SupportServiceGetSessionByIdResponses,
   SupportServiceListSessionsData,
+  SupportServiceListSessionsErrors,
   SupportServiceListSessionsResponses,
 } from "./types.gen"
 import {
@@ -163,6 +221,11 @@ import {
   zIdentityServiceResetPasswordData,
   zIdentityServiceUpdateCurrentUserProfileData,
   zIdentityServiceVerifyEmailData,
+  zNotificationServiceGetPreferencesData,
+  zNotificationServiceGetUserDevicesData,
+  zNotificationServiceRegisterDeviceData,
+  zNotificationServiceRemoveDeviceData,
+  zNotificationServiceUpdatePreferencesData,
   zSubmissionServiceCreateSubmissionData,
   zSubmissionServiceGetAllSubmissionsData,
   zSubmissionServiceGetSubmissionByIdData,
@@ -191,13 +254,18 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 }
 
 /**
- * Deactivate user
- * Deactivate a user account (Admin only)
+ * Vô hiệu hóa người dùng
+ *
+ * Vô hiệu hóa tài khoản người dùng (chỉ Admin)
  */
 export const identityServiceDeactivateUser = <ThrowOnError extends boolean = false>(
   options: Options<IdentityServiceDeactivateUserData, ThrowOnError>,
 ) => {
-  return (options.client ?? client).put<IdentityServiceDeactivateUserResponses, unknown, ThrowOnError>({
+  return (options.client ?? client).put<
+    IdentityServiceDeactivateUserResponses,
+    IdentityServiceDeactivateUserErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) => {
       return await zIdentityServiceDeactivateUserData.parseAsync(data)
     },
@@ -207,13 +275,18 @@ export const identityServiceDeactivateUser = <ThrowOnError extends boolean = fal
 }
 
 /**
- * Activate user
- * Activate a user account (Admin only)
+ * Kích hoạt người dùng
+ *
+ * Kích hoạt tài khoản người dùng (chỉ Admin)
  */
 export const identityServiceActivateUser = <ThrowOnError extends boolean = false>(
   options: Options<IdentityServiceActivateUserData, ThrowOnError>,
 ) => {
-  return (options.client ?? client).put<IdentityServiceActivateUserResponses, unknown, ThrowOnError>({
+  return (options.client ?? client).put<
+    IdentityServiceActivateUserResponses,
+    IdentityServiceActivateUserErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) => {
       return await zIdentityServiceActivateUserData.parseAsync(data)
     },
@@ -223,13 +296,18 @@ export const identityServiceActivateUser = <ThrowOnError extends boolean = false
 }
 
 /**
- * Get current user profile
- * Get the profile of the currently authenticated user
+ * Lấy hồ sơ người dùng hiện tại
+ *
+ * Lấy thông tin hồ sơ của người dùng đang đăng nhập
  */
 export const identityServiceGetCurrentUser = <ThrowOnError extends boolean = false>(
   options?: Options<IdentityServiceGetCurrentUserData, ThrowOnError>,
 ) => {
-  return (options?.client ?? client).get<IdentityServiceGetCurrentUserResponses, unknown, ThrowOnError>({
+  return (options?.client ?? client).get<
+    IdentityServiceGetCurrentUserResponses,
+    IdentityServiceGetCurrentUserErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) => {
       return await zIdentityServiceGetCurrentUserData.parseAsync(data)
     },
@@ -240,13 +318,18 @@ export const identityServiceGetCurrentUser = <ThrowOnError extends boolean = fal
 }
 
 /**
- * Update current user profile
- * Update the profile of the currently authenticated user
+ * Cập nhật hồ sơ người dùng
+ *
+ * Cập nhật thông tin hồ sơ của người dùng đang đăng nhập
  */
 export const identityServiceUpdateCurrentUserProfile = <ThrowOnError extends boolean = false>(
   options: Options<IdentityServiceUpdateCurrentUserProfileData, ThrowOnError>,
 ) => {
-  return (options.client ?? client).put<IdentityServiceUpdateCurrentUserProfileResponses, unknown, ThrowOnError>({
+  return (options.client ?? client).put<
+    IdentityServiceUpdateCurrentUserProfileResponses,
+    IdentityServiceUpdateCurrentUserProfileErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) => {
       return await zIdentityServiceUpdateCurrentUserProfileData.parseAsync(data)
     },
@@ -261,13 +344,18 @@ export const identityServiceUpdateCurrentUserProfile = <ThrowOnError extends boo
 }
 
 /**
- * Get all users
- * Get all users with pagination and sorting (Admin only)
+ * Lấy tất cả người dùng
+ *
+ * Lấy danh sách người dùng có phân trang và sắp xếp (chỉ Admin)
  */
 export const identityServiceGetAllUsers = <ThrowOnError extends boolean = false>(
   options?: Options<IdentityServiceGetAllUsersData, ThrowOnError>,
 ) => {
-  return (options?.client ?? client).get<IdentityServiceGetAllUsersResponses, unknown, ThrowOnError>({
+  return (options?.client ?? client).get<
+    IdentityServiceGetAllUsersResponses,
+    IdentityServiceGetAllUsersErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) => {
       return await zIdentityServiceGetAllUsersData.parseAsync(data)
     },
@@ -278,13 +366,18 @@ export const identityServiceGetAllUsers = <ThrowOnError extends boolean = false>
 }
 
 /**
- * Create user
- * Create a new user (Admin only)
+ * Tạo người dùng
+ *
+ * Tạo mới người dùng (chỉ Admin)
  */
 export const identityServiceCreateUser = <ThrowOnError extends boolean = false>(
   options: Options<IdentityServiceCreateUserData, ThrowOnError>,
 ) => {
-  return (options.client ?? client).post<IdentityServiceCreateUserResponses, unknown, ThrowOnError>({
+  return (options.client ?? client).post<
+    IdentityServiceCreateUserResponses,
+    IdentityServiceCreateUserErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) => {
       return await zIdentityServiceCreateUserData.parseAsync(data)
     },
@@ -299,13 +392,18 @@ export const identityServiceCreateUser = <ThrowOnError extends boolean = false>(
 }
 
 /**
- * Change password
- * Change password for the currently authenticated user
+ * Đổi mật khẩu
+ *
+ * Đổi mật khẩu cho người dùng đang đăng nhập
  */
 export const identityServiceChangePassword = <ThrowOnError extends boolean = false>(
   options: Options<IdentityServiceChangePasswordData, ThrowOnError>,
 ) => {
-  return (options.client ?? client).post<IdentityServiceChangePasswordResponses, unknown, ThrowOnError>({
+  return (options.client ?? client).post<
+    IdentityServiceChangePasswordResponses,
+    IdentityServiceChangePasswordErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) => {
       return await zIdentityServiceChangePasswordData.parseAsync(data)
     },
@@ -319,13 +417,18 @@ export const identityServiceChangePassword = <ThrowOnError extends boolean = fal
 }
 
 /**
- * Verify email
- * Verify user email with token
+ * Xác thực email
+ *
+ * Xác thực email người dùng bằng mã token
  */
 export const identityServiceVerifyEmail = <ThrowOnError extends boolean = false>(
   options: Options<IdentityServiceVerifyEmailData, ThrowOnError>,
 ) => {
-  return (options.client ?? client).post<IdentityServiceVerifyEmailResponses, unknown, ThrowOnError>({
+  return (options.client ?? client).post<
+    IdentityServiceVerifyEmailResponses,
+    IdentityServiceVerifyEmailErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) => {
       return await zIdentityServiceVerifyEmailData.parseAsync(data)
     },
@@ -339,13 +442,18 @@ export const identityServiceVerifyEmail = <ThrowOnError extends boolean = false>
 }
 
 /**
- * Reset password
- * Reset password with token
+ * Đặt lại mật khẩu
+ *
+ * Đặt lại mật khẩu bằng mã token
  */
 export const identityServiceResetPassword = <ThrowOnError extends boolean = false>(
   options: Options<IdentityServiceResetPasswordData, ThrowOnError>,
 ) => {
-  return (options.client ?? client).post<IdentityServiceResetPasswordResponses, unknown, ThrowOnError>({
+  return (options.client ?? client).post<
+    IdentityServiceResetPasswordResponses,
+    IdentityServiceResetPasswordErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) => {
       return await zIdentityServiceResetPasswordData.parseAsync(data)
     },
@@ -359,13 +467,18 @@ export const identityServiceResetPassword = <ThrowOnError extends boolean = fals
 }
 
 /**
- * Resend verification email
- * Resend email verification link
+ * Gửi lại email xác thực
+ *
+ * Gửi lại liên kết xác thực email
  */
 export const identityServiceResendVerificationEmail = <ThrowOnError extends boolean = false>(
   options: Options<IdentityServiceResendVerificationEmailData, ThrowOnError>,
 ) => {
-  return (options.client ?? client).post<IdentityServiceResendVerificationEmailResponses, unknown, ThrowOnError>({
+  return (options.client ?? client).post<
+    IdentityServiceResendVerificationEmailResponses,
+    IdentityServiceResendVerificationEmailErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) => {
       return await zIdentityServiceResendVerificationEmailData.parseAsync(data)
     },
@@ -379,34 +492,38 @@ export const identityServiceResendVerificationEmail = <ThrowOnError extends bool
 }
 
 /**
- * Register a new user
- * Register a new user account with student role
+ * Đăng ký người dùng mới
+ *
+ * Đăng ký tài khoản mới với vai trò sinh viên
  */
 export const identityServiceRegister = <ThrowOnError extends boolean = false>(
   options: Options<IdentityServiceRegisterData, ThrowOnError>,
 ) => {
-  return (options.client ?? client).post<IdentityServiceRegisterResponses, unknown, ThrowOnError>({
-    requestValidator: async (data) => {
-      return await zIdentityServiceRegisterData.parseAsync(data)
+  return (options.client ?? client).post<IdentityServiceRegisterResponses, IdentityServiceRegisterErrors, ThrowOnError>(
+    {
+      requestValidator: async (data) => {
+        return await zIdentityServiceRegisterData.parseAsync(data)
+      },
+      responseTransformer: identityServiceRegisterResponseTransformer,
+      url: "/api/auth/register",
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...options.headers,
+      },
     },
-    responseTransformer: identityServiceRegisterResponseTransformer,
-    url: "/api/auth/register",
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
-  })
+  )
 }
 
 /**
- * Login
- * Authenticate user and return JWT token
+ * Đăng nhập
+ *
+ * Xác thực người dùng và trả về JWT token
  */
 export const identityServiceLogin = <ThrowOnError extends boolean = false>(
   options: Options<IdentityServiceLoginData, ThrowOnError>,
 ) => {
-  return (options.client ?? client).post<IdentityServiceLoginResponses, unknown, ThrowOnError>({
+  return (options.client ?? client).post<IdentityServiceLoginResponses, IdentityServiceLoginErrors, ThrowOnError>({
     requestValidator: async (data) => {
       return await zIdentityServiceLoginData.parseAsync(data)
     },
@@ -421,13 +538,18 @@ export const identityServiceLogin = <ThrowOnError extends boolean = false>(
 }
 
 /**
- * Request password reset
- * Request password reset link
+ * Yêu cầu đặt lại mật khẩu
+ *
+ * Yêu cầu gửi liên kết đặt lại mật khẩu qua email
  */
 export const identityServiceRequestPasswordReset = <ThrowOnError extends boolean = false>(
   options: Options<IdentityServiceRequestPasswordResetData, ThrowOnError>,
 ) => {
-  return (options.client ?? client).post<IdentityServiceRequestPasswordResetResponses, unknown, ThrowOnError>({
+  return (options.client ?? client).post<
+    IdentityServiceRequestPasswordResetResponses,
+    IdentityServiceRequestPasswordResetErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) => {
       return await zIdentityServiceRequestPasswordResetData.parseAsync(data)
     },
@@ -441,13 +563,18 @@ export const identityServiceRequestPasswordReset = <ThrowOnError extends boolean
 }
 
 /**
- * Delete user
- * Delete a user account (Admin only)
+ * Xóa người dùng
+ *
+ * Xóa tài khoản người dùng (chỉ Admin)
  */
 export const identityServiceDeleteUser = <ThrowOnError extends boolean = false>(
   options: Options<IdentityServiceDeleteUserData, ThrowOnError>,
 ) => {
-  return (options.client ?? client).delete<IdentityServiceDeleteUserResponses, unknown, ThrowOnError>({
+  return (options.client ?? client).delete<
+    IdentityServiceDeleteUserResponses,
+    IdentityServiceDeleteUserErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) => {
       return await zIdentityServiceDeleteUserData.parseAsync(data)
     },
@@ -457,13 +584,18 @@ export const identityServiceDeleteUser = <ThrowOnError extends boolean = false>(
 }
 
 /**
- * Get user by ID
- * Get user details by ID (Admin and Instructor only)
+ * Lấy người dùng theo ID
+ *
+ * Lấy thông tin người dùng theo ID (chỉ Admin và Giảng viên)
  */
 export const identityServiceGetUserById = <ThrowOnError extends boolean = false>(
   options: Options<IdentityServiceGetUserByIdData, ThrowOnError>,
 ) => {
-  return (options.client ?? client).get<IdentityServiceGetUserByIdResponses, unknown, ThrowOnError>({
+  return (options.client ?? client).get<
+    IdentityServiceGetUserByIdResponses,
+    IdentityServiceGetUserByIdErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) => {
       return await zIdentityServiceGetUserByIdData.parseAsync(data)
     },
@@ -474,13 +606,18 @@ export const identityServiceGetUserById = <ThrowOnError extends boolean = false>
 }
 
 /**
- * Get users by role
- * Get users by role with pagination and sorting (Admin and Instructor only)
+ * Lấy người dùng theo vai trò
+ *
+ * Lấy danh sách người dùng theo vai trò có phân trang và sắp xếp (chỉ Admin và Giảng viên)
  */
 export const identityServiceGetUsersByRole = <ThrowOnError extends boolean = false>(
   options: Options<IdentityServiceGetUsersByRoleData, ThrowOnError>,
 ) => {
-  return (options.client ?? client).get<IdentityServiceGetUsersByRoleResponses, unknown, ThrowOnError>({
+  return (options.client ?? client).get<
+    IdentityServiceGetUsersByRoleResponses,
+    IdentityServiceGetUsersByRoleErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) => {
       return await zIdentityServiceGetUsersByRoleData.parseAsync(data)
     },
@@ -491,13 +628,18 @@ export const identityServiceGetUsersByRole = <ThrowOnError extends boolean = fal
 }
 
 /**
- * Get all tutorials
- * Get all available tutorials with pagination and sorting
+ * Lấy tất cả hướng dẫn
+ *
+ * Lấy danh sách hướng dẫn có phân trang và sắp xếp
  */
 export const contentServiceGetAllTutorials = <ThrowOnError extends boolean = false>(
   options?: Options<ContentServiceGetAllTutorialsData, ThrowOnError>,
 ) => {
-  return (options?.client ?? client).get<ContentServiceGetAllTutorialsResponses, unknown, ThrowOnError>({
+  return (options?.client ?? client).get<
+    ContentServiceGetAllTutorialsResponses,
+    ContentServiceGetAllTutorialsErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) => {
       return await zContentServiceGetAllTutorialsData.parseAsync(data)
     },
@@ -508,13 +650,18 @@ export const contentServiceGetAllTutorials = <ThrowOnError extends boolean = fal
 }
 
 /**
- * Create a new tutorial
- * Create a new tutorial (Content Provider only)
+ * Tạo hướng dẫn mới
+ *
+ * Tạo mới hướng dẫn (chỉ Content Provider)
  */
 export const contentServiceCreateTutorial = <ThrowOnError extends boolean = false>(
   options: Options<ContentServiceCreateTutorialData, ThrowOnError>,
 ) => {
-  return (options.client ?? client).post<ContentServiceCreateTutorialResponses, unknown, ThrowOnError>({
+  return (options.client ?? client).post<
+    ContentServiceCreateTutorialResponses,
+    ContentServiceCreateTutorialErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) => {
       return await zContentServiceCreateTutorialData.parseAsync(data)
     },
@@ -529,13 +676,18 @@ export const contentServiceCreateTutorial = <ThrowOnError extends boolean = fals
 }
 
 /**
- * Get all skills
- * Get all available skills with pagination and sorting
+ * Lấy tất cả kỹ năng
+ *
+ * Lấy danh sách kỹ năng có phân trang và sắp xếp
  */
 export const contentServiceGetAllSkills = <ThrowOnError extends boolean = false>(
   options?: Options<ContentServiceGetAllSkillsData, ThrowOnError>,
 ) => {
-  return (options?.client ?? client).get<ContentServiceGetAllSkillsResponses, unknown, ThrowOnError>({
+  return (options?.client ?? client).get<
+    ContentServiceGetAllSkillsResponses,
+    ContentServiceGetAllSkillsErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) => {
       return await zContentServiceGetAllSkillsData.parseAsync(data)
     },
@@ -546,13 +698,18 @@ export const contentServiceGetAllSkills = <ThrowOnError extends boolean = false>
 }
 
 /**
- * Create a new skill
- * Create a new skill (Content Provider only)
+ * Tạo kỹ năng mới
+ *
+ * Tạo mới kỹ năng (chỉ Content Provider)
  */
 export const contentServiceCreateSkill = <ThrowOnError extends boolean = false>(
   options: Options<ContentServiceCreateSkillData, ThrowOnError>,
 ) => {
-  return (options.client ?? client).post<ContentServiceCreateSkillResponses, unknown, ThrowOnError>({
+  return (options.client ?? client).post<
+    ContentServiceCreateSkillResponses,
+    ContentServiceCreateSkillErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) => {
       return await zContentServiceCreateSkillData.parseAsync(data)
     },
@@ -567,13 +724,18 @@ export const contentServiceCreateSkill = <ThrowOnError extends boolean = false>(
 }
 
 /**
- * Get all assignments
- * Get all available assignments with pagination and sorting
+ * Lấy tất cả bài tập
+ *
+ * Lấy danh sách bài tập có phân trang và sắp xếp
  */
 export const contentServiceGetAllAssignments = <ThrowOnError extends boolean = false>(
   options?: Options<ContentServiceGetAllAssignmentsData, ThrowOnError>,
 ) => {
-  return (options?.client ?? client).get<ContentServiceGetAllAssignmentsResponses, unknown, ThrowOnError>({
+  return (options?.client ?? client).get<
+    ContentServiceGetAllAssignmentsResponses,
+    ContentServiceGetAllAssignmentsErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) => {
       return await zContentServiceGetAllAssignmentsData.parseAsync(data)
     },
@@ -584,13 +746,18 @@ export const contentServiceGetAllAssignments = <ThrowOnError extends boolean = f
 }
 
 /**
- * Create a new assignment
- * Create a new assignment (Content Provider only)
+ * Tạo bài tập mới
+ *
+ * Tạo mới bài tập (chỉ Content Provider)
  */
 export const contentServiceCreateAssignment = <ThrowOnError extends boolean = false>(
   options: Options<ContentServiceCreateAssignmentData, ThrowOnError>,
 ) => {
-  return (options.client ?? client).post<ContentServiceCreateAssignmentResponses, unknown, ThrowOnError>({
+  return (options.client ?? client).post<
+    ContentServiceCreateAssignmentResponses,
+    ContentServiceCreateAssignmentErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) => {
       return await zContentServiceCreateAssignmentData.parseAsync(data)
     },
@@ -605,13 +772,18 @@ export const contentServiceCreateAssignment = <ThrowOnError extends boolean = fa
 }
 
 /**
- * Publish an assignment
- * Publish a draft assignment (Content Provider only)
+ * Xuất bản bài tập
+ *
+ * Xuất bản bài tập nháp (chỉ Content Provider)
  */
 export const contentServicePublishAssignment = <ThrowOnError extends boolean = false>(
   options: Options<ContentServicePublishAssignmentData, ThrowOnError>,
 ) => {
-  return (options.client ?? client).post<ContentServicePublishAssignmentResponses, unknown, ThrowOnError>({
+  return (options.client ?? client).post<
+    ContentServicePublishAssignmentResponses,
+    ContentServicePublishAssignmentErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) => {
       return await zContentServicePublishAssignmentData.parseAsync(data)
     },
@@ -622,13 +794,18 @@ export const contentServicePublishAssignment = <ThrowOnError extends boolean = f
 }
 
 /**
- * Archive an assignment
- * Archive an assignment (Content Provider only)
+ * Lưu trữ bài tập
+ *
+ * Lưu trữ bài tập (chỉ Content Provider)
  */
 export const contentServiceArchiveAssignment = <ThrowOnError extends boolean = false>(
   options: Options<ContentServiceArchiveAssignmentData, ThrowOnError>,
 ) => {
-  return (options.client ?? client).post<ContentServiceArchiveAssignmentResponses, unknown, ThrowOnError>({
+  return (options.client ?? client).post<
+    ContentServiceArchiveAssignmentResponses,
+    ContentServiceArchiveAssignmentErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) => {
       return await zContentServiceArchiveAssignmentData.parseAsync(data)
     },
@@ -639,13 +816,18 @@ export const contentServiceArchiveAssignment = <ThrowOnError extends boolean = f
 }
 
 /**
- * Delete tutorial
- * Delete a tutorial (Content Provider only)
+ * Xóa hướng dẫn
+ *
+ * Xóa hướng dẫn (chỉ Content Provider)
  */
 export const contentServiceDeleteTutorial = <ThrowOnError extends boolean = false>(
   options: Options<ContentServiceDeleteTutorialData, ThrowOnError>,
 ) => {
-  return (options.client ?? client).delete<ContentServiceDeleteTutorialResponses, unknown, ThrowOnError>({
+  return (options.client ?? client).delete<
+    ContentServiceDeleteTutorialResponses,
+    ContentServiceDeleteTutorialErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) => {
       return await zContentServiceDeleteTutorialData.parseAsync(data)
     },
@@ -655,13 +837,18 @@ export const contentServiceDeleteTutorial = <ThrowOnError extends boolean = fals
 }
 
 /**
- * Get tutorial by ID
- * Get tutorial details by ID
+ * Lấy hướng dẫn theo ID
+ *
+ * Lấy chi tiết hướng dẫn theo ID
  */
 export const contentServiceGetTutorialById = <ThrowOnError extends boolean = false>(
   options: Options<ContentServiceGetTutorialByIdData, ThrowOnError>,
 ) => {
-  return (options.client ?? client).get<ContentServiceGetTutorialByIdResponses, unknown, ThrowOnError>({
+  return (options.client ?? client).get<
+    ContentServiceGetTutorialByIdResponses,
+    ContentServiceGetTutorialByIdErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) => {
       return await zContentServiceGetTutorialByIdData.parseAsync(data)
     },
@@ -672,13 +859,18 @@ export const contentServiceGetTutorialById = <ThrowOnError extends boolean = fal
 }
 
 /**
- * Update tutorial
- * Update tutorial details (Content Provider only)
+ * Cập nhật hướng dẫn
+ *
+ * Cập nhật thông tin hướng dẫn (chỉ Content Provider)
  */
 export const contentServiceUpdateTutorial = <ThrowOnError extends boolean = false>(
   options: Options<ContentServiceUpdateTutorialData, ThrowOnError>,
 ) => {
-  return (options.client ?? client).patch<ContentServiceUpdateTutorialResponses, unknown, ThrowOnError>({
+  return (options.client ?? client).patch<
+    ContentServiceUpdateTutorialResponses,
+    ContentServiceUpdateTutorialErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) => {
       return await zContentServiceUpdateTutorialData.parseAsync(data)
     },
@@ -693,13 +885,18 @@ export const contentServiceUpdateTutorial = <ThrowOnError extends boolean = fals
 }
 
 /**
- * Delete skill
- * Delete a skill (Content Provider only)
+ * Xóa kỹ năng
+ *
+ * Xóa kỹ năng (chỉ Content Provider)
  */
 export const contentServiceDeleteSkill = <ThrowOnError extends boolean = false>(
   options: Options<ContentServiceDeleteSkillData, ThrowOnError>,
 ) => {
-  return (options.client ?? client).delete<ContentServiceDeleteSkillResponses, unknown, ThrowOnError>({
+  return (options.client ?? client).delete<
+    ContentServiceDeleteSkillResponses,
+    ContentServiceDeleteSkillErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) => {
       return await zContentServiceDeleteSkillData.parseAsync(data)
     },
@@ -709,13 +906,18 @@ export const contentServiceDeleteSkill = <ThrowOnError extends boolean = false>(
 }
 
 /**
- * Get skill by ID
- * Get skill details by ID
+ * Lấy kỹ năng theo ID
+ *
+ * Lấy chi tiết kỹ năng theo ID
  */
 export const contentServiceGetSkillById = <ThrowOnError extends boolean = false>(
   options: Options<ContentServiceGetSkillByIdData, ThrowOnError>,
 ) => {
-  return (options.client ?? client).get<ContentServiceGetSkillByIdResponses, unknown, ThrowOnError>({
+  return (options.client ?? client).get<
+    ContentServiceGetSkillByIdResponses,
+    ContentServiceGetSkillByIdErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) => {
       return await zContentServiceGetSkillByIdData.parseAsync(data)
     },
@@ -726,13 +928,18 @@ export const contentServiceGetSkillById = <ThrowOnError extends boolean = false>
 }
 
 /**
- * Update skill
- * Update skill details (Content Provider only)
+ * Cập nhật kỹ năng
+ *
+ * Cập nhật thông tin kỹ năng (chỉ Content Provider)
  */
 export const contentServiceUpdateSkill = <ThrowOnError extends boolean = false>(
   options: Options<ContentServiceUpdateSkillData, ThrowOnError>,
 ) => {
-  return (options.client ?? client).patch<ContentServiceUpdateSkillResponses, unknown, ThrowOnError>({
+  return (options.client ?? client).patch<
+    ContentServiceUpdateSkillResponses,
+    ContentServiceUpdateSkillErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) => {
       return await zContentServiceUpdateSkillData.parseAsync(data)
     },
@@ -747,13 +954,18 @@ export const contentServiceUpdateSkill = <ThrowOnError extends boolean = false>(
 }
 
 /**
- * Delete assignment
- * Delete an assignment (Content Provider only)
+ * Xóa bài tập
+ *
+ * Xóa bài tập (chỉ Content Provider)
  */
 export const contentServiceDeleteAssignment = <ThrowOnError extends boolean = false>(
   options: Options<ContentServiceDeleteAssignmentData, ThrowOnError>,
 ) => {
-  return (options.client ?? client).delete<ContentServiceDeleteAssignmentResponses, unknown, ThrowOnError>({
+  return (options.client ?? client).delete<
+    ContentServiceDeleteAssignmentResponses,
+    ContentServiceDeleteAssignmentErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) => {
       return await zContentServiceDeleteAssignmentData.parseAsync(data)
     },
@@ -763,13 +975,18 @@ export const contentServiceDeleteAssignment = <ThrowOnError extends boolean = fa
 }
 
 /**
- * Get assignment by ID
- * Get assignment details by ID
+ * Lấy bài tập theo ID
+ *
+ * Lấy chi tiết bài tập theo ID
  */
 export const contentServiceGetAssignmentById = <ThrowOnError extends boolean = false>(
   options: Options<ContentServiceGetAssignmentByIdData, ThrowOnError>,
 ) => {
-  return (options.client ?? client).get<ContentServiceGetAssignmentByIdResponses, unknown, ThrowOnError>({
+  return (options.client ?? client).get<
+    ContentServiceGetAssignmentByIdResponses,
+    ContentServiceGetAssignmentByIdErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) => {
       return await zContentServiceGetAssignmentByIdData.parseAsync(data)
     },
@@ -780,13 +997,18 @@ export const contentServiceGetAssignmentById = <ThrowOnError extends boolean = f
 }
 
 /**
- * Update assignment
- * Update assignment details (Content Provider only)
+ * Cập nhật bài tập
+ *
+ * Cập nhật thông tin bài tập (chỉ Content Provider)
  */
 export const contentServiceUpdateAssignment = <ThrowOnError extends boolean = false>(
   options: Options<ContentServiceUpdateAssignmentData, ThrowOnError>,
 ) => {
-  return (options.client ?? client).patch<ContentServiceUpdateAssignmentResponses, unknown, ThrowOnError>({
+  return (options.client ?? client).patch<
+    ContentServiceUpdateAssignmentResponses,
+    ContentServiceUpdateAssignmentErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) => {
       return await zContentServiceUpdateAssignmentData.parseAsync(data)
     },
@@ -801,13 +1023,18 @@ export const contentServiceUpdateAssignment = <ThrowOnError extends boolean = fa
 }
 
 /**
- * Update assignment schedule
- * Update assignment schedule (start_date, due_date) (Instructor only)
+ * Cập nhật lịch bài tập
+ *
+ * Cập nhật lịch bài tập (start_date, due_date) (chỉ Giảng viên)
  */
 export const contentServiceUpdateAssignmentSchedule = <ThrowOnError extends boolean = false>(
   options: Options<ContentServiceUpdateAssignmentScheduleData, ThrowOnError>,
 ) => {
-  return (options.client ?? client).patch<ContentServiceUpdateAssignmentScheduleResponses, unknown, ThrowOnError>({
+  return (options.client ?? client).patch<
+    ContentServiceUpdateAssignmentScheduleResponses,
+    ContentServiceUpdateAssignmentScheduleErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) => {
       return await zContentServiceUpdateAssignmentScheduleData.parseAsync(data)
     },
@@ -822,13 +1049,18 @@ export const contentServiceUpdateAssignmentSchedule = <ThrowOnError extends bool
 }
 
 /**
- * Get all submissions
- * Get all submissions with pagination and sorting. Students see only their own, instructors can filter by assignment and student
+ * Lấy tất cả bài nộp
+ *
+ * Lấy danh sách bài nộp với phân trang và sắp xếp. Sinh viên chỉ xem bài của mình, giảng viên có thể lọc theo bài tập và sinh viên.
  */
 export const submissionServiceGetAllSubmissions = <ThrowOnError extends boolean = false>(
   options?: Options<SubmissionServiceGetAllSubmissionsData, ThrowOnError>,
 ) => {
-  return (options?.client ?? client).get<SubmissionServiceGetAllSubmissionsResponses, unknown, ThrowOnError>({
+  return (options?.client ?? client).get<
+    SubmissionServiceGetAllSubmissionsResponses,
+    SubmissionServiceGetAllSubmissionsErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) => {
       return await zSubmissionServiceGetAllSubmissionsData.parseAsync(data)
     },
@@ -839,13 +1071,18 @@ export const submissionServiceGetAllSubmissions = <ThrowOnError extends boolean 
 }
 
 /**
- * Create a new submission
- * Submit a solution for an assignment (Students only)
+ * Tạo bài nộp mới
+ *
+ * Nộp bài giải cho một bài tập (chỉ sinh viên)
  */
 export const submissionServiceCreateSubmission = <ThrowOnError extends boolean = false>(
   options: Options<SubmissionServiceCreateSubmissionData, ThrowOnError>,
 ) => {
-  return (options.client ?? client).post<SubmissionServiceCreateSubmissionResponses, unknown, ThrowOnError>({
+  return (options.client ?? client).post<
+    SubmissionServiceCreateSubmissionResponses,
+    SubmissionServiceCreateSubmissionErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) => {
       return await zSubmissionServiceCreateSubmissionData.parseAsync(data)
     },
@@ -860,13 +1097,18 @@ export const submissionServiceCreateSubmission = <ThrowOnError extends boolean =
 }
 
 /**
- * Provide feedback for a submission
- * Add instructor feedback to a submission (Instructors only)
+ * Thêm nhận xét cho bài nộp
+ *
+ * Thêm nhận xét của giảng viên cho bài nộp (chỉ giảng viên)
  */
 export const submissionServiceProvideFeedback = <ThrowOnError extends boolean = false>(
   options: Options<SubmissionServiceProvideFeedbackData, ThrowOnError>,
 ) => {
-  return (options.client ?? client).post<SubmissionServiceProvideFeedbackResponses, unknown, ThrowOnError>({
+  return (options.client ?? client).post<
+    SubmissionServiceProvideFeedbackResponses,
+    SubmissionServiceProvideFeedbackErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) => {
       return await zSubmissionServiceProvideFeedbackData.parseAsync(data)
     },
@@ -881,13 +1123,18 @@ export const submissionServiceProvideFeedback = <ThrowOnError extends boolean = 
 }
 
 /**
- * Get submission by ID
- * Get submission details by ID. Students can only view their own, instructors can view all
+ * Lấy bài nộp theo ID
+ *
+ * Lấy chi tiết bài nộp theo ID. Sinh viên chỉ xem bài của mình, giảng viên xem được tất cả.
  */
 export const submissionServiceGetSubmissionById = <ThrowOnError extends boolean = false>(
   options: Options<SubmissionServiceGetSubmissionByIdData, ThrowOnError>,
 ) => {
-  return (options.client ?? client).get<SubmissionServiceGetSubmissionByIdResponses, unknown, ThrowOnError>({
+  return (options.client ?? client).get<
+    SubmissionServiceGetSubmissionByIdResponses,
+    SubmissionServiceGetSubmissionByIdErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) => {
       return await zSubmissionServiceGetSubmissionByIdData.parseAsync(data)
     },
@@ -898,8 +1145,9 @@ export const submissionServiceGetSubmissionById = <ThrowOnError extends boolean 
 }
 
 /**
- * Get supported runtimes
- * Returns list of all supported programming languages and their versions
+ * Lấy danh sách runtime hỗ trợ
+ *
+ * Trả về danh sách tất cả ngôn ngữ lập trình và phiên bản được hỗ trợ
  */
 export const evaluationServiceGetSupportedRuntimes = <ThrowOnError extends boolean = false>(
   options?: Options<EvaluationServiceGetSupportedRuntimesData, ThrowOnError>,
@@ -918,13 +1166,18 @@ export const evaluationServiceGetSupportedRuntimes = <ThrowOnError extends boole
 }
 
 /**
- * List all support sessions
- * Instructors view all sessions with pagination, students view their own
+ * Lấy danh sách phiên hỗ trợ
+ *
+ * Giảng viên xem tất cả phiên hỗ trợ với phân trang, sinh viên chỉ xem phiên của mình
  */
 export const supportServiceListSessions = <ThrowOnError extends boolean = false>(
   options?: Options<SupportServiceListSessionsData, ThrowOnError>,
 ) => {
-  return (options?.client ?? client).get<SupportServiceListSessionsResponses, unknown, ThrowOnError>({
+  return (options?.client ?? client).get<
+    SupportServiceListSessionsResponses,
+    SupportServiceListSessionsErrors,
+    ThrowOnError
+  >({
     requestValidator: async (data) => {
       return await zSupportServiceListSessionsData.parseAsync(data)
     },
@@ -935,8 +1188,9 @@ export const supportServiceListSessions = <ThrowOnError extends boolean = false>
 }
 
 /**
- * Create a new support session
- * Students can create support sessions
+ * Tạo phiên hỗ trợ mới
+ *
+ * Sinh viên có thể tạo phiên hỗ trợ mới
  */
 export const supportServiceCreateSession = <ThrowOnError extends boolean = false>(
   options: Options<SupportServiceCreateSessionData, ThrowOnError>,
@@ -960,8 +1214,9 @@ export const supportServiceCreateSession = <ThrowOnError extends boolean = false
 }
 
 /**
- * Close a support session
- * Only the student who created the session can close it
+ * Đóng phiên hỗ trợ
+ *
+ * Chỉ sinh viên tạo phiên mới được đóng phiên hỗ trợ
  */
 export const supportServiceCloseSession = <ThrowOnError extends boolean = false>(
   options: Options<SupportServiceCloseSessionData, ThrowOnError>,
@@ -981,8 +1236,9 @@ export const supportServiceCloseSession = <ThrowOnError extends boolean = false>
 }
 
 /**
- * Get support session by ID
- * Instructors can view all, students can view their own
+ * Lấy phiên hỗ trợ theo ID
+ *
+ * Giảng viên xem được tất cả, sinh viên chỉ xem phiên của mình
  */
 export const supportServiceGetSessionById = <ThrowOnError extends boolean = false>(
   options: Options<SupportServiceGetSessionByIdData, ThrowOnError>,
@@ -997,6 +1253,123 @@ export const supportServiceGetSessionById = <ThrowOnError extends boolean = fals
     },
     responseTransformer: supportServiceGetSessionByIdResponseTransformer,
     url: "/api/v1/support/sessions/{id}",
+    ...options,
+  })
+}
+
+/**
+ * Lấy tùy chọn thông báo
+ *
+ * Lấy tùy chọn nhận thông báo của người dùng hiện tại
+ */
+export const notificationServiceGetPreferences = <ThrowOnError extends boolean = false>(
+  options?: Options<NotificationServiceGetPreferencesData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    NotificationServiceGetPreferencesResponses,
+    NotificationServiceGetPreferencesErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) => {
+      return await zNotificationServiceGetPreferencesData.parseAsync(data)
+    },
+    responseTransformer: notificationServiceGetPreferencesResponseTransformer,
+    url: "/api/v1/preferences",
+    ...options,
+  })
+}
+
+/**
+ * Cập nhật tùy chọn thông báo
+ *
+ * Cập nhật tùy chọn nhận thông báo của người dùng hiện tại
+ */
+export const notificationServiceUpdatePreferences = <ThrowOnError extends boolean = false>(
+  options: Options<NotificationServiceUpdatePreferencesData, ThrowOnError>,
+) => {
+  return (options.client ?? client).put<
+    NotificationServiceUpdatePreferencesResponses,
+    NotificationServiceUpdatePreferencesErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) => {
+      return await zNotificationServiceUpdatePreferencesData.parseAsync(data)
+    },
+    responseTransformer: notificationServiceUpdatePreferencesResponseTransformer,
+    url: "/api/v1/preferences",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  })
+}
+
+/**
+ * Đăng ký token thiết bị FCM
+ *
+ * Đăng ký token thiết bị Firebase Cloud Messaging để nhận thông báo đẩy
+ */
+export const notificationServiceRegisterDevice = <ThrowOnError extends boolean = false>(
+  options: Options<NotificationServiceRegisterDeviceData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    NotificationServiceRegisterDeviceResponses,
+    NotificationServiceRegisterDeviceErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) => {
+      return await zNotificationServiceRegisterDeviceData.parseAsync(data)
+    },
+    responseTransformer: notificationServiceRegisterDeviceResponseTransformer,
+    url: "/api/v1/devices/register",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  })
+}
+
+/**
+ * Lấy danh sách thiết bị
+ *
+ * Lấy tất cả thiết bị đã đăng ký của người dùng hiện tại
+ */
+export const notificationServiceGetUserDevices = <ThrowOnError extends boolean = false>(
+  options?: Options<NotificationServiceGetUserDevicesData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    NotificationServiceGetUserDevicesResponses,
+    NotificationServiceGetUserDevicesErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) => {
+      return await zNotificationServiceGetUserDevicesData.parseAsync(data)
+    },
+    responseTransformer: notificationServiceGetUserDevicesResponseTransformer,
+    url: "/api/v1/devices",
+    ...options,
+  })
+}
+
+/**
+ * Xóa token thiết bị
+ *
+ * Xóa token thiết bị FCM đã đăng ký
+ */
+export const notificationServiceRemoveDevice = <ThrowOnError extends boolean = false>(
+  options: Options<NotificationServiceRemoveDeviceData, ThrowOnError>,
+) => {
+  return (options.client ?? client).delete<
+    NotificationServiceRemoveDeviceResponses,
+    NotificationServiceRemoveDeviceErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) => {
+      return await zNotificationServiceRemoveDeviceData.parseAsync(data)
+    },
+    url: "/api/v1/devices/{token}",
     ...options,
   })
 }

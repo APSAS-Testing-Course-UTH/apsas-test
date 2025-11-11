@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Internal API controller for inter-service communication. Not exposed through API Gateway - only
- * accessible within the service mesh.
+ * Bộ điều khiển API nội bộ phục vụ giao tiếp giữa các dịch vụ trong hệ thống APSAS.
+ * Không công khai qua API Gateway, chỉ truy cập trong service mesh.
  */
 @Hidden // Hide from public Swagger docs
 @RestController
@@ -29,11 +29,11 @@ public class InternalUserController {
   private final FeignUserMapper feignUserMapper;
 
   /**
-   * Internal endpoint to get user details for other services Used by notification service and other
-   * internal services
+   * API nội bộ lấy thông tin người dùng theo ID.
+   * Được sử dụng bởi các dịch vụ như notification và các dịch vụ nội bộ khác.
    *
-   * @param id User ID
-   * @return User details DTO
+   * @param id ID người dùng
+   * @return DTO thông tin người dùng
    */
   @GetMapping("/{id}")
   public apsas.feign.dto.UserResponse getUserInternal(
@@ -44,10 +44,11 @@ public class InternalUserController {
   }
 
   /**
-   * Internal endpoint to get multiple users by IDs Useful for batch operations
+   * API nội bộ lấy thông tin nhiều người dùng theo danh sách ID.
+   * Hữu ích cho các thao tác hàng loạt giữa các dịch vụ.
    *
-   * @param ids List of user IDs
-   * @return List of user details
+   * @param ids Danh sách ID người dùng
+   * @return Danh sách DTO thông tin người dùng
    */
   @PostMapping("/batch")
   public List<apsas.feign.dto.UserResponse> getUsersBatchInternal(
@@ -60,10 +61,10 @@ public class InternalUserController {
   }
 
   /**
-   * Internal endpoint to get users by role
+   * API nội bộ lấy danh sách người dùng theo vai trò.
    *
-   * @param role User role filter
-   * @return List of user details
+   * @param role Bộ lọc vai trò người dùng
+   * @return Danh sách DTO thông tin người dùng
    */
   @GetMapping("/by-role")
   public List<apsas.feign.dto.UserResponse> getUsersByRoleInternal(

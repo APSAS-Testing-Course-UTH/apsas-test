@@ -16,6 +16,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,30 +27,49 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
+/**
+ * Bộ điều khiển quản lý bài tập cho hệ thống APSAS.
+ * Cung cấp các API tạo, cập nhật, xóa, xuất bản và phân trang bài tập.
+ */
 @RestController
-@RequestMapping("/api/v1/assignments")
-@Tag(name = "Assignment Management", description = "Assignment management endpoints")
+@RequestMapping(
+  path = "/api/v1/assignments",
+  consumes = MediaType.APPLICATION_JSON_VALUE,
+  produces = MediaType.APPLICATION_JSON_VALUE
+)
+@Tag(name = "Quản lý bài tập", description = "Các API quản lý bài tập")
 @SecurityRequirement(name = "Bearer Authentication")
 @RequiredArgsConstructor
 public class AssignmentController {
   private final AssignmentService assignmentService;
 
-  @GetMapping
-  @Operation(
-      summary = "Get all assignments",
-      description = "Get all available assignments with pagination and sorting"
-  )
-  public ResponseEntity<PageResponse<AssignmentResponse>> getAllAssignments(
+    /**
+     * Lấy danh sách tất cả bài tập có phân trang và sắp xếp.
+     * @param pageParams Tham số phân trang
+     * @return Danh sách bài tập
+     */
+    @GetMapping
+    @Operation(
+      summary = "Lấy tất cả bài tập",
+      description = "Lấy danh sách bài tập có phân trang và sắp xếp"
+    )
+    public ResponseEntity<PageResponse<AssignmentResponse>> getAllAssignments(
       PageRequestParams pageParams
-  ) {
+    ) {
     PageResponse<AssignmentResponse> assignments =
-        assignmentService.getAllAssignments(pageParams.toPageable());
+      assignmentService.getAllAssignments(pageParams.toPageable());
     return ResponseEntity.ok(assignments);
-  }
+    }
 
+  /**
+   * Lấy chi tiết bài tập theo ID.
+   * @param id ID bài tập
+   * @return Thông tin bài tập
+   */
   @GetMapping("/{id}")
-  @Operation(summary = "Get assignment by ID", description = "Get assignment details by ID")
+  @Operation(summary = "Lấy bài tập theo ID", description = "Lấy chi tiết bài tập theo ID")
   public ResponseEntity<AssignmentResponse> getAssignmentById(
       @PathVariable
       UUID id
@@ -58,12 +78,19 @@ public class AssignmentController {
     return ResponseEntity.ok(assignment);
   }
 
+  /**
+   * Tạo mới bài tập (chỉ Content Provider).
+   * @param request Dữ liệu bài tập mới
+   * @param authentication Thông tin xác thực
+   * @return Thông tin bài tập vừa tạo
+   */
   @PostMapping
   @PreAuthorize("hasRole('CONTENT_PROVIDER')")
   @Operation(
-      summary = "Create a new assignment",
-      description = "Create a new assignment (Content Provider only)"
+      summary = "Tạo bài tập mới",
+      description = "Tạo mới bài tập (chỉ Content Provider)"
   )
+  @ResponseStatus(HttpStatus.CREATED)
   public ResponseEntity<AssignmentResponse> createAssignment(
       @Valid
       @RequestBody
@@ -72,14 +99,21 @@ public class AssignmentController {
     UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
     UUID creatorId = userPrincipal.userId();
     AssignmentResponse assignment = assignmentService.createAssignment(request, creatorId);
-    return new ResponseEntity<>(assignment, HttpStatus.CREATED);
+    return ResponseEntity.status(HttpStatus.CREATED).body(assignment);
   }
 
+  /**
+   * Cập nhật thông tin bài tập (chỉ Content Provider).
+   * @param id ID bài tập
+   * @param request Dữ liệu cập nhật
+   * @param authentication Thông tin xác thực
+   * @return Thông tin bài tập đã cập nhật
+   */
   @PatchMapping("/{id}")
   @PreAuthorize("hasRole('CONTENT_PROVIDER')")
   @Operation(
-      summary = "Update assignment",
-      description = "Update assignment details (Content Provider only)"
+      summary = "Cập nhật bài tập",
+      description = "Cập nhật thông tin bài tập (chỉ Content Provider)"
   )
   public ResponseEntity<AssignmentResponse> updateAssignment(
       @PathVariable
@@ -95,11 +129,17 @@ public class AssignmentController {
     return ResponseEntity.ok(assignment);
   }
 
+  /**
+   * Cập nhật lịch bài tập (chỉ Giảng viên).
+   * @param id ID bài tập
+   * @param request Dữ liệu lịch bài tập
+   * @return Thông tin bài tập đã cập nhật
+   */
   @PatchMapping("/{id}/schedule")
   @PreAuthorize("hasRole('INSTRUCTOR')")
   @Operation(
-      summary = "Update assignment schedule",
-      description = "Update assignment schedule (start_date, due_date) (Instructor only)"
+      summary = "Cập nhật lịch bài tập",
+      description = "Cập nhật lịch bài tập (start_date, due_date) (chỉ Giảng viên)"
   )
   public ResponseEntity<AssignmentResponse> updateAssignmentSchedule(
       @PathVariable
@@ -112,12 +152,18 @@ public class AssignmentController {
     return ResponseEntity.ok(assignment);
   }
 
+  /**
+   * Xóa bài tập (chỉ Content Provider).
+   * @param id ID bài tập
+   * @param authentication Thông tin xác thực
+   */
   @DeleteMapping("/{id}")
   @PreAuthorize("hasRole('CONTENT_PROVIDER')")
   @Operation(
-      summary = "Delete assignment",
-      description = "Delete an assignment (Content Provider only)"
+      summary = "Xóa bài tập",
+      description = "Xóa bài tập (chỉ Content Provider)"
   )
+  @ResponseStatus(HttpStatus.NO_CONTENT)
   public ResponseEntity<Void> deleteAssignment(
       @PathVariable
       UUID id, Authentication authentication
@@ -128,11 +174,17 @@ public class AssignmentController {
     return ResponseEntity.noContent().build();
   }
 
+  /**
+   * Xuất bản bài tập nháp (chỉ Content Provider).
+   * @param id ID bài tập
+   * @param authentication Thông tin xác thực
+   * @return Thông tin bài tập đã xuất bản
+   */
   @PostMapping("/{id}/publish")
   @PreAuthorize("hasRole('CONTENT_PROVIDER')")
   @Operation(
-      summary = "Publish an assignment",
-      description = "Publish a draft assignment (Content Provider only)"
+      summary = "Xuất bản bài tập",
+      description = "Xuất bản bài tập nháp (chỉ Content Provider)"
   )
   public ResponseEntity<AssignmentResponse> publishAssignment(
       @PathVariable
@@ -144,11 +196,17 @@ public class AssignmentController {
     return ResponseEntity.ok(assignment);
   }
 
+  /**
+   * Lưu trữ bài tập (chỉ Content Provider).
+   * @param id ID bài tập
+   * @param authentication Thông tin xác thực
+   * @return Thông tin bài tập đã lưu trữ
+   */
   @PostMapping("/{id}/archive")
   @PreAuthorize("hasRole('CONTENT_PROVIDER')")
   @Operation(
-      summary = "Archive an assignment",
-      description = "Archive an assignment (Content Provider only)"
+      summary = "Lưu trữ bài tập",
+      description = "Lưu trữ bài tập (chỉ Content Provider)"
   )
   public ResponseEntity<AssignmentResponse> archiveAssignment(
       @PathVariable

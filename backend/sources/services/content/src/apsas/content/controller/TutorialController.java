@@ -14,7 +14,9 @@ import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,29 +28,47 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Bộ điều khiển quản lý hướng dẫn cho hệ thống APSAS.
+ * Cung cấp các API tạo, cập nhật, xóa và phân trang hướng dẫn.
+ */
 @RestController
-@RequestMapping("/api/v1/tutorials")
-@Tag(name = "Tutorial Management", description = "Tutorial management endpoints")
+@RequestMapping(
+  value = "/api/v1/tutorials",
+  consumes = MediaType.APPLICATION_JSON_VALUE,
+  produces = MediaType.APPLICATION_JSON_VALUE
+)
+@Tag(name = "Quản lý hướng dẫn", description = "Các API quản lý hướng dẫn")
 @SecurityRequirement(name = "Bearer Authentication")
 @RequiredArgsConstructor
 public class TutorialController {
   private final TutorialService tutorialService;
 
-  @GetMapping
-  @Operation(
-      summary = "Get all tutorials",
-      description = "Get all available tutorials with pagination and sorting"
-  )
-  public ResponseEntity<PageResponse<TutorialResponse>> getAllTutorials(
+    /**
+     * Lấy danh sách tất cả hướng dẫn có phân trang và sắp xếp.
+     * @param pageParams Tham số phân trang
+     * @return Danh sách hướng dẫn
+     */
+    @GetMapping
+    @Operation(
+      summary = "Lấy tất cả hướng dẫn",
+      description = "Lấy danh sách hướng dẫn có phân trang và sắp xếp"
+    )
+    public ResponseEntity<PageResponse<TutorialResponse>> getAllTutorials(
       PageRequestParams pageParams
-  ) {
+    ) {
     PageResponse<TutorialResponse> tutorials =
-        tutorialService.getAllTutorials(pageParams.toPageable());
+      tutorialService.getAllTutorials(pageParams.toPageable());
     return ResponseEntity.ok(tutorials);
-  }
+    }
 
+  /**
+   * Lấy chi tiết hướng dẫn theo ID.
+   * @param id ID hướng dẫn
+   * @return Thông tin hướng dẫn
+   */
   @GetMapping("/{id}")
-  @Operation(summary = "Get tutorial by ID", description = "Get tutorial details by ID")
+  @Operation(summary = "Lấy hướng dẫn theo ID", description = "Lấy chi tiết hướng dẫn theo ID")
   public ResponseEntity<TutorialResponse> getTutorialById(
       @PathVariable
       UUID id
@@ -57,12 +77,19 @@ public class TutorialController {
     return ResponseEntity.ok(tutorial);
   }
 
+  /**
+   * Tạo mới hướng dẫn (chỉ Content Provider).
+   * @param request Dữ liệu hướng dẫn mới
+   * @param authentication Thông tin xác thực
+   * @return Thông tin hướng dẫn vừa tạo
+   */
   @PostMapping
   @PreAuthorize("hasRole('CONTENT_PROVIDER')")
   @Operation(
-      summary = "Create a new tutorial",
-      description = "Create a new tutorial (Content Provider only)"
+      summary = "Tạo hướng dẫn mới",
+      description = "Tạo mới hướng dẫn (chỉ Content Provider)"
   )
+  @ResponseStatus(HttpStatus.CREATED)
   public ResponseEntity<TutorialResponse> createTutorial(
       @Valid
       @RequestBody
@@ -71,14 +98,21 @@ public class TutorialController {
     UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
     UUID creatorId = userPrincipal.userId();
     TutorialResponse tutorial = tutorialService.createTutorial(request, creatorId);
-    return new ResponseEntity<>(tutorial, HttpStatus.CREATED);
+    return ResponseEntity.status(HttpStatus.CREATED).body(tutorial);
   }
 
+  /**
+   * Cập nhật thông tin hướng dẫn (chỉ Content Provider).
+   * @param id ID hướng dẫn
+   * @param request Dữ liệu cập nhật
+   * @param authentication Thông tin xác thực
+   * @return Thông tin hướng dẫn đã cập nhật
+   */
   @PatchMapping("/{id}")
   @PreAuthorize("hasRole('CONTENT_PROVIDER')")
   @Operation(
-      summary = "Update tutorial",
-      description = "Update tutorial details (Content Provider only)"
+      summary = "Cập nhật hướng dẫn",
+      description = "Cập nhật thông tin hướng dẫn (chỉ Content Provider)"
   )
   public ResponseEntity<TutorialResponse> updateTutorial(
       @PathVariable
@@ -94,9 +128,15 @@ public class TutorialController {
     return ResponseEntity.ok(tutorial);
   }
 
+  /**
+   * Xóa hướng dẫn (chỉ Content Provider).
+   * @param id ID hướng dẫn
+   * @param authentication Thông tin xác thực
+   */
   @DeleteMapping("/{id}")
   @PreAuthorize("hasRole('CONTENT_PROVIDER')")
-  @Operation(summary = "Delete tutorial", description = "Delete a tutorial (Content Provider only)")
+  @Operation(summary = "Xóa hướng dẫn", description = "Xóa hướng dẫn (chỉ Content Provider)")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
   public ResponseEntity<Void> deleteTutorial(
       @PathVariable
       UUID id, Authentication authentication

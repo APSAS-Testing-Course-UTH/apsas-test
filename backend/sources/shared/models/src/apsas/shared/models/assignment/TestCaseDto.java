@@ -3,8 +3,8 @@ package apsas.shared.models.assignment;
 import jakarta.validation.constraints.NotNull;
 
 /**
- * Shared DTO for Test Case details used across services. This is the single source of truth for
- * test case data in inter-service communication.
+ * DTO dùng chung cho thông tin test case, sử dụng giữa các service.
+ * Đây là nguồn dữ liệu duy nhất cho test case trong giao tiếp giữa các service.
  */
 public record TestCaseDto(
     @NotNull Integer order,

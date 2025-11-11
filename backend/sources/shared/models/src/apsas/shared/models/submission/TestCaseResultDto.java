@@ -6,8 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Shared DTO for Test Case execution results.
- * Used across submission and evaluation services for consistent result reporting.
+ * DTO dùng chung cho kết quả thực thi test case.
+ * Sử dụng giữa các service submission và evaluation để báo cáo kết quả nhất quán.
  */
 @Getter
 @Setter

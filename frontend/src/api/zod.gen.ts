@@ -66,7 +66,7 @@ export const zIdentityServiceLoginRequest = z.object({
 })
 
 /**
- * Paginated response wrapper
+ * Lớp bọc phản hồi phân trang
  */
 export const zIdentityServicePageResponseUserResponse = z.object({
   content: z.optional(z.array(zIdentityServiceUserResponse)),
@@ -78,6 +78,17 @@ export const zIdentityServicePageResponseUserResponse = z.object({
   last: z.optional(z.boolean()),
   hasNext: z.optional(z.boolean()),
   hasPrevious: z.optional(z.boolean()),
+})
+
+/**
+ * Chi tiết lỗi theo chuẩn RFC 9457
+ */
+export const zIdentityServiceProblemDetail = z.object({
+  type: z.optional(z.unknown()),
+  title: z.optional(z.unknown()),
+  status: z.optional(z.unknown()),
+  detail: z.optional(z.unknown()),
+  instance: z.optional(z.unknown()),
 })
 
 export const zContentServiceCreateTutorialRequest = z.object({
@@ -181,7 +192,7 @@ export const zContentServiceUpdateAssignmentScheduleRequest = z.object({
 })
 
 /**
- * Paginated response wrapper
+ * Lớp bọc phản hồi phân trang
  */
 export const zContentServicePageResponseTutorialResponse = z.object({
   content: z.optional(z.array(zContentServiceTutorialResponse)),
@@ -196,7 +207,7 @@ export const zContentServicePageResponseTutorialResponse = z.object({
 })
 
 /**
- * Paginated response wrapper
+ * Lớp bọc phản hồi phân trang
  */
 export const zContentServicePageResponseSkillResponse = z.object({
   content: z.optional(z.array(zContentServiceSkillResponse)),
@@ -211,7 +222,7 @@ export const zContentServicePageResponseSkillResponse = z.object({
 })
 
 /**
- * Paginated response wrapper
+ * Lớp bọc phản hồi phân trang
  */
 export const zContentServicePageResponseAssignmentResponse = z.object({
   content: z.optional(z.array(zContentServiceAssignmentResponse)),
@@ -225,13 +236,24 @@ export const zContentServicePageResponseAssignmentResponse = z.object({
   hasPrevious: z.optional(z.boolean()),
 })
 
+/**
+ * Chi tiết lỗi theo chuẩn RFC 9457
+ */
+export const zContentServiceProblemDetail = z.object({
+  type: z.optional(z.unknown()),
+  title: z.optional(z.unknown()),
+  status: z.optional(z.unknown()),
+  detail: z.optional(z.unknown()),
+  instance: z.optional(z.unknown()),
+})
+
 export const zSubmissionServiceCreateSubmissionRequest = z.object({
   assignmentId: z.uuid(),
   code: z.string().min(1),
   language: z.string().min(1),
 })
 
-export const zSubmissionServiceTestCaseResultResponse = z.object({
+export const zSubmissionServiceTestCaseResultDto = z.object({
   order: z.optional(z.int()),
   description: z.optional(z.string()),
   hidden: z.optional(z.boolean()),
@@ -257,7 +279,7 @@ export const zSubmissionServiceSubmissionResponse = z.object({
   language: z.optional(z.string()),
   result: z.optional(z.enum(["PASSED", "FAILED", "PARTIAL"])),
   score: z.optional(z.number()),
-  testCaseResults: z.optional(z.array(zSubmissionServiceTestCaseResultResponse)),
+  testCaseResults: z.optional(z.array(zSubmissionServiceTestCaseResultDto)),
   evaluatedAt: z.optional(z.iso.datetime()),
   feedback: z.optional(z.string()),
 })
@@ -267,7 +289,7 @@ export const zSubmissionServiceSubmissionFeedbackRequest = z.object({
 })
 
 /**
- * Paginated response wrapper
+ * Lớp bọc phản hồi phân trang
  */
 export const zSubmissionServicePageResponseSubmissionResponse = z.object({
   content: z.optional(z.array(zSubmissionServiceSubmissionResponse)),
@@ -282,13 +304,35 @@ export const zSubmissionServicePageResponseSubmissionResponse = z.object({
 })
 
 /**
- * Supported programming language runtime information
+ * Chi tiết lỗi theo chuẩn RFC 9457
+ */
+export const zSubmissionServiceProblemDetail = z.object({
+  type: z.optional(z.unknown()),
+  title: z.optional(z.unknown()),
+  status: z.optional(z.unknown()),
+  detail: z.optional(z.unknown()),
+  instance: z.optional(z.unknown()),
+})
+
+/**
+ * Thông tin runtime của ngôn ngữ lập trình được hỗ trợ
  */
 export const zEvaluationServiceRuntimeResponse = z.object({
   language: z.optional(z.string()),
   version: z.optional(z.string()),
   aliases: z.optional(z.array(z.string())),
   runtime: z.optional(z.string()),
+})
+
+/**
+ * Chi tiết lỗi theo chuẩn RFC 9457
+ */
+export const zEvaluationServiceProblemDetail = z.object({
+  type: z.optional(z.unknown()),
+  title: z.optional(z.unknown()),
+  status: z.optional(z.unknown()),
+  detail: z.optional(z.unknown()),
+  instance: z.optional(z.unknown()),
 })
 
 export const zSupportServiceCreateSupportSessionRequest = z.object({
@@ -315,7 +359,7 @@ export const zSupportServiceSupportSessionDto = z.object({
 })
 
 /**
- * Paginated response wrapper
+ * Lớp bọc phản hồi phân trang
  */
 export const zSupportServicePageResponseSupportSessionDto = z.object({
   content: z.optional(z.array(zSupportServiceSupportSessionDto)),
@@ -329,6 +373,66 @@ export const zSupportServicePageResponseSupportSessionDto = z.object({
   hasPrevious: z.optional(z.boolean()),
 })
 
+/**
+ * Chi tiết lỗi theo chuẩn RFC 9457
+ */
+export const zSupportServiceProblemDetail = z.object({
+  type: z.optional(z.unknown()),
+  title: z.optional(z.unknown()),
+  status: z.optional(z.unknown()),
+  detail: z.optional(z.unknown()),
+  instance: z.optional(z.unknown()),
+})
+
+export const zNotificationServiceNotificationPreferencesRequest = z.object({
+  emailEnabled: z.optional(z.boolean()),
+  pushEnabled: z.optional(z.boolean()),
+  emailAssignmentPublished: z.optional(z.boolean()),
+  emailSubmissionEvaluated: z.optional(z.boolean()),
+  pushAssignmentPublished: z.optional(z.boolean()),
+  pushSubmissionEvaluated: z.optional(z.boolean()),
+})
+
+export const zNotificationServiceNotificationPreferencesResponse = z.object({
+  id: z.optional(z.uuid()),
+  userId: z.optional(z.uuid()),
+  emailEnabled: z.optional(z.boolean()),
+  pushEnabled: z.optional(z.boolean()),
+  emailAssignmentPublished: z.optional(z.boolean()),
+  emailSubmissionEvaluated: z.optional(z.boolean()),
+  pushAssignmentPublished: z.optional(z.boolean()),
+  pushSubmissionEvaluated: z.optional(z.boolean()),
+  createdAt: z.optional(z.iso.datetime()),
+  updatedAt: z.optional(z.iso.datetime()),
+})
+
+export const zNotificationServiceRegisterDeviceRequest = z.object({
+  token: z.string().min(1),
+  deviceType: z.string().min(1),
+  userAgent: z.optional(z.string()),
+})
+
+export const zNotificationServiceDeviceTokenResponse = z.object({
+  id: z.optional(z.uuid()),
+  token: z.optional(z.string()),
+  deviceType: z.optional(z.string()),
+  userAgent: z.optional(z.string()),
+  isActive: z.optional(z.boolean()),
+  createdAt: z.optional(z.iso.datetime()),
+  updatedAt: z.optional(z.iso.datetime()),
+})
+
+/**
+ * Chi tiết lỗi theo chuẩn RFC 9457
+ */
+export const zNotificationServiceProblemDetail = z.object({
+  type: z.optional(z.unknown()),
+  title: z.optional(z.unknown()),
+  status: z.optional(z.unknown()),
+  detail: z.optional(z.unknown()),
+  instance: z.optional(z.unknown()),
+})
+
 export const zIdentityServiceDeactivateUserData = z.object({
   body: z.optional(z.never()),
   path: z.object({
@@ -338,9 +442,9 @@ export const zIdentityServiceDeactivateUserData = z.object({
 })
 
 /**
- * OK
+ * No Content
  */
-export const zIdentityServiceDeactivateUserResponse = z.record(z.string(), z.string())
+export const zIdentityServiceDeactivateUserResponse = z.void()
 
 export const zIdentityServiceActivateUserData = z.object({
   body: z.optional(z.never()),
@@ -351,9 +455,9 @@ export const zIdentityServiceActivateUserData = z.object({
 })
 
 /**
- * OK
+ * No Content
  */
-export const zIdentityServiceActivateUserResponse = z.record(z.string(), z.string())
+export const zIdentityServiceActivateUserResponse = z.void()
 
 export const zIdentityServiceGetCurrentUserData = z.object({
   body: z.optional(z.never()),
@@ -384,7 +488,6 @@ export const zIdentityServiceGetAllUsersData = z.object({
     z.object({
       page: z.optional(z.string()),
       size: z.optional(z.string()),
-      sort: z.optional(z.string()),
     }),
   ),
 })
@@ -401,7 +504,7 @@ export const zIdentityServiceCreateUserData = z.object({
 })
 
 /**
- * OK
+ * Created
  */
 export const zIdentityServiceCreateUserResponse = zIdentityServiceUserResponse
 
@@ -412,9 +515,9 @@ export const zIdentityServiceChangePasswordData = z.object({
 })
 
 /**
- * OK
+ * No Content
  */
-export const zIdentityServiceChangePasswordResponse = z.record(z.string(), z.string())
+export const zIdentityServiceChangePasswordResponse = z.void()
 
 export const zIdentityServiceVerifyEmailData = z.object({
   body: zIdentityServiceTokenRequest,
@@ -423,9 +526,9 @@ export const zIdentityServiceVerifyEmailData = z.object({
 })
 
 /**
- * OK
+ * No Content
  */
-export const zIdentityServiceVerifyEmailResponse = z.record(z.string(), z.string())
+export const zIdentityServiceVerifyEmailResponse = z.void()
 
 export const zIdentityServiceResetPasswordData = z.object({
   body: zIdentityServiceResetPasswordRequest,
@@ -434,9 +537,9 @@ export const zIdentityServiceResetPasswordData = z.object({
 })
 
 /**
- * OK
+ * No Content
  */
-export const zIdentityServiceResetPasswordResponse = z.record(z.string(), z.string())
+export const zIdentityServiceResetPasswordResponse = z.void()
 
 export const zIdentityServiceResendVerificationEmailData = z.object({
   body: zIdentityServiceEmailRequest,
@@ -445,9 +548,9 @@ export const zIdentityServiceResendVerificationEmailData = z.object({
 })
 
 /**
- * OK
+ * No Content
  */
-export const zIdentityServiceResendVerificationEmailResponse = z.record(z.string(), z.string())
+export const zIdentityServiceResendVerificationEmailResponse = z.void()
 
 export const zIdentityServiceRegisterData = z.object({
   body: zIdentityServiceRegisterRequest,
@@ -456,7 +559,7 @@ export const zIdentityServiceRegisterData = z.object({
 })
 
 /**
- * OK
+ * Created
  */
 export const zIdentityServiceRegisterResponse = zIdentityServiceAuthResponse
 
@@ -478,9 +581,9 @@ export const zIdentityServiceRequestPasswordResetData = z.object({
 })
 
 /**
- * OK
+ * No Content
  */
-export const zIdentityServiceRequestPasswordResetResponse = z.record(z.string(), z.string())
+export const zIdentityServiceRequestPasswordResetResponse = z.void()
 
 export const zIdentityServiceDeleteUserData = z.object({
   body: z.optional(z.never()),
@@ -491,9 +594,9 @@ export const zIdentityServiceDeleteUserData = z.object({
 })
 
 /**
- * OK
+ * No Content
  */
-export const zIdentityServiceDeleteUserResponse = z.record(z.string(), z.string())
+export const zIdentityServiceDeleteUserResponse = z.void()
 
 export const zIdentityServiceGetUserByIdData = z.object({
   body: z.optional(z.never()),
@@ -517,7 +620,6 @@ export const zIdentityServiceGetUsersByRoleData = z.object({
     z.object({
       page: z.optional(z.string()),
       size: z.optional(z.string()),
-      sort: z.optional(z.string()),
     }),
   ),
 })
@@ -534,7 +636,6 @@ export const zContentServiceGetAllTutorialsData = z.object({
     z.object({
       page: z.optional(z.string()),
       size: z.optional(z.string()),
-      sort: z.optional(z.string()),
     }),
   ),
 })
@@ -551,7 +652,7 @@ export const zContentServiceCreateTutorialData = z.object({
 })
 
 /**
- * OK
+ * Created
  */
 export const zContentServiceCreateTutorialResponse = zContentServiceTutorialResponse
 
@@ -562,7 +663,6 @@ export const zContentServiceGetAllSkillsData = z.object({
     z.object({
       page: z.optional(z.string()),
       size: z.optional(z.string()),
-      sort: z.optional(z.string()),
     }),
   ),
 })
@@ -579,7 +679,7 @@ export const zContentServiceCreateSkillData = z.object({
 })
 
 /**
- * OK
+ * Created
  */
 export const zContentServiceCreateSkillResponse = zContentServiceSkillResponse
 
@@ -590,7 +690,6 @@ export const zContentServiceGetAllAssignmentsData = z.object({
     z.object({
       page: z.optional(z.string()),
       size: z.optional(z.string()),
-      sort: z.optional(z.string()),
     }),
   ),
 })
@@ -607,7 +706,7 @@ export const zContentServiceCreateAssignmentData = z.object({
 })
 
 /**
- * OK
+ * Created
  */
 export const zContentServiceCreateAssignmentResponse = zContentServiceAssignmentResponse
 
@@ -646,9 +745,9 @@ export const zContentServiceDeleteTutorialData = z.object({
 })
 
 /**
- * OK
+ * No Content
  */
-export const zContentServiceDeleteTutorialResponse = z.record(z.string(), z.string())
+export const zContentServiceDeleteTutorialResponse = z.void()
 
 export const zContentServiceGetTutorialByIdData = z.object({
   body: z.optional(z.never()),
@@ -685,9 +784,9 @@ export const zContentServiceDeleteSkillData = z.object({
 })
 
 /**
- * OK
+ * No Content
  */
-export const zContentServiceDeleteSkillResponse = z.record(z.string(), z.string())
+export const zContentServiceDeleteSkillResponse = z.void()
 
 export const zContentServiceGetSkillByIdData = z.object({
   body: z.optional(z.never()),
@@ -724,9 +823,9 @@ export const zContentServiceDeleteAssignmentData = z.object({
 })
 
 /**
- * OK
+ * No Content
  */
-export const zContentServiceDeleteAssignmentResponse = z.record(z.string(), z.string())
+export const zContentServiceDeleteAssignmentResponse = z.void()
 
 export const zContentServiceGetAssignmentByIdData = z.object({
   body: z.optional(z.never()),
@@ -777,7 +876,6 @@ export const zSubmissionServiceGetAllSubmissionsData = z.object({
       status: z.optional(z.enum(["PENDING", "EVALUATED", "FAILED"])),
       page: z.optional(z.string()),
       size: z.optional(z.string()),
-      sort: z.optional(z.string()),
     }),
   ),
 })
@@ -794,7 +892,7 @@ export const zSubmissionServiceCreateSubmissionData = z.object({
 })
 
 /**
- * OK
+ * Created
  */
 export const zSubmissionServiceCreateSubmissionResponse = zSubmissionServiceSubmissionResponse
 
@@ -831,7 +929,7 @@ export const zEvaluationServiceGetSupportedRuntimesData = z.object({
 })
 
 /**
- * Successfully retrieved runtimes
+ * OK
  */
 export const zEvaluationServiceGetSupportedRuntimesResponse = z.array(zEvaluationServiceRuntimeResponse)
 
@@ -842,7 +940,6 @@ export const zSupportServiceListSessionsData = z.object({
     z.object({
       page: z.optional(z.string()),
       size: z.optional(z.string()),
-      sort: z.optional(z.string()),
       userId: z.optional(z.uuid()),
       email: z.optional(z.string()),
       firstName: z.optional(z.string()),
@@ -854,7 +951,7 @@ export const zSupportServiceListSessionsData = z.object({
 })
 
 /**
- * Successfully retrieved sessions
+ * OK
  */
 export const zSupportServiceListSessionsResponse = zSupportServicePageResponseSupportSessionDto
 
@@ -874,7 +971,7 @@ export const zSupportServiceCreateSessionData = z.object({
 })
 
 /**
- * Session created successfully
+ * Created
  */
 export const zSupportServiceCreateSessionResponse = zSupportServiceSupportSessionDto
 
@@ -896,7 +993,7 @@ export const zSupportServiceCloseSessionData = z.object({
 })
 
 /**
- * Session closed successfully
+ * OK
  */
 export const zSupportServiceCloseSessionResponse = zSupportServiceSupportSessionDto
 
@@ -918,6 +1015,63 @@ export const zSupportServiceGetSessionByIdData = z.object({
 })
 
 /**
- * Successfully retrieved session
+ * OK
  */
 export const zSupportServiceGetSessionByIdResponse = zSupportServiceSupportSessionDto
+
+export const zNotificationServiceGetPreferencesData = z.object({
+  body: z.optional(z.never()),
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * OK
+ */
+export const zNotificationServiceGetPreferencesResponse = zNotificationServiceNotificationPreferencesResponse
+
+export const zNotificationServiceUpdatePreferencesData = z.object({
+  body: zNotificationServiceNotificationPreferencesRequest,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * OK
+ */
+export const zNotificationServiceUpdatePreferencesResponse = zNotificationServiceNotificationPreferencesResponse
+
+export const zNotificationServiceRegisterDeviceData = z.object({
+  body: zNotificationServiceRegisterDeviceRequest,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Created
+ */
+export const zNotificationServiceRegisterDeviceResponse = zNotificationServiceDeviceTokenResponse
+
+export const zNotificationServiceGetUserDevicesData = z.object({
+  body: z.optional(z.never()),
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * OK
+ */
+export const zNotificationServiceGetUserDevicesResponse = z.array(zNotificationServiceDeviceTokenResponse)
+
+export const zNotificationServiceRemoveDeviceData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    token: z.string(),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * No Content
+ */
+export const zNotificationServiceRemoveDeviceResponse = z.void()

@@ -4,30 +4,30 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
 /**
- * Generic paginated response wrapper.
+ * Lớp bọc phản hồi phân trang tổng quát.
  *
- * @param <T> The type of content in the page
+ * @param <T> Kiểu dữ liệu của nội dung trang
  */
-@Schema(description = "Paginated response wrapper")
+@Schema(description = "Lớp bọc phản hồi phân trang")
 public record PageResponse<T>(
-    @Schema(description = "List of items in the current page") List<T> content,
-    @Schema(description = "Current page number (0-indexed)", example = "0") int pageNumber,
-    @Schema(description = "Number of items per page", example = "10") int pageSize,
-    @Schema(description = "Total number of items across all pages", example = "100")
+    @Schema(description = "Danh sách phần tử trong trang hiện tại") List<T> content,
+    @Schema(description = "Số trang hiện tại (bắt đầu từ 0)", example = "0") int pageNumber,
+    @Schema(description = "Số lượng phần tử mỗi trang", example = "10") int pageSize,
+    @Schema(description = "Tổng số phần tử trên tất cả các trang", example = "100")
         long totalElements,
-    @Schema(description = "Total number of pages", example = "10") int totalPages,
-    @Schema(description = "Whether this is the first page", example = "true") boolean first,
-    @Schema(description = "Whether this is the last page", example = "false") boolean last,
-    @Schema(description = "Whether there is a next page", example = "true") boolean hasNext,
-    @Schema(description = "Whether there is a previous page", example = "false")
+    @Schema(description = "Tổng số trang", example = "10") int totalPages,
+    @Schema(description = "Có phải trang đầu tiên không", example = "true") boolean first,
+    @Schema(description = "Có phải trang cuối cùng không", example = "false") boolean last,
+    @Schema(description = "Có trang tiếp theo không", example = "true") boolean hasNext,
+    @Schema(description = "Có trang trước đó không", example = "false")
         boolean hasPrevious) {
 
   /**
-   * Creates a PageResponse from Spring Data's Page object.
+   * Tạo PageResponse từ đối tượng Page của Spring Data.
    *
-   * @param page Spring Data Page object
-   * @param <T> The type of content
-   * @return PageResponse instance
+   * @param page Đối tượng Page của Spring Data
+   * @param <T> Kiểu dữ liệu của nội dung
+   * @return Đối tượng PageResponse
    */
   public static <T> PageResponse<T> of(org.springframework.data.domain.Page<T> page) {
     return new PageResponse<>(
