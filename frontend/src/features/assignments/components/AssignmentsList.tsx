@@ -11,6 +11,7 @@
 
 import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
+import type { AxiosError } from 'axios'
 import {
   Table,
   Button,
@@ -28,6 +29,14 @@ import { useAssignmentsFiltered, type AssignmentFilters } from '../hooks/useAssi
 import { AssignmentsFilterBar } from './AssignmentsFilterBar'
 import { getUrgencyLevel, getUrgencyLabel, formatDateShort, getDeadlineStatusText } from '@/utils/dateUtils'
 import { mapUrgencyToBadgeColor } from '@/components/utils/badgeColorUtils'
+import { 
+  getErrorMessage, 
+  isNetworkError, 
+  isTimeoutError,
+  showErrorNotification,
+  showNetworkErrorNotification,
+  showTimeoutNotification,
+} from '@/features/student/utils'
 import styles from './AssignmentsList.module.css'
 
 interface AssignmentsListProps {
@@ -82,14 +91,37 @@ export function AssignmentsList({ onSelectAssignment }: AssignmentsListProps) {
 
   // Render error state
   if (error) {
+    const isNetwork = isNetworkError(error as AxiosError)
+    const isTimeout = isTimeoutError(error as AxiosError)
+    const errorMessage = getErrorMessage(error)
+
     return (
       <Stack className={styles.container} gap="md">
         <AssignmentsFilterBar filters={filters} onFiltersChange={handleFiltersChange} isLoading={false} />
         <Center className={styles.container}>
           <Stack align="center" gap="md">
-            <Badge color="red">Lỗi</Badge>
-            <Text>Không thể tải danh sách bài tập. Vui lòng thử lại.</Text>
-            <Button onClick={() => window.location.reload()}>Tải lại trang</Button>
+            <Badge color={isNetwork || isTimeout ? 'orange' : 'red'}>
+              {isNetwork ? '🌐 Lỗi kết nối' : isTimeout ? '⏱️ Hết thời gian chờ' : 'Lỗi'}
+            </Badge>
+            <Text>{errorMessage}</Text>
+            <Stack gap="xs">
+              <Button 
+                onClick={() => window.location.reload()}
+                variant="light"
+              >
+                Tải lại trang
+              </Button>
+              {isNetwork && (
+                <Text size="sm" c="dimmed">
+                  💡 Gợi ý: Kiểm tra kết nối mạng của bạn
+                </Text>
+              )}
+              {isTimeout && (
+                <Text size="sm" c="dimmed">
+                  💡 Gợi ý: Máy chủ đang chậm, hãy thử lại trong vài giây
+                </Text>
+              )}
+            </Stack>
           </Stack>
         </Center>
       </Stack>

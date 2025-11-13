@@ -5,7 +5,7 @@
  */
 
 import { useState, useCallback, useMemo } from 'react'
-import { useQuery } from '@tanstack/react-query'
+
 
 /**
  * Filter state for assignments

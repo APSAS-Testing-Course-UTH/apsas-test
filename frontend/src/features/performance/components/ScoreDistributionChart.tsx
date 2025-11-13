@@ -118,12 +118,12 @@ export function ScoreDistributionChart({
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
-                data={gradeData}
+                data={gradeData as any}
                 cx="50%"
                 cy="50%"
                 labelLine={false}
                 label={({ name, value, percent }) =>
-                  `${name}: ${value} (${(percent * 100).toFixed(0)}%)`
+                  `${name}: ${value} (${((percent as number) * 100).toFixed(0)}%)`
                 }
                 outerRadius={100}
                 fill="#8884d8"

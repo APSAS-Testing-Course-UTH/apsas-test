@@ -1,0 +1,110 @@
+.container {
+  padding: 0;
+  gap: 1rem;
+}
+
+.tableWrapper {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: var(--mantine-radius-md);
+  border: 1px solid var(--mantine-color-gray-2);
+}
+
+.row {
+  transition: background-color 0.2s ease;
+}
+
+.row:hover {
+  background-color: var(--mantine-color-gray-1);
+}
+
+/* Table column widths - total 100% */
+.titleCol {
+  width: 35%;
+  min-width: 300px;
+  box-sizing: border-box;
+}
+
+.titleContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.difficultyCol {
+  width: 12%;
+  min-width: 100px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.statusCol {
+  width: 12%;
+  min-width: 120px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.dateCol {
+  width: 12%;
+  min-width: 120px;
+  box-sizing: border-box;
+}
+
+.actionCol {
+  width: 17%;
+  min-width: 150px;
+  text-align: right;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .titleCol {
+    width: 40%;
+    min-width: 250px;
+  }
+
+  .difficultyCol {
+    width: 12%;
+    min-width: 80px;
+  }
+
+  .statusCol {
+    width: 12%;
+    min-width: 100px;
+  }
+
+  .dateCol {
+    width: 0;
+    padding: 0;
+    display: none;
+  }
+
+  .actionCol {
+    width: 36%;
+    min-width: 120px;
+  }
+}
+
+@media (max-width: 480px) {
+  .titleCol {
+    width: 50%;
+    min-width: 200px;
+  }
+
+  .difficultyCol {
+    width: 0;
+    padding: 0;
+    display: none;
+  }
+
+  .statusCol {
+    width: 15%;
+    min-width: 80px;
+  }
+
+  .actionCol {
+    width: 35%;
+    min-width: 100px;
+  }
+}

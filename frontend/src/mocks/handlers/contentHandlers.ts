@@ -73,9 +73,8 @@ export const contentHandlers = [
    * Create a new tutorial (Provider only)
    */
   http.post('**/api/v1/tutorials',
-    withAuth(async ({ request }: { request: Request }) => {
-      const token = request.headers.get('Authorization')?.split(' ')[1]
-      const userRole = token?.includes('provider') ? UserRole.PROVIDER : UserRole.STUDENT
+    withAuth(async ({ request, user }: any) => {
+      const userRole = user.role
 
       // Only providers can create tutorials
       if (userRole !== UserRole.PROVIDER) {
@@ -142,9 +141,8 @@ export const contentHandlers = [
    * Update tutorial (Provider only)
    */
   http.patch('**/api/v1/tutorials/:id',
-    withAuth(async ({ request, params }: { request: Request, params: { id: string } }) => {
-      const token = request.headers.get('Authorization')?.split(' ')[1]
-      const userRole = token?.includes('provider') ? UserRole.PROVIDER : UserRole.STUDENT
+    withAuth(async ({ request, params, user }: any) => {
+      const userRole = user.role
 
       // Only providers can update tutorials
       if (userRole !== UserRole.PROVIDER) {
@@ -183,9 +181,8 @@ export const contentHandlers = [
    * Delete tutorial (Provider only)
    */
   http.delete('**/api/v1/tutorials/:id',
-    withAuth(({ request, params }: { request: Request, params: { id: string } }) => {
-      const token = request.headers.get('Authorization')?.split(' ')[1]
-      const userRole = token?.includes('provider') ? UserRole.PROVIDER : UserRole.STUDENT
+    withAuth(({ request, params, user }: any) => {
+      const userRole = user.role
 
       // Only providers can delete tutorials
       if (userRole !== UserRole.PROVIDER) {
@@ -253,9 +250,8 @@ export const contentHandlers = [
    * Create a new skill (Provider only)
    */
   http.post('**/api/v1/skills',
-    withAuth(async ({ request }: { request: Request }) => {
-      const token = request.headers.get('Authorization')?.split(' ')[1]
-      const userRole = token?.includes('provider') ? UserRole.PROVIDER : UserRole.STUDENT
+    withAuth(async ({ request, user }: any) => {
+      const userRole = user.role
 
       // Only providers can create skills
       if (userRole !== UserRole.PROVIDER) {
@@ -314,9 +310,8 @@ export const contentHandlers = [
    * Update skill (Provider only)
    */
   http.patch('**/api/v1/skills/:id',
-    withAuth(async ({ request, params }: { request: Request, params: { id: string } }) => {
-      const token = request.headers.get('Authorization')?.split(' ')[1]
-      const userRole = token?.includes('provider') ? UserRole.PROVIDER : UserRole.STUDENT
+    withAuth(async ({ request, params, user }: any) => {
+      const userRole = user.role
 
       // Only providers can update skills
       if (userRole !== UserRole.PROVIDER) {
@@ -354,9 +349,8 @@ export const contentHandlers = [
    * Delete skill (Provider only)
    */
   http.delete('**/api/v1/skills/:id',
-    withAuth(({ request, params }: { request: Request, params: { id: string } }) => {
-      const token = request.headers.get('Authorization')?.split(' ')[1]
-      const userRole = token?.includes('provider') ? UserRole.PROVIDER : UserRole.STUDENT
+    withAuth(({ request, params, user }: any) => {
+      const userRole = user.role
 
       // Only providers can delete skills
       if (userRole !== UserRole.PROVIDER) {
@@ -424,9 +418,8 @@ export const contentHandlers = [
    * Create a new assignment (Provider only)
    */
   http.post('**/api/v1/assignments',
-    withAuth(async ({ request }: { request: Request }) => {
-      const token = request.headers.get('Authorization')?.split(' ')[1]
-      const userRole = token?.includes('provider') ? UserRole.PROVIDER : UserRole.STUDENT
+    withAuth(async ({ request, user }: any) => {
+      const userRole = user.role
 
       // Only providers can create assignments
       if (userRole !== UserRole.PROVIDER) {
@@ -495,9 +488,8 @@ export const contentHandlers = [
    * Update assignment (Provider only)
    */
   http.patch('**/api/v1/assignments/:id',
-    withAuth(async ({ request, params }: { request: Request, params: { id: string } }) => {
-      const token = request.headers.get('Authorization')?.split(' ')[1]
-      const userRole = token?.includes('provider') ? UserRole.PROVIDER : UserRole.STUDENT
+    withAuth(async ({ request, params, user }: any) => {
+      const userRole = user.role
 
       // Only providers can update assignments
       if (userRole !== UserRole.PROVIDER) {
@@ -543,9 +535,8 @@ export const contentHandlers = [
    * Publish assignment (Provider only)
    */
   http.post('**/api/v1/assignments/:id/publish',
-    withAuth(({ request, params }: { request: Request, params: { id: string } }) => {
-      const token = request.headers.get('Authorization')?.split(' ')[1]
-      const userRole = token?.includes('provider') ? UserRole.PROVIDER : UserRole.STUDENT
+    withAuth(({ request, params, user }: any) => {
+      const userRole = user.role
 
       // Only providers can publish assignments
       if (userRole !== UserRole.PROVIDER) {
@@ -580,9 +571,8 @@ export const contentHandlers = [
    * Archive assignment (Provider only)
    */
   http.post('**/api/v1/assignments/:id/archive',
-    withAuth(({ request, params }: { request: Request, params: { id: string } }) => {
-      const token = request.headers.get('Authorization')?.split(' ')[1]
-      const userRole = token?.includes('provider') ? UserRole.PROVIDER : UserRole.STUDENT
+    withAuth(({ request, params, user }: any) => {
+      const userRole = user.role
 
       // Only providers can archive assignments
       if (userRole !== UserRole.PROVIDER) {
@@ -657,6 +647,39 @@ export const contentHandlers = [
       mockAssignments[params.id] = updatedAssignment
 
       return HttpResponse.json(updatedAssignment, { status: 200 })
+    })
+  ),
+
+  /**
+   * DELETE /api/v1/assignments/{id}
+   * Delete assignment (Provider only)
+   */
+  http.delete('**/api/v1/assignments/:id',
+    withAuth(({ params, user }: any) => {
+      const userRole = user.role
+
+      // Only providers can delete assignments
+      if (userRole !== UserRole.PROVIDER) {
+        return HttpResponse.json(
+          { error: 'Forbidden', message: 'Only content providers can delete assignments' },
+          { status: 403 }
+        )
+      }
+
+      const assignment = mockAssignments[params.id]
+      if (!assignment) {
+        return HttpResponse.json(
+          { error: 'Not Found', message: 'Assignment not found' },
+          { status: 404 }
+        )
+      }
+
+      delete mockAssignments[params.id]
+
+      return HttpResponse.json(
+        { message: 'Assignment deleted successfully' },
+        { status: 200 }
+      )
     })
   ),
 ]

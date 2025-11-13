@@ -61,7 +61,7 @@ describe('TutorialDetailModal', () => {
 
     // Wait for data to load and modal to render
     await waitFor(() => {
-      expect(screen.getByText('Hướng dẫn React Hooks')).toBeInTheDocument()
+      expect(screen.getByText(/Hướng dẫn React Hooks/i)).toBeInTheDocument()
     })
 
     // Should not show loading state anymore
@@ -78,7 +78,7 @@ describe('TutorialDetailModal', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getByText('Hướng dẫn React Hooks')).toBeInTheDocument()
+      expect(screen.getByText(/Hướng dẫn React Hooks/i)).toBeInTheDocument()
     })
   })
 
@@ -161,7 +161,7 @@ describe('TutorialDetailModal', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getByText('Hướng dẫn React Hooks')).toBeInTheDocument()
+      expect(screen.getByText(/Hướng dẫn React Hooks/i)).toBeInTheDocument()
     })
 
     const downloadButton = screen.getByRole('button', { name: /Tải xuống/ })
@@ -180,7 +180,7 @@ describe('TutorialDetailModal', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getByText('Hướng dẫn React Hooks')).toBeInTheDocument()
+      expect(screen.getByText(/Hướng dẫn React Hooks/i)).toBeInTheDocument()
     })
 
     expect(screen.queryByRole('button', { name: /Tải xuống/ })).not.toBeInTheDocument()

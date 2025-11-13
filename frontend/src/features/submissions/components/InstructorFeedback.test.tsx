@@ -6,7 +6,6 @@ describe('InstructorFeedback', () => {
   describe('Empty State', () => {
     it('should render empty state when no feedback provided', () => {
       render(<InstructorFeedback />)
-      
       expect(screen.getByText('Chưa có phản hồi nào')).toBeInTheDocument()
     })
 

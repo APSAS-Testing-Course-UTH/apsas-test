@@ -20,6 +20,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { useState } from 'react';
 import { Outlet, useLocation, useNavigate } from '@tanstack/react-router';
 import { useAuthStore } from '@/features/auth/stores/useAuthStore';
+import { useLogout } from '@/features/auth/hooks/useLogout';
 import { STUDENT_NAV_ITEMS, BRAND_CONFIG } from '@/constants/navigation';
 import classes from './StudentPortalLayout.module.css';
 
@@ -28,7 +29,8 @@ export function StudentPortalLayout() {
   const [menuOpened, setMenuOpened] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, logout } = useAuthStore();
+  const { user } = useAuthStore();
+  const { logout } = useLogout();
 
   /**
    * Handle logout
@@ -40,7 +42,7 @@ export function StudentPortalLayout() {
     try {
       setMenuOpened(false);
       await logout();
-      navigate({ to: '/login', search: { redirect: undefined } });
+      // Navigation happens automatically in useLogout hook
     } catch (error) {
       console.error('Logout error:', error);
     }

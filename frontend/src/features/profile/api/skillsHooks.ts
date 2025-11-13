@@ -19,14 +19,17 @@ export const skillKeys = {
  * @returns Query result with skills list
  */
 export function useAllSkills(page: number = 0, size: number = 100) {
+  const { queryFn, ...options } = contentServiceGetAllSkillsOptions({
+    query: {
+      page: String(page),
+      size: String(size),
+    },
+  })
+  
   return useQuery<ContentServicePageResponseSkillResponse>({
-    ...contentServiceGetAllSkillsOptions({
-      query: {
-        page: String(page),
-        size: String(size),
-      },
-    }),
+    ...(options as any),
     queryKey: skillKeys.list({ page, size }),
+    queryFn: queryFn as any,
     staleTime: 10 * 60 * 1000, // 10 minutes - skills don't change often
     gcTime: 30 * 60 * 1000, // 30 minutes
   })
@@ -41,12 +44,12 @@ export function useAllSkills(page: number = 0, size: number = 100) {
 export function useSkillsList() {
   const { data, isLoading, error } = useAllSkills(0, 1000)
   
-  const skills: ContentServiceSkillResponse[] = data?.content ?? []
+  const skills: ContentServiceSkillResponse[] = (data as any)?.content ?? []
   
   return {
     skills,
     isLoading,
     error: error instanceof Error ? error : null,
-    total: data?.totalElements ?? 0,
+    total: (data as any)?.totalElements ?? 0,
   }
 }

@@ -10,7 +10,10 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import { submissionServiceGetAllSubmissions } from '@/api/sdk.gen';
+import {
+  submissionServiceGetAllSubmissions,
+  contentServiceGetAllAssignments,
+} from '@/api/sdk.gen';
 import type { SubmissionServicePageResponseSubmissionResponse } from '@/api/types.gen';
 
 // Query keys for caching
@@ -65,8 +68,12 @@ function calculateSkillProgress(
       skill.passed += 1;
     }
     // Update last attempt date with most recent
-    if (submission.createdAt && submission.createdAt > skill.lastAttemptDate) {
-      skill.lastAttemptDate = submission.createdAt;
+    if (submission.submittedAt) {
+      const submittedDate = new Date(submission.submittedAt).getTime()
+      const lastAttemptTime = new Date(skill.lastAttemptDate).getTime()
+      if (submittedDate > lastAttemptTime) {
+        skill.lastAttemptDate = new Date(submission.submittedAt).toISOString()
+      }
     }
   });
 

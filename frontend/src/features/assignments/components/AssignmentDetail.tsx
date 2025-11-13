@@ -8,14 +8,20 @@
  */
 
 import { useParams, useNavigate } from '@tanstack/react-router'
+import type { AxiosError } from 'axios'
 import { Container, Stack, Text, Button, Group, Loader, Center, Alert } from '@mantine/core'
-import { IconArrowLeft, IconAlertCircle } from '@tabler/icons-react'
+import { IconArrowLeft, IconAlertCircle, IconRefresh } from '@tabler/icons-react'
 import { useAssignmentDetailQuery } from '../api/useAssignmentDetailQuery'
 import { AssignmentMetadata } from './AssignmentMetadata'
 import { AssignmentTimeline } from './AssignmentTimeline'
 import { TestCaseList } from './TestCaseList'
 import { SkillBadges } from './SkillBadges'
 import { TutorialLinks } from './TutorialLinks'
+import { 
+  getErrorMessage,
+  isNetworkError,
+  isTimeoutError,
+} from '@/features/student/utils'
 
 const labels = {
   description: 'Mô tả bài toán',
@@ -54,8 +60,11 @@ export function AssignmentDetail() {
 
   // Error state
   if (error) {
-    const statusCode = error.response?.status
+    const statusCode = (error as AxiosError)?.response?.status
     const isNotFound = statusCode === 404
+    const isNetwork = isNetworkError(error as AxiosError)
+    const isTimeout = isTimeoutError(error as AxiosError)
+    const errorMessage = getErrorMessage(error)
 
     return (
       <Container size="lg" py="xl">
@@ -65,18 +74,32 @@ export function AssignmentDetail() {
             variant="subtle"
             onClick={() => navigate({ to: '/student/assignments' })}
           >
-            {labels.back}
+            Quay lại danh sách
           </Button>
 
-          <Alert icon={<IconAlertCircle />} color="red" title={labels.error}>
-            {isNotFound
-              ? labels.notFound
-              : error.message || 'Có lỗi xảy ra khi tải dữ liệu. Vui lòng thử lại.'}
+          <Alert 
+            icon={<IconAlertCircle />} 
+            color={isNetwork || isTimeout ? 'orange' : isNotFound ? 'yellow' : 'red'} 
+            title={isNetwork ? '🌐 Lỗi kết nối' : isTimeout ? '⏱️ Hết thời gian chờ' : 'Lỗi tải bài tập'}
+          >
+            {isNotFound ? 'Bài tập không tồn tại.' : errorMessage}
           </Alert>
 
-          <Button onClick={() => refetch()} variant="light">
-            {labels.tryAgain}
-          </Button>
+          <Group>
+            <Button onClick={() => refetch()} leftSection={<IconRefresh size={16} />} variant="light">
+              Thử lại
+            </Button>
+            {isNetwork && (
+              <Text size="sm" c="dimmed">
+                💡 Kiểm tra kết nối mạng của bạn
+              </Text>
+            )}
+            {isTimeout && (
+              <Text size="sm" c="dimmed">
+                💡 Máy chủ đang chậm, hãy thử lại sau
+              </Text>
+            )}
+          </Group>
         </Stack>
       </Container>
     )

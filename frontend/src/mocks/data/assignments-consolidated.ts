@@ -64,7 +64,7 @@ function calculatePerformanceMetrics(submissions: typeof mockSubmissions) {
     averageScore: scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0,
     passRate: submissions.length > 0 ? Math.round((passed.length / evaluated.length) * 100) : 0,
     lastSubmittedAt: submissions.length > 0 
-      ? submissions.sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime())[0].submittedAt
+      ? (submissions as any).sort((a: any, b: any) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime())[0].submittedAt
       : undefined
   }
 }
@@ -102,7 +102,7 @@ export const consolidatedMockAssignments: Record<string, ConsolidatedAssignment>
     skills: [],
     tutorials: [],
     // NESTED: Submissions for this assignment
-    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440100'),
+    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440100') as any,
     // NESTED: Performance metrics
     performanceMetrics: calculatePerformanceMetrics(
       mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440100')
@@ -154,7 +154,7 @@ export const consolidatedMockAssignments: Record<string, ConsolidatedAssignment>
     ],
     skills: [],
     tutorials: [],
-    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440101'),
+    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440101') as any,
     performanceMetrics: calculatePerformanceMetrics(
       mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440101')
     ),
@@ -201,7 +201,7 @@ export const consolidatedMockAssignments: Record<string, ConsolidatedAssignment>
     ],
     skills: [],
     tutorials: [],
-    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440102'),
+    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440102') as any,
     performanceMetrics: calculatePerformanceMetrics(
       mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440102')
     ),
@@ -248,7 +248,7 @@ export const consolidatedMockAssignments: Record<string, ConsolidatedAssignment>
     ],
     skills: [],
     tutorials: [],
-    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440103'),
+    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440103') as any,
     performanceMetrics: calculatePerformanceMetrics(
       mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440103')
     ),
@@ -285,7 +285,7 @@ export const consolidatedMockAssignments: Record<string, ConsolidatedAssignment>
     ],
     skills: [],
     tutorials: [],
-    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440104'),
+    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440104') as any,
     performanceMetrics: calculatePerformanceMetrics(
       mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440104')
     ),
@@ -322,7 +322,7 @@ export const consolidatedMockAssignments: Record<string, ConsolidatedAssignment>
     ],
     skills: [],
     tutorials: [],
-    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440105'),
+    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440105') as any,
     performanceMetrics: calculatePerformanceMetrics(
       mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440105')
     ),
@@ -368,7 +368,7 @@ export const consolidatedMockAssignments: Record<string, ConsolidatedAssignment>
     ],
     skills: [],
     tutorials: [],
-    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440106'),
+    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440106') as any,
     performanceMetrics: calculatePerformanceMetrics(
       mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440106')
     ),
@@ -394,7 +394,7 @@ export const consolidatedMockAssignments: Record<string, ConsolidatedAssignment>
     testCases: [],
     skills: [],
     tutorials: [],
-    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440107'),
+    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440107') as any,
     performanceMetrics: calculatePerformanceMetrics(
       mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440107')
     ),
@@ -419,7 +419,7 @@ export const consolidatedMockAssignments: Record<string, ConsolidatedAssignment>
     testCases: [],
     skills: [],
     tutorials: [],
-    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440108'),
+    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440108') as any,
     performanceMetrics: calculatePerformanceMetrics(
       mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440108')
     ),
@@ -444,7 +444,7 @@ export const consolidatedMockAssignments: Record<string, ConsolidatedAssignment>
     testCases: [],
     skills: [],
     tutorials: [],
-    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440109'),
+    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440109') as any,
     performanceMetrics: calculatePerformanceMetrics(
       mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440109')
     ),
@@ -469,7 +469,7 @@ export const consolidatedMockAssignments: Record<string, ConsolidatedAssignment>
     testCases: [],
     skills: [],
     tutorials: [],
-    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440110'),
+    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440110') as any,
     performanceMetrics: calculatePerformanceMetrics(
       mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440110')
     ),
@@ -494,7 +494,7 @@ export const consolidatedMockAssignments: Record<string, ConsolidatedAssignment>
     testCases: [],
     skills: [],
     tutorials: [],
-    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440111'),
+    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440111') as any,
     performanceMetrics: calculatePerformanceMetrics(
       mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440111')
     ),
@@ -519,7 +519,7 @@ export const consolidatedMockAssignments: Record<string, ConsolidatedAssignment>
     testCases: [],
     skills: [],
     tutorials: [],
-    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440112'),
+    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440112') as any,
     performanceMetrics: calculatePerformanceMetrics(
       mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440112')
     ),
@@ -544,7 +544,7 @@ export const consolidatedMockAssignments: Record<string, ConsolidatedAssignment>
     testCases: [],
     skills: [],
     tutorials: [],
-    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440113'),
+    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440113') as any,
     performanceMetrics: calculatePerformanceMetrics(
       mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440113')
     ),
@@ -569,7 +569,7 @@ export const consolidatedMockAssignments: Record<string, ConsolidatedAssignment>
     testCases: [],
     skills: [],
     tutorials: [],
-    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440114'),
+    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440114') as any,
     performanceMetrics: calculatePerformanceMetrics(
       mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440114')
     ),
@@ -594,7 +594,7 @@ export const consolidatedMockAssignments: Record<string, ConsolidatedAssignment>
     testCases: [],
     skills: [],
     tutorials: [],
-    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440115'),
+    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440115') as any,
     performanceMetrics: calculatePerformanceMetrics(
       mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440115')
     ),
@@ -619,7 +619,7 @@ export const consolidatedMockAssignments: Record<string, ConsolidatedAssignment>
     testCases: [],
     skills: [],
     tutorials: [],
-    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440116'),
+    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440116') as any,
     performanceMetrics: calculatePerformanceMetrics(
       mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440116')
     ),
@@ -644,7 +644,7 @@ export const consolidatedMockAssignments: Record<string, ConsolidatedAssignment>
     testCases: [],
     skills: [],
     tutorials: [],
-    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440117'),
+    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440117') as any,
     performanceMetrics: calculatePerformanceMetrics(
       mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440117')
     ),
@@ -669,7 +669,7 @@ export const consolidatedMockAssignments: Record<string, ConsolidatedAssignment>
     testCases: [],
     skills: [],
     tutorials: [],
-    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440019'),
+    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440019') as any,
     performanceMetrics: calculatePerformanceMetrics(
       mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440019')
     ),
@@ -694,7 +694,7 @@ export const consolidatedMockAssignments: Record<string, ConsolidatedAssignment>
     testCases: [],
     skills: [],
     tutorials: [],
-    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440020'),
+    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440020') as any,
     performanceMetrics: calculatePerformanceMetrics(
       mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440020')
     ),
@@ -719,7 +719,7 @@ export const consolidatedMockAssignments: Record<string, ConsolidatedAssignment>
     testCases: [],
     skills: [],
     tutorials: [],
-    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440021'),
+    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440021') as any,
     performanceMetrics: calculatePerformanceMetrics(
       mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440021')
     ),
@@ -744,7 +744,7 @@ export const consolidatedMockAssignments: Record<string, ConsolidatedAssignment>
     testCases: [],
     skills: [],
     tutorials: [],
-    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440022'),
+    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440022') as any,
     performanceMetrics: calculatePerformanceMetrics(
       mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440022')
     ),
@@ -770,7 +770,7 @@ export const consolidatedMockAssignments: Record<string, ConsolidatedAssignment>
     testCases: [],
     skills: [],
     tutorials: [],
-    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440007'),
+    submissions: mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440007') as any,
     performanceMetrics: calculatePerformanceMetrics(
       mockSubmissions.filter(s => s.assignmentId === '550e8400-e29b-41d4-a716-446655440007')
     ),
@@ -849,7 +849,7 @@ export const verifyConsolidatedDataConsistency = () => {
   
   Object.entries(consolidatedMockAssignments).forEach(([assignmentId, assignment]) => {
     // Check submissions have valid assignmentId
-    assignment.submissions?.forEach(submission => {
+    (assignment.submissions as any)?.forEach((submission: any) => {
       if (submission.assignmentId !== assignmentId) {
         errors.push(`❌ Submission ${submission.id} has wrong assignmentId`)
       }

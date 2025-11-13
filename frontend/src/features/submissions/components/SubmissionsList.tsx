@@ -11,7 +11,7 @@
  * - 100% Vietnamese UI
  */
 
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo, useEffect } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import {
@@ -30,13 +30,21 @@ import {
   Center,
   Loader,
   Tooltip,
+  Alert,
+  Card,
 } from '@mantine/core'
-import { IconSearch, IconX, IconEye } from '@tabler/icons-react'
+import { IconSearch, IconX, IconEye, IconAlertCircle, IconWifi, IconClock } from '@tabler/icons-react'
 import { useDebouncedValue } from '@mantine/hooks'
 import { submissionServiceGetAllSubmissionsOptions } from '@/api/@tanstack/react-query.gen'
 import { useAssignmentDetails } from '../api/hooks'
 import { useSubmissionPolling } from '../hooks'
 import { showInfoNotification } from '@/utils/notifications'
+import { useErrorHandler } from '@/features/student/hooks'
+import {
+  getErrorCategory,
+  isNetworkError,
+  isTimeoutError,
+} from '@/features/student/utils'
 import type { SubmissionServiceSubmissionResponse } from '@/api/types.gen'
 
 interface SubmissionsListProps {
@@ -258,18 +266,44 @@ export function SubmissionsList({ assignmentId, limit = 20 }: SubmissionsListPro
     )
   }
 
-  // Error state
-  if (isError) {
+  // Error state with detailed error handling
+  if (isError && error) {
+    const errorCategory = getErrorCategory(error)
+    const isNetworkDown = isNetworkError(error)
+    const isTimeout = isTimeoutError(error)
+
+    let errorIcon = <IconAlertCircle size={20} />
+    let errorTitle = 'Có lỗi xảy ra'
+    let errorMessage = 'Vui lòng thử lại sau'
+    let errorColor = 'red'
+
+    if (isNetworkDown) {
+      errorIcon = <IconWifi size={20} />
+      errorTitle = 'Lỗi kết nối mạng'
+      errorMessage = 'Kiểm tra kết nối Internet của bạn và thử lại'
+      errorColor = 'orange'
+    } else if (isTimeout) {
+      errorIcon = <IconClock size={20} />
+      errorTitle = 'Yêu cầu hết thời gian chờ'
+      errorMessage = 'Máy chủ phản hồi quá chậm. Vui lòng thử lại.'
+      errorColor = 'orange'
+    } else if (errorCategory === 'auth') {
+      errorTitle = 'Lỗi xác thực'
+      errorMessage = 'Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.'
+      errorColor = 'red'
+    }
+
     return (
-      <Paper p="xl" withBorder>
-        <Stack align="center" gap="md">
-          <Text size="lg" fw={600} c="red">
-            Có lỗi xảy ra khi tải dữ liệu
-          </Text>
-          <Text c="dimmed">{error?.message || 'Vui lòng thử lại sau'}</Text>
-          <Button onClick={() => refetch()}>Thử lại</Button>
-        </Stack>
-      </Paper>
+      <Card p="lg" radius="md" withBorder className="error-card">
+        <Alert icon={errorIcon} color={errorColor} title={errorTitle}>
+          {errorMessage}
+        </Alert>
+        <Group justify="center" mt="lg">
+          <Button onClick={() => refetch()} variant="light">
+            Thử lại
+          </Button>
+        </Group>
+      </Card>
     )
   }
 

@@ -9,13 +9,14 @@
  * - Test case results table
  * - Instructor feedback section
  * - Real-time polling for PENDING status
+ * - Comprehensive error handling with retry
  * 
  * Vietnamese UI: All labels in Vietnamese
  */
 
 import { useCallback } from 'react'
 import { Stack, Text, Card, Group, Badge, Alert, Center, Loader, Button, Tooltip } from '@mantine/core'
-import { IconArrowLeft, IconAlertCircle, IconWifi, IconWifiOff } from '@tabler/icons-react'
+import { IconArrowLeft, IconAlertCircle, IconWifi, IconWifiOff, IconRefresh } from '@tabler/icons-react'
 import { useParams, useNavigate } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { submissionServiceGetSubmissionByIdOptions } from '@/api/@tanstack/react-query.gen'
@@ -24,7 +25,8 @@ import { InstructorFeedback } from './InstructorFeedback'
 import { CodeDisplay } from './CodeDisplay'
 import { useWebSocket, type WebSocketMessage } from '../hooks'
 import { useAuthStore } from '@/features/auth/stores/useAuthStore'
-import { showErrorNotification } from '@/utils/notifications'
+import { showErrorNotification, showInfoNotification } from '@/utils/notifications'
+import { getErrorCategory, isNetworkError, isTimeoutError } from '@/features/student/utils'
 
 /**
  * Vietnamese labels for UI
@@ -162,32 +164,69 @@ export function SubmissionDetail() {
     )
   }
   
-  // Error state
+  // Error state with detailed error handling
   if (error) {
-    const isNotFound = (error as any)?.response?.status === 404
+    const errorStatus = (error as any)?.response?.status
+    const isNotFound = errorStatus === 404
+    const isNetworkDown = isNetworkError(error)
+    const isTimeout = isTimeoutError(error)
+    const errorCategory = getErrorCategory(error)
+
+    let errorIcon = <IconAlertCircle size={20} />
+    let errorTitle = labels.error
+    let errorMessage = 'Vui lòng thử lại sau'
+    let errorColor = 'red'
+
+    if (isNotFound) {
+      errorTitle = 'Không tìm thấy'
+      errorMessage = labels.notFound
+      errorColor = 'yellow'
+    } else if (isNetworkDown) {
+      errorTitle = 'Lỗi kết nối mạng'
+      errorMessage = 'Kiểm tra kết nối Internet của bạn và thử lại'
+      errorColor = 'orange'
+    } else if (isTimeout) {
+      errorTitle = 'Yêu cầu hết thời gian chờ'
+      errorMessage = 'Máy chủ phản hồi quá chậm. Vui lòng thử lại.'
+      errorColor = 'orange'
+    } else if (errorCategory === 'auth') {
+      errorTitle = 'Lỗi xác thực'
+      errorMessage = 'Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.'
+      errorColor = 'red'
+    } else if (errorCategory === 'server') {
+      errorTitle = 'Lỗi máy chủ'
+      errorMessage = 'Máy chủ gặp sự cố. Vui lòng thử lại sau.'
+      errorColor = 'red'
+    } else {
+      errorMessage = error?.message || errorMessage
+    }
     
     return (
       <Stack gap="md" p="md">
         <Alert
-          icon={<IconAlertCircle size={20} />}
-          title={labels.error}
-          color="red"
+          icon={errorIcon}
+          title={errorTitle}
+          color={errorColor}
           variant="filled"
         >
-          {isNotFound ? labels.notFound : error.message || labels.error}
+          {errorMessage}
         </Alert>
         
         <Group>
           <Button
             variant="light"
             leftSection={<IconArrowLeft size={16} />}
-            onClick={() => navigate({ to: '/student/dashboard' })}
+            onClick={() => navigate({ to: '/student/submissions' })}
           >
             {labels.backToList}
           </Button>
           
           {!isNotFound && (
-            <Button onClick={() => refetch()}>
+            <Button
+              onClick={() => refetch()}
+              leftSection={<IconRefresh size={16} />}
+              variant="default"
+            >
               {labels.retry}
             </Button>
           )}

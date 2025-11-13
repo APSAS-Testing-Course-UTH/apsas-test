@@ -1,0 +1,109 @@
+/* AssignmentForm.module.css */
+
+.form {
+  width: 100%;
+}
+
+.formContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.tabsContainer {
+  margin-top: 1rem;
+}
+
+.testCasesTable {
+  width: 100%;
+}
+
+.testCaseCard {
+  background: var(--mantine-color-gray-0);
+  border: 1px solid var(--mantine-color-gray-2);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.testCaseCard:hover {
+  background: var(--mantine-color-gray-1);
+  border-color: var(--mantine-color-gray-3);
+}
+
+.testCaseCard > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.formSection {
+  margin-bottom: 2rem;
+}
+
+.fieldGroup {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .fieldGroup {
+    grid-template-columns: 1fr;
+  }
+
+  .testCaseCard {
+    padding: 1rem !important;
+  }
+}
+
+.errorAlert {
+  margin-bottom: 1rem;
+}
+
+.successAlert {
+  margin-bottom: 1rem;
+  background: var(--mantine-color-green-0);
+  border-color: var(--mantine-color-green-3);
+}
+
+.loadingState {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  font-size: 1rem;
+  color: var(--mantine-color-gray-6);
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--mantine-color-gray-2);
+}
+
+.deleteButton {
+  color: var(--mantine-color-red-6);
+}
+
+.deleteButton:hover {
+  background: var(--mantine-color-red-0);
+  color: var(--mantine-color-red-7);
+}
+
+/* Responsive design */
+@media (max-width: 576px) {
+  .formContainer {
+    padding: 1rem 0.5rem;
+  }
+
+  .formActions {
+    flex-direction: column;
+  }
+
+  .formActions button {
+    width: 100%;
+  }
+}

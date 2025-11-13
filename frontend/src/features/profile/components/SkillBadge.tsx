@@ -3,7 +3,7 @@
  * Displays a single skill as a styled badge with description tooltip
  */
 
-import { Badge, Tooltip, Group } from '@mantine/core'
+import { Badge, Tooltip } from '@mantine/core'
 import type { ContentServiceSkillResponse } from '@/api/types.gen'
 
 interface SkillBadgeProps {

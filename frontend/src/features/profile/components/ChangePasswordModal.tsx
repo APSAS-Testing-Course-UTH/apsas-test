@@ -1,4 +1,5 @@
 import { Modal, PasswordInput, Button, Group, Stack } from '@mantine/core'
+import type { AxiosError } from 'axios'
 import { useForm } from '@mantine/form'
 import { notifications } from '@mantine/notifications'
 import { useChangePassword } from '../api/hooks'
@@ -9,6 +10,11 @@ import {
   NOTIFICATION_MESSAGES,
   type PasswordFormValues,
 } from '../types'
+import {
+  getErrorMessage,
+  showErrorNotification,
+  showSuccessNotification,
+} from '@/features/student/utils'
 
 interface ChangePasswordModalProps {
   opened: boolean
@@ -82,20 +88,13 @@ export function ChangePasswordModal({ opened, onClose }: ChangePasswordModalProp
         newPassword: values.newPassword,
       })
 
-      notifications.show({
-        title: 'Thành công',
-        message: NOTIFICATION_MESSAGES.changePasswordSuccess,
-        color: 'green',
-      })
+      showSuccessNotification('Thành công', NOTIFICATION_MESSAGES.changePasswordSuccess)
 
       form.reset()
       onClose()
     } catch (error) {
-      notifications.show({
-        title: 'Lỗi',
-        message: NOTIFICATION_MESSAGES.changePasswordError,
-        color: 'red',
-      })
+      const errorMessage = getErrorMessage(error)
+      showErrorNotification('Lỗi đổi mật khẩu', errorMessage, error)
     }
   })
 

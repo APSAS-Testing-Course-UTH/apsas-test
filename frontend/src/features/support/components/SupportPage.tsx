@@ -15,13 +15,19 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { Container, Grid, Stack, Paper, Title, Group, Button, Loader, Center, Text, ActionIcon, Pagination } from '@mantine/core'
-import { IconPlus, IconRefresh } from '@tabler/icons-react'
+import type { AxiosError } from 'axios'
+import { Container, Grid, Stack, Paper, Title, Group, Button, Loader, Center, Text, ActionIcon, Pagination, Badge, Alert } from '@mantine/core'
+import { IconPlus, IconRefresh, IconAlertCircle } from '@tabler/icons-react'
 import { useSupportSessions, useSupportSession } from '../api'
 import { SessionsList } from './SessionsList'
 import { ChatWindow } from './ChatWindow'
 import { CreateSessionModal } from './CreateSessionModal'
 import type { SupportSession } from '../types'
+import {
+  getErrorMessage,
+  isNetworkError,
+  isTimeoutError,
+} from '@/features/student/utils'
 import styles from './SupportPage.module.css'
 
 export function SupportPage() {
@@ -137,6 +143,28 @@ export function SupportPage() {
                   <Center py="xl">
                     <Loader size="sm" />
                   </Center>
+                ) : sessionsData?.error ? (
+                  <Alert
+                    icon={<IconAlertCircle size={16} />}
+                    title="Lỗi tải danh sách"
+                    color={
+                      isNetworkError(sessionsData.error as AxiosError) ||
+                      isTimeoutError(sessionsData.error as AxiosError)
+                        ? 'orange'
+                        : 'red'
+                    }
+                    variant="light"
+                  >
+                    {getErrorMessage(sessionsData.error)}
+                    <Button
+                      size="xs"
+                      mt="sm"
+                      onClick={handleRefresh}
+                      variant="light"
+                    >
+                      Thử lại
+                    </Button>
+                  </Alert>
                 ) : sessions.length === 0 ? (
                   <Text c="dimmed" size="sm" ta="center" py="xl">
                     Không có yêu cầu nào
@@ -168,6 +196,30 @@ export function SupportPage() {
           <Grid.Col span={{ base: 12, md: 9 }} className={styles.rightPanel}>
             {selectedSession ? (
               <ChatWindow session={selectedSession} onRefresh={() => refetchSession()} />
+            ) : sessionError ? (
+              <Paper withBorder p="md" h="100%">
+                <Center h="100%">
+                  <Stack gap="md" align="center">
+                    <Alert
+                      icon={<IconAlertCircle size={16} />}
+                      title="Lỗi tải yêu cầu"
+                      color={
+                        isNetworkError(sessionError as AxiosError) ||
+                        isTimeoutError(sessionError as AxiosError)
+                          ? 'orange'
+                          : 'red'
+                      }
+                      variant="light"
+                      style={{ width: '100%' }}
+                    >
+                      {getErrorMessage(sessionError)}
+                    </Alert>
+                    <Button onClick={() => refetchSession()} variant="light">
+                      Thử lại
+                    </Button>
+                  </Stack>
+                </Center>
+              </Paper>
             ) : (
               <Paper withBorder p="md" h="100%">
                 <Center h="100%">

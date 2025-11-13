@@ -2,6 +2,8 @@ import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useAuthStore } from '../features/auth/stores/useAuthStore'
 import { Loader, Center } from '@mantine/core'
 import { StudentPortalLayout } from '@/layouts/StudentPortalLayout'
+import { ContentProviderLayout } from '@/layouts/ContentProviderLayout'
+import { USER_ROLES } from '@/constants/roles'
 
 // Layout route cho tất cả protected routes
 // Tự động redirect về /login nếu chưa authenticated
@@ -42,7 +44,7 @@ export const Route = createFileRoute('/_authenticated')({
 })
 
 function AuthenticatedLayout() {
-  const { isLoading } = useAuthStore()
+  const { user, isLoading } = useAuthStore()
 
   // Hiển thị loading khi đang check auth
   if (isLoading) {
@@ -53,6 +55,18 @@ function AuthenticatedLayout() {
     )
   }
 
-  // Render protected content with StudentPortalLayout
-  return <StudentPortalLayout />
+  // ✅ FIXED: Select layout based on user role instead of always using StudentPortalLayout
+  // This resolves the stack overflow issue caused by all roles being forced into StudentPortalLayout
+  switch (user?.role) {
+    case USER_ROLES.STUDENT:
+      return <StudentPortalLayout />
+    case USER_ROLES.CONTENT_PROVIDER:
+      return <ContentProviderLayout />
+    // For admin and lecturer, use StudentPortalLayout as fallback
+    // These roles have simpler dashboard-only views
+    case USER_ROLES.ADMIN:
+    case USER_ROLES.INSTRUCTOR:
+    default:
+      return <StudentPortalLayout />
+  }
 }

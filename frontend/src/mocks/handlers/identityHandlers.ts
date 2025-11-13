@@ -19,31 +19,13 @@ import type {
 } from '@/api/types.gen'
 // Import from centralized mock data registry
 import { MOCK_DATA_REGISTRY, getStudentOverallPerformance } from '../factory/mockDataRegistry'
-import { UserRole, withAuth } from '../middleware/withAuth'
+import { UserRole, withAuth, mapRoleToApi } from '../middleware/withAuth'
 import type { UserRoleType } from '../middleware/withAuth'
 import { errorResponses } from '../middleware/errorHandler'
 import { factory, primaryKey } from '@mswjs/data'
 import { MSW_BASE_URL } from '../config'
 
 console.log('[Identity Handlers] Using base URL:', MSW_BASE_URL)
-
-// Helper function to map mock user roles to API roles
-const mapRoleToApi = (role: UserRoleType): "ADMIN" | "INSTRUCTOR" | "STUDENT" | "CONTENT_PROVIDER" => {
-  switch (role) {
-    case UserRole.ADMIN:
-      return 'ADMIN'
-    case UserRole.INSTRUCTOR:
-      return 'INSTRUCTOR'
-    case UserRole.STUDENT:
-      return 'STUDENT'
-    case UserRole.PROVIDER:
-      return 'CONTENT_PROVIDER'
-    default:
-      return 'STUDENT'
-  }
-}
-
-// Base URL no longer needed - removed unused variable
 
 // Create MSW Data database for persistent mock data
 const db = factory({
@@ -195,7 +177,7 @@ export const loginHandler = http.post(
           email: mockUser.email,
           firstName: mockUser.firstName,
           lastName: mockUser.lastName,
-          role: mockUser.role.toUpperCase() as "STUDENT" | "INSTRUCTOR" | "CONTENT_PROVIDER" | "ADMIN",
+          role: mapRoleToApi(user.role as UserRoleType),
           isActive: mockUser.isActive,
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -513,7 +495,7 @@ const getCurrentUserHandler = http.get('**/api/v1/users/me',
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
-        role: user.role === UserRole.PROVIDER ? 'CONTENT_PROVIDER' : user.role.toUpperCase() as any,
+        role: mapRoleToApi(user.role as UserRoleType),
         isActive: user.isActive,
         isEmailVerified: user.isEmailVerified,
         createdAt: user.createdAt ? new Date(user.createdAt) : undefined,
@@ -564,7 +546,7 @@ const updateCurrentUserHandler = http.put('**/api/v1/users/me',
         email: updatedUser.email,
         firstName: updatedUser.firstName,
         lastName: updatedUser.lastName,
-        role: updatedUser.role === UserRole.PROVIDER ? 'CONTENT_PROVIDER' : updatedUser.role.toUpperCase() as any,
+        role: mapRoleToApi(updatedUser.role as UserRoleType),
         isActive: updatedUser.isActive,
         isEmailVerified: updatedUser.isEmailVerified,
         createdAt: updatedUser.createdAt ? new Date(updatedUser.createdAt) : undefined,

@@ -11,11 +11,13 @@ import {
   CopyButton,
   Tooltip,
 } from '@mantine/core';
-import { IconAlertCircle, IconCheck } from '@tabler/icons-react';
+import { IconAlertCircle, IconCheck, IconWifi, IconClock } from '@tabler/icons-react';
 import type { SubmissionServiceSubmissionResponse, EvaluationServiceRuntimeResponse } from '@/api/types.gen';
 import { validateSubmission } from '../schemas';
 import { useFormAutoSave, AUTO_SAVE_LABELS } from '../hooks';
 import { AdvancedCodeEditor } from './AdvancedCodeEditor';
+import { useSubmissionErrorHandler } from '@/features/student/hooks';
+import { getErrorCategory, isNetworkError, isTimeoutError } from '@/features/student/utils';
 import styles from './CodeSubmissionForm.module.css';
 
 interface CodeSubmissionFormProps {
@@ -76,8 +78,12 @@ export function CodeSubmissionForm({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitErrorType, setSubmitErrorType] = useState<'network' | 'timeout' | 'validation' | 'error' | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [editorTheme, setEditorTheme] = useState('vs-dark');
+
+  // Use submission error handler hook
+  const { handleSubmissionError } = useSubmissionErrorHandler();
 
   const {
     lastSavedTime,
@@ -176,6 +182,7 @@ export function CodeSubmissionForm({
 
       setIsSubmitting(true);
       setSubmitError(null);
+      setSubmitErrorType(null);
 
       try {
         const submissionRequest = {
@@ -190,6 +197,7 @@ export function CodeSubmissionForm({
 
         setSubmitSuccess(true);
         setSubmitError(null);
+        setSubmitErrorType(null);
 
         clearAutoSaveDraft();
 
@@ -198,15 +206,37 @@ export function CodeSubmissionForm({
 
         setTimeout(() => setSubmitSuccess(false), 3000);
       } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : UI_LABELS.errors.submitFailed;
+        const errorCategory = getErrorCategory(error);
+        const isNetwork = isNetworkError(error);
+        const isTimeout = isTimeoutError(error);
+
+        let errorMessage = UI_LABELS.errors.submitFailed;
+        let errorTypeCategory: 'network' | 'timeout' | 'validation' | 'error' = 'error';
+
+        if (isNetwork) {
+          errorMessage = 'Lỗi kết nối mạng. Kiểm tra kết nối Internet và thử lại.';
+          errorTypeCategory = 'network';
+        } else if (isTimeout) {
+          errorMessage = 'Yêu cầu hết thời gian chờ. Máy chủ phản hồi quá chậm. Vui lòng thử lại.';
+          errorTypeCategory = 'timeout';
+        } else if (errorCategory === 'validation') {
+          errorMessage = 'Dữ liệu không hợp lệ. Vui lòng kiểm tra mã lại.';
+          errorTypeCategory = 'validation';
+        } else if (error instanceof Error) {
+          errorMessage = error.message;
+        }
+
         setSubmitError(errorMessage);
+        setSubmitErrorType(errorTypeCategory);
+
+        // Also call the error handler hook for notifications
+        handleSubmissionError(error);
         onError?.(error instanceof Error ? error : new Error(errorMessage));
       } finally {
         setIsSubmitting(false);
       }
     },
-    [validate, selectedRuntime, assignmentId, code, onSubmit, onError, onSuccess, clearAutoSaveDraft]
+    [validate, selectedRuntime, assignmentId, code, onSubmit, onError, onSuccess, clearAutoSaveDraft, handleSubmissionError]
   );
 
   const handleClear = useCallback(() => {
@@ -343,7 +373,25 @@ export function CodeSubmissionForm({
         )}
 
         {submitError && (
-          <Alert icon={<IconAlertCircle />} color="red" title={UI_LABELS.errors.submitFailed}>
+          <Alert
+            icon={
+              submitErrorType === 'network' ? (
+                <IconWifi size={16} />
+              ) : submitErrorType === 'timeout' ? (
+                <IconClock size={16} />
+              ) : (
+                <IconAlertCircle size={16} />
+              )
+            }
+            color={submitErrorType === 'network' || submitErrorType === 'timeout' ? 'orange' : 'red'}
+            title={
+              submitErrorType === 'network'
+                ? 'Lỗi kết nối mạng'
+                : submitErrorType === 'timeout'
+                  ? 'Yêu cầu hết thời gian chờ'
+                  : UI_LABELS.errors.submitFailed
+            }
+          >
             {submitError}
           </Alert>
         )}

@@ -1,6 +1,58 @@
 // vitest test setup - runs after jsdom environment created
 // All imports are lazy-loaded to avoid "document is not defined" errors
+/// <reference types="@testing-library/jest-dom" />
 import { expect, afterEach, beforeAll, afterAll, vi } from 'vitest'
+
+// Global module mock: Mock useToast before any component imports occur so
+// tests that import components using useToast receive a safe mock implementation.
+vi.mock('@/components/hooks/useToast', () => {
+  const makeMock = () => ({
+    show: vi.fn(),
+    success: vi.fn(),
+    error: vi.fn(),
+    warning: vi.fn(),
+    info: vi.fn(),
+    close: vi.fn(),
+    closeAll: vi.fn(),
+  })
+
+  return {
+    useToast: makeMock,
+    default: makeMock,
+  }
+})
+
+// Also mock the notifications helper (some modules import notifications.show directly)
+vi.mock('@/utils/notifications', () => {
+  const makeMock = () => ({
+    show: vi.fn(),
+    showSuccessNotification: vi.fn(),
+    showErrorNotification: vi.fn(),
+    showInfoNotification: vi.fn(),
+    showWarningNotification: vi.fn(),
+  })
+
+  return {
+    showNotification: makeMock().show,
+    showSuccessNotification: makeMock().showSuccessNotification,
+    showErrorNotification: makeMock().showErrorNotification,
+    showInfoNotification: makeMock().showInfoNotification,
+    showWarningNotification: makeMock().showWarningNotification,
+    default: makeMock,
+  }
+})
+
+// Provide a minimal mock for TanStack Router hooks used in components/tests.
+// Some tests rely on useNavigate() existing; provide a safe no-op implementation.
+vi.mock('@tanstack/react-router', () => {
+  return {
+    useNavigate: () => vi.fn(),
+    // Provide noop components for RouterProvider/RootRoute when tests import them
+    RouterProvider: ({ children }: any) => children,
+    RootRoute: (opts: any) => ({ component: opts?.component ?? (() => null) }),
+    Router: (opts: any) => ({ routeTree: opts?.routeTree ?? null }),
+  }
+})
 
 console.log('🔧 [Test Setup] Lazy-loading test DOM configuration...')
 
@@ -63,6 +115,18 @@ beforeAll(async () => {
         unobserve: vi.fn(),
         disconnect: vi.fn(),
       }))
+    }
+
+    // Ensure Mantine shared portal node is present for portal-based components
+    if (typeof document !== 'undefined') {
+      const existing = document.querySelector('[data-mantine-shared-portal-node]')
+      if (!existing) {
+        const portal = document.createElement('div')
+        portal.setAttribute('data-mantine-shared-portal-node', 'true')
+        portal.setAttribute('data-portal', 'true')
+        document.body.appendChild(portal)
+        console.log('[Test Setup] ✅ Mantine portal node appended to document.body')
+      }
     }
 
     // Mock localStorage
@@ -178,6 +242,8 @@ beforeAll(async () => {
       return request
     })
     console.log('[Test Setup] ✅ SDK client auth interceptor configured')
+
+        // (useToast is mocked globally above to avoid timing issues)
 
     const totalDuration = Date.now() - startTime
     console.log(`[Test Setup] ✅ beforeAll hook completed in ${totalDuration}ms`)

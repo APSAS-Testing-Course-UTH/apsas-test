@@ -1,0 +1,29 @@
+.settingsContainer {
+  max-width: 900px;
+}
+
+.tabPanel {
+  padding-top: var(--mantine-spacing-md);
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-md);
+}
+
+.passwordRequirements {
+  background-color: var(--mantine-color-gray-0);
+  padding: var(--mantine-spacing-md);
+  border-radius: var(--mantine-radius-md);
+  margin-top: var(--mantine-spacing-md);
+}
+
+.apiKey {
+  background-color: var(--mantine-color-gray-0);
+  padding: var(--mantine-spacing-sm);
+  border-radius: var(--mantine-radius-md);
+  font-family: monospace;
+  font-size: 12px;
+  word-break: break-all;
+}

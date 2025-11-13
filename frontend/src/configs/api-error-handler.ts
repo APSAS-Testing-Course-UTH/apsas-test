@@ -352,7 +352,7 @@ export const setGlobalErrorHandler = (handler: ErrorHandlerCallback): void => {
 /**
  * Handle error với global handler và logging
  */
-export const handleError = (
+export const handleApiError = (
   error: AxiosError | Error | unknown,
   context?: string,
   _showToast: boolean = true

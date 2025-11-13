@@ -1,24 +1,34 @@
-import { SimpleGrid, Skeleton, Center, Text, Group, Pagination, Stack } from '@mantine/core'
+import { SimpleGrid, Skeleton, Center, Text, Group, Pagination, Stack, Badge, Button } from '@mantine/core'
+import type { AxiosError } from 'axios'
 import type { ContentServiceTutorialResponse, ContentServiceSkillResponse } from '@/api/types.gen'
 import { ResourceCard } from './ResourceCard'
+import { 
+  getErrorMessage,
+  isNetworkError,
+  isTimeoutError,
+} from '@/features/student/utils'
 
 interface ResourcesListProps {
   items?: ContentServiceTutorialResponse[] | ContentServiceSkillResponse[]
   isLoading: boolean
+  error?: AxiosError | Error | null
   totalPages?: number
   currentPage?: number
   onPageChange?: (page: number) => void
   onDownload?: (resource: any) => void
+  onRetry?: () => void
   type?: 'tutorials' | 'skills'
 }
 
 export function ResourcesList({
   items,
   isLoading,
+  error,
   totalPages = 1,
   currentPage = 1,
   onPageChange,
   onDownload,
+  onRetry,
   type = 'tutorials',
 }: ResourcesListProps) {
   if (isLoading) {
@@ -36,6 +46,39 @@ export function ResourcesList({
           ))}
         </SimpleGrid>
       </Stack>
+    )
+  }
+
+  // Error state
+  if (error) {
+    const isNetwork = isNetworkError(error as AxiosError)
+    const isTimeout = isTimeoutError(error as AxiosError)
+    const errorMessage = getErrorMessage(error)
+
+    return (
+      <Center py="xl">
+        <Stack align="center" gap="md">
+          <Badge color={isNetwork || isTimeout ? 'orange' : 'red'}>
+            {isNetwork ? '🌐 Lỗi kết nối' : isTimeout ? '⏱️ Hết thời gian chờ' : 'Lỗi'}
+          </Badge>
+          <Text>{errorMessage}</Text>
+          {onRetry && (
+            <Button onClick={onRetry} variant="light">
+              Thử lại
+            </Button>
+          )}
+          {isNetwork && (
+            <Text size="sm" c="dimmed">
+              💡 Kiểm tra kết nối mạng của bạn
+            </Text>
+          )}
+          {isTimeout && (
+            <Text size="sm" c="dimmed">
+              💡 Máy chủ đang chậm, hãy thử lại sau
+            </Text>
+          )}
+        </Stack>
+      </Center>
     )
   }
 

@@ -11,7 +11,7 @@ import {
 } from '@mantine/core'
 import { IconAlertCircle, IconX } from '@tabler/icons-react'
 import Markdown from 'react-markdown'
-import type { ContentServiceTutorialResponse } from '@/api/types.gen'
+
 import { useTutorialDetail } from '../api/useTutorialDetail'
 import styles from './TutorialDetailModal.module.css'
 

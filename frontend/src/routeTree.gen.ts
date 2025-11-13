@@ -17,7 +17,9 @@ import { Route as ForgotPasswordRouteImport } from "./routes/forgot-password"
 import { Route as DevRouteImport } from "./routes/dev"
 import { Route as AuthenticatedRouteImport } from "./routes/_authenticated"
 import { Route as IndexRouteImport } from "./routes/index"
+import { Route as AuthenticatedProviderRouteImport } from "./routes/_authenticated/provider"
 import { Route as AuthenticatedStudentIndexRouteImport } from "./routes/_authenticated/student/index"
+import { Route as AuthenticatedProviderIndexRouteImport } from "./routes/_authenticated/provider/index"
 import { Route as AuthenticatedStudentSupportRouteImport } from "./routes/_authenticated/student/support"
 import { Route as AuthenticatedStudentSubmissionsRouteImport } from "./routes/_authenticated/student/submissions"
 import { Route as AuthenticatedStudentSettingsRouteImport } from "./routes/_authenticated/student/settings"
@@ -26,19 +28,34 @@ import { Route as AuthenticatedStudentProfileRouteImport } from "./routes/_authe
 import { Route as AuthenticatedStudentPerformanceRouteImport } from "./routes/_authenticated/student/performance"
 import { Route as AuthenticatedStudentDashboardRouteImport } from "./routes/_authenticated/student/dashboard"
 import { Route as AuthenticatedStudentAssignmentsRouteImport } from "./routes/_authenticated/student/assignments"
+import { Route as AuthenticatedProviderSettingsRouteImport } from "./routes/_authenticated/provider/settings"
+import { Route as AuthenticatedProviderProfileRouteImport } from "./routes/_authenticated/provider/profile"
 import { Route as AuthenticatedProviderDashboardRouteImport } from "./routes/_authenticated/provider/dashboard"
+import { Route as AuthenticatedProviderAssignmentsRouteImport } from "./routes/_authenticated/provider/assignments"
+import { Route as AuthenticatedProviderAnalyticsRouteImport } from "./routes/_authenticated/provider/analytics"
 import { Route as AuthenticatedLecturerDashboardRouteImport } from "./routes/_authenticated/lecturer/dashboard"
 import { Route as AuthenticatedAdminDashboardRouteImport } from "./routes/_authenticated/admin/dashboard"
 import { Route as AuthenticatedStudentSubmissionsIndexRouteImport } from "./routes/_authenticated/student/submissions/index"
 import { Route as AuthenticatedStudentResourcesIndexRouteImport } from "./routes/_authenticated/student/resources/index"
 import { Route as AuthenticatedStudentAssignmentsIndexRouteImport } from "./routes/_authenticated/student/assignments/index"
+import { Route as AuthenticatedProviderTutorialsIndexRouteImport } from "./routes/_authenticated/provider/tutorials/index"
+import { Route as AuthenticatedProviderSkillsIndexRouteImport } from "./routes/_authenticated/provider/skills/index"
+import { Route as AuthenticatedProviderAssignmentsIndexRouteImport } from "./routes/_authenticated/provider/assignments/index"
 import { Route as AuthenticatedStudentSubmissionsIdRouteImport } from "./routes/_authenticated/student/submissions/$id"
 import { Route as AuthenticatedStudentSubmissionIdRouteImport } from "./routes/_authenticated/student/submission/$id"
 import { Route as AuthenticatedStudentResourcesSkillsRouteImport } from "./routes/_authenticated/student/resources/skills"
 import { Route as AuthenticatedStudentAssignmentsIdRouteImport } from "./routes/_authenticated/student/assignments/$id"
+import { Route as AuthenticatedProviderTutorialsCreateRouteImport } from "./routes/_authenticated/provider/tutorials/create"
+import { Route as AuthenticatedProviderTutorialsIdRouteImport } from "./routes/_authenticated/provider/tutorials/$id"
+import { Route as AuthenticatedProviderSkillsCreateRouteImport } from "./routes/_authenticated/provider/skills/create"
+import { Route as AuthenticatedProviderSkillsIdRouteImport } from "./routes/_authenticated/provider/skills/$id"
+import { Route as AuthenticatedProviderAssignmentsCreateRouteImport } from "./routes/_authenticated/provider/assignments/create"
+import { Route as AuthenticatedProviderAssignmentsIdRouteImport } from "./routes/_authenticated/provider/assignments/$id"
 import { Route as AuthenticatedStudentResourcesSkillsIndexRouteImport } from "./routes/_authenticated/student/resources/skills/index"
 import { Route as AuthenticatedStudentResourcesTutorialsIdRouteImport } from "./routes/_authenticated/student/resources/tutorials/$id"
 import { Route as AuthenticatedStudentResourcesSkillsIdRouteImport } from "./routes/_authenticated/student/resources/skills/$id"
+import { Route as AuthenticatedProviderTutorialsIdEditRouteImport } from "./routes/_authenticated/provider/tutorials/$id/edit"
+import { Route as AuthenticatedProviderSkillsIdEditRouteImport } from "./routes/_authenticated/provider/skills/$id/edit"
 
 const VerifyEmailRoute = VerifyEmailRouteImport.update({
   id: "/verify-email",
@@ -79,11 +96,22 @@ const IndexRoute = IndexRouteImport.update({
   path: "/",
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedProviderRoute = AuthenticatedProviderRouteImport.update({
+  id: "/provider",
+  path: "/provider",
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedStudentIndexRoute =
   AuthenticatedStudentIndexRouteImport.update({
     id: "/student/",
     path: "/student/",
     getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedProviderIndexRoute =
+  AuthenticatedProviderIndexRouteImport.update({
+    id: "/",
+    path: "/",
+    getParentRoute: () => AuthenticatedProviderRoute,
   } as any)
 const AuthenticatedStudentSupportRoute =
   AuthenticatedStudentSupportRouteImport.update({
@@ -133,11 +161,35 @@ const AuthenticatedStudentAssignmentsRoute =
     path: "/student/assignments",
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedProviderSettingsRoute =
+  AuthenticatedProviderSettingsRouteImport.update({
+    id: "/settings",
+    path: "/settings",
+    getParentRoute: () => AuthenticatedProviderRoute,
+  } as any)
+const AuthenticatedProviderProfileRoute =
+  AuthenticatedProviderProfileRouteImport.update({
+    id: "/profile",
+    path: "/profile",
+    getParentRoute: () => AuthenticatedProviderRoute,
+  } as any)
 const AuthenticatedProviderDashboardRoute =
   AuthenticatedProviderDashboardRouteImport.update({
-    id: "/provider/dashboard",
-    path: "/provider/dashboard",
-    getParentRoute: () => AuthenticatedRoute,
+    id: "/dashboard",
+    path: "/dashboard",
+    getParentRoute: () => AuthenticatedProviderRoute,
+  } as any)
+const AuthenticatedProviderAssignmentsRoute =
+  AuthenticatedProviderAssignmentsRouteImport.update({
+    id: "/assignments",
+    path: "/assignments",
+    getParentRoute: () => AuthenticatedProviderRoute,
+  } as any)
+const AuthenticatedProviderAnalyticsRoute =
+  AuthenticatedProviderAnalyticsRouteImport.update({
+    id: "/analytics",
+    path: "/analytics",
+    getParentRoute: () => AuthenticatedProviderRoute,
   } as any)
 const AuthenticatedLecturerDashboardRoute =
   AuthenticatedLecturerDashboardRouteImport.update({
@@ -169,6 +221,24 @@ const AuthenticatedStudentAssignmentsIndexRoute =
     path: "/",
     getParentRoute: () => AuthenticatedStudentAssignmentsRoute,
   } as any)
+const AuthenticatedProviderTutorialsIndexRoute =
+  AuthenticatedProviderTutorialsIndexRouteImport.update({
+    id: "/tutorials/",
+    path: "/tutorials/",
+    getParentRoute: () => AuthenticatedProviderRoute,
+  } as any)
+const AuthenticatedProviderSkillsIndexRoute =
+  AuthenticatedProviderSkillsIndexRouteImport.update({
+    id: "/skills/",
+    path: "/skills/",
+    getParentRoute: () => AuthenticatedProviderRoute,
+  } as any)
+const AuthenticatedProviderAssignmentsIndexRoute =
+  AuthenticatedProviderAssignmentsIndexRouteImport.update({
+    id: "/",
+    path: "/",
+    getParentRoute: () => AuthenticatedProviderAssignmentsRoute,
+  } as any)
 const AuthenticatedStudentSubmissionsIdRoute =
   AuthenticatedStudentSubmissionsIdRouteImport.update({
     id: "/$id",
@@ -193,6 +263,42 @@ const AuthenticatedStudentAssignmentsIdRoute =
     path: "/$id",
     getParentRoute: () => AuthenticatedStudentAssignmentsRoute,
   } as any)
+const AuthenticatedProviderTutorialsCreateRoute =
+  AuthenticatedProviderTutorialsCreateRouteImport.update({
+    id: "/tutorials/create",
+    path: "/tutorials/create",
+    getParentRoute: () => AuthenticatedProviderRoute,
+  } as any)
+const AuthenticatedProviderTutorialsIdRoute =
+  AuthenticatedProviderTutorialsIdRouteImport.update({
+    id: "/tutorials/$id",
+    path: "/tutorials/$id",
+    getParentRoute: () => AuthenticatedProviderRoute,
+  } as any)
+const AuthenticatedProviderSkillsCreateRoute =
+  AuthenticatedProviderSkillsCreateRouteImport.update({
+    id: "/skills/create",
+    path: "/skills/create",
+    getParentRoute: () => AuthenticatedProviderRoute,
+  } as any)
+const AuthenticatedProviderSkillsIdRoute =
+  AuthenticatedProviderSkillsIdRouteImport.update({
+    id: "/skills/$id",
+    path: "/skills/$id",
+    getParentRoute: () => AuthenticatedProviderRoute,
+  } as any)
+const AuthenticatedProviderAssignmentsCreateRoute =
+  AuthenticatedProviderAssignmentsCreateRouteImport.update({
+    id: "/create",
+    path: "/create",
+    getParentRoute: () => AuthenticatedProviderAssignmentsRoute,
+  } as any)
+const AuthenticatedProviderAssignmentsIdRoute =
+  AuthenticatedProviderAssignmentsIdRouteImport.update({
+    id: "/$id",
+    path: "/$id",
+    getParentRoute: () => AuthenticatedProviderAssignmentsRoute,
+  } as any)
 const AuthenticatedStudentResourcesSkillsIndexRoute =
   AuthenticatedStudentResourcesSkillsIndexRouteImport.update({
     id: "/",
@@ -211,6 +317,18 @@ const AuthenticatedStudentResourcesSkillsIdRoute =
     path: "/$id",
     getParentRoute: () => AuthenticatedStudentResourcesSkillsRoute,
   } as any)
+const AuthenticatedProviderTutorialsIdEditRoute =
+  AuthenticatedProviderTutorialsIdEditRouteImport.update({
+    id: "/edit",
+    path: "/edit",
+    getParentRoute: () => AuthenticatedProviderTutorialsIdRoute,
+  } as any)
+const AuthenticatedProviderSkillsIdEditRoute =
+  AuthenticatedProviderSkillsIdEditRouteImport.update({
+    id: "/edit",
+    path: "/edit",
+    getParentRoute: () => AuthenticatedProviderSkillsIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   "/": typeof IndexRoute
@@ -220,9 +338,14 @@ export interface FileRoutesByFullPath {
   "/register": typeof RegisterRoute
   "/reset-password": typeof ResetPasswordRoute
   "/verify-email": typeof VerifyEmailRoute
+  "/provider": typeof AuthenticatedProviderRouteWithChildren
   "/admin/dashboard": typeof AuthenticatedAdminDashboardRoute
   "/lecturer/dashboard": typeof AuthenticatedLecturerDashboardRoute
+  "/provider/analytics": typeof AuthenticatedProviderAnalyticsRoute
+  "/provider/assignments": typeof AuthenticatedProviderAssignmentsRouteWithChildren
   "/provider/dashboard": typeof AuthenticatedProviderDashboardRoute
+  "/provider/profile": typeof AuthenticatedProviderProfileRoute
+  "/provider/settings": typeof AuthenticatedProviderSettingsRoute
   "/student/assignments": typeof AuthenticatedStudentAssignmentsRouteWithChildren
   "/student/dashboard": typeof AuthenticatedStudentDashboardRoute
   "/student/performance": typeof AuthenticatedStudentPerformanceRoute
@@ -231,14 +354,26 @@ export interface FileRoutesByFullPath {
   "/student/settings": typeof AuthenticatedStudentSettingsRoute
   "/student/submissions": typeof AuthenticatedStudentSubmissionsRouteWithChildren
   "/student/support": typeof AuthenticatedStudentSupportRoute
+  "/provider/": typeof AuthenticatedProviderIndexRoute
   "/student": typeof AuthenticatedStudentIndexRoute
+  "/provider/assignments/$id": typeof AuthenticatedProviderAssignmentsIdRoute
+  "/provider/assignments/create": typeof AuthenticatedProviderAssignmentsCreateRoute
+  "/provider/skills/$id": typeof AuthenticatedProviderSkillsIdRouteWithChildren
+  "/provider/skills/create": typeof AuthenticatedProviderSkillsCreateRoute
+  "/provider/tutorials/$id": typeof AuthenticatedProviderTutorialsIdRouteWithChildren
+  "/provider/tutorials/create": typeof AuthenticatedProviderTutorialsCreateRoute
   "/student/assignments/$id": typeof AuthenticatedStudentAssignmentsIdRoute
   "/student/resources/skills": typeof AuthenticatedStudentResourcesSkillsRouteWithChildren
   "/student/submission/$id": typeof AuthenticatedStudentSubmissionIdRoute
   "/student/submissions/$id": typeof AuthenticatedStudentSubmissionsIdRoute
+  "/provider/assignments/": typeof AuthenticatedProviderAssignmentsIndexRoute
+  "/provider/skills": typeof AuthenticatedProviderSkillsIndexRoute
+  "/provider/tutorials": typeof AuthenticatedProviderTutorialsIndexRoute
   "/student/assignments/": typeof AuthenticatedStudentAssignmentsIndexRoute
   "/student/resources/": typeof AuthenticatedStudentResourcesIndexRoute
   "/student/submissions/": typeof AuthenticatedStudentSubmissionsIndexRoute
+  "/provider/skills/$id/edit": typeof AuthenticatedProviderSkillsIdEditRoute
+  "/provider/tutorials/$id/edit": typeof AuthenticatedProviderTutorialsIdEditRoute
   "/student/resources/skills/$id": typeof AuthenticatedStudentResourcesSkillsIdRoute
   "/student/resources/tutorials/$id": typeof AuthenticatedStudentResourcesTutorialsIdRoute
   "/student/resources/skills/": typeof AuthenticatedStudentResourcesSkillsIndexRoute
@@ -253,19 +388,34 @@ export interface FileRoutesByTo {
   "/verify-email": typeof VerifyEmailRoute
   "/admin/dashboard": typeof AuthenticatedAdminDashboardRoute
   "/lecturer/dashboard": typeof AuthenticatedLecturerDashboardRoute
+  "/provider/analytics": typeof AuthenticatedProviderAnalyticsRoute
   "/provider/dashboard": typeof AuthenticatedProviderDashboardRoute
+  "/provider/profile": typeof AuthenticatedProviderProfileRoute
+  "/provider/settings": typeof AuthenticatedProviderSettingsRoute
   "/student/dashboard": typeof AuthenticatedStudentDashboardRoute
   "/student/performance": typeof AuthenticatedStudentPerformanceRoute
   "/student/profile": typeof AuthenticatedStudentProfileRoute
   "/student/settings": typeof AuthenticatedStudentSettingsRoute
   "/student/support": typeof AuthenticatedStudentSupportRoute
+  "/provider": typeof AuthenticatedProviderIndexRoute
   "/student": typeof AuthenticatedStudentIndexRoute
+  "/provider/assignments/$id": typeof AuthenticatedProviderAssignmentsIdRoute
+  "/provider/assignments/create": typeof AuthenticatedProviderAssignmentsCreateRoute
+  "/provider/skills/$id": typeof AuthenticatedProviderSkillsIdRouteWithChildren
+  "/provider/skills/create": typeof AuthenticatedProviderSkillsCreateRoute
+  "/provider/tutorials/$id": typeof AuthenticatedProviderTutorialsIdRouteWithChildren
+  "/provider/tutorials/create": typeof AuthenticatedProviderTutorialsCreateRoute
   "/student/assignments/$id": typeof AuthenticatedStudentAssignmentsIdRoute
   "/student/submission/$id": typeof AuthenticatedStudentSubmissionIdRoute
   "/student/submissions/$id": typeof AuthenticatedStudentSubmissionsIdRoute
+  "/provider/assignments": typeof AuthenticatedProviderAssignmentsIndexRoute
+  "/provider/skills": typeof AuthenticatedProviderSkillsIndexRoute
+  "/provider/tutorials": typeof AuthenticatedProviderTutorialsIndexRoute
   "/student/assignments": typeof AuthenticatedStudentAssignmentsIndexRoute
   "/student/resources": typeof AuthenticatedStudentResourcesIndexRoute
   "/student/submissions": typeof AuthenticatedStudentSubmissionsIndexRoute
+  "/provider/skills/$id/edit": typeof AuthenticatedProviderSkillsIdEditRoute
+  "/provider/tutorials/$id/edit": typeof AuthenticatedProviderTutorialsIdEditRoute
   "/student/resources/skills/$id": typeof AuthenticatedStudentResourcesSkillsIdRoute
   "/student/resources/tutorials/$id": typeof AuthenticatedStudentResourcesTutorialsIdRoute
   "/student/resources/skills": typeof AuthenticatedStudentResourcesSkillsIndexRoute
@@ -280,9 +430,14 @@ export interface FileRoutesById {
   "/register": typeof RegisterRoute
   "/reset-password": typeof ResetPasswordRoute
   "/verify-email": typeof VerifyEmailRoute
+  "/_authenticated/provider": typeof AuthenticatedProviderRouteWithChildren
   "/_authenticated/admin/dashboard": typeof AuthenticatedAdminDashboardRoute
   "/_authenticated/lecturer/dashboard": typeof AuthenticatedLecturerDashboardRoute
+  "/_authenticated/provider/analytics": typeof AuthenticatedProviderAnalyticsRoute
+  "/_authenticated/provider/assignments": typeof AuthenticatedProviderAssignmentsRouteWithChildren
   "/_authenticated/provider/dashboard": typeof AuthenticatedProviderDashboardRoute
+  "/_authenticated/provider/profile": typeof AuthenticatedProviderProfileRoute
+  "/_authenticated/provider/settings": typeof AuthenticatedProviderSettingsRoute
   "/_authenticated/student/assignments": typeof AuthenticatedStudentAssignmentsRouteWithChildren
   "/_authenticated/student/dashboard": typeof AuthenticatedStudentDashboardRoute
   "/_authenticated/student/performance": typeof AuthenticatedStudentPerformanceRoute
@@ -291,14 +446,26 @@ export interface FileRoutesById {
   "/_authenticated/student/settings": typeof AuthenticatedStudentSettingsRoute
   "/_authenticated/student/submissions": typeof AuthenticatedStudentSubmissionsRouteWithChildren
   "/_authenticated/student/support": typeof AuthenticatedStudentSupportRoute
+  "/_authenticated/provider/": typeof AuthenticatedProviderIndexRoute
   "/_authenticated/student/": typeof AuthenticatedStudentIndexRoute
+  "/_authenticated/provider/assignments/$id": typeof AuthenticatedProviderAssignmentsIdRoute
+  "/_authenticated/provider/assignments/create": typeof AuthenticatedProviderAssignmentsCreateRoute
+  "/_authenticated/provider/skills/$id": typeof AuthenticatedProviderSkillsIdRouteWithChildren
+  "/_authenticated/provider/skills/create": typeof AuthenticatedProviderSkillsCreateRoute
+  "/_authenticated/provider/tutorials/$id": typeof AuthenticatedProviderTutorialsIdRouteWithChildren
+  "/_authenticated/provider/tutorials/create": typeof AuthenticatedProviderTutorialsCreateRoute
   "/_authenticated/student/assignments/$id": typeof AuthenticatedStudentAssignmentsIdRoute
   "/_authenticated/student/resources/skills": typeof AuthenticatedStudentResourcesSkillsRouteWithChildren
   "/_authenticated/student/submission/$id": typeof AuthenticatedStudentSubmissionIdRoute
   "/_authenticated/student/submissions/$id": typeof AuthenticatedStudentSubmissionsIdRoute
+  "/_authenticated/provider/assignments/": typeof AuthenticatedProviderAssignmentsIndexRoute
+  "/_authenticated/provider/skills/": typeof AuthenticatedProviderSkillsIndexRoute
+  "/_authenticated/provider/tutorials/": typeof AuthenticatedProviderTutorialsIndexRoute
   "/_authenticated/student/assignments/": typeof AuthenticatedStudentAssignmentsIndexRoute
   "/_authenticated/student/resources/": typeof AuthenticatedStudentResourcesIndexRoute
   "/_authenticated/student/submissions/": typeof AuthenticatedStudentSubmissionsIndexRoute
+  "/_authenticated/provider/skills/$id/edit": typeof AuthenticatedProviderSkillsIdEditRoute
+  "/_authenticated/provider/tutorials/$id/edit": typeof AuthenticatedProviderTutorialsIdEditRoute
   "/_authenticated/student/resources/skills/$id": typeof AuthenticatedStudentResourcesSkillsIdRoute
   "/_authenticated/student/resources/tutorials/$id": typeof AuthenticatedStudentResourcesTutorialsIdRoute
   "/_authenticated/student/resources/skills/": typeof AuthenticatedStudentResourcesSkillsIndexRoute
@@ -313,9 +480,14 @@ export interface FileRouteTypes {
     | "/register"
     | "/reset-password"
     | "/verify-email"
+    | "/provider"
     | "/admin/dashboard"
     | "/lecturer/dashboard"
+    | "/provider/analytics"
+    | "/provider/assignments"
     | "/provider/dashboard"
+    | "/provider/profile"
+    | "/provider/settings"
     | "/student/assignments"
     | "/student/dashboard"
     | "/student/performance"
@@ -324,14 +496,26 @@ export interface FileRouteTypes {
     | "/student/settings"
     | "/student/submissions"
     | "/student/support"
+    | "/provider/"
     | "/student"
+    | "/provider/assignments/$id"
+    | "/provider/assignments/create"
+    | "/provider/skills/$id"
+    | "/provider/skills/create"
+    | "/provider/tutorials/$id"
+    | "/provider/tutorials/create"
     | "/student/assignments/$id"
     | "/student/resources/skills"
     | "/student/submission/$id"
     | "/student/submissions/$id"
+    | "/provider/assignments/"
+    | "/provider/skills"
+    | "/provider/tutorials"
     | "/student/assignments/"
     | "/student/resources/"
     | "/student/submissions/"
+    | "/provider/skills/$id/edit"
+    | "/provider/tutorials/$id/edit"
     | "/student/resources/skills/$id"
     | "/student/resources/tutorials/$id"
     | "/student/resources/skills/"
@@ -346,19 +530,34 @@ export interface FileRouteTypes {
     | "/verify-email"
     | "/admin/dashboard"
     | "/lecturer/dashboard"
+    | "/provider/analytics"
     | "/provider/dashboard"
+    | "/provider/profile"
+    | "/provider/settings"
     | "/student/dashboard"
     | "/student/performance"
     | "/student/profile"
     | "/student/settings"
     | "/student/support"
+    | "/provider"
     | "/student"
+    | "/provider/assignments/$id"
+    | "/provider/assignments/create"
+    | "/provider/skills/$id"
+    | "/provider/skills/create"
+    | "/provider/tutorials/$id"
+    | "/provider/tutorials/create"
     | "/student/assignments/$id"
     | "/student/submission/$id"
     | "/student/submissions/$id"
+    | "/provider/assignments"
+    | "/provider/skills"
+    | "/provider/tutorials"
     | "/student/assignments"
     | "/student/resources"
     | "/student/submissions"
+    | "/provider/skills/$id/edit"
+    | "/provider/tutorials/$id/edit"
     | "/student/resources/skills/$id"
     | "/student/resources/tutorials/$id"
     | "/student/resources/skills"
@@ -372,9 +571,14 @@ export interface FileRouteTypes {
     | "/register"
     | "/reset-password"
     | "/verify-email"
+    | "/_authenticated/provider"
     | "/_authenticated/admin/dashboard"
     | "/_authenticated/lecturer/dashboard"
+    | "/_authenticated/provider/analytics"
+    | "/_authenticated/provider/assignments"
     | "/_authenticated/provider/dashboard"
+    | "/_authenticated/provider/profile"
+    | "/_authenticated/provider/settings"
     | "/_authenticated/student/assignments"
     | "/_authenticated/student/dashboard"
     | "/_authenticated/student/performance"
@@ -383,14 +587,26 @@ export interface FileRouteTypes {
     | "/_authenticated/student/settings"
     | "/_authenticated/student/submissions"
     | "/_authenticated/student/support"
+    | "/_authenticated/provider/"
     | "/_authenticated/student/"
+    | "/_authenticated/provider/assignments/$id"
+    | "/_authenticated/provider/assignments/create"
+    | "/_authenticated/provider/skills/$id"
+    | "/_authenticated/provider/skills/create"
+    | "/_authenticated/provider/tutorials/$id"
+    | "/_authenticated/provider/tutorials/create"
     | "/_authenticated/student/assignments/$id"
     | "/_authenticated/student/resources/skills"
     | "/_authenticated/student/submission/$id"
     | "/_authenticated/student/submissions/$id"
+    | "/_authenticated/provider/assignments/"
+    | "/_authenticated/provider/skills/"
+    | "/_authenticated/provider/tutorials/"
     | "/_authenticated/student/assignments/"
     | "/_authenticated/student/resources/"
     | "/_authenticated/student/submissions/"
+    | "/_authenticated/provider/skills/$id/edit"
+    | "/_authenticated/provider/tutorials/$id/edit"
     | "/_authenticated/student/resources/skills/$id"
     | "/_authenticated/student/resources/tutorials/$id"
     | "/_authenticated/student/resources/skills/"
@@ -465,12 +681,26 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    "/_authenticated/provider": {
+      id: "/_authenticated/provider"
+      path: "/provider"
+      fullPath: "/provider"
+      preLoaderRoute: typeof AuthenticatedProviderRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     "/_authenticated/student/": {
       id: "/_authenticated/student/"
       path: "/student"
       fullPath: "/student"
       preLoaderRoute: typeof AuthenticatedStudentIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    "/_authenticated/provider/": {
+      id: "/_authenticated/provider/"
+      path: "/"
+      fullPath: "/provider/"
+      preLoaderRoute: typeof AuthenticatedProviderIndexRouteImport
+      parentRoute: typeof AuthenticatedProviderRoute
     }
     "/_authenticated/student/support": {
       id: "/_authenticated/student/support"
@@ -528,12 +758,40 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AuthenticatedStudentAssignmentsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    "/_authenticated/provider/settings": {
+      id: "/_authenticated/provider/settings"
+      path: "/settings"
+      fullPath: "/provider/settings"
+      preLoaderRoute: typeof AuthenticatedProviderSettingsRouteImport
+      parentRoute: typeof AuthenticatedProviderRoute
+    }
+    "/_authenticated/provider/profile": {
+      id: "/_authenticated/provider/profile"
+      path: "/profile"
+      fullPath: "/provider/profile"
+      preLoaderRoute: typeof AuthenticatedProviderProfileRouteImport
+      parentRoute: typeof AuthenticatedProviderRoute
+    }
     "/_authenticated/provider/dashboard": {
       id: "/_authenticated/provider/dashboard"
-      path: "/provider/dashboard"
+      path: "/dashboard"
       fullPath: "/provider/dashboard"
       preLoaderRoute: typeof AuthenticatedProviderDashboardRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      parentRoute: typeof AuthenticatedProviderRoute
+    }
+    "/_authenticated/provider/assignments": {
+      id: "/_authenticated/provider/assignments"
+      path: "/assignments"
+      fullPath: "/provider/assignments"
+      preLoaderRoute: typeof AuthenticatedProviderAssignmentsRouteImport
+      parentRoute: typeof AuthenticatedProviderRoute
+    }
+    "/_authenticated/provider/analytics": {
+      id: "/_authenticated/provider/analytics"
+      path: "/analytics"
+      fullPath: "/provider/analytics"
+      preLoaderRoute: typeof AuthenticatedProviderAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedProviderRoute
     }
     "/_authenticated/lecturer/dashboard": {
       id: "/_authenticated/lecturer/dashboard"
@@ -570,6 +828,27 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AuthenticatedStudentAssignmentsIndexRouteImport
       parentRoute: typeof AuthenticatedStudentAssignmentsRoute
     }
+    "/_authenticated/provider/tutorials/": {
+      id: "/_authenticated/provider/tutorials/"
+      path: "/tutorials"
+      fullPath: "/provider/tutorials"
+      preLoaderRoute: typeof AuthenticatedProviderTutorialsIndexRouteImport
+      parentRoute: typeof AuthenticatedProviderRoute
+    }
+    "/_authenticated/provider/skills/": {
+      id: "/_authenticated/provider/skills/"
+      path: "/skills"
+      fullPath: "/provider/skills"
+      preLoaderRoute: typeof AuthenticatedProviderSkillsIndexRouteImport
+      parentRoute: typeof AuthenticatedProviderRoute
+    }
+    "/_authenticated/provider/assignments/": {
+      id: "/_authenticated/provider/assignments/"
+      path: "/"
+      fullPath: "/provider/assignments/"
+      preLoaderRoute: typeof AuthenticatedProviderAssignmentsIndexRouteImport
+      parentRoute: typeof AuthenticatedProviderAssignmentsRoute
+    }
     "/_authenticated/student/submissions/$id": {
       id: "/_authenticated/student/submissions/$id"
       path: "/$id"
@@ -598,6 +877,48 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AuthenticatedStudentAssignmentsIdRouteImport
       parentRoute: typeof AuthenticatedStudentAssignmentsRoute
     }
+    "/_authenticated/provider/tutorials/create": {
+      id: "/_authenticated/provider/tutorials/create"
+      path: "/tutorials/create"
+      fullPath: "/provider/tutorials/create"
+      preLoaderRoute: typeof AuthenticatedProviderTutorialsCreateRouteImport
+      parentRoute: typeof AuthenticatedProviderRoute
+    }
+    "/_authenticated/provider/tutorials/$id": {
+      id: "/_authenticated/provider/tutorials/$id"
+      path: "/tutorials/$id"
+      fullPath: "/provider/tutorials/$id"
+      preLoaderRoute: typeof AuthenticatedProviderTutorialsIdRouteImport
+      parentRoute: typeof AuthenticatedProviderRoute
+    }
+    "/_authenticated/provider/skills/create": {
+      id: "/_authenticated/provider/skills/create"
+      path: "/skills/create"
+      fullPath: "/provider/skills/create"
+      preLoaderRoute: typeof AuthenticatedProviderSkillsCreateRouteImport
+      parentRoute: typeof AuthenticatedProviderRoute
+    }
+    "/_authenticated/provider/skills/$id": {
+      id: "/_authenticated/provider/skills/$id"
+      path: "/skills/$id"
+      fullPath: "/provider/skills/$id"
+      preLoaderRoute: typeof AuthenticatedProviderSkillsIdRouteImport
+      parentRoute: typeof AuthenticatedProviderRoute
+    }
+    "/_authenticated/provider/assignments/create": {
+      id: "/_authenticated/provider/assignments/create"
+      path: "/create"
+      fullPath: "/provider/assignments/create"
+      preLoaderRoute: typeof AuthenticatedProviderAssignmentsCreateRouteImport
+      parentRoute: typeof AuthenticatedProviderAssignmentsRoute
+    }
+    "/_authenticated/provider/assignments/$id": {
+      id: "/_authenticated/provider/assignments/$id"
+      path: "/$id"
+      fullPath: "/provider/assignments/$id"
+      preLoaderRoute: typeof AuthenticatedProviderAssignmentsIdRouteImport
+      parentRoute: typeof AuthenticatedProviderAssignmentsRoute
+    }
     "/_authenticated/student/resources/skills/": {
       id: "/_authenticated/student/resources/skills/"
       path: "/"
@@ -619,8 +940,114 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AuthenticatedStudentResourcesSkillsIdRouteImport
       parentRoute: typeof AuthenticatedStudentResourcesSkillsRoute
     }
+    "/_authenticated/provider/tutorials/$id/edit": {
+      id: "/_authenticated/provider/tutorials/$id/edit"
+      path: "/edit"
+      fullPath: "/provider/tutorials/$id/edit"
+      preLoaderRoute: typeof AuthenticatedProviderTutorialsIdEditRouteImport
+      parentRoute: typeof AuthenticatedProviderTutorialsIdRoute
+    }
+    "/_authenticated/provider/skills/$id/edit": {
+      id: "/_authenticated/provider/skills/$id/edit"
+      path: "/edit"
+      fullPath: "/provider/skills/$id/edit"
+      preLoaderRoute: typeof AuthenticatedProviderSkillsIdEditRouteImport
+      parentRoute: typeof AuthenticatedProviderSkillsIdRoute
+    }
   }
 }
+
+interface AuthenticatedProviderAssignmentsRouteChildren {
+  AuthenticatedProviderAssignmentsIdRoute: typeof AuthenticatedProviderAssignmentsIdRoute
+  AuthenticatedProviderAssignmentsCreateRoute: typeof AuthenticatedProviderAssignmentsCreateRoute
+  AuthenticatedProviderAssignmentsIndexRoute: typeof AuthenticatedProviderAssignmentsIndexRoute
+}
+
+const AuthenticatedProviderAssignmentsRouteChildren: AuthenticatedProviderAssignmentsRouteChildren =
+  {
+    AuthenticatedProviderAssignmentsIdRoute:
+      AuthenticatedProviderAssignmentsIdRoute,
+    AuthenticatedProviderAssignmentsCreateRoute:
+      AuthenticatedProviderAssignmentsCreateRoute,
+    AuthenticatedProviderAssignmentsIndexRoute:
+      AuthenticatedProviderAssignmentsIndexRoute,
+  }
+
+const AuthenticatedProviderAssignmentsRouteWithChildren =
+  AuthenticatedProviderAssignmentsRoute._addFileChildren(
+    AuthenticatedProviderAssignmentsRouteChildren,
+  )
+
+interface AuthenticatedProviderSkillsIdRouteChildren {
+  AuthenticatedProviderSkillsIdEditRoute: typeof AuthenticatedProviderSkillsIdEditRoute
+}
+
+const AuthenticatedProviderSkillsIdRouteChildren: AuthenticatedProviderSkillsIdRouteChildren =
+  {
+    AuthenticatedProviderSkillsIdEditRoute:
+      AuthenticatedProviderSkillsIdEditRoute,
+  }
+
+const AuthenticatedProviderSkillsIdRouteWithChildren =
+  AuthenticatedProviderSkillsIdRoute._addFileChildren(
+    AuthenticatedProviderSkillsIdRouteChildren,
+  )
+
+interface AuthenticatedProviderTutorialsIdRouteChildren {
+  AuthenticatedProviderTutorialsIdEditRoute: typeof AuthenticatedProviderTutorialsIdEditRoute
+}
+
+const AuthenticatedProviderTutorialsIdRouteChildren: AuthenticatedProviderTutorialsIdRouteChildren =
+  {
+    AuthenticatedProviderTutorialsIdEditRoute:
+      AuthenticatedProviderTutorialsIdEditRoute,
+  }
+
+const AuthenticatedProviderTutorialsIdRouteWithChildren =
+  AuthenticatedProviderTutorialsIdRoute._addFileChildren(
+    AuthenticatedProviderTutorialsIdRouteChildren,
+  )
+
+interface AuthenticatedProviderRouteChildren {
+  AuthenticatedProviderAnalyticsRoute: typeof AuthenticatedProviderAnalyticsRoute
+  AuthenticatedProviderAssignmentsRoute: typeof AuthenticatedProviderAssignmentsRouteWithChildren
+  AuthenticatedProviderDashboardRoute: typeof AuthenticatedProviderDashboardRoute
+  AuthenticatedProviderProfileRoute: typeof AuthenticatedProviderProfileRoute
+  AuthenticatedProviderSettingsRoute: typeof AuthenticatedProviderSettingsRoute
+  AuthenticatedProviderIndexRoute: typeof AuthenticatedProviderIndexRoute
+  AuthenticatedProviderSkillsIdRoute: typeof AuthenticatedProviderSkillsIdRouteWithChildren
+  AuthenticatedProviderSkillsCreateRoute: typeof AuthenticatedProviderSkillsCreateRoute
+  AuthenticatedProviderTutorialsIdRoute: typeof AuthenticatedProviderTutorialsIdRouteWithChildren
+  AuthenticatedProviderTutorialsCreateRoute: typeof AuthenticatedProviderTutorialsCreateRoute
+  AuthenticatedProviderSkillsIndexRoute: typeof AuthenticatedProviderSkillsIndexRoute
+  AuthenticatedProviderTutorialsIndexRoute: typeof AuthenticatedProviderTutorialsIndexRoute
+}
+
+const AuthenticatedProviderRouteChildren: AuthenticatedProviderRouteChildren = {
+  AuthenticatedProviderAnalyticsRoute: AuthenticatedProviderAnalyticsRoute,
+  AuthenticatedProviderAssignmentsRoute:
+    AuthenticatedProviderAssignmentsRouteWithChildren,
+  AuthenticatedProviderDashboardRoute: AuthenticatedProviderDashboardRoute,
+  AuthenticatedProviderProfileRoute: AuthenticatedProviderProfileRoute,
+  AuthenticatedProviderSettingsRoute: AuthenticatedProviderSettingsRoute,
+  AuthenticatedProviderIndexRoute: AuthenticatedProviderIndexRoute,
+  AuthenticatedProviderSkillsIdRoute:
+    AuthenticatedProviderSkillsIdRouteWithChildren,
+  AuthenticatedProviderSkillsCreateRoute:
+    AuthenticatedProviderSkillsCreateRoute,
+  AuthenticatedProviderTutorialsIdRoute:
+    AuthenticatedProviderTutorialsIdRouteWithChildren,
+  AuthenticatedProviderTutorialsCreateRoute:
+    AuthenticatedProviderTutorialsCreateRoute,
+  AuthenticatedProviderSkillsIndexRoute: AuthenticatedProviderSkillsIndexRoute,
+  AuthenticatedProviderTutorialsIndexRoute:
+    AuthenticatedProviderTutorialsIndexRoute,
+}
+
+const AuthenticatedProviderRouteWithChildren =
+  AuthenticatedProviderRoute._addFileChildren(
+    AuthenticatedProviderRouteChildren,
+  )
 
 interface AuthenticatedStudentAssignmentsRouteChildren {
   AuthenticatedStudentAssignmentsIdRoute: typeof AuthenticatedStudentAssignmentsIdRoute
@@ -698,9 +1125,9 @@ const AuthenticatedStudentSubmissionsRouteWithChildren =
   )
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedProviderRoute: typeof AuthenticatedProviderRouteWithChildren
   AuthenticatedAdminDashboardRoute: typeof AuthenticatedAdminDashboardRoute
   AuthenticatedLecturerDashboardRoute: typeof AuthenticatedLecturerDashboardRoute
-  AuthenticatedProviderDashboardRoute: typeof AuthenticatedProviderDashboardRoute
   AuthenticatedStudentAssignmentsRoute: typeof AuthenticatedStudentAssignmentsRouteWithChildren
   AuthenticatedStudentDashboardRoute: typeof AuthenticatedStudentDashboardRoute
   AuthenticatedStudentPerformanceRoute: typeof AuthenticatedStudentPerformanceRoute
@@ -714,9 +1141,9 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedProviderRoute: AuthenticatedProviderRouteWithChildren,
   AuthenticatedAdminDashboardRoute: AuthenticatedAdminDashboardRoute,
   AuthenticatedLecturerDashboardRoute: AuthenticatedLecturerDashboardRoute,
-  AuthenticatedProviderDashboardRoute: AuthenticatedProviderDashboardRoute,
   AuthenticatedStudentAssignmentsRoute:
     AuthenticatedStudentAssignmentsRouteWithChildren,
   AuthenticatedStudentDashboardRoute: AuthenticatedStudentDashboardRoute,

@@ -1,5 +1,6 @@
 import { Stack, Paper, Group, Text, Button, Avatar, Badge, Loader, Alert } from '@mantine/core'
-import { IconUser, IconEdit, IconLock, IconAlertCircle } from '@tabler/icons-react'
+import type { AxiosError } from 'axios'
+import { IconUser, IconEdit, IconLock, IconAlertCircle, IconRefresh } from '@tabler/icons-react'
 import { useCurrentUser } from '../api/hooks'
 import {
   PAGE_TITLE,
@@ -8,6 +9,11 @@ import {
   BUTTON_LABELS,
   NOTIFICATION_MESSAGES,
 } from '../types'
+import { 
+  getErrorMessage,
+  isNetworkError,
+  isTimeoutError,
+} from '@/features/student/utils'
 
 interface ProfileViewProps {
   onEditProfile?: () => void
@@ -52,15 +58,29 @@ export function ProfileView({ onEditProfile, onChangePassword }: ProfileViewProp
 
   // Error state
   if (error) {
+    const isNetwork = isNetworkError(error as AxiosError)
+    const isTimeout = isTimeoutError(error as AxiosError)
+    const errorMessage = getErrorMessage(error)
+
     return (
       <Paper p="xl" shadow="sm" radius="md" withBorder>
         <Alert
           icon={<IconAlertCircle size={16} />}
-          title="Lỗi"
-          color="red"
+          title={isNetwork ? '🌐 Lỗi kết nối' : isTimeout ? '⏱️ Hết thời gian chờ' : 'Lỗi'}
+          color={isNetwork || isTimeout ? 'orange' : 'red'}
           variant="light"
         >
-          {NOTIFICATION_MESSAGES.loadProfileError}
+          {errorMessage}
+          {isNetwork && (
+            <Text size="sm" mt="sm">
+              💡 Kiểm tra kết nối mạng của bạn
+            </Text>
+          )}
+          {isTimeout && (
+            <Text size="sm" mt="sm">
+              💡 Máy chủ đang chậm, hãy thử lại sau
+            </Text>
+          )}
         </Alert>
       </Paper>
     )

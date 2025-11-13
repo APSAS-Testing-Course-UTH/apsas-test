@@ -44,7 +44,7 @@ function transformSkillsForRadar(
   const result = skillsProgress.slice(0, 4).map((skill) => ({
     name: skill.skillName.replace('Assignment ', ''),  // Shorten label for display
     value: Math.round(skill.progressPercentage),
-    fullMark: 100,
+    fullMark: 100 as const,
   }));
   
   return result;
@@ -99,18 +99,18 @@ export function SkillsMasteryChart({
               <PolarGrid stroke="#e0e0e0" strokeDasharray="0" />
               <PolarAngleAxis
                 dataKey="name"
-                tick={({ x, y, payload }) => (
+                tick={({ x, y, payload }: any) => (
                   <text
                     x={x}
                     y={y}
-                    textAnchor={x > 300 ? 'start' : x < 100 ? 'end' : 'middle'}
+                    textAnchor={(x as number) > 300 ? 'start' : (x as number) < 100 ? 'end' : 'middle'}
                     fill="#666"
                     fontSize="11"
                   >
                     {payload.value}
                   </text>
                 )}
-                angle={90}
+
                 type="category"
               />
               <PolarRadiusAxis

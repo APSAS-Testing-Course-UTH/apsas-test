@@ -99,12 +99,16 @@ export function ResourcesPage() {
                   style={{ flex: 1 }}
                 />
               </Group>
-
               <ResourcesList
                 items={filteredTutorials}
                 isLoading={tutorialsResult.isLoading}
+                error={tutorialsResult.error}
+                totalPages={tutorialsResult.data?.totalPages || 1}
+                currentPage={tutorialPage + 1}
+                onPageChange={(page) => setTutorialPage(page - 1)}
+                onDownload={(resource) => handleDownload(resource, 'tutorial')}
+                onRetry={() => tutorialsResult.refetch?.()}
                 type="tutorials"
-                onDownload={(item) => handleDownload(item, 'tutorial')}
               />
 
               <Pagination
@@ -134,8 +138,13 @@ export function ResourcesPage() {
               <ResourcesList
                 items={filteredSkills}
                 isLoading={skillsResult.isLoading}
+                error={skillsResult.error}
+                totalPages={skillsResult.data?.totalPages || 1}
+                currentPage={skillsPage + 1}
+                onPageChange={(page) => setSkillsPage(page - 1)}
+                onDownload={(resource) => handleDownload(resource, 'skill')}
+                onRetry={() => skillsResult.refetch?.()}
                 type="skills"
-                onDownload={(item) => handleDownload(item, 'skill')}
               />
 
               <Pagination

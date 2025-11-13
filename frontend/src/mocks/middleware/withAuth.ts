@@ -5,6 +5,22 @@ import { UserRole, type UserRoleType } from '../types/userRole'
 // Re-export for backward compatibility
 export { UserRole, type UserRoleType }
 
+// Helper function to map mock user roles to API roles
+export const mapRoleToApi = (role: UserRoleType): "ADMIN" | "INSTRUCTOR" | "STUDENT" | "CONTENT_PROVIDER" => {
+  switch (role) {
+    case UserRole.ADMIN:
+      return 'ADMIN'
+    case UserRole.INSTRUCTOR:
+      return 'INSTRUCTOR'
+    case UserRole.STUDENT:
+      return 'STUDENT'
+    case UserRole.PROVIDER:
+      return 'CONTENT_PROVIDER'
+    default:
+      return 'STUDENT'
+  }
+}
+
 // Mock user interface
 export interface MockUser {
   id: string

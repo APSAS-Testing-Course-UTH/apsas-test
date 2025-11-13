@@ -41,7 +41,7 @@ export const Route = createFileRoute('/')({
       } else if (user?.role === USER_ROLES.ADMIN) {
         throw redirect({ to: '/admin/dashboard' })
       } else if (user?.role === USER_ROLES.CONTENT_PROVIDER) {
-        throw redirect({ to: '/provider/dashboard' })
+        throw redirect({ to: '/student/dashboard' })
       }
 
       // Fallback: redirect to student dashboard if role unknown

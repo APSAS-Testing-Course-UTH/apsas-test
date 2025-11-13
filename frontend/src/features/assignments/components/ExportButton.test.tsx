@@ -8,10 +8,16 @@ vi.mock('../utils/exportUtils', () => ({
   generateFilename: vi.fn(() => 'test-08-11-2025.csv'),
 }));
 
-// Mock the toast hook
+// Use a minimal-compatible mock for useToast so components receive the expected API
 vi.mock('@/components/hooks/useToast', () => ({
   useToast: () => ({
-    showNotification: vi.fn(),
+    show: vi.fn(),
+    success: vi.fn(),
+    error: vi.fn(),
+    warning: vi.fn(),
+    info: vi.fn(),
+    close: vi.fn(),
+    closeAll: vi.fn(),
   }),
 }));
 
