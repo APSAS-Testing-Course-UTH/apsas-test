@@ -35,6 +35,7 @@ import {
   Modal,
   TextInput,
   Select,
+  Checkbox,
 } from '@mantine/core'
 import { DatePickerInput } from '@mantine/dates'
 import {
@@ -148,6 +149,9 @@ export function AssignmentsList({ onSelectAssignment }: AssignmentsListProps) {
     assignmentId?: string
     assignmentTitle?: string
   }>({ open: false })
+  
+  // Row selection state for bulk actions
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
 
   // Fetch assignments with pagination
   const { data, isLoading, error } = useAssignmentsQuery({
@@ -162,7 +166,7 @@ export function AssignmentsList({ onSelectAssignment }: AssignmentsListProps) {
 
   const assignmentList = data?.content || []
 
-  // Client-side filtering
+  // Client-side filtering - moved before callbacks to avoid circular dependency
   const filterFunctions = createAssignmentFilterFunctions()
   const filteredAssignments = useFilteredData(
     assignmentList,
@@ -178,6 +182,52 @@ export function AssignmentsList({ onSelectAssignment }: AssignmentsListProps) {
       filterFunctions,
     }
   )
+
+  // Row selection handlers
+  const toggleRow = useCallback((id: string) => {
+    setSelectedRows((prev) => {
+      const newSet = new Set(prev)
+      if (newSet.has(id)) {
+        newSet.delete(id)
+      } else {
+        newSet.add(id)
+      }
+      return newSet
+    })
+  }, [])
+
+  const toggleAllRows = useCallback(() => {
+    if (selectedRows.size === filteredAssignments.length && filteredAssignments.length > 0) {
+      setSelectedRows(new Set())
+    } else {
+      setSelectedRows(new Set(filteredAssignments.map((a) => a.id!)))
+    }
+  }, [filteredAssignments, selectedRows.size])
+
+  // Bulk action handlers
+  const handleBulkPublish = useCallback(async () => {
+    const toPublish = Array.from(selectedRows)
+    for (const id of toPublish) {
+      publishAssignment.mutate(id)
+    }
+    setSelectedRows(new Set())
+  }, [selectedRows, publishAssignment])
+
+  const handleBulkArchive = useCallback(async () => {
+    const toArchive = Array.from(selectedRows)
+    for (const id of toArchive) {
+      archiveAssignment.mutate(id)
+    }
+    setSelectedRows(new Set())
+  }, [selectedRows, archiveAssignment])
+
+  const handleBulkDelete = useCallback(() => {
+    setDeleteConfirm({
+      open: true,
+      assignmentId: 'bulk',
+      assignmentTitle: `${selectedRows.size} bài tập`,
+    })
+  }, [selectedRows.size])
 
   // Handle select assignment (navigate to edit form)
   const handleSelectAssignment = useCallback(
@@ -207,14 +257,28 @@ export function AssignmentsList({ onSelectAssignment }: AssignmentsListProps) {
 
   // Confirm delete
   const handleConfirmDelete = useCallback(async () => {
-    if (deleteConfirm.assignmentId && deleteConfirm.assignmentTitle) {
+    if (deleteConfirm.assignmentId === 'bulk') {
+      // Bulk delete
+      const toDelete = Array.from(selectedRows)
+      for (const id of toDelete) {
+        const assignment = assignmentList.find((a) => a.id === id)
+        if (assignment && assignment.id && assignment.title) {
+          await deleteAssignment.mutateAsync({
+            id: assignment.id,
+            title: assignment.title,
+          })
+        }
+      }
+      setSelectedRows(new Set())
+    } else if (deleteConfirm.assignmentId && deleteConfirm.assignmentTitle) {
+      // Single delete
       await deleteAssignment.mutateAsync({
         id: deleteConfirm.assignmentId,
         title: deleteConfirm.assignmentTitle,
       })
-      setDeleteConfirm({ open: false })
     }
-  }, [deleteConfirm.assignmentId, deleteConfirm.assignmentTitle, deleteAssignment])
+    setDeleteConfirm({ open: false })
+  }, [deleteConfirm.assignmentId, deleteConfirm.assignmentTitle, deleteAssignment, selectedRows, assignmentList])
 
   // Handle publish
   const handlePublish = useCallback(
@@ -287,6 +351,52 @@ export function AssignmentsList({ onSelectAssignment }: AssignmentsListProps) {
           Tạo bài tập mới
         </Button>
       </Group>
+
+      {/* Bulk Actions Toolbar - Show when rows selected */}
+      {selectedRows.size > 0 && (
+        <Group bg="blue.0" p="md" justify="space-between">
+          <Text size="sm" fw={500}>
+            Đã chọn {selectedRows.size} bài tập
+          </Text>
+          <Group gap="sm">
+            <Button
+              size="xs"
+              variant="light"
+              color="blue"
+              onClick={handleBulkPublish}
+              disabled={publishAssignment.isPending}
+            >
+              Công bố
+            </Button>
+            <Button
+              size="xs"
+              variant="light"
+              color="orange"
+              onClick={handleBulkArchive}
+              disabled={archiveAssignment.isPending}
+            >
+              Lưu trữ
+            </Button>
+            <Button
+              size="xs"
+              variant="light"
+              color="red"
+              onClick={handleBulkDelete}
+              disabled={deleteAssignment.isPending}
+            >
+              Xóa
+            </Button>
+            <Button
+              size="xs"
+              variant="light"
+              color="gray"
+              onClick={() => setSelectedRows(new Set())}
+            >
+              Bỏ chọn
+            </Button>
+          </Group>
+        </Group>
+      )}
 
       {/* Filters Row: Search + Status + Difficulty + Date Filters */}
       <Group grow align="flex-end">
@@ -386,7 +496,15 @@ export function AssignmentsList({ onSelectAssignment }: AssignmentsListProps) {
           <Table striped highlightOnHover stickyHeader layout="fixed">
             <Table.Thead>
             <Table.Tr>
-              <Table.Th w="35%">Tiêu đề</Table.Th>
+              <Table.Th w="5%">
+                <Checkbox
+                  checked={selectedRows.size === filteredAssignments.length && filteredAssignments.length > 0}
+                  indeterminate={selectedRows.size > 0 && selectedRows.size < filteredAssignments.length}
+                  onChange={toggleAllRows}
+                  aria-label="Chọn tất cả"
+                />
+              </Table.Th>
+              <Table.Th w="30%">Tiêu đề</Table.Th>
               <Table.Th w="12%" style={{ textAlign: 'center' }}>Độ khó</Table.Th>
               <Table.Th w="12%" style={{ textAlign: 'center' }}>Trạng thái</Table.Th>
               <Table.Th w="12%">Ngày tạo</Table.Th>
@@ -395,14 +513,24 @@ export function AssignmentsList({ onSelectAssignment }: AssignmentsListProps) {
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
-            {filteredAssignments.map((assignment) => (
+            {filteredAssignments.map((assignment) => {
+              const isSelected = selectedRows.has(assignment.id!)
+              return (
               <Table.Tr
                 key={assignment.id}
                 className={styles.row}
-                onClick={() => handleSelectAssignment(assignment.id!)}
+                bg={isSelected ? 'blue.0' : undefined}
                 style={{ cursor: 'pointer' }}
               >
-                <Table.Td w="35%">
+                <Table.Td w="5%">
+                  <Checkbox
+                    checked={isSelected}
+                    onChange={() => toggleRow(assignment.id!)}
+                    onClick={(e) => e.stopPropagation()}
+                    aria-label={`Chọn ${assignment.title}`}
+                  />
+                </Table.Td>
+                <Table.Td w="30%" onClick={() => handleSelectAssignment(assignment.id!)}>
                   <div className={styles.titleContent}>
                     <Text size="sm" fw={500}>
                       {assignment.title}
@@ -526,7 +654,7 @@ export function AssignmentsList({ onSelectAssignment }: AssignmentsListProps) {
                   </Group>
                 </Table.Td>
               </Table.Tr>
-            ))}
+            )})}
           </Table.Tbody>
             </Table>
           </div>

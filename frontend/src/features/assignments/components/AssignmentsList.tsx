@@ -33,9 +33,6 @@ import {
   getErrorMessage, 
   isNetworkError, 
   isTimeoutError,
-  showErrorNotification,
-  showNetworkErrorNotification,
-  showTimeoutNotification,
 } from '@/features/student/utils'
 import styles from './AssignmentsList.module.css'
 

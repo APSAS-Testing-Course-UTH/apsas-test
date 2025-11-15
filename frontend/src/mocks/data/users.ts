@@ -31,7 +31,7 @@ export const mockUsers: Record<string, MockUser> = {
   instructor1: {
     id: 'instructor-001',
     email: 'instructor@apsas.edu.vn',
-    firstName: 'John',
+    firstName: 'Bịp',
     lastName: 'Instructor',
     role: UserRole.INSTRUCTOR,
     isActive: true,

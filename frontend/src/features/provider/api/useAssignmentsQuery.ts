@@ -34,7 +34,7 @@ export function useAssignmentsQuery({
     queryKey: ['assignments', 'list', { page, size, sort }] as const,
     queryFn: async () => {
       const response = await contentServiceGetAllAssignments({
-        query: { page: String(page), size: String(size), sort },
+        query: { page: String(page), size: String(size) },
       })
       return response.data || (response as any)
     },

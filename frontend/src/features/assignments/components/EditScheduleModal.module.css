@@ -1,0 +1,43 @@
+/**
+ * EditScheduleModal Component Styles
+ * Modal for editing assignment schedule (start date, due date)
+ */
+
+.label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #1a1a1a;
+}
+
+.required {
+  color: #ff6b6b;
+  margin-left: 0.25rem;
+}
+
+.info {
+  background-color: #e7f5ff;
+  border-left: 4px solid #1971c2;
+  padding: 0.75rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  color: #0c3a66;
+  line-height: 1.5;
+}
+
+.alert {
+  margin-bottom: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .label {
+    font-size: 0.9rem;
+  }
+
+  .info {
+    font-size: 0.8rem;
+    padding: 0.6rem;
+  }
+}

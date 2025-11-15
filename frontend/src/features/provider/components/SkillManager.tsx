@@ -30,6 +30,7 @@ import {
   Menu,
   Modal,
   TextInput,
+  Checkbox,
 } from '@mantine/core'
 import { DatePickerInput } from '@mantine/dates'
 import {
@@ -64,6 +65,7 @@ export function SkillManager({ onSelectSkill }: SkillManagerProps) {
     null,
     null,
   ])
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
   const [deleteConfirm, setDeleteConfirm] = useState<{
     open: boolean
     skillId?: string
@@ -119,16 +121,50 @@ export function SkillManager({ onSelectSkill }: SkillManagerProps) {
 
   // Confirm delete
   const handleConfirmDelete = useCallback(async () => {
-    if (deleteConfirm.skillId && deleteConfirm.skillName) {
+    if (deleteConfirm.skillId === 'bulk' && selectedRows.size > 0) {
+      // Bulk delete
+      for (const id of selectedRows) {
+        const skillName = filteredSkills.find(s => s.id === id)?.name || 'Unknown'
+        await deleteSkill.mutateAsync({ id, name: skillName })
+      }
+      setSelectedRows(new Set())
+    } else if (deleteConfirm.skillId && deleteConfirm.skillName) {
+      // Single delete
       await deleteSkill.mutateAsync({
         id: deleteConfirm.skillId,
         name: deleteConfirm.skillName,
       })
-      setDeleteConfirm({ open: false })
     }
-  }, [deleteConfirm.skillId, deleteConfirm.skillName, deleteSkill])
+    setDeleteConfirm({ open: false })
+  }, [deleteConfirm.skillId, deleteConfirm.skillName, deleteSkill, selectedRows, filteredSkills])
 
-  // Render loading state
+  // Toggle row selection
+  const toggleRow = useCallback((id: string) => {
+    setSelectedRows(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(id)) newSet.delete(id)
+      else newSet.add(id)
+      return newSet
+    })
+  }, [])
+
+  // Toggle all rows
+  const toggleAllRows = useCallback(() => {
+    if (selectedRows.size === filteredSkills.length) {
+      setSelectedRows(new Set())
+    } else {
+      setSelectedRows(new Set(filteredSkills.map(s => s.id || '')))
+    }
+  }, [selectedRows.size, filteredSkills])
+
+  // Handle bulk delete
+  const handleBulkDelete = useCallback(() => {
+    setDeleteConfirm({
+      open: true,
+      skillId: 'bulk',
+      skillName: `${selectedRows.size} kỹ năng`,
+    })
+  }, [selectedRows.size])
   if (isLoading) {
     return (
       <Center className={styles.container}>
@@ -184,6 +220,31 @@ export function SkillManager({ onSelectSkill }: SkillManagerProps) {
           Tạo kỹ năng mới
         </Button>
       </Group>
+
+      {/* Bulk Action Toolbar */}
+      {selectedRows.size > 0 && (
+        <Group bg="blue.0" p="md" justify="space-between">
+          <Text fw={500}>Đã chọn {selectedRows.size} kỹ năng</Text>
+          <Group gap="sm">
+            <Button
+              variant="light"
+              color="red"
+              size="sm"
+              onClick={handleBulkDelete}
+              loading={deleteSkill.isPending}
+            >
+              Xóa
+            </Button>
+            <Button
+              variant="light"
+              size="sm"
+              onClick={() => setSelectedRows(new Set())}
+            >
+              Bỏ chọn
+            </Button>
+          </Group>
+        </Group>
+      )}
 
       {/* Filters Row: Search + Date Filters */}
       <Group grow align="flex-end">
@@ -259,102 +320,113 @@ export function SkillManager({ onSelectSkill }: SkillManagerProps) {
           <Table striped highlightOnHover stickyHeader layout="fixed">
             <Table.Thead>
               <Table.Tr>
+                <Table.Th w="5%">
+                  <Checkbox
+                    checked={selectedRows.size === filteredSkills.length}
+                    indeterminate={selectedRows.size > 0 && selectedRows.size < filteredSkills.length}
+                    onChange={toggleAllRows}
+                  />
+                </Table.Th>
                 <Table.Th w="25%">Tên kỹ năng</Table.Th>
-                <Table.Th w="36%">Mô tả</Table.Th>
+                <Table.Th w="30%">Mô tả</Table.Th>
                 <Table.Th w="12%" style={{ textAlign: 'center' }}>Ngày tạo</Table.Th>
                 <Table.Th w="12%" style={{ textAlign: 'center' }}>Cập nhật</Table.Th>
-                <Table.Th w="15%" style={{ textAlign: 'right' }}>Hành động</Table.Th>
+                <Table.Th w="16%" style={{ textAlign: 'right' }}>Hành động</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
-              {filteredSkills.map((skill) => (
-                <Table.Tr
-                  key={skill.id}
-                  className={styles.row}
-                  onClick={() => handleSelectSkill(skill.id!)}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <Table.Td w="25%">
-                    <Text size="sm" fw={500}>
-                      {skill.name}
-                    </Text>
-                  </Table.Td>
-
-                  <Table.Td w="36%">
-                    <Text size="xs" c="dimmed" lineClamp={2}>
-                      {skill.description || 'Không có mô tả'}
-                    </Text>
-                  </Table.Td>
-
-                  <Table.Td w="12%" style={{ textAlign: 'center' }}>
-                    <Text size="sm">
-                      {skill.createdAt
-                        ? formatDateShort(new Date(skill.createdAt))
-                        : 'N/A'}
-                    </Text>
-                  </Table.Td>
-
-                  <Table.Td w="12%" style={{ textAlign: 'center' }}>
-                    <Text size="sm">
-                      {skill.updatedAt
-                        ? formatDateShort(new Date(skill.updatedAt))
-                        : 'N/A'}
-                    </Text>
-                  </Table.Td>
-
-                  <Table.Td w="15%" style={{ textAlign: 'right' }}>
-                    <Group gap={0} justify="flex-end">
-                      <Tooltip label="Xem chi tiết">
-                        <ActionIcon
-                          variant="light"
-                          color="blue"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleSelectSkill(skill.id!)
-                          }}
-                        >
-                          <IconArrowRight size={18} />
-                        </ActionIcon>
-                      </Tooltip>
-
-                      <Menu shadow="md" position="bottom-end">
-                        <Menu.Target>
+              {filteredSkills.map((skill) => {
+                const isSelected = selectedRows.has(skill.id || '')
+                return (
+                  <Table.Tr
+                    key={skill.id}
+                    className={styles.row}
+                    style={{
+                      backgroundColor: isSelected ? 'var(--mantine-color-blue-0)' : undefined,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <Table.Td w="5%" onClick={(e) => e.stopPropagation()}>
+                      <Checkbox
+                        checked={isSelected}
+                        onChange={() => toggleRow(skill.id || '')}
+                      />
+                    </Table.Td>
+                    <Table.Td w="25%" onClick={() => handleSelectSkill(skill.id!)}>
+                      <Text size="sm" fw={500}>
+                        {skill.name}
+                      </Text>
+                    </Table.Td>
+                    <Table.Td w="30%" onClick={() => handleSelectSkill(skill.id!)}>
+                      <Text size="xs" c="dimmed" lineClamp={2}>
+                        {skill.description || 'Không có mô tả'}
+                      </Text>
+                    </Table.Td>
+                    <Table.Td w="12%" style={{ textAlign: 'center' }} onClick={() => handleSelectSkill(skill.id!)}>
+                      <Text size="sm">
+                        {skill.createdAt
+                          ? formatDateShort(new Date(skill.createdAt))
+                          : 'N/A'}
+                      </Text>
+                    </Table.Td>
+                    <Table.Td w="12%" style={{ textAlign: 'center' }} onClick={() => handleSelectSkill(skill.id!)}>
+                      <Text size="sm">
+                        {skill.updatedAt
+                          ? formatDateShort(new Date(skill.updatedAt))
+                          : 'N/A'}
+                      </Text>
+                    </Table.Td>
+                    <Table.Td w="16%" style={{ textAlign: 'right' }}>
+                      <Group gap={0} justify="flex-end">
+                        <Tooltip label="Xem chi tiết">
                           <ActionIcon
                             variant="light"
-                            onClick={(e) => e.stopPropagation()}
+                            color="blue"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleSelectSkill(skill.id!)
+                            }}
                           >
-                            <IconDots size={18} />
+                            <IconArrowRight size={18} />
                           </ActionIcon>
-                        </Menu.Target>
-                        <Menu.Dropdown>
-                          <Menu.Item
-                            leftSection={<IconEdit size={14} />}
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              handleEditSkill(skill.id!)
-                            }}
-                          >
-                            Chỉnh sửa
-                          </Menu.Item>
-
-                          <Menu.Divider />
-
-                          <Menu.Item
-                            leftSection={<IconTrash size={14} />}
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              handleDeleteClick(skill)
-                            }}
-                            color="red"
-                          >
-                            Xóa
-                          </Menu.Item>
-                        </Menu.Dropdown>
-                      </Menu>
-                    </Group>
-                  </Table.Td>
-                </Table.Tr>
-              ))}
+                        </Tooltip>
+                        <Menu shadow="md" position="bottom-end">
+                          <Menu.Target>
+                            <ActionIcon
+                              variant="light"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <IconDots size={18} />
+                            </ActionIcon>
+                          </Menu.Target>
+                          <Menu.Dropdown>
+                            <Menu.Item
+                              leftSection={<IconEdit size={14} />}
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleEditSkill(skill.id!)
+                              }}
+                            >
+                              Chỉnh sửa
+                            </Menu.Item>
+                            <Menu.Divider />
+                            <Menu.Item
+                              leftSection={<IconTrash size={14} />}
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleDeleteClick(skill)
+                              }}
+                              color="red"
+                            >
+                              Xóa
+                            </Menu.Item>
+                          </Menu.Dropdown>
+                        </Menu>
+                      </Group>
+                    </Table.Td>
+                  </Table.Tr>
+                )
+              })}
             </Table.Tbody>
           </Table>
         </div>

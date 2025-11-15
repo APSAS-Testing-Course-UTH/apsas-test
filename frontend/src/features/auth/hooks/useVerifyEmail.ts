@@ -45,7 +45,7 @@ import { mapApiError } from '@/configs/api-error-handler'
  */
 export const useVerifyEmail = () => {
   return useMutation({
-    ...authService.verifyEmail,
+    mutationFn: authService.verifyEmail.mutationFn,
 
     onSuccess: () => {
       // Hiển thị success notification

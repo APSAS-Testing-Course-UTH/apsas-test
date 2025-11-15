@@ -25,7 +25,7 @@ import { InstructorFeedback } from './InstructorFeedback'
 import { CodeDisplay } from './CodeDisplay'
 import { useWebSocket, type WebSocketMessage } from '../hooks'
 import { useAuthStore } from '@/features/auth/stores/useAuthStore'
-import { showErrorNotification, showInfoNotification } from '@/utils/notifications'
+import { showErrorNotification } from '@/utils/notifications'
 import { getErrorCategory, isNetworkError, isTimeoutError } from '@/features/student/utils'
 
 /**
@@ -111,10 +111,26 @@ function formatDate(date?: Date): string {
 /**
  * SubmissionDetail Component
  */
-export function SubmissionDetail() {
-  // Get submission ID from route params
-  const { id } = useParams({ from: '/_authenticated/student/submissions/$id' })
+export function SubmissionDetail({ 
+  submissionId,
+  onProvideFeedback,
+}: { 
+  submissionId?: string
+  onProvideFeedback?: () => void
+}) {
+  // Get submission ID from route params OR prop
+  const routeParams = useParams({ strict: false }) as { id?: string }
+  const id = submissionId || routeParams.id
   const navigate = useNavigate()
+  
+  // Early return if no ID
+  if (!id) {
+    return (
+      <Alert color="red">
+        Không tìm thấy ID bài nộp
+      </Alert>
+    )
+  }
   
   // Fetch submission data
   const {
@@ -216,7 +232,7 @@ export function SubmissionDetail() {
           <Button
             variant="light"
             leftSection={<IconArrowLeft size={16} />}
-            onClick={() => navigate({ to: '/student/submissions' })}
+            onClick={() => navigate({ to: '/instructor/submissions' })}
           >
             {labels.backToList}
           </Button>
@@ -243,13 +259,13 @@ export function SubmissionDetail() {
           {labels.notFound}
         </Alert>
         
-        <Button
-          variant="light"
-          leftSection={<IconArrowLeft size={16} />}
-          onClick={() => navigate({ to: '/student/dashboard' })}
-        >
-          {labels.backToList}
-        </Button>
+          <Button
+            variant="light"
+            leftSection={<IconArrowLeft size={16} />}
+            onClick={() => navigate({ to: '/instructor/submissions' })}
+          >
+            {labels.backToList}
+          </Button>
       </Stack>
     )
   }
@@ -257,15 +273,6 @@ export function SubmissionDetail() {
   // Render submission detail
   return (
     <Stack gap="lg" p="md">
-      {/* Back button */}
-      <Button
-        variant="light"
-        leftSection={<IconArrowLeft size={16} />}
-        onClick={() => navigate({ to: '/student/dashboard' })}
-        w="fit-content"
-      >
-        {labels.backToList}
-      </Button>
       
       {/* Summary Card */}
       <Card shadow="sm" padding="lg" radius="md" withBorder>
@@ -399,7 +406,22 @@ export function SubmissionDetail() {
       </Stack>
       
       {/* Instructor Feedback */}
-      <InstructorFeedback feedback={submission.feedback} />
+      <InstructorFeedback 
+        feedback={submission.feedback}
+        onProvideFeedback={onProvideFeedback}
+      />
+      
+      {/* Back button - improved styling */}
+      <Group justify="center" mt="xl">
+        <Button
+          variant="default"
+          size="md"
+          leftSection={<IconArrowLeft size={18} />}
+          onClick={() => navigate({ to: '/instructor/submissions' })}
+        >
+          {labels.backToList}
+        </Button>
+      </Group>
     </Stack>
   )
 }

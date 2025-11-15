@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import { Table, Badge, Button, Text, Stack, Paper } from '@mantine/core'
-import type { SubmissionServiceTestCaseResultResponse } from '@/api/types.gen'
+import type { SubmissionServiceTestCaseResultDto } from '@/api/types.gen'
 import styles from './TestCaseResults.module.css'
 
 interface TestCaseResultsProps {
-  testCases: SubmissionServiceTestCaseResultResponse[]
+  testCases: SubmissionServiceTestCaseResultDto[]
   showHiddenTests?: boolean
 }
 

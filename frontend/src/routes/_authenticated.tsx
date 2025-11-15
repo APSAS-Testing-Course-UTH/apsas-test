@@ -2,6 +2,7 @@ import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useAuthStore } from '../features/auth/stores/useAuthStore'
 import { Loader, Center } from '@mantine/core'
 import { StudentPortalLayout } from '@/layouts/StudentPortalLayout'
+import { InstructorPortalLayout } from '@/layouts/InstructorPortalLayout'
 import { ContentProviderLayout } from '@/layouts/ContentProviderLayout'
 import { USER_ROLES } from '@/constants/roles'
 
@@ -60,12 +61,12 @@ function AuthenticatedLayout() {
   switch (user?.role) {
     case USER_ROLES.STUDENT:
       return <StudentPortalLayout />
+    case USER_ROLES.INSTRUCTOR:
+      return <InstructorPortalLayout />
     case USER_ROLES.CONTENT_PROVIDER:
       return <ContentProviderLayout />
-    // For admin and lecturer, use StudentPortalLayout as fallback
-    // These roles have simpler dashboard-only views
+    // For admin, use StudentPortalLayout as fallback
     case USER_ROLES.ADMIN:
-    case USER_ROLES.INSTRUCTOR:
     default:
       return <StudentPortalLayout />
   }

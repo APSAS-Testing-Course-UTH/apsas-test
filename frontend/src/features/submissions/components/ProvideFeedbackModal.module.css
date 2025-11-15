@@ -1,0 +1,47 @@
+.feedbackContainer {
+  width: 100%;
+}
+
+.feedbackContainer textarea {
+  font-family: 'Courier New', monospace;
+  resize: vertical;
+}
+
+.submissionInfo {
+  background-color: var(--mantine-color-gray-0);
+  padding: 1rem;
+  border-radius: var(--mantine-radius-md);
+  border-left: 4px solid var(--mantine-color-blue-500);
+}
+
+.submissionInfo h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+}
+
+/* Character count styling */
+.charCount {
+  font-size: 0.85rem;
+  color: var(--mantine-color-gray-600);
+  text-align: right;
+  margin-top: 0.25rem;
+}
+
+.charCount.warning {
+  color: var(--mantine-color-orange-600);
+}
+
+.charCount.error {
+  color: var(--mantine-color-red-600);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 600px) {
+  .feedbackContainer {
+    width: 100%;
+  }
+
+  .feedbackContainer textarea {
+    font-size: 16px; /* Prevents iOS zoom */
+  }
+}

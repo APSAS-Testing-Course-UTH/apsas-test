@@ -38,7 +38,7 @@ import { mapApiError } from '@/configs/api-error-handler'
  */
 export const useResetPassword = () => {
   return useMutation({
-    ...authService.resetPassword,
+    mutationFn: authService.resetPassword.mutationFn,
 
     onSuccess: () => {
       // Hiển thị success notification

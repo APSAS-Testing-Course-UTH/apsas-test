@@ -1,13 +1,12 @@
 import { Stack, Paper, Group, Text, Button, Avatar, Badge, Loader, Alert } from '@mantine/core'
 import type { AxiosError } from 'axios'
-import { IconUser, IconEdit, IconLock, IconAlertCircle, IconRefresh } from '@tabler/icons-react'
+import { IconUser, IconEdit, IconLock, IconAlertCircle } from '@tabler/icons-react'
 import { useCurrentUser } from '../api/hooks'
 import {
   PAGE_TITLE,
   PROFILE_FIELD_LABELS,
   ROLE_LABELS,
   BUTTON_LABELS,
-  NOTIFICATION_MESSAGES,
 } from '../types'
 import { 
   getErrorMessage,

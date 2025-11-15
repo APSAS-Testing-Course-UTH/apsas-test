@@ -16,7 +16,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import type { AxiosError } from 'axios'
-import { Container, Grid, Stack, Paper, Title, Group, Button, Loader, Center, Text, ActionIcon, Pagination, Badge, Alert } from '@mantine/core'
+import { Container, Grid, Stack, Paper, Title, Group, Button, Loader, Center, Text, ActionIcon, Pagination, Alert } from '@mantine/core'
 import { IconPlus, IconRefresh, IconAlertCircle } from '@tabler/icons-react'
 import { useSupportSessions, useSupportSession } from '../api'
 import { SessionsList } from './SessionsList'
@@ -143,19 +143,19 @@ export function SupportPage() {
                   <Center py="xl">
                     <Loader size="sm" />
                   </Center>
-                ) : sessionsData?.error ? (
+                ) : sessionError ? (
                   <Alert
                     icon={<IconAlertCircle size={16} />}
                     title="Lỗi tải danh sách"
                     color={
-                      isNetworkError(sessionsData.error as AxiosError) ||
-                      isTimeoutError(sessionsData.error as AxiosError)
+                      isNetworkError(sessionError as AxiosError) ||
+                      isTimeoutError(sessionError as AxiosError)
                         ? 'orange'
                         : 'red'
                     }
                     variant="light"
                   >
-                    {getErrorMessage(sessionsData.error)}
+                    {getErrorMessage(sessionError)}
                     <Button
                       size="xs"
                       mt="sm"

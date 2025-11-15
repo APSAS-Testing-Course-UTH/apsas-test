@@ -25,9 +25,9 @@ interface UseLoginOptions {
  * 
  * Role-based redirect mapping:
  * - STUDENT → /student/dashboard
- * - INSTRUCTOR → /lecturer/dashboard
+ * - INSTRUCTOR → /instructor/dashboard
  * - CONTENT_PROVIDER → /provider/dashboard
- * - ADMIN → /admin/dashboard
+ * - ADMIN → /login (admin portal is server-side)
  *
  * @param {UseLoginOptions} [options] - Cấu hình hook
  * @param {string} [options.redirectTo] - URL tùy chỉnh để redirect (không được là /login hoặc /register)
@@ -57,7 +57,7 @@ export const useLogin = ({ redirectTo }: UseLoginOptions = {}) => {
   const navigate = useNavigate()
 
   return useMutation({
-    ...authService.login,
+    mutationFn: authService.login.mutationFn,
 
     onSuccess: (data) => {
       // Validate response data

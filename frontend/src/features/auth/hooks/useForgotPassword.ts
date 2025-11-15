@@ -40,7 +40,7 @@ import { mapApiError } from '@/configs/api-error-handler'
  */
 export const useForgotPassword = () => {
   return useMutation({
-    ...authService.forgotPassword,
+    mutationFn: authService.forgotPassword.mutationFn,
 
     onSuccess: () => {
       // Hiển thị success notification

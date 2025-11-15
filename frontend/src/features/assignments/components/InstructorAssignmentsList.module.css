@@ -1,0 +1,55 @@
+/**
+ * InstructorAssignmentsList Component Styles
+ * Table display for instructor's assignments with actions
+ */
+
+.container {
+  width: 100%;
+  padding: 0;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.titleCell {
+  max-width: 300px;
+}
+
+.actionsHeader {
+  text-align: right;
+  padding-right: 1.5rem;
+}
+
+.pagination {
+  margin-top: 2rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .titleCell {
+    max-width: 150px;
+  }
+
+  .tableWrapper {
+    font-size: 0.85rem;
+  }
+
+  .actionsHeader {
+    padding-right: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .tableWrapper {
+    font-size: 0.75rem;
+  }
+
+  .pagination {
+    margin-top: 1rem;
+  }
+}

@@ -42,6 +42,8 @@ import {
  * }
  * ```
  */
+export type UseErrorHandlerReturn = ReturnType<typeof useErrorHandler>
+
 export function useErrorHandler() {
   const handleError = useCallback(
     (error: AxiosError | Error | unknown, title: string = 'Lỗi') => {

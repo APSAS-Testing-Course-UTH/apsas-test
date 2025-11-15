@@ -63,4 +63,52 @@ export const submissionHandlers = [
       empty: items.length === 0,
     })
   }),
+  
+  /**
+   * POST /api/v1/submissions/{id}/feedback
+   * Provide feedback on a submission
+   */
+  http.post('/api/v1/submissions/:id/feedback', async ({ params, request }) => {
+    const { id } = params
+    const body = await request.json() as { feedback: string }
+    
+    await delay(200)
+    
+    // Validate feedback
+    if (!body.feedback || body.feedback.length < 10) {
+      return HttpResponse.json(
+        { message: 'Feedback must be at least 10 characters' },
+        { status: 400 }
+      )
+    }
+    
+    if (body.feedback.length > 5000) {
+      return HttpResponse.json(
+        { message: 'Feedback must not exceed 5000 characters' },
+        { status: 400 }
+      )
+    }
+    
+    // Find and update submission
+    const submission = mockSubmissions.find(
+      (s: SubmissionServiceSubmissionResponse) => s.id === id
+    )
+    
+    if (!submission) {
+      return HttpResponse.json(
+        { message: 'Submission not found' },
+        { status: 404 }
+      )
+    }
+    
+    // Update submission with feedback
+    const updated = {
+      ...submission,
+      feedback: body.feedback,
+      hasFeedback: true,
+      feedbackUpdatedAt: new Date().toISOString(),
+    }
+    
+    return HttpResponse.json<SubmissionServiceSubmissionResponse>(updated)
+  }),
 ]

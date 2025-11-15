@@ -181,7 +181,7 @@ export const contentHandlers = [
    * Delete tutorial (Provider only)
    */
   http.delete('**/api/v1/tutorials/:id',
-    withAuth(({ request, params, user }: any) => {
+    withAuth(({ params, user }: any) => {
       const userRole = user.role
 
       // Only providers can delete tutorials
@@ -349,7 +349,7 @@ export const contentHandlers = [
    * Delete skill (Provider only)
    */
   http.delete('**/api/v1/skills/:id',
-    withAuth(({ request, params, user }: any) => {
+    withAuth(({ params, user }: any) => {
       const userRole = user.role
 
       // Only providers can delete skills
@@ -535,7 +535,7 @@ export const contentHandlers = [
    * Publish assignment (Provider only)
    */
   http.post('**/api/v1/assignments/:id/publish',
-    withAuth(({ request, params, user }: any) => {
+    withAuth(({ params, user }: any) => {
       const userRole = user.role
 
       // Only providers can publish assignments
@@ -571,7 +571,7 @@ export const contentHandlers = [
    * Archive assignment (Provider only)
    */
   http.post('**/api/v1/assignments/:id/archive',
-    withAuth(({ request, params, user }: any) => {
+    withAuth(({ params, user }: any) => {
       const userRole = user.role
 
       // Only providers can archive assignments

@@ -1,0 +1,46 @@
+.container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.container table {
+  min-width: 900px;
+}
+
+.container tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.container tbody tr:hover {
+  background-color: var(--mantine-color-gray-0);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .container {
+    border: 1px solid var(--mantine-color-gray-200);
+    border-radius: var(--mantine-radius-md);
+  }
+
+  .container table {
+    font-size: 0.85rem;
+  }
+}
+
+/* Status badge styling */
+.statusBadge {
+  font-weight: 500;
+}
+
+/* Action buttons styling */
+.actionButtons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Score styling */
+.score {
+  font-weight: 600;
+  font-size: 1.1rem;
+}

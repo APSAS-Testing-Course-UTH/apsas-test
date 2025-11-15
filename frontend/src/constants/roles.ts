@@ -93,22 +93,24 @@ export const ROLE_PERMISSIONS: Record<UserRole, UserPermissions> = {
 
 /**
  * Route mặc định sau khi login theo role
+ * Note: ADMIN không có route vì admin portal là server-side (MVC)
  */
 export const ROLE_REDIRECTS: RoleRedirects = {
   [USER_ROLES.STUDENT]: '/student/dashboard',
-  [USER_ROLES.INSTRUCTOR]: '/lecturer/dashboard',
+  [USER_ROLES.INSTRUCTOR]: '/instructor/dashboard',
   [USER_ROLES.CONTENT_PROVIDER]: '/provider/dashboard',
-  [USER_ROLES.ADMIN]: '/admin/dashboard',
+  [USER_ROLES.ADMIN]: '/login', // Admin portal is server-side, redirect to login
 };
 
 /**
  * Route dashboard của từng role
+ * Note: ADMIN không có dashboard route vì portal là server-side
  */
 export const DASHBOARD_ROUTES: DashboardRoutes = {
   [USER_ROLES.STUDENT]: '/student/dashboard',
-  [USER_ROLES.INSTRUCTOR]: '/lecturer/dashboard',
+  [USER_ROLES.INSTRUCTOR]: '/instructor/dashboard',
   [USER_ROLES.CONTENT_PROVIDER]: '/provider/dashboard',
-  [USER_ROLES.ADMIN]: '/admin/dashboard',
+  [USER_ROLES.ADMIN]: '/login', // Admin uses separate server-side portal
 };
 
 /**
@@ -222,11 +224,11 @@ export const ROLE_NAVIGATION = {
     { label: 'Hỗ trợ', path: '/student/support', icon: 'help' },
   ],
   [USER_ROLES.INSTRUCTOR]: [
-    { label: 'Dashboard', path: '/lecturer/dashboard', icon: 'home' },
-    { label: 'Bài tập', path: '/lecturer/assignments', icon: 'assignment' },
-    { label: 'Chấm bài', path: '/lecturer/grading', icon: 'grade' },
-    { label: 'Thống kê', path: '/lecturer/analytics', icon: 'analytics' },
-    { label: 'Hỗ trợ', path: '/lecturer/support', icon: 'help' },
+    { label: 'Dashboard', path: '/instructor/dashboard', icon: 'home' },
+    { label: 'Bài tập', path: '/instructor/assignments', icon: 'assignment' },
+    { label: 'Chấm bài', path: '/instructor/grading', icon: 'grade' },
+    { label: 'Thống kê', path: '/instructor/analytics', icon: 'analytics' },
+    { label: 'Hỗ trợ', path: '/instructor/support', icon: 'help' },
   ],
   [USER_ROLES.CONTENT_PROVIDER]: [
     { label: 'Dashboard', path: '/provider/dashboard', icon: 'home' },
@@ -235,13 +237,9 @@ export const ROLE_NAVIGATION = {
     { label: 'Hướng dẫn', path: '/provider/tutorials', icon: 'tutorial' },
     { label: 'Thống kê', path: '/provider/analytics', icon: 'analytics' },
   ],
-  [USER_ROLES.ADMIN]: [
-    { label: 'Dashboard', path: '/admin/dashboard', icon: 'home' },
-    { label: 'Quản lý người dùng', path: '/admin/users', icon: 'users' },
-    { label: 'Quản lý bài tập', path: '/admin/assignments', icon: 'assignment' },
-    { label: 'Thống kê hệ thống', path: '/admin/analytics', icon: 'analytics' },
-    { label: 'Cài đặt', path: '/admin/settings', icon: 'settings' },
-  ],
+  // Admin navigation removed - admin portal is server-side (MVC)
+  // Admin users should access separate admin portal URL
+  [USER_ROLES.ADMIN]: [],
 } as const;
 
 /**

@@ -219,15 +219,11 @@ export const submissionHandlers = [
    * Provide feedback for submission (Instructors only)
    */
   http.post('**/api/v1/submissions/:id/feedback',
-    withAuth(async ({ request, params }: { request: Request, params: { id: string } }) => {
+    withAuth(async ({ request, params, user }: { request: Request, params: { id: string }, user: MockUser }) => {
       const { id } = params
-      const token = request.headers.get('Authorization')?.split(' ')[1]
-      const userRole = token?.includes('admin') ? UserRole.ADMIN :
-                      token?.includes('instructor') ? UserRole.INSTRUCTOR :
-                      token?.includes('student') ? UserRole.STUDENT : UserRole.STUDENT
 
       // Only instructors can provide feedback
-      if (userRole !== UserRole.INSTRUCTOR) {
+      if (user.role !== UserRole.INSTRUCTOR) {
         return errorResponses.forbidden('Only instructors can provide feedback')
       }
 

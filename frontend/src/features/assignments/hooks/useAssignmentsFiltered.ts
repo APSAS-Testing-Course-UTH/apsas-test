@@ -30,13 +30,13 @@ export interface UseAssignmentsFilteredOptions {
 const assignmentKeys = {
   all: ['assignments'],
   lists: () => [...assignmentKeys.all, 'list'],
-  list: (page: number, size: number, sort: string) => [
+  list: (page: number, size: number) => [
     ...assignmentKeys.lists(),
-    { page, size, sort },
+    { page, size },
   ],
-  filtered: (page: number, size: number, sort: string, filters: AssignmentFilters) => [
+  filtered: (page: number, size: number, filters: AssignmentFilters) => [
     ...assignmentKeys.lists(),
-    { page, size, sort, filters },
+    { page, size, filters },
   ],
 }
 
@@ -46,18 +46,16 @@ const assignmentKeys = {
 export function useAssignmentsFiltered({
   page,
   size,
-  sort = 'dueDate,desc',
   filters,
 }: UseAssignmentsFilteredOptions) {
   // Fetch data from server with pagination
   const queryResult = useQuery({
-    queryKey: assignmentKeys.list(page, size, sort),
+    queryKey: assignmentKeys.list(page, size),
     queryFn: async () => {
       const response = await contentServiceGetAllAssignments({
         query: {
           page: String(page),
           size: String(size),
-          sort,
         },
       })
       return response.data

@@ -2,6 +2,11 @@
 // All imports are lazy-loaded to avoid "document is not defined" errors
 /// <reference types="@testing-library/jest-dom" />
 import { expect, afterEach, beforeAll, afterAll, vi } from 'vitest'
+import '@testing-library/jest-dom'
+import * as jestDomMatchers from '@testing-library/jest-dom/matchers'
+
+// Extend vitest expect with jest-dom matchers
+expect.extend(jestDomMatchers)
 
 // Global module mock: Mock useToast before any component imports occur so
 // tests that import components using useToast receive a safe mock implementation.
@@ -58,7 +63,7 @@ console.log('🔧 [Test Setup] Lazy-loading test DOM configuration...')
 
 // Store references for deferred imports
 let cleanup: any
-let matchers: any
+// Matchers are imported/extended in test setup
 
 // CRITICAL: Store MSW server globally so it persists across test suites
 declare global {
@@ -81,14 +86,7 @@ beforeAll(async () => {
   const startTime = Date.now()
 
   try {
-    // Step 1: Lazy-load and extend matchers
-    console.log('[Test Setup] Loading matchers...')
-    matchers = await import('@testing-library/jest-dom/matchers')
-    // Matchers are directly exported, not under .default
-    expect.extend(matchers)
-    console.log('[Test Setup] ✅ Matchers loaded')
-
-    // Step 2: Setup DOM mocks (now safe since jsdom is initialized)
+    // Step 1: Setup DOM mocks (now safe since jsdom is initialized)
     console.log('[Test Setup] Setting up DOM mocks...')
 
     // Mock window.matchMedia for Mantine (required for MantineProvider)
@@ -177,13 +175,13 @@ beforeAll(async () => {
 
     console.log('[Test Setup] ✅ DOM mocks configured')
 
-    // Step 3: Lazy-load cleanup function
+    // Step 2: Lazy-load cleanup function
     console.log('[Test Setup] Loading cleanup function...')
     const testingLibraryReact = await import('@testing-library/react')
     cleanup = testingLibraryReact.cleanup
     console.log('[Test Setup] ✅ Cleanup loaded')
 
-    // Step 4: Add custom matcher for CSS Module classes
+    // Step 3: Add custom matcher for CSS Module classes
     expect.extend({
       toHaveCSSModuleClass(element: HTMLElement, className: string) {
         const classList = Array.from(element.classList)
@@ -199,7 +197,7 @@ beforeAll(async () => {
 
     console.log('[Test Setup] ✅ Custom matchers added')
 
-    // Step 5: Install undici fetch if needed
+    // Step 4: Install undici fetch if needed
     if (!globalThis.fetch || globalThis.fetch.name !== 'fetch' || globalThis.fetch.toString().includes('native')) {
       console.log('[Test Setup] Installing undici fetch...')
       const { fetch: undiciFetch } = await import('undici')
@@ -209,7 +207,7 @@ beforeAll(async () => {
       console.log('[Test Setup] Using existing fetch:', globalThis.fetch.name)
     }
 
-    // Step 6: Initialize MSW server if not already initialized
+    // Step 5: Initialize MSW server if not already initialized
     if (!globalThis.__MSW_SERVER__) {
       console.log('[Test Setup] Initializing MSW server for first time...')
       const { server } = await import('@/mocks/server')
@@ -223,14 +221,14 @@ beforeAll(async () => {
       globalThis.__MSW_SERVER__.resetHandlers()
     }
 
-    // Step 7: Initialize localStorage with test token
+    // Step 6: Initialize localStorage with test token
     if (typeof localStorage !== 'undefined') {
       const testToken = 'student_student-001'
       localStorage.setItem('apsas_token', testToken)
       console.log('[Test Setup] ✅ localStorage initialized with test token')
     }
 
-    // Step 8: Configure SDK client with auth interceptor for tests
+    // Step 7: Configure SDK client with auth interceptor for tests
     const { client } = await import('@/api/client.gen')
     client.interceptors.request.use(async (request) => {
       if (typeof localStorage !== 'undefined') {

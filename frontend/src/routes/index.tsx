@@ -37,11 +37,19 @@ export const Route = createFileRoute('/')({
       if (user?.role === USER_ROLES.STUDENT) {
         throw redirect({ to: '/student/dashboard' })
       } else if (user?.role === USER_ROLES.INSTRUCTOR) {
-        throw redirect({ to: '/lecturer/dashboard' })
+        throw redirect({ to: '/instructor/dashboard' })
       } else if (user?.role === USER_ROLES.ADMIN) {
-        throw redirect({ to: '/admin/dashboard' })
+        // Admin portal is server-side (MVC), not React SPA
+        // Redirect to login with message that admin should use separate admin portal
+        throw redirect({ 
+          to: '/login',
+          search: {
+            redirect: undefined,
+            message: 'Admin users should access the Admin Portal directly',
+          },
+        })
       } else if (user?.role === USER_ROLES.CONTENT_PROVIDER) {
-        throw redirect({ to: '/student/dashboard' })
+        throw redirect({ to: '/provider/dashboard' })
       }
 
       // Fallback: redirect to student dashboard if role unknown

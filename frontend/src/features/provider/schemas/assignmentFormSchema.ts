@@ -228,7 +228,6 @@ export const toCreateAssignmentRequest = (data: CreateAssignmentFormData): Conte
   // Helper to safely convert dates - handle both Date objects and ISO strings
   const toISODateString = (date: Date | string | null | undefined): string | undefined => {
     if (!date) return undefined
-    let dateObj: Date
     
     if (typeof date === 'string') {
       // Convert YYYY-MM-DD to ISO 8601 datetime with time at midnight UTC
@@ -262,7 +261,6 @@ export const toUpdateAssignmentRequest = (data: UpdateAssignmentFormData): Conte
   // Helper to safely convert dates - handle both Date objects and ISO strings
   const toISODateString = (date: Date | string | null | undefined): string | undefined => {
     if (!date) return undefined
-    let dateObj: Date
     
     if (typeof date === 'string') {
       // Convert YYYY-MM-DD to ISO 8601 datetime with time at midnight UTC

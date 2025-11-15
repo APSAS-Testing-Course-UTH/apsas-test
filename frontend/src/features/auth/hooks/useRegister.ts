@@ -53,7 +53,7 @@ export const useRegister = () => {
   const navigate = useNavigate()
 
   return useMutation({
-    ...authService.register,
+    mutationFn: authService.register.mutationFn,
 
     onSuccess: (data) => {
       // Validate response data

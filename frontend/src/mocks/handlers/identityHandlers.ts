@@ -6,12 +6,8 @@ import type {
   IdentityServiceRegisterRequest,
   IdentityServiceRegisterResponses,
   IdentityServiceEmailRequest,
-  IdentityServiceRequestPasswordResetResponses,
   IdentityServiceResetPasswordRequest,
-  IdentityServiceResetPasswordResponses,
   IdentityServiceTokenRequest,
-  IdentityServiceVerifyEmailResponses,
-  IdentityServiceResendVerificationEmailResponses,
   IdentityServiceUserResponse,
   IdentityServiceUpdateProfileRequest,
   IdentityServicePageResponseUserResponse,
@@ -234,7 +230,7 @@ export const registerHandler = http.post('**/api/auth/register',
       persistDatabase()
 
       // Return AuthResponse with the newly created user's details
-      const response: IdentityServiceRegisterResponses[200] = {
+      const response: IdentityServiceRegisterResponses[201] = {
         token: (MOCK_DATA_REGISTRY.tokens as any).student,
         type: 'Bearer',
         user: {
@@ -278,10 +274,7 @@ export const forgotPasswordHandler = http.post('**/api/auth/forgot-password',
       if (!user) {
         // For security, don't reveal if email exists or not
         // Return success message anyway
-        const response: IdentityServiceRequestPasswordResetResponses[200] = {
-          message: 'If an account with this email exists, a password reset link has been sent.',
-        }
-        return HttpResponse.json(response, { status: 200 })
+        return HttpResponse.json(null, { status: 204 })
       }
 
       // Generate reset token and expiry (24 hours from now)
@@ -300,12 +293,8 @@ export const forgotPasswordHandler = http.post('**/api/auth/forgot-password',
       persistDatabase()
 
       // In a real implementation, this would send an email with the reset link
-      // For mocking, just return success
-      const response: IdentityServiceRequestPasswordResetResponses[200] = {
-        message: 'If an account with this email exists, a password reset link has been sent.',
-      }
-
-      return HttpResponse.json(response, { status: 200 })
+      // For mocking, just return success with 204 No Content
+      return HttpResponse.json(null, { status: 204 })
     } catch (error) {
       return errorResponses.internalServerError('Failed to process password reset request')
     }
@@ -357,10 +346,7 @@ export const resetPasswordHandler = http.post('**/api/auth/reset-password',
           persistDatabase()
         }
 
-        const response: IdentityServiceResetPasswordResponses[200] = {
-          message: 'Password has been reset successfully',
-        }
-        return HttpResponse.json(response, { status: 200 })
+        return HttpResponse.json(null, { status: 204 })
       }
 
       // Find user by reset token in database
@@ -389,11 +375,7 @@ export const resetPasswordHandler = http.post('**/api/auth/reset-password',
       })
       persistDatabase()
 
-      const response: IdentityServiceResetPasswordResponses[200] = {
-        message: 'Password has been reset successfully',
-      }
-
-      return HttpResponse.json(response, { status: 200 })
+      return HttpResponse.json(null, { status: 204 })
     } catch (error) {
       return errorResponses.internalServerError('Failed to reset password')
     }
@@ -425,11 +407,7 @@ export const verifyEmailHandler = http.post('**/api/auth/verify-email',
       }
 
       // Accept valid tokens (like 'valid-verification-token-123')
-      const response: IdentityServiceVerifyEmailResponses[200] = {
-        message: 'Email has been verified successfully',
-      }
-
-      return HttpResponse.json(response, { status: 200 })
+      return HttpResponse.json(null, { status: 204 })
     } catch (error) {
       return errorResponses.internalServerError('Failed to verify email')
     }
@@ -455,19 +433,12 @@ export const resendVerificationHandler = http.post('**/api/auth/resend-verificat
       if (!userExists) {
         // For security, don't reveal if email exists or not
         // Return success message anyway
-        const response: IdentityServiceResendVerificationEmailResponses[200] = {
-          message: 'If an account with this email exists, a verification email has been sent.',
-        }
-        return HttpResponse.json(response, { status: 200 })
+        return HttpResponse.json(null, { status: 204 })
       }
 
       // In a real implementation, this would send a new verification email
       // For mocking, just return success
-      const response: IdentityServiceResendVerificationEmailResponses[200] = {
-        message: 'If an account with this email exists, a verification email has been sent.',
-      }
-
-      return HttpResponse.json(response, { status: 200 })
+      return HttpResponse.json(null, { status: 204 })
     } catch (error) {
       return errorResponses.internalServerError('Failed to resend verification email')
     }

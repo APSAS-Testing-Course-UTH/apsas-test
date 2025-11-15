@@ -11,7 +11,7 @@
  * - 100% Vietnamese UI
  */
 
-import { useState, useCallback, useMemo, useEffect } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import {
@@ -39,7 +39,6 @@ import { submissionServiceGetAllSubmissionsOptions } from '@/api/@tanstack/react
 import { useAssignmentDetails } from '../api/hooks'
 import { useSubmissionPolling } from '../hooks'
 import { showInfoNotification } from '@/utils/notifications'
-import { useErrorHandler } from '@/features/student/hooks'
 import {
   getErrorCategory,
   isNetworkError,

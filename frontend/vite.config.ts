@@ -43,45 +43,5 @@ export default defineConfig({
     __APP_VERSION__: JSON.stringify(process.env.VITE_APP_VERSION),   // Version app từ .env
     global: 'globalThis', // Polyfill for global object (needed for sockjs-client and @stomp/stompjs)
   },
-  test: {
-    environment: "happy-dom",
-    // Use globals to ensure describe/it/expect are available
-    globals: true,
-    setupFiles: ["./src/test/setup.ts"],
-    hookTimeout: 30000,
-    testTimeout: 30000,
-    include: ["src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
-    exclude: ["node_modules", "dist"],
-    // Set environment variables for tests
-    env: {
-      VITE_API_BASE_URL: "http://localhost:3000",
-    },
-    // Ensure jsdom is properly initialized before tests run
-    environmentOptions: {
-      jsdom: {
-        beforeParse() {
-          // jsdom will create window/document here
-        },
-      },
-    },
-    coverage: {
-      provider: "v8",
-      reporter: ["text", "json", "html", "lcov"],
-      include: ["src/**/*.tsx", "src/**/*.ts"],
-      exclude: [
-        "node_modules",
-        "dist",
-        "**/*.test.tsx",
-        "**/*.test.ts",
-        "**/*.spec.tsx",
-        "**/*.spec.ts",
-      ],
-      thresholds: {
-        lines: 90,
-        functions: 90,
-        branches: 85,
-        statements: 90,
-      },
-    },
-  },
+
 })

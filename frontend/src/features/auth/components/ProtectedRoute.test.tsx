@@ -378,7 +378,7 @@ describe('ProtectedRoute - Route Guard Testing', () => {
       )
 
       const navigate = screen.getByTestId('navigate')
-      expect(navigate).toHaveAttribute('data-to', '/lecturer/dashboard')
+      expect(navigate).toHaveAttribute('data-to', '/instructor/dashboard')
     })
 
     it('should handle multiple role requirements correctly', () => {

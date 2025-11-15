@@ -54,14 +54,31 @@ export function ChatWindow({ session, onRefresh }: ChatWindowProps) {
 
   // Combine REST messages from session with WebSocket messages
   // REST messages are initial batch, WebSocket delivers new messages in real-time
-  const allMessages: SupportMessage[] = useMemo(() => [
-    ...(session.messages ?? []),
-    ...stompSession.messages,
-  ].sort((a, b) => {
-    const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0
-    const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0
-    return timeA - timeB
-  }), [session.messages, stompSession.messages])
+  // Deduplicate by message ID to prevent duplicates when refresh refetches REST data
+  const allMessages: SupportMessage[] = useMemo(() => {
+    const messageMap = new Map<string, SupportMessage>()
+    
+    // Add REST messages first
+    session.messages?.forEach((msg) => {
+      if (msg.id) {
+        messageMap.set(msg.id, msg)
+      }
+    })
+    
+    // Add WebSocket messages (will overwrite if same ID)
+    stompSession.messages.forEach((msg) => {
+      if (msg.id) {
+        messageMap.set(msg.id, msg)
+      }
+    })
+    
+    // Convert to array and sort by timestamp
+    return Array.from(messageMap.values()).sort((a, b) => {
+      const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0
+      const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0
+      return timeA - timeB
+    })
+  }, [session.messages, stompSession.messages])
 
   // Auto-scroll to latest message
   useEffect(() => {

@@ -1,6 +1,6 @@
 /**
  * Vietnamese Navigation Constants
- * APSAS Student Portal - Navigation labels and routes
+ * APSAS Portal - Navigation labels and routes (Student, Instructor)
  */
 
 import {
@@ -10,6 +10,8 @@ import {
   IconChartBar,
   IconHelp,
   IconBookmark,
+  IconChecklist,
+  IconClipboardList,
   type Icon,
 } from '@tabler/icons-react';
 
@@ -52,6 +54,43 @@ export const STUDENT_NAV_ITEMS: NavItem[] = [
   {
     label: 'Hỗ trợ', // Support
     href: '/student/support',
+    icon: IconHelp,
+  },
+];
+
+/**
+ * Instructor Portal Navigation Items
+ * All labels in Vietnamese (ENFORCED)
+ */
+export const INSTRUCTOR_NAV_ITEMS: NavItem[] = [
+  {
+    label: 'Bảng điều khiển', // Dashboard
+    href: '/instructor',
+    icon: IconDashboard,
+  },
+  {
+    label: 'Quản lý bài tập', // Manage Assignments
+    href: '/instructor/assignments',
+    icon: IconBook,
+  },
+  {
+    label: 'Bài nộp', // Submissions
+    href: '/instructor/submissions',
+    icon: IconFileUpload,
+  },
+  {
+    label: 'Lịch trình', // Schedule
+    href: '/instructor/schedule',
+    icon: IconChecklist,
+  },
+  {
+    label: 'Phản hồi', // Feedback
+    href: '/instructor/feedback',
+    icon: IconClipboardList,
+  },
+  {
+    label: 'Hỗ trợ', // Support
+    href: '/instructor/support',
     icon: IconHelp,
   },
 ];

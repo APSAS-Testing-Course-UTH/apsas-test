@@ -1,7 +1,5 @@
 import { Modal, PasswordInput, Button, Group, Stack } from '@mantine/core'
-import type { AxiosError } from 'axios'
 import { useForm } from '@mantine/form'
-import { notifications } from '@mantine/notifications'
 import { useChangePassword } from '../api/hooks'
 import {
   MODAL_TITLES,

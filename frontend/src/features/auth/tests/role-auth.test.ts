@@ -93,7 +93,7 @@ describe('Role-Based Auth Tests', () => {
       expect(ROLE_REDIRECTS[USER_ROLES.STUDENT]).toBe('/student/dashboard')
     })
 
-    it('should redirect INSTRUCTOR to /lecturer/dashboard', () => {
+    it('should redirect INSTRUCTOR to /instructor/dashboard', () => {
       const { login } = useAuthStore.getState()
 
       const instructorResponse = {
@@ -111,22 +111,31 @@ describe('Role-Based Auth Tests', () => {
 
       login(instructorResponse)
 
-      expect(ROLE_REDIRECTS[USER_ROLES.INSTRUCTOR]).toBe('/lecturer/dashboard')
+      expect(ROLE_REDIRECTS[USER_ROLES.INSTRUCTOR]).toBe('/instructor/dashboard')
     })
 
     it('should redirect CONTENT_PROVIDER to /provider/dashboard', () => {
       expect(ROLE_REDIRECTS[USER_ROLES.CONTENT_PROVIDER]).toBe('/provider/dashboard')
     })
 
-    it('should redirect ADMIN to /admin/dashboard', () => {
-      expect(ROLE_REDIRECTS[USER_ROLES.ADMIN]).toBe('/admin/dashboard')
+    it('should redirect ADMIN to /login (admin portal is server-side)', () => {
+      expect(ROLE_REDIRECTS[USER_ROLES.ADMIN]).toBe('/login')
     })
 
-    it('should have unique redirect paths for each role', () => {
-      const redirectPaths = Object.values(ROLE_REDIRECTS)
+    it('should have valid redirect paths for frontend roles (STUDENT, INSTRUCTOR, PROVIDER)', () => {
+      // Only check frontend roles - ADMIN uses server-side portal
+      const frontendRoles = [USER_ROLES.STUDENT, USER_ROLES.INSTRUCTOR, USER_ROLES.CONTENT_PROVIDER]
+      const redirectPaths = frontendRoles.map(role => ROLE_REDIRECTS[role])
       const uniquePaths = new Set(redirectPaths)
 
-      expect(uniquePaths.size).toBe(redirectPaths.length)
+      // Frontend roles should have unique paths
+      expect(uniquePaths.size).toBe(frontendRoles.length)
+      
+      // All frontend paths should be defined
+      redirectPaths.forEach(path => {
+        expect(path).toBeTruthy()
+        expect(path).not.toBe('/login') // Frontend roles don't redirect to login
+      })
     })
   })
 

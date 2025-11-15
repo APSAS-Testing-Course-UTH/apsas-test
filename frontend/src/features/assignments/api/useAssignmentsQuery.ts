@@ -51,16 +51,14 @@ export const assignmentKeys = {
 export function useAssignmentsQuery(
   page: number = 0,
   size: number = 10,
-  sort: string = 'dueDate,desc'
 ) {
   return useQuery<ContentServicePageResponseAssignmentResponse, AxiosError>({
-    queryKey: assignmentKeys.list(page, size, sort),
+    queryKey: assignmentKeys.list(page, size),
     queryFn: async () => {
       const result = await contentServiceGetAllAssignments({
         query: {
           page: String(page),
           size: String(size),
-          sort,
         },
       })
       if (result.error) throw result.error
@@ -166,7 +164,6 @@ export function useAssignmentSearchQuery(query: string, page: number = 0, size: 
         query: {
           page: String(page),
           size: String(size),
-          sort: 'dueDate,desc',
         },
       })
 

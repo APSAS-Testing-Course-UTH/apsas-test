@@ -36,34 +36,40 @@ interface StatsCardProps {
  */
 export function StatsCard({ title, value, icon, color = 'blue', trend }: StatsCardProps) {
   return (
-    <Card withBorder shadow="sm" p="lg" className={classes.card}>
-      <Group justify="space-between" mb="md">
-        <Text size="sm" fw={500} c="dimmed" className={classes.title}>
+    <Card 
+      withBorder 
+      shadow="sm" 
+      p="lg" 
+      className={classes.card} 
+      style={{ height: '160px', display: 'flex', flexDirection: 'column' }}
+    >
+      <Group justify="space-between" mb="md" wrap="nowrap">
+        <Text size="sm" fw={500} c="dimmed" className={classes.title} lineClamp={1} style={{ flex: 1, overflow: 'hidden' }}>
           {title}
         </Text>
-        <ThemeIcon color={color} variant="light" size="lg" radius="md">
+        <ThemeIcon color={color} variant="light" size="lg" radius="md" style={{ flexShrink: 0 }}>
           {icon}
         </ThemeIcon>
       </Group>
 
-      <Stack gap="xs">
+      <Stack gap="xs" style={{ flex: 1, overflow: 'hidden' }}>
         <Text size="xl" fw={700} className={classes.value}>
           {value}
         </Text>
 
         {trend && (
-          <Group gap="xs">
-            <Group gap={4}>
+          <Group gap="xs" wrap="nowrap" style={{ overflow: 'hidden' }}>
+            <Group gap={4} style={{ flexShrink: 0 }}>
               {trend.direction === 'up' ? (
                 <IconArrowUp size={16} className={classes.trendIconUp} />
               ) : (
                 <IconArrowDown size={16} className={classes.trendIconDown} />
               )}
-              <Text size="sm" fw={500} className={trend.direction === 'up' ? classes.trendUp : classes.trendDown}>
+              <Text size="sm" fw={500} className={trend.direction === 'up' ? classes.trendUp : classes.trendDown} style={{ whiteSpace: 'nowrap' }}>
                 {trend.value}%
               </Text>
             </Group>
-            <Text size="sm" c="dimmed">
+            <Text size="sm" c="dimmed" lineClamp={1} style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {trend.label}
             </Text>
           </Group>

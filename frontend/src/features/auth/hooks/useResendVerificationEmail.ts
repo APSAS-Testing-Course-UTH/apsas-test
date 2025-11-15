@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
 import { notifications } from '@mantine/notifications'
 
-import { identityServiceResendVerificationEmailMutation } from '@/api/@tanstack/react-query.gen'
+import { authService } from '../api'
 import { mapApiError } from '@/configs/api-error-handler'
 
 /**
@@ -42,8 +42,8 @@ import { mapApiError } from '@/configs/api-error-handler'
  * )
  */
 export const useResendVerificationEmail = () => {
-  return useMutation({
-    ...identityServiceResendVerificationEmailMutation(),
+  return useMutation<void, Error, { body: { email: string } }>({
+    mutationFn: authService.forgotPassword.mutationFn,
 
     onSuccess: () => {
       // Hiển thị success notification
