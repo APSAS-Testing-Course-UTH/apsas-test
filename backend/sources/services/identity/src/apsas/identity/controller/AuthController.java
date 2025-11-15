@@ -20,19 +20,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Bộ điều khiển xác thực cho hệ thống APSAS. Cung cấp các API đăng ký, đăng nhập, xác thực email và
+ * quản lý mật khẩu.
+ */
 @RestController
 @RequestMapping(
     path = "/api/auth",
-    consumes = MediaType.APPLICATION_JSON_VALUE,
     produces = MediaType.APPLICATION_JSON_VALUE
 )
-/**
- * Bộ điều khiển xác thực cho hệ thống APSAS.
- * Cung cấp các API đăng ký, đăng nhập, xác thực email và quản lý mật khẩu.
- */
 @Tag(
-  name = "Xác thực",
-  description = "Các API xác thực và phân quyền"
+    name = "Xác thực",
+    description = "Các API xác thực và phân quyền"
 )
 @RequiredArgsConstructor
 public class AuthController {
@@ -41,10 +40,11 @@ public class AuthController {
 
   /**
    * Đăng ký tài khoản mới với vai trò sinh viên.
+   *
    * @param request Thông tin đăng ký
    * @return Thông tin xác thực
    */
-  @PostMapping("/register")
+  @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE)
   @Operation(
       summary = "Đăng ký người dùng mới",
       description = "Đăng ký tài khoản mới với vai trò sinh viên"
@@ -61,10 +61,11 @@ public class AuthController {
 
   /**
    * Đăng nhập và nhận JWT token.
+   *
    * @param request Thông tin đăng nhập
    * @return Thông tin xác thực
    */
-  @PostMapping("/login")
+  @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
   @Operation(
       summary = "Đăng nhập",
       description = "Xác thực người dùng và trả về JWT token"
@@ -80,9 +81,10 @@ public class AuthController {
 
   /**
    * Xác thực email người dùng bằng mã token.
+   *
    * @param request Token xác thực email
    */
-  @PostMapping("/verify-email")
+  @PostMapping(value = "/verify-email", consumes = MediaType.APPLICATION_JSON_VALUE)
   @Operation(
       summary = "Xác thực email",
       description = "Xác thực email người dùng bằng mã token"
@@ -99,9 +101,10 @@ public class AuthController {
 
   /**
    * Gửi lại email xác thực tài khoản.
+   *
    * @param request Thông tin email
    */
-  @PostMapping("/resend-verification")
+  @PostMapping(value = "/resend-verification", consumes = MediaType.APPLICATION_JSON_VALUE)
   @Operation(
       summary = "Gửi lại email xác thực",
       description = "Gửi lại liên kết xác thực email"
@@ -118,9 +121,10 @@ public class AuthController {
 
   /**
    * Yêu cầu gửi email đặt lại mật khẩu.
+   *
    * @param request Thông tin email
    */
-  @PostMapping("/forgot-password")
+  @PostMapping(value = "/forgot-password", consumes = MediaType.APPLICATION_JSON_VALUE)
   @Operation(
       summary = "Yêu cầu đặt lại mật khẩu",
       description = "Yêu cầu gửi liên kết đặt lại mật khẩu qua email"
@@ -137,9 +141,10 @@ public class AuthController {
 
   /**
    * Đặt lại mật khẩu bằng mã token.
+   *
    * @param request Thông tin đặt lại mật khẩu
    */
-  @PostMapping("/reset-password")
+  @PostMapping(value = "/reset-password", consumes = MediaType.APPLICATION_JSON_VALUE)
   @Operation(
       summary = "Đặt lại mật khẩu",
       description = "Đặt lại mật khẩu bằng mã token"

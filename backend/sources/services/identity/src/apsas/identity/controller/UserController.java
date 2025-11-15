@@ -16,29 +16,28 @@ import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Bộ điều khiển quản lý người dùng cho hệ thống APSAS.
- * Cung cấp các API quản lý tài khoản, hồ sơ, phân quyền và bảo mật.
+ * Bộ điều khiển quản lý người dùng cho hệ thống APSAS. Cung cấp các API quản lý tài khoản, hồ sơ,
+ * phân quyền và bảo mật.
  */
 @RestController
 @RequestMapping(
-  value = "/api/v1/users",
-  consumes = MediaType.APPLICATION_JSON_VALUE,
-  produces = MediaType.APPLICATION_JSON_VALUE
+    value = "/api/v1/users",
+    produces = MediaType.APPLICATION_JSON_VALUE
 )
 @Tag(name = "Quản lý người dùng", description = "Các API quản lý người dùng")
 @SecurityRequirement(name = "Bearer Authentication")
@@ -48,6 +47,7 @@ public class UserController {
 
   /**
    * Lấy thông tin hồ sơ người dùng hiện tại.
+   *
    * @param authentication Thông tin xác thực
    * @return Hồ sơ người dùng
    */
@@ -65,11 +65,12 @@ public class UserController {
 
   /**
    * Cập nhật hồ sơ người dùng hiện tại.
+   *
    * @param authentication Thông tin xác thực
-   * @param request Dữ liệu cập nhật hồ sơ
+   * @param request        Dữ liệu cập nhật hồ sơ
    * @return Hồ sơ người dùng đã cập nhật
    */
-  @PutMapping("/me")
+  @PatchMapping(value = "/me", consumes = MediaType.APPLICATION_JSON_VALUE)
   @Operation(
       summary = "Cập nhật hồ sơ người dùng",
       description = "Cập nhật thông tin hồ sơ của người dùng đang đăng nhập"
@@ -88,11 +89,12 @@ public class UserController {
 
   /**
    * Đổi mật khẩu cho người dùng hiện tại.
+   *
    * @param authentication Thông tin xác thực
-   * @param request Dữ liệu đổi mật khẩu
+   * @param request        Dữ liệu đổi mật khẩu
    * @return Thông báo đổi mật khẩu thành công
    */
-  @PostMapping("/me/change-password")
+  @PostMapping(value = "/me/change-password", consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @Operation(
       summary = "Đổi mật khẩu",
@@ -112,10 +114,11 @@ public class UserController {
 
   /**
    * Lấy thông tin người dùng theo ID (chỉ Admin và Giảng viên).
+   *
    * @param userId ID người dùng
    * @return Thông tin người dùng
    */
-  @GetMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(value = "/{userId}")
   @PreAuthorize("hasAnyRole('ADMIN', 'INSTRUCTOR')")
   @Operation(
       summary = "Lấy người dùng theo ID",
@@ -131,10 +134,11 @@ public class UserController {
 
   /**
    * Lấy danh sách tất cả người dùng (chỉ Admin).
+   *
    * @param pageParams Tham số phân trang
    * @return Danh sách người dùng
    */
-  @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping
   @PreAuthorize("hasRole('ADMIN')")
   @Operation(
       summary = "Lấy tất cả người dùng",
@@ -149,11 +153,12 @@ public class UserController {
 
   /**
    * Lấy danh sách người dùng theo vai trò (chỉ Admin và Giảng viên).
-   * @param role Vai trò người dùng
+   *
+   * @param role       Vai trò người dùng
    * @param pageParams Tham số phân trang
    * @return Danh sách người dùng
    */
-  @GetMapping(value = "/role/{role}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(value = "/role/{role}")
   @PreAuthorize("hasAnyRole('ADMIN', 'INSTRUCTOR')")
   @Operation(
       summary = "Lấy người dùng theo vai trò",
@@ -170,10 +175,11 @@ public class UserController {
 
   /**
    * Tạo mới người dùng (chỉ Admin).
+   *
    * @param request Dữ liệu người dùng mới
    * @return Thông tin người dùng vừa tạo
    */
-  @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("hasRole('ADMIN')")
   @Operation(summary = "Tạo người dùng", description = "Tạo mới người dùng (chỉ Admin)")
   @ResponseStatus(HttpStatus.CREATED)
@@ -188,13 +194,17 @@ public class UserController {
 
   /**
    * Vô hiệu hóa tài khoản người dùng (chỉ Admin).
+   *
    * @param userId ID người dùng
    * @return Thông báo vô hiệu hóa thành công
    */
-  @PutMapping("/{userId}/deactivate")
+  @PostMapping("/{userId}/deactivate")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @PreAuthorize("hasRole('ADMIN')")
-  @Operation(summary = "Vô hiệu hóa người dùng", description = "Vô hiệu hóa tài khoản người dùng (chỉ Admin)")
+  @Operation(
+      summary = "Vô hiệu hóa người dùng",
+      description = "Vô hiệu hóa tài khoản người dùng (chỉ Admin)"
+  )
   public ResponseEntity<Void> deactivateUser(
       @PathVariable
       UUID userId
@@ -205,13 +215,17 @@ public class UserController {
 
   /**
    * Kích hoạt tài khoản người dùng (chỉ Admin).
+   *
    * @param userId ID người dùng
    * @return Thông báo kích hoạt thành công
    */
-  @PutMapping("/{userId}/activate")
+  @PostMapping("/{userId}/activate")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @PreAuthorize("hasRole('ADMIN')")
-  @Operation(summary = "Kích hoạt người dùng", description = "Kích hoạt tài khoản người dùng (chỉ Admin)")
+  @Operation(
+      summary = "Kích hoạt người dùng",
+      description = "Kích hoạt tài khoản người dùng (chỉ Admin)"
+  )
   public ResponseEntity<Void> activateUser(
       @PathVariable
       UUID userId
@@ -222,6 +236,7 @@ public class UserController {
 
   /**
    * Xóa tài khoản người dùng (chỉ Admin).
+   *
    * @param userId ID người dùng
    * @return Thông báo xóa thành công
    */

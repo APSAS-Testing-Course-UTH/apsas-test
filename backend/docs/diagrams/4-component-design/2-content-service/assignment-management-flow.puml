@@ -1,0 +1,38 @@
+@startuml AssignmentFlow
+actor Instructor
+participant "Content Service" as CS
+participant "PostgreSQL" as DB
+participant "RabbitMQ" as RMQ
+participant "Notification Service" as NT
+actor Students
+
+== Create Assignment ==
+Instructor -> CS: POST /assignments\n{title, description, startDate, dueDate,\nskillIds, tutorialIds, languages, testCases}
+
+CS -> CS: Validate dates (due > start)\nValidate skillIds and tutorialIds exist
+
+CS -> DB: Save assignment as draft
+DB --> CS: Assignment saved
+
+CS --> Instructor: 201 Created + AssignmentResponse
+
+== Publish Assignment ==
+Instructor -> CS: PUT /assignments/{id}/publish
+
+CS -> DB: Retrieve assignment
+DB --> CS: Assignment details
+
+CS -> CS: Check status == DRAFT\nCheck creatorId == userId
+
+CS -> DB: Publish assignment
+DB --> CS: Updated
+
+CS -> RMQ: Publish AssignmentPublishedEvent\n{id, title, timestamp}
+
+CS --> Instructor: 200 OK + AssignmentResponse
+
+RMQ -> NT: Consume AssignmentPublishedEvent
+
+NT -> Students: Send email/push notification\n"New assignment published: {title}"
+
+@enduml

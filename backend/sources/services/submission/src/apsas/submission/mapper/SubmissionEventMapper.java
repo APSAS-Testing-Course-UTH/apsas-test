@@ -1,16 +1,18 @@
 package apsas.submission.mapper;
 
-import apsas.shared.messaging.model.SubmissionResult;
-import apsas.shared.messaging.model.SubmissionStatus;
-import apsas.shared.models.submission.TestCaseResultDto;
+import apsas.shared.messaging.event.SubmissionEvaluatedEvent.Result;
+import apsas.shared.messaging.event.SubmissionEvaluatedEvent.Status;
+import apsas.shared.models.submission.TestCaseResultResponse;
+import apsas.submission.model.entity.SubmissionResult;
+import apsas.submission.model.entity.SubmissionStatus;
 import apsas.submission.model.entity.TestCaseResult;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface SubmissionEventMapper {
-  apsas.submission.model.entity.SubmissionStatus toEntityStatus(SubmissionStatus status);
+  SubmissionStatus toEntityStatus(Status status);
 
-  apsas.submission.model.entity.SubmissionResult toEntityResult(SubmissionResult result);
+  SubmissionResult toEntityResult(Result result);
 
-  TestCaseResult toEntityTestCaseResult(TestCaseResultDto dto);
+  TestCaseResult toEntityTestCaseResult(TestCaseResultResponse dto);
 }

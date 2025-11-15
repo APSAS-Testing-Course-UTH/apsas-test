@@ -1,0 +1,46 @@
+@startuml Auth Flow
+
+title Authentication and Authorization Flow
+
+actor Client
+participant "API Gateway" as GW
+participant "Identity Service" as ID
+participant "Target Service" as SVC
+
+== User Authentication ==
+
+Client --> ID: Login Request\n(email, password)
+ID -> ID: Validate credentials
+alt Invalid credentials
+    ID --> GW: 401 Unauthorized
+    GW --> Client: 401 Unauthorized
+else Valid credentials
+    ID -> ID: Generate JWT\n(userId, email, role)
+    ID --> GW: 200 OK\n{ token: <JWT> }
+    GW --> Client: 200 OK\n{ token: <JWT> }
+end
+
+== Authorized Service Request ==
+
+Client -> GW: Request with JWT\nAuthorization: Bearer <token>
+
+GW -> GW: Validate JWT signature
+alt Invalid token
+    GW --> Client: 401 Unauthorized
+else Valid token
+    GW -> GW: Extract claims\n(userId, email, role)
+    GW -> GW: Add headers:\nX-User-Info: <base64-encoded>
+
+    GW -> SVC: Forward request with headers
+    SVC -> SVC: Authorization check\n(role-based, resource-level)
+
+    alt Authorized
+        SVC -> SVC: Process request
+        SVC --> GW: Response
+        GW --> Client: Response
+    else Forbidden
+        SVC --> GW: 403 Forbidden
+        GW --> Client: 403 Forbidden
+    end
+end
+@enduml

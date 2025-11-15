@@ -1,0 +1,105 @@
+@startuml Evaluation Service Class Diagram
+' !pragma layout elk
+top to bottom direction
+skinparam linetype ortho
+
+title Evaluation Service Class Diagram
+
+hide empty members
+
+interface AssignmentFeignClient << interface >> {
+    + getAssignmentById(UUID): AssignmentResponse
+    + getBatchAssignments(List<UUID>): List<AssignmentResponse>
+}
+class BaseEvent {
+    timestamp: Instant
+}
+class EvaluationController {
+    + getSupportedRuntimes(): ResponseEntity<List<RuntimeResponse>>
+}
+class EvaluationService {
+    + getSupportedRuntimes(): List<RuntimeResponse>
+    + evaluateSubmission(SubmissionCreatedEvent): void
+}
+class EventPublisher {
+    + publish(String, BaseEvent): void
+}
+class PistonApiClient {
+    + getRuntimes(): List<RuntimeResponse>
+    + execute(PistonExecuteRequest): PistonExecuteResponse
+}
+entity PistonExecuteRequest << record >> {
+    args(): List<String>
+    compileMemoryLimit(): Long
+    compileTimeout(): Integer
+    files(): List<FileContent>
+    language(): String
+    runMemoryLimit(): Long
+    runTimeout(): Integer
+    stdin(): String
+    version(): String
+}
+entity PistonExecuteResponse << record >> {
+    compile(): ExecutionResult
+    language(): String
+    run(): ExecutionResult
+    version(): String
+}
+class PistonRequestMapper {
+    - getFileName(String): String
+    + createExecuteRequest(String, String, TestCaseDto): PistonExecuteRequest
+}
+entity RuntimeResponse << record >> {
+    aliases(): List<String>
+    language(): String
+    runtime(): String
+    version(): String
+}
+class SubmissionCreatedEvent {
+    assignmentId: UUID
+    codeBase64: String
+    language: String
+    studentId: UUID
+    submissionId: UUID
+}
+class SubmissionEvaluatedEvent {
+    evaluatedAt: LocalDateTime
+    result: Result
+    score: BigDecimal
+    status: Status
+    submissionId: UUID
+    testCaseResults: List<TestCaseResultResponse>
+}
+class SubmissionEventListener {
+    + handleSubmissionCreated(SubmissionCreatedEvent): void
+}
+interface TestCaseMapper << interface >> {
+    + toTestCaseResult(TestCaseDto): TestCaseResultResponse
+}
+class TestCaseService {
+    + executeTestCase(String, String, TestCaseDto): CompletableFuture<TestCaseResultResponse>
+}
+
+EvaluationController     "1" *-[#595959,plain]- "evaluationService\n1" EvaluationService
+EvaluationController      -[#595959,dashed]->  RuntimeResponse
+EvaluationService        "1" *-[#595959,plain]- "assignmentFeignClient\n1" AssignmentFeignClient
+EvaluationService        "1" *-[#595959,plain]- "eventPublisher\n1" EventPublisher
+EvaluationService        "1" *-[#595959,plain]- "pistonApiClient\n1" PistonApiClient
+EvaluationService         -[#595959,dashed]->  RuntimeResponse
+EvaluationService         -[#595959,dashed]->  SubmissionCreatedEvent
+EvaluationService         -[#595959,dashed]->  SubmissionEvaluatedEvent
+EvaluationService        "1" *-[#595959,plain]- "testCaseService\n1" TestCaseService
+EventPublisher            -[#595959,dashed]->  BaseEvent
+PistonApiClient           -[#595959,dashed]->  PistonExecuteRequest
+PistonApiClient           -[#595959,dashed]->  PistonExecuteResponse
+PistonApiClient           -[#595959,dashed]->  RuntimeResponse
+PistonRequestMapper       -[#595959,dashed]->  PistonExecuteRequest
+SubmissionCreatedEvent    -[#000082,plain]-^  BaseEvent
+SubmissionEvaluatedEvent  -[#000082,plain]-^  BaseEvent
+SubmissionEventListener  "1" *-[#595959,plain]- "evaluationService\n1" EvaluationService
+SubmissionEventListener   -[#595959,dashed]->  SubmissionCreatedEvent
+TestCaseService          "1" *-[#595959,plain]- "pistonApiClient\n1" PistonApiClient
+TestCaseService          "1" *-[#595959,plain]- "pistonRequestMapper\n1" PistonRequestMapper
+TestCaseService          "1" *-[#595959,plain]- "testCaseMapper\n1" TestCaseMapper
+
+@enduml

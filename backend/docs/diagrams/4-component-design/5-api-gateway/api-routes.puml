@@ -1,0 +1,60 @@
+@startuml API Gateway Routes Component Diagram
+!pragma layout elk
+
+!define AWSPUML https://raw.githubusercontent.com/awslabs/aws-icons-for-plantuml/v14.0/dist
+!include AWSPUML/AWSCommon.puml
+
+' skinparam linetype ortho
+top to bottom direction
+
+title API Gateway - Route Configuration to Services
+
+package "Client Applications" {
+    component [Client] <<client>> as client
+}
+
+package "API Gateway (Port 8080)" {
+    component [Security Filter] <<filter>> as security
+    component [Route Predicates & Filters] <<filter>> as routes
+
+    component [Identity Route] <<route>> as identity_route
+    component [Content Route] <<route>> as content_route
+    component [Submission Route] <<route>> as submission_route
+    component [Evaluation Route] <<route>> as evaluation_route
+    component [Support Route] <<route>> as support_route
+    component [Support WebSocket Route] <<route>> as support_ws_route
+    component [Notification Route] <<route>> as notification_route
+}
+
+package "Microservices (Service Discovery - Eureka)" {
+    component [Identity Service] <<service>> as identity_svc
+    component [Content Service] <<service>> as content_svc
+    component [Submission Service] <<service>> as submission_svc
+    component [Evaluation Service] <<service>> as evaluation_svc
+    component [Support Service] <<service>> as support_svc
+    component [Notification Service] <<service>> as notification_svc
+}
+
+' Client to Gateway
+client --> security : HTTP/REST
+
+' Gateway routing
+security --> routes
+routes --> identity_route : /api/auth/**\n/api/v1/users/**
+routes --> content_route : /api/v1/assignments/**\n/api/v1/tutorials/**\n/api/v1/skills/**
+routes --> submission_route : /api/v1/submissions/**
+routes --> evaluation_route : /api/v1/runtimes/**
+routes --> support_route : /api/v1/support/**\n(HTTP)
+routes --> support_ws_route : /ws/support/**\n(WebSocket)
+routes --> notification_route : /api/v1/preferences/**\n/api/v1/devices/**
+
+' API Gateway routes to services
+identity_route --> identity_svc : lb://identity-service
+content_route --> content_svc : lb://content-service
+submission_route --> submission_svc : lb://submission-service
+evaluation_route --> evaluation_svc : lb://evaluation-service
+support_route --> support_svc : lb://support-service (HTTP)
+support_ws_route --> support_svc : lb:ws://support-service (WebSocket)
+notification_route --> notification_svc : lb://notification-service
+
+@enduml

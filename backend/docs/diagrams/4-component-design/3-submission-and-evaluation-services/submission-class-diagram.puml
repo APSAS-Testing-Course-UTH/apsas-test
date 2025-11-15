@@ -1,0 +1,168 @@
+@startuml Submission Service Class Diagram
+' !pragma layout elk
+top to bottom direction
+skinparam linetype ortho
+
+title Submission Service Class Diagram
+
+hide empty members
+
+
+interface JpaRepository<T, ID> << interface >> {
+    note right
+        Contains basic CRUD methods:
+        save(), findById(), findAll(),
+        delete(), deleteById(), etc.
+    end note
+}
+
+class BaseEvent {
+    timestamp: Instant
+}
+class CreateSubmissionRequest {
+    assignmentId: UUID
+    code: String
+    language: String
+}
+class EventListener {
+    + handleSubmissionEvaluated(SubmissionEvaluatedEvent): void
+}
+class EventPublisher {
+    + publish(String, BaseEvent): void
+}
+class Submission {
+    assignmentId: UUID
+    code: String
+    evaluatedAt: LocalDateTime
+    feedback: String
+    id: UUID
+    language: String
+    result: SubmissionResult
+    score: BigDecimal
+    status: SubmissionStatus
+    studentId: UUID
+    submittedAt: LocalDateTime
+    testCaseResults: List<TestCaseResult>
+}
+class SubmissionController {
+    + getAllSubmissions(UUID, UUID, SubmissionStatus, PageRequestParams, Authentication): ResponseEntity<PageResponse<SubmissionResponse>>
+    + provideFeedback(UUID, SubmissionFeedbackRequest): ResponseEntity<SubmissionResponse>
+    + getSubmissionById(UUID, Authentication): ResponseEntity<SubmissionResponse>
+    + createSubmission(CreateSubmissionRequest, Authentication): ResponseEntity<SubmissionResponse>
+}
+class SubmissionCreatedEvent {
+    assignmentId: UUID
+    codeBase64: String
+    language: String
+    studentId: UUID
+    submissionId: UUID
+}
+class SubmissionEvaluatedEvent {
+    evaluatedAt: LocalDateTime
+    result: Result
+    score: BigDecimal
+    status: Status
+    submissionId: UUID
+    testCaseResults: List<TestCaseResultResponse>
+}
+interface SubmissionEventMapper << interface >> {
+    + toEntityResult(Result): SubmissionResult
+    + toEntityStatus(Status): SubmissionStatus
+    + toEntityTestCaseResult(TestCaseResultResponse): TestCaseResult
+}
+class SubmissionFeedbackRequest {
+    feedback: String
+}
+interface SubmissionMapper << interface >> {
+    + toTestCaseResultResponse(TestCaseResult): TestCaseResultResponse
+    + toEntity(CreateSubmissionRequest, UUID): Submission
+    + toResponse(Submission): SubmissionResponse
+    + toTestCaseResultDtos(List<TestCaseResult>): List<TestCaseResultResponse>
+}
+interface SubmissionRepository << interface >> {
+    + findByFilters(UUID, UUID, SubmissionStatus, Pageable): Page<Submission>
+}
+class SubmissionResponse {
+    assignmentId: UUID
+    code: String
+    evaluatedAt: LocalDateTime
+    feedback: String
+    id: UUID
+    language: String
+    result: SubmissionResult
+    score: BigDecimal
+    status: SubmissionStatus
+    studentId: UUID
+    submittedAt: LocalDateTime
+    testCaseResults: List<TestCaseResultResponse>
+}
+enum SubmissionResult << enumeration >> {
+    PASSED
+    FAILED
+    PARTIAL
+}
+class SubmissionService {
+    + handleSubmissionEvaluated(UUID, Status, Result, BigDecimal, List<TestCaseResultResponse>, LocalDateTime): void
+    + getSubmissionById(UUID, UUID, boolean): SubmissionResponse
+    + createSubmission(CreateSubmissionRequest, UUID): SubmissionResponse
+    + getAllSubmissions(UUID, UUID, UUID, SubmissionStatus, boolean, Pageable): PageResponse<SubmissionResponse>
+    + provideFeedback(UUID, String): SubmissionResponse
+}
+enum SubmissionStatus << enumeration >> {
+    PENDING
+    EVALUATED
+    FAILED
+}
+class TestCaseResult {
+    actualOutput: String
+    description: String
+    errorMessage: String
+    executionTime: Double
+    hidden: Boolean
+    input: String
+    memoryLimit: Integer
+    memoryUsed: Double
+    order: Integer
+    output: String
+    passed: Boolean
+    timeout: Integer
+    weight: Double
+}
+
+EventListener              -[#595959,dashed]->  SubmissionEvaluatedEvent
+EventListener             "1" *-[#595959,plain]- "submissionService\n1" SubmissionService
+EventPublisher             -[#595959,dashed]->  BaseEvent
+Submission                "1" *-[#595959,plain]- "result\n1" SubmissionResult
+Submission                "1" *-[#595959,plain]- "status\n1" SubmissionStatus
+Submission                "1" *-[#595959,plain]- "testCaseResults\n*" TestCaseResult
+SubmissionController       -[#595959,dashed]->  CreateSubmissionRequest
+SubmissionController       -[#595959,dashed]->  SubmissionFeedbackRequest
+SubmissionController       -[#595959,dashed]->  SubmissionResponse
+SubmissionController      "1" *-[#595959,plain]- "submissionService\n1" SubmissionService
+SubmissionController       -[#595959,dashed]->  SubmissionStatus
+SubmissionCreatedEvent     -[#000082,plain]-^  BaseEvent
+SubmissionEvaluatedEvent   -[#000082,plain]-^  BaseEvent
+SubmissionEventMapper      -[#595959,dashed]->  SubmissionEvaluatedEvent
+SubmissionEventMapper      -[#595959,dashed]->  SubmissionResult
+SubmissionEventMapper      -[#595959,dashed]->  SubmissionStatus
+SubmissionEventMapper      -[#595959,dashed]->  TestCaseResult
+SubmissionMapper           -[#595959,dashed]->  CreateSubmissionRequest
+SubmissionMapper           -[#595959,dashed]->  Submission
+SubmissionMapper           -[#595959,dashed]->  SubmissionResponse
+SubmissionMapper           -[#595959,dashed]->  TestCaseResult
+SubmissionRepository       -[#595959,dashed]->  Submission
+SubmissionRepository       -[#595959,dashed]->  SubmissionStatus
+SubmissionResponse        "1" *-[#595959,plain]- "result\n1" SubmissionResult
+SubmissionResponse        "1" *-[#595959,plain]- "status\n1" SubmissionStatus
+SubmissionService          -[#595959,dashed]->  CreateSubmissionRequest
+SubmissionService         "1" *-[#595959,plain]- "eventPublisher\n1" EventPublisher
+SubmissionService          -[#595959,dashed]->  SubmissionEvaluatedEvent
+SubmissionService         "1" *-[#595959,plain]- "submissionEventMapper\n1" SubmissionEventMapper
+SubmissionService         "1" *-[#595959,plain]- "submissionMapper\n1" SubmissionMapper
+SubmissionService         "1" *-[#595959,plain]- "submissionRepository\n1" SubmissionRepository
+SubmissionService          -[#595959,dashed]->  SubmissionResponse
+SubmissionService          -[#595959,dashed]->  SubmissionStatus
+
+SubmissionRepository --|> JpaRepository : extends
+
+@enduml

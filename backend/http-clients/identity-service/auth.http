@@ -102,7 +102,7 @@ Authorization: Bearer {{auth_token}}
 %}
 
 ### Update User Profile
-PUT {{BASE_URL}}/api/v1/users/me
+PATCH {{BASE_URL}}/api/v1/users/me
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 

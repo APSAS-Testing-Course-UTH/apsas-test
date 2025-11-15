@@ -53,6 +53,7 @@ import {
   supportServiceCreateSession,
   supportServiceGetSessionById,
   supportServiceListSessions,
+  supportServiceSendMessage,
 } from "../sdk.gen"
 import type {
   ContentServiceArchiveAssignmentData,
@@ -179,65 +180,10 @@ import type {
   SupportServiceListSessionsData,
   SupportServiceListSessionsError,
   SupportServiceListSessionsResponse,
+  SupportServiceSendMessageData,
+  SupportServiceSendMessageError,
+  SupportServiceSendMessageResponse,
 } from "../types.gen"
-
-/**
- * Vô hiệu hóa người dùng
- *
- * Vô hiệu hóa tài khoản người dùng (chỉ Admin)
- */
-export const identityServiceDeactivateUserMutation = (
-  options?: Partial<Options<IdentityServiceDeactivateUserData>>,
-): UseMutationOptions<
-  IdentityServiceDeactivateUserResponse,
-  IdentityServiceDeactivateUserError,
-  Options<IdentityServiceDeactivateUserData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    IdentityServiceDeactivateUserResponse,
-    IdentityServiceDeactivateUserError,
-    Options<IdentityServiceDeactivateUserData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await identityServiceDeactivateUser({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      })
-      return data
-    },
-  }
-  return mutationOptions
-}
-
-/**
- * Kích hoạt người dùng
- *
- * Kích hoạt tài khoản người dùng (chỉ Admin)
- */
-export const identityServiceActivateUserMutation = (
-  options?: Partial<Options<IdentityServiceActivateUserData>>,
-): UseMutationOptions<
-  IdentityServiceActivateUserResponse,
-  IdentityServiceActivateUserError,
-  Options<IdentityServiceActivateUserData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    IdentityServiceActivateUserResponse,
-    IdentityServiceActivateUserError,
-    Options<IdentityServiceActivateUserData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await identityServiceActivateUser({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      })
-      return data
-    },
-  }
-  return mutationOptions
-}
 
 export type QueryKey<TOptions extends Options> = [
   Pick<TOptions, "baseUrl" | "body" | "headers" | "path" | "query"> & {
@@ -276,58 +222,6 @@ const createQueryKey = <TOptions extends Options>(
     params.query = options.query
   }
   return [params]
-}
-
-export const identityServiceGetCurrentUserQueryKey = (options?: Options<IdentityServiceGetCurrentUserData>) =>
-  createQueryKey("identityServiceGetCurrentUser", options)
-
-/**
- * Lấy hồ sơ người dùng hiện tại
- *
- * Lấy thông tin hồ sơ của người dùng đang đăng nhập
- */
-export const identityServiceGetCurrentUserOptions = (options?: Options<IdentityServiceGetCurrentUserData>) => {
-  return queryOptions({
-    queryFn: async ({ queryKey, signal }) => {
-      const { data } = await identityServiceGetCurrentUser({
-        ...options,
-        ...queryKey[0],
-        signal,
-        throwOnError: true,
-      })
-      return data
-    },
-    queryKey: identityServiceGetCurrentUserQueryKey(options),
-  })
-}
-
-/**
- * Cập nhật hồ sơ người dùng
- *
- * Cập nhật thông tin hồ sơ của người dùng đang đăng nhập
- */
-export const identityServiceUpdateCurrentUserProfileMutation = (
-  options?: Partial<Options<IdentityServiceUpdateCurrentUserProfileData>>,
-): UseMutationOptions<
-  IdentityServiceUpdateCurrentUserProfileResponse,
-  IdentityServiceUpdateCurrentUserProfileError,
-  Options<IdentityServiceUpdateCurrentUserProfileData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    IdentityServiceUpdateCurrentUserProfileResponse,
-    IdentityServiceUpdateCurrentUserProfileError,
-    Options<IdentityServiceUpdateCurrentUserProfileData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await identityServiceUpdateCurrentUserProfile({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      })
-      return data
-    },
-  }
-  return mutationOptions
 }
 
 export const identityServiceGetAllUsersQueryKey = (options?: Options<IdentityServiceGetAllUsersData>) =>
@@ -449,6 +343,64 @@ export const identityServiceCreateUserMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await identityServiceCreateUser({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+/**
+ * Vô hiệu hóa người dùng
+ *
+ * Vô hiệu hóa tài khoản người dùng (chỉ Admin)
+ */
+export const identityServiceDeactivateUserMutation = (
+  options?: Partial<Options<IdentityServiceDeactivateUserData>>,
+): UseMutationOptions<
+  IdentityServiceDeactivateUserResponse,
+  IdentityServiceDeactivateUserError,
+  Options<IdentityServiceDeactivateUserData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    IdentityServiceDeactivateUserResponse,
+    IdentityServiceDeactivateUserError,
+    Options<IdentityServiceDeactivateUserData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await identityServiceDeactivateUser({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+/**
+ * Kích hoạt người dùng
+ *
+ * Kích hoạt tài khoản người dùng (chỉ Admin)
+ */
+export const identityServiceActivateUserMutation = (
+  options?: Partial<Options<IdentityServiceActivateUserData>>,
+): UseMutationOptions<
+  IdentityServiceActivateUserResponse,
+  IdentityServiceActivateUserError,
+  Options<IdentityServiceActivateUserData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    IdentityServiceActivateUserResponse,
+    IdentityServiceActivateUserError,
+    Options<IdentityServiceActivateUserData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await identityServiceActivateUser({
         ...options,
         ...fnOptions,
         throwOnError: true,
@@ -648,6 +600,58 @@ export const identityServiceRequestPasswordResetMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await identityServiceRequestPasswordReset({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+export const identityServiceGetCurrentUserQueryKey = (options?: Options<IdentityServiceGetCurrentUserData>) =>
+  createQueryKey("identityServiceGetCurrentUser", options)
+
+/**
+ * Lấy hồ sơ người dùng hiện tại
+ *
+ * Lấy thông tin hồ sơ của người dùng đang đăng nhập
+ */
+export const identityServiceGetCurrentUserOptions = (options?: Options<IdentityServiceGetCurrentUserData>) => {
+  return queryOptions({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await identityServiceGetCurrentUser({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      })
+      return data
+    },
+    queryKey: identityServiceGetCurrentUserQueryKey(options),
+  })
+}
+
+/**
+ * Cập nhật hồ sơ người dùng
+ *
+ * Cập nhật thông tin hồ sơ của người dùng đang đăng nhập
+ */
+export const identityServiceUpdateCurrentUserProfileMutation = (
+  options?: Partial<Options<IdentityServiceUpdateCurrentUserProfileData>>,
+): UseMutationOptions<
+  IdentityServiceUpdateCurrentUserProfileResponse,
+  IdentityServiceUpdateCurrentUserProfileError,
+  Options<IdentityServiceUpdateCurrentUserProfileData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    IdentityServiceUpdateCurrentUserProfileResponse,
+    IdentityServiceUpdateCurrentUserProfileError,
+    Options<IdentityServiceUpdateCurrentUserProfileData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await identityServiceUpdateCurrentUserProfile({
         ...options,
         ...fnOptions,
         throwOnError: true,
@@ -1590,9 +1594,9 @@ export const supportServiceListSessionsQueryKey = (options?: Options<SupportServ
   createQueryKey("supportServiceListSessions", options)
 
 /**
- * Lấy danh sách phiên hỗ trợ
+ * Liệt kê các phiên hỗ trợ
  *
- * Giảng viên xem tất cả phiên hỗ trợ với phân trang, sinh viên chỉ xem phiên của mình
+ * Giảng viên xem tất cả phiên, sinh viên chỉ xem phiên của mình
  */
 export const supportServiceListSessionsOptions = (options?: Options<SupportServiceListSessionsData>) => {
   return queryOptions({
@@ -1614,9 +1618,9 @@ export const supportServiceListSessionsInfiniteQueryKey = (
 ): QueryKey<Options<SupportServiceListSessionsData>> => createQueryKey("supportServiceListSessions", options, true)
 
 /**
- * Lấy danh sách phiên hỗ trợ
+ * Liệt kê các phiên hỗ trợ
  *
- * Giảng viên xem tất cả phiên hỗ trợ với phân trang, sinh viên chỉ xem phiên của mình
+ * Giảng viên xem tất cả phiên, sinh viên chỉ xem phiên của mình
  */
 export const supportServiceListSessionsInfiniteOptions = (options?: Options<SupportServiceListSessionsData>) => {
   return infiniteQueryOptions<
@@ -1682,9 +1686,38 @@ export const supportServiceCreateSessionMutation = (
 }
 
 /**
+ * Gửi tin nhắn trong phiên hỗ trợ
+ *
+ * Gửi tin nhắn trong một phiên hỗ trợ
+ */
+export const supportServiceSendMessageMutation = (
+  options?: Partial<Options<SupportServiceSendMessageData>>,
+): UseMutationOptions<
+  SupportServiceSendMessageResponse,
+  SupportServiceSendMessageError,
+  Options<SupportServiceSendMessageData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    SupportServiceSendMessageResponse,
+    SupportServiceSendMessageError,
+    Options<SupportServiceSendMessageData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await supportServiceSendMessage({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+/**
  * Đóng phiên hỗ trợ
  *
- * Chỉ sinh viên tạo phiên mới được đóng phiên hỗ trợ
+ * Chỉ sinh viên tạo phiên mới được đóng phiên
  */
 export const supportServiceCloseSessionMutation = (
   options?: Partial<Options<SupportServiceCloseSessionData>>,
@@ -1714,9 +1747,9 @@ export const supportServiceGetSessionByIdQueryKey = (options: Options<SupportSer
   createQueryKey("supportServiceGetSessionById", options)
 
 /**
- * Lấy phiên hỗ trợ theo ID
+ * Xem chi tiết phiên hỗ trợ
  *
- * Giảng viên xem được tất cả, sinh viên chỉ xem phiên của mình
+ * Giảng viên xem mọi phiên, sinh viên chỉ xem phiên của mình
  */
 export const supportServiceGetSessionByIdOptions = (options: Options<SupportServiceGetSessionByIdData>) => {
   return queryOptions({
@@ -1731,6 +1764,35 @@ export const supportServiceGetSessionByIdOptions = (options: Options<SupportServ
     },
     queryKey: supportServiceGetSessionByIdQueryKey(options),
   })
+}
+
+/**
+ * Đăng ký token thiết bị FCM
+ *
+ * Đăng ký token thiết bị Firebase Cloud Messaging để nhận thông báo đẩy
+ */
+export const notificationServiceRegisterDeviceMutation = (
+  options?: Partial<Options<NotificationServiceRegisterDeviceData>>,
+): UseMutationOptions<
+  NotificationServiceRegisterDeviceResponse,
+  NotificationServiceRegisterDeviceError,
+  Options<NotificationServiceRegisterDeviceData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    NotificationServiceRegisterDeviceResponse,
+    NotificationServiceRegisterDeviceError,
+    Options<NotificationServiceRegisterDeviceData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await notificationServiceRegisterDevice({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
 }
 
 export const notificationServiceGetPreferencesQueryKey = (options?: Options<NotificationServiceGetPreferencesData>) =>
@@ -1775,35 +1837,6 @@ export const notificationServiceUpdatePreferencesMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await notificationServiceUpdatePreferences({
-        ...options,
-        ...fnOptions,
-        throwOnError: true,
-      })
-      return data
-    },
-  }
-  return mutationOptions
-}
-
-/**
- * Đăng ký token thiết bị FCM
- *
- * Đăng ký token thiết bị Firebase Cloud Messaging để nhận thông báo đẩy
- */
-export const notificationServiceRegisterDeviceMutation = (
-  options?: Partial<Options<NotificationServiceRegisterDeviceData>>,
-): UseMutationOptions<
-  NotificationServiceRegisterDeviceResponse,
-  NotificationServiceRegisterDeviceError,
-  Options<NotificationServiceRegisterDeviceData>
-> => {
-  const mutationOptions: UseMutationOptions<
-    NotificationServiceRegisterDeviceResponse,
-    NotificationServiceRegisterDeviceError,
-    Options<NotificationServiceRegisterDeviceData>
-  > = {
-    mutationFn: async (fnOptions) => {
-      const { data } = await notificationServiceRegisterDevice({
         ...options,
         ...fnOptions,
         throwOnError: true,

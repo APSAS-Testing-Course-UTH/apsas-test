@@ -1,8 +1,6 @@
 package apsas.shared.messaging.event;
 
-import apsas.shared.messaging.model.SubmissionResult;
-import apsas.shared.messaging.model.SubmissionStatus;
-import apsas.shared.models.submission.TestCaseResultDto;
+import apsas.shared.models.submission.TestCaseResultResponse;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,13 +25,25 @@ public final class SubmissionEvaluatedEvent extends BaseEvent {
   /** ID của bài nộp */
   private UUID submissionId;
   /** Trạng thái (PENDING, EVALUATED, FAILED) */
-  private SubmissionStatus status;
+  private Status status;
   /** Kết quả (PASSED, FAILED, PARTIAL) */
-  private SubmissionResult result;
+  private Result result;
   /** Điểm số (0-100) */
   private BigDecimal score;
   /** Kết quả chi tiết từng test case */
-  private List<TestCaseResultDto> testCaseResults;
+  private List<TestCaseResultResponse> testCaseResults;
   /** Thời gian hoàn thành đánh giá */
   private LocalDateTime evaluatedAt;
+
+  public enum Result {
+    PASSED,
+    FAILED,
+    PARTIAL
+  }
+
+  public enum Status {
+    PENDING,
+    EVALUATED,
+    FAILED
+  }
 }

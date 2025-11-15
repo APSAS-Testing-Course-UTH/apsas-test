@@ -11,9 +11,8 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -28,9 +28,8 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping(
-  value = "/api/v1/devices",
-  consumes = MediaType.APPLICATION_JSON_VALUE,
-  produces = MediaType.APPLICATION_JSON_VALUE
+    value = "/api/v1/devices",
+    produces = MediaType.APPLICATION_JSON_VALUE
 )
 @Tag(name = "Quản lý thiết bị", description = "Quản lý token thiết bị FCM cho thông báo đẩy")
 @SecurityRequirement(name = "Bearer Authentication")
@@ -45,11 +44,11 @@ public class DeviceTokenController {
   /**
    * Đăng ký token thiết bị FCM cho thông báo đẩy.
    *
-   * @param request Thông tin đăng ký thiết bị
+   * @param request        Thông tin đăng ký thiết bị
    * @param authentication Thông tin xác thực người dùng
    * @return Thông tin token thiết bị đã đăng ký
    */
-  @PostMapping("/register")
+  @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE)
   @Operation(
       summary = "Đăng ký token thiết bị FCM",
       description = "Đăng ký token thiết bị Firebase Cloud Messaging để nhận thông báo đẩy"
@@ -70,15 +69,13 @@ public class DeviceTokenController {
    * Xóa token thiết bị FCM đã đăng ký.
    *
    * @param token Token thiết bị cần xóa
-   * @param authentication Thông tin xác thực người dùng
-   * @return Thông báo xóa thành công
    */
   @DeleteMapping("/{token}")
   @Operation(summary = "Xóa token thiết bị", description = "Xóa token thiết bị FCM đã đăng ký")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void removeDevice(
       @PathVariable
-      String token, Authentication authentication
+      String token
   ) {
     deviceTokenService.removeToken(token);
   }

@@ -1,19 +1,34 @@
 package apsas.support.model.dto;
 
-import java.util.UUID;
-
-public record WebSocketMessage(
-    String type, UUID sessionId, UUID userId, String content, Object data
+public record WebSocketMessage<T>(
+    Type type,
+    T data
 ) {
-  public static WebSocketMessage sessionJoined(UUID sessionId, UUID userId) {
-    return new WebSocketMessage("session_joined", sessionId, userId, null, null);
+  public static WebSocketMessage<SupportSessionResponse> newSession(SupportSessionResponse session) {
+    return new WebSocketMessage<>(Type.NEW_SESSION, session);
   }
 
-  public static WebSocketMessage sessionLeft(UUID sessionId, UUID userId) {
-    return new WebSocketMessage("session_left", sessionId, userId, null, null);
+  public static WebSocketMessage<SupportMessageResponse> newMessage(SupportMessageResponse message) {
+    return new WebSocketMessage<>(Type.NEW_MESSAGE, message);
   }
 
-  public static WebSocketMessage newMessage(UUID sessionId, SupportMessageDto message) {
-    return new WebSocketMessage("new_message", sessionId, null, null, message);
+  public static WebSocketMessage<SupportSessionResponse> sessionJoined(SupportSessionResponse session) {
+    return new WebSocketMessage<>(Type.SESSION_JOINED, session);
+  }
+
+  public static WebSocketMessage<SupportSessionResponse> getSession(SupportSessionResponse session) {
+    return new WebSocketMessage<>(Type.GET_SESSION, session);
+  }
+
+  public static WebSocketMessage<SupportSessionResponse> sessionClosed(SupportSessionResponse message) {
+    return new WebSocketMessage<>(Type.SESSION_CLOSED, message);
+  }
+
+  public enum Type {
+    NEW_SESSION,
+    NEW_MESSAGE,
+    SESSION_JOINED,
+    SESSION_CLOSED,
+    GET_SESSION
   }
 }

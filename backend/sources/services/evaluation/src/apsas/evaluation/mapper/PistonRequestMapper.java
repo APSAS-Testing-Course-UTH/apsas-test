@@ -1,24 +1,53 @@
 package apsas.evaluation.mapper;
 
 import apsas.evaluation.model.dto.PistonExecuteRequest;
+import apsas.evaluation.model.dto.PistonExecuteRequest.FileContent;
 import apsas.feign.dto.TestCaseDto;
 import java.util.ArrayList;
 import java.util.List;
-import org.mapstruct.Mapper;
+import org.springframework.stereotype.Component;
 
 /**
  * MapStruct mapper for creating Piston API request objects
  */
-@Mapper(componentModel = "spring")
-public interface PistonRequestMapper {
+@Component
+public class PistonRequestMapper {
 
   /**
-   * Get appropriate file name based on language
+   * Create Piston execute request from code and test case
    *
-   * @param language Programming language
-   * @return File name
+   * @param codeBase64 Student's code (base64 encoded)
+   * @param language   Programming language
+   * @param testCase   Test case
+   * @return Piston execute request
    */
-  default String getFileName(String language) {
+  public PistonExecuteRequest createExecuteRequest(
+      String codeBase64,
+      String language,
+      TestCaseDto testCase
+  ) {
+    List<PistonExecuteRequest.FileContent> files = new ArrayList<>();
+
+    var fileName = getFileName(language);
+    files.add(new FileContent(fileName, codeBase64, FileContent.BASE64_ENCODING));
+
+    var timeout = testCase.getTimeout() != null ? testCase.getTimeout() : 5000;
+    var memoryLimit =
+        testCase.getMemoryLimit() != null ? testCase.getMemoryLimit().longValue() * 1024 * 1024
+            : -1L;
+
+    return new PistonExecuteRequest(
+        language,
+        "*",
+        files,
+        testCase.getInput(),
+        timeout,
+        timeout,
+        memoryLimit
+    );
+  }
+
+  private String getFileName(String language) {
     return switch (language.toLowerCase()) {
       case "java" -> "Main.java";
       case "python", "python3" -> "main.py";
@@ -32,30 +61,7 @@ public interface PistonRequestMapper {
       case "php" -> "main.php";
       case "csharp", "c#" -> "Main.cs";
       case "kotlin", "kt" -> "Main.kt";
-      default -> "main.txt";
+      default -> null;
     };
-  }
-
-  /**
-   * Create Piston execute request from code and test case
-   *
-   * @param code     Student's code
-   * @param language Programming language
-   * @param testCase Test case
-   * @return Piston execute request
-   */
-  default PistonExecuteRequest createExecuteRequest(
-      String code, String language, TestCaseDto testCase) {
-    List<PistonExecuteRequest.FileContent> files = new ArrayList<>();
-
-    String fileName = getFileName(language);
-    files.add(new PistonExecuteRequest.FileContent(fileName, code));
-
-    Integer timeout = testCase.getTimeout() != null ? testCase.getTimeout() : 5000;
-    Long memoryLimit =
-        testCase.getMemoryLimit() != null ? testCase.getMemoryLimit().longValue() * 1024 * 1024 : -1L;
-
-    return new PistonExecuteRequest(
-        language, "*", files, testCase.getInput(), timeout, timeout, memoryLimit);
   }
 }

@@ -1,5 +1,6 @@
 package apsas.submission.mapper;
 
+import apsas.shared.models.submission.TestCaseResultResponse;
 import apsas.submission.model.dto.SubmissionResponse;
 import apsas.submission.model.entity.SubmissionResult;
 import apsas.submission.model.entity.SubmissionStatus;
@@ -33,7 +34,7 @@ public interface FeignSubmissionMapper {
 
   @Named("mapTestCaseResults")
   default List<apsas.feign.dto.TestCaseResultDto> mapTestCaseResults(
-      List<apsas.shared.models.submission.TestCaseResultDto> testCaseResults
+      List<TestCaseResultResponse> testCaseResults
   ) {
     if (testCaseResults == null) {
       return null;

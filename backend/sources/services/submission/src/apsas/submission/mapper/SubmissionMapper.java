@@ -1,6 +1,6 @@
 package apsas.submission.mapper;
 
-import apsas.shared.models.submission.TestCaseResultDto;
+import apsas.shared.models.submission.TestCaseResultResponse;
 import apsas.submission.model.dto.CreateSubmissionRequest;
 import apsas.submission.model.dto.SubmissionResponse;
 import apsas.submission.model.entity.Submission;
@@ -47,7 +47,7 @@ public interface SubmissionMapper {
   SubmissionResponse toResponse(Submission submission);
 
   @Named("toTestCaseResultDtos")
-  default List<TestCaseResultDto> toTestCaseResultDtos(List<TestCaseResult> testCaseResults) {
+  default List<TestCaseResultResponse> toTestCaseResultDtos(List<TestCaseResult> testCaseResults) {
     if (testCaseResults == null) {
       return null;
     }
@@ -56,5 +56,5 @@ public interface SubmissionMapper {
         .collect(java.util.stream.Collectors.toList());
   }
 
-  TestCaseResultDto toTestCaseResultResponse(TestCaseResult testCaseResult);
+  TestCaseResultResponse toTestCaseResultResponse(TestCaseResult testCaseResult);
 }

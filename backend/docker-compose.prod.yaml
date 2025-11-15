@@ -1,6 +1,27 @@
 name: apsas-backend
 services:
   # ============================================================================
+  # ADMIN PORTAL
+  # ============================================================================
+  admin-portal:
+    image: tozydev/apsas-admin-portal:${ADMIN_PORTAL_VERSION:-latest}
+    container_name: apsas-admin-portal
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      EUREKA_URL: http://service-registry:8761/eureka/
+      EUREKA_INSTANCE_HOSTNAME: admin-portal
+      ADMIN_USERNAME: ${ADMIN_USERNAME}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      ADMIN_PORTAL_PORT: ${ADMIN_PORTAL_PORT:-9090}
+      ADMIN_PORTAL_URL: ${ADMIN_PORTAL_URL:-http://localhost:9090}
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "${ADMIN_PORTAL_PORT:-9090}:9090"
+    networks:
+      - apsas-network
+    mem_limit: 1024mb
+
+  # ============================================================================
   # INFRASTRUCTURE SERVICES
   # ============================================================================
 

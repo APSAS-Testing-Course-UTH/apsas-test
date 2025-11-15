@@ -30,7 +30,6 @@ sequenceOf(
     "sources:shared:models",
     "sources:shared:feign-clients",
     "sources:shared:cache",
-    "sources:shared:test",
     "sources:shared:api-docs",
     // Services
     "sources:services:identity",
@@ -39,4 +38,6 @@ sequenceOf(
     "sources:services:evaluation",
     "sources:services:notification",
     "sources:services:support",
+    // Frontend
+    "sources:admin-portal",
 ).forEach { include(it) }

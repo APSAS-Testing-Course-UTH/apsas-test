@@ -39,8 +39,6 @@ public record PistonExecuteRequest(
   }
 
   public record FileContent(String name, String content, String encoding) {
-    public FileContent(String name, String content) {
-      this(name, content, "utf8");
-    }
+    public static String BASE64_ENCODING = "base64";
   }
 }

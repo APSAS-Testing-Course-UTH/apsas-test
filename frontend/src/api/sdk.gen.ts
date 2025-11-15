@@ -38,6 +38,7 @@ import {
   supportServiceCreateSessionResponseTransformer,
   supportServiceGetSessionByIdResponseTransformer,
   supportServiceListSessionsResponseTransformer,
+  supportServiceSendMessageResponseTransformer,
 } from "./transformers.gen"
 import type {
   ContentServiceArchiveAssignmentData,
@@ -184,6 +185,9 @@ import type {
   SupportServiceListSessionsData,
   SupportServiceListSessionsErrors,
   SupportServiceListSessionsResponses,
+  SupportServiceSendMessageData,
+  SupportServiceSendMessageErrors,
+  SupportServiceSendMessageResponses,
 } from "./types.gen"
 import {
   zContentServiceArchiveAssignmentData,
@@ -234,6 +238,7 @@ import {
   zSupportServiceCreateSessionData,
   zSupportServiceGetSessionByIdData,
   zSupportServiceListSessionsData,
+  zSupportServiceSendMessageData,
 } from "./zod.gen"
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<
@@ -251,96 +256,6 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
    * used to access values that aren't defined as part of the SDK function.
    */
   meta?: Record<string, unknown>
-}
-
-/**
- * Vô hiệu hóa người dùng
- *
- * Vô hiệu hóa tài khoản người dùng (chỉ Admin)
- */
-export const identityServiceDeactivateUser = <ThrowOnError extends boolean = false>(
-  options: Options<IdentityServiceDeactivateUserData, ThrowOnError>,
-) => {
-  return (options.client ?? client).put<
-    IdentityServiceDeactivateUserResponses,
-    IdentityServiceDeactivateUserErrors,
-    ThrowOnError
-  >({
-    requestValidator: async (data) => {
-      return await zIdentityServiceDeactivateUserData.parseAsync(data)
-    },
-    url: "/api/v1/users/{userId}/deactivate",
-    ...options,
-  })
-}
-
-/**
- * Kích hoạt người dùng
- *
- * Kích hoạt tài khoản người dùng (chỉ Admin)
- */
-export const identityServiceActivateUser = <ThrowOnError extends boolean = false>(
-  options: Options<IdentityServiceActivateUserData, ThrowOnError>,
-) => {
-  return (options.client ?? client).put<
-    IdentityServiceActivateUserResponses,
-    IdentityServiceActivateUserErrors,
-    ThrowOnError
-  >({
-    requestValidator: async (data) => {
-      return await zIdentityServiceActivateUserData.parseAsync(data)
-    },
-    url: "/api/v1/users/{userId}/activate",
-    ...options,
-  })
-}
-
-/**
- * Lấy hồ sơ người dùng hiện tại
- *
- * Lấy thông tin hồ sơ của người dùng đang đăng nhập
- */
-export const identityServiceGetCurrentUser = <ThrowOnError extends boolean = false>(
-  options?: Options<IdentityServiceGetCurrentUserData, ThrowOnError>,
-) => {
-  return (options?.client ?? client).get<
-    IdentityServiceGetCurrentUserResponses,
-    IdentityServiceGetCurrentUserErrors,
-    ThrowOnError
-  >({
-    requestValidator: async (data) => {
-      return await zIdentityServiceGetCurrentUserData.parseAsync(data)
-    },
-    responseTransformer: identityServiceGetCurrentUserResponseTransformer,
-    url: "/api/v1/users/me",
-    ...options,
-  })
-}
-
-/**
- * Cập nhật hồ sơ người dùng
- *
- * Cập nhật thông tin hồ sơ của người dùng đang đăng nhập
- */
-export const identityServiceUpdateCurrentUserProfile = <ThrowOnError extends boolean = false>(
-  options: Options<IdentityServiceUpdateCurrentUserProfileData, ThrowOnError>,
-) => {
-  return (options.client ?? client).put<
-    IdentityServiceUpdateCurrentUserProfileResponses,
-    IdentityServiceUpdateCurrentUserProfileErrors,
-    ThrowOnError
-  >({
-    requestValidator: async (data) => {
-      return await zIdentityServiceUpdateCurrentUserProfileData.parseAsync(data)
-    },
-    responseTransformer: identityServiceUpdateCurrentUserProfileResponseTransformer,
-    url: "/api/v1/users/me",
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
-  })
 }
 
 /**
@@ -388,6 +303,48 @@ export const identityServiceCreateUser = <ThrowOnError extends boolean = false>(
       "Content-Type": "application/json",
       ...options.headers,
     },
+  })
+}
+
+/**
+ * Vô hiệu hóa người dùng
+ *
+ * Vô hiệu hóa tài khoản người dùng (chỉ Admin)
+ */
+export const identityServiceDeactivateUser = <ThrowOnError extends boolean = false>(
+  options: Options<IdentityServiceDeactivateUserData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    IdentityServiceDeactivateUserResponses,
+    IdentityServiceDeactivateUserErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) => {
+      return await zIdentityServiceDeactivateUserData.parseAsync(data)
+    },
+    url: "/api/v1/users/{userId}/deactivate",
+    ...options,
+  })
+}
+
+/**
+ * Kích hoạt người dùng
+ *
+ * Kích hoạt tài khoản người dùng (chỉ Admin)
+ */
+export const identityServiceActivateUser = <ThrowOnError extends boolean = false>(
+  options: Options<IdentityServiceActivateUserData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    IdentityServiceActivateUserResponses,
+    IdentityServiceActivateUserErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) => {
+      return await zIdentityServiceActivateUserData.parseAsync(data)
+    },
+    url: "/api/v1/users/{userId}/activate",
+    ...options,
   })
 }
 
@@ -554,6 +511,54 @@ export const identityServiceRequestPasswordReset = <ThrowOnError extends boolean
       return await zIdentityServiceRequestPasswordResetData.parseAsync(data)
     },
     url: "/api/auth/forgot-password",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  })
+}
+
+/**
+ * Lấy hồ sơ người dùng hiện tại
+ *
+ * Lấy thông tin hồ sơ của người dùng đang đăng nhập
+ */
+export const identityServiceGetCurrentUser = <ThrowOnError extends boolean = false>(
+  options?: Options<IdentityServiceGetCurrentUserData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    IdentityServiceGetCurrentUserResponses,
+    IdentityServiceGetCurrentUserErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) => {
+      return await zIdentityServiceGetCurrentUserData.parseAsync(data)
+    },
+    responseTransformer: identityServiceGetCurrentUserResponseTransformer,
+    url: "/api/v1/users/me",
+    ...options,
+  })
+}
+
+/**
+ * Cập nhật hồ sơ người dùng
+ *
+ * Cập nhật thông tin hồ sơ của người dùng đang đăng nhập
+ */
+export const identityServiceUpdateCurrentUserProfile = <ThrowOnError extends boolean = false>(
+  options: Options<IdentityServiceUpdateCurrentUserProfileData, ThrowOnError>,
+) => {
+  return (options.client ?? client).patch<
+    IdentityServiceUpdateCurrentUserProfileResponses,
+    IdentityServiceUpdateCurrentUserProfileErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) => {
+      return await zIdentityServiceUpdateCurrentUserProfileData.parseAsync(data)
+    },
+    responseTransformer: identityServiceUpdateCurrentUserProfileResponseTransformer,
+    url: "/api/v1/users/me",
     ...options,
     headers: {
       "Content-Type": "application/json",
@@ -1166,9 +1171,9 @@ export const evaluationServiceGetSupportedRuntimes = <ThrowOnError extends boole
 }
 
 /**
- * Lấy danh sách phiên hỗ trợ
+ * Liệt kê các phiên hỗ trợ
  *
- * Giảng viên xem tất cả phiên hỗ trợ với phân trang, sinh viên chỉ xem phiên của mình
+ * Giảng viên xem tất cả phiên, sinh viên chỉ xem phiên của mình
  */
 export const supportServiceListSessions = <ThrowOnError extends boolean = false>(
   options?: Options<SupportServiceListSessionsData, ThrowOnError>,
@@ -1214,9 +1219,35 @@ export const supportServiceCreateSession = <ThrowOnError extends boolean = false
 }
 
 /**
+ * Gửi tin nhắn trong phiên hỗ trợ
+ *
+ * Gửi tin nhắn trong một phiên hỗ trợ
+ */
+export const supportServiceSendMessage = <ThrowOnError extends boolean = false>(
+  options: Options<SupportServiceSendMessageData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    SupportServiceSendMessageResponses,
+    SupportServiceSendMessageErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) => {
+      return await zSupportServiceSendMessageData.parseAsync(data)
+    },
+    responseTransformer: supportServiceSendMessageResponseTransformer,
+    url: "/api/v1/support/sessions/{sessionId}/messages",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  })
+}
+
+/**
  * Đóng phiên hỗ trợ
  *
- * Chỉ sinh viên tạo phiên mới được đóng phiên hỗ trợ
+ * Chỉ sinh viên tạo phiên mới được đóng phiên
  */
 export const supportServiceCloseSession = <ThrowOnError extends boolean = false>(
   options: Options<SupportServiceCloseSessionData, ThrowOnError>,
@@ -1230,15 +1261,15 @@ export const supportServiceCloseSession = <ThrowOnError extends boolean = false>
       return await zSupportServiceCloseSessionData.parseAsync(data)
     },
     responseTransformer: supportServiceCloseSessionResponseTransformer,
-    url: "/api/v1/support/sessions/{id}/close",
+    url: "/api/v1/support/sessions/{sessionId}/close",
     ...options,
   })
 }
 
 /**
- * Lấy phiên hỗ trợ theo ID
+ * Xem chi tiết phiên hỗ trợ
  *
- * Giảng viên xem được tất cả, sinh viên chỉ xem phiên của mình
+ * Giảng viên xem mọi phiên, sinh viên chỉ xem phiên của mình
  */
 export const supportServiceGetSessionById = <ThrowOnError extends boolean = false>(
   options: Options<SupportServiceGetSessionByIdData, ThrowOnError>,
@@ -1252,8 +1283,34 @@ export const supportServiceGetSessionById = <ThrowOnError extends boolean = fals
       return await zSupportServiceGetSessionByIdData.parseAsync(data)
     },
     responseTransformer: supportServiceGetSessionByIdResponseTransformer,
-    url: "/api/v1/support/sessions/{id}",
+    url: "/api/v1/support/sessions/{sessionId}",
     ...options,
+  })
+}
+
+/**
+ * Đăng ký token thiết bị FCM
+ *
+ * Đăng ký token thiết bị Firebase Cloud Messaging để nhận thông báo đẩy
+ */
+export const notificationServiceRegisterDevice = <ThrowOnError extends boolean = false>(
+  options: Options<NotificationServiceRegisterDeviceData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    NotificationServiceRegisterDeviceResponses,
+    NotificationServiceRegisterDeviceErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) => {
+      return await zNotificationServiceRegisterDeviceData.parseAsync(data)
+    },
+    responseTransformer: notificationServiceRegisterDeviceResponseTransformer,
+    url: "/api/v1/devices/register",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
   })
 }
 
@@ -1287,7 +1344,7 @@ export const notificationServiceGetPreferences = <ThrowOnError extends boolean =
 export const notificationServiceUpdatePreferences = <ThrowOnError extends boolean = false>(
   options: Options<NotificationServiceUpdatePreferencesData, ThrowOnError>,
 ) => {
-  return (options.client ?? client).put<
+  return (options.client ?? client).patch<
     NotificationServiceUpdatePreferencesResponses,
     NotificationServiceUpdatePreferencesErrors,
     ThrowOnError
@@ -1297,32 +1354,6 @@ export const notificationServiceUpdatePreferences = <ThrowOnError extends boolea
     },
     responseTransformer: notificationServiceUpdatePreferencesResponseTransformer,
     url: "/api/v1/preferences",
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
-  })
-}
-
-/**
- * Đăng ký token thiết bị FCM
- *
- * Đăng ký token thiết bị Firebase Cloud Messaging để nhận thông báo đẩy
- */
-export const notificationServiceRegisterDevice = <ThrowOnError extends boolean = false>(
-  options: Options<NotificationServiceRegisterDeviceData, ThrowOnError>,
-) => {
-  return (options.client ?? client).post<
-    NotificationServiceRegisterDeviceResponses,
-    NotificationServiceRegisterDeviceErrors,
-    ThrowOnError
-  >({
-    requestValidator: async (data) => {
-      return await zNotificationServiceRegisterDeviceData.parseAsync(data)
-    },
-    responseTransformer: notificationServiceRegisterDeviceResponseTransformer,
-    url: "/api/v1/devices/register",
     ...options,
     headers: {
       "Content-Type": "application/json",

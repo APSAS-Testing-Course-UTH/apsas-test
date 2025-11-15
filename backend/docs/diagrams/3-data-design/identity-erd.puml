@@ -1,0 +1,55 @@
+@startuml Identity Service ERD
+!pragma layout elk
+skinparam linetype ortho
+
+title Identity Service ERD
+
+class "users" as users {
+  <b> id : UUID <<PK>>
+  --
+  email : VARCHAR(255)
+  password_hash : VARCHAR(255)
+  first_name : VARCHAR(100)
+  last_name : VARCHAR(100)
+  role : VARCHAR(50)
+  is_active : BOOLEAN
+  is_email_verified : BOOLEAN
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+class "email_verification_tokens" as email_verification_tokens {
+  <b> id : UUID <<PK>>
+  <i> user_id : UUID <<FK>>
+  --
+  token : VARCHAR(255)
+  expires_at : TIMESTAMP
+  created_at : TIMESTAMP
+}
+
+class "password_reset_tokens" as password_reset_tokens {
+  <b> id : UUID <<PK>>
+  <i> user_id : UUID <<FK>>
+  --
+  token : VARCHAR(255)
+  expires_at : TIMESTAMP
+  created_at : TIMESTAMP
+}
+
+enum "role" as role_enum {
+  STUDENT
+  INSTRUCTOR
+  CONTENT_PROVIDER
+  ADMIN
+}
+
+users::id ||--o{ email_verification_tokens::user_id : "user_id"
+users::id ||--o{ password_reset_tokens::user_id : "user_id"
+
+users::role -- role_enum
+
+hide users circle
+hide email_verification_tokens circle
+hide password_reset_tokens circle
+
+@enduml

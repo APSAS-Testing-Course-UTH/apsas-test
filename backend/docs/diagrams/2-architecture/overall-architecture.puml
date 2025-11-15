@@ -1,0 +1,85 @@
+@startuml Overall Architecture
+!NEW_C4_STYLE=1
+
+!pragma layout elk
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title Kiến trúc Tổng thể APSAS
+
+System_Boundary(frontend, "Frontend") {
+    Person(student, "Student", "Nộp bài, xem kết quả")
+    Person(instructor, "Instructor", "Đánh giá, hỗ trợ học sinh")
+    Person(content_provider, "Content Provider", "Cung cấp nội dung học tập")
+    Person(admin, "Admin", "Quản trị hệ thống")
+}
+
+System_Boundary(internal, "Internal Systems") {
+    System_Boundary(apsas, "APSAS Platform") {
+        Container(gateway, "API Gateway", "Spring Cloud Gateway", "Single entry point, JWT auth")
+        Container(identity, "Identity Service", "Spring Boot", "Authentication, User management")
+        Container(content, "Content Service", "Spring Boot", "Assignments, Tutorials")
+        Container(submission, "Submission Service", "Spring Boot", "Code submissions")
+        Container(evaluation, "Evaluation Service", "Spring Boot", "Code evaluation")
+        Container(notification, "Notification Service", "Spring Boot", "Multi-channel notifications")
+        Container(support, "Support Service", "Spring Boot", "Real-time chat support")
+    }
+    Container(admin_portal, "Admin Portal", "Spring MVC", "Administrative interface")
+
+    ContainerDb(postgres, "PostgreSQL", "PostgreSQL 17", "Schema-per-service isolation")
+    ContainerDb(redis, "Redis", "Redis Cache", "Distributed caching")
+    ContainerQueue(rabbitmq, "RabbitMQ", "Message Broker", "Event-driven messaging")
+    Container(eureka, "Service Registry", "Netflix Eureka", "Service discovery")
+    Container(config, "Config Server", "Spring Cloud Config", "Centralized configuration")
+
+}
+
+System_Ext(piston, "Piston API", "Code execution engine")
+System_Ext(mailpit, "SMTP", "Email delivery")
+System_Ext(fcm, "Firebase FCM", "Push notifications")
+
+AddRelTag("gateway", $lineColor="#0af321ff")
+AddRelTag("caching", $lineColor="#ff4000ff")
+AddRelTag("database", $lineColor="#37d5f1ff")
+AddRelTag("messaging", $lineColor="#531effff")
+
+Lay_D(eureka, config)
+
+Rel(student, gateway, "Uses", "HTTP", $tags="gateway")
+Rel(instructor, gateway, "Uses", "HTTP", $tags="gateway")
+Rel(admin, gateway, "Uses", "HTTP", $tags="gateway")
+Rel(admin, admin_portal, "Uses", "HTTP")
+Rel(content_provider, gateway, "Uses", "HTTP", $tags="gateway")
+
+Rel(gateway, identity, "Routes", "HTTP")
+Rel(gateway, content, "Routes", "HTTP")
+Rel(gateway, submission, "Routes", "HTTP")
+Rel(gateway, evaluation, "Routes", "HTTP")
+Rel(gateway, notification, "Routes", "HTTP")
+Rel(gateway, support, "Routes", "HTTP/WebSocket")
+
+Rel(evaluation, piston, "Execute code", "HTTP")
+Rel(notification, mailpit, "Send email", "SMTP")
+Rel(notification, fcm, "Send push", "HTTP")
+
+Rel_D(admin_portal, eureka, "Service discovery", "HTTP")
+Rel(admin_portal, apsas, "Monitoring", "HTTP")
+
+Rel(identity, postgres, "Read/Write", "JDBC", $tags="database")
+Rel(content, postgres, "Read/Write", "JDBC", $tags="database")
+Rel(submission, postgres, "Read/Write", "JDBC", $tags="database")
+Rel(notification, postgres, "Read/Write", "JDBC", $tags="database")
+Rel(support, postgres, "Read/Write", "JDBC", $tags="database")
+
+Rel(identity, redis, "Cache", "Redis Protocol", $tags="caching")
+Rel(content, redis, "Cache", "Redis Protocol", $tags="caching")
+Rel(submission, redis, "Cache", "Redis Protocol", $tags="caching")
+
+Rel(identity, rabbitmq, "Publish events", "AMQP", $tags="messaging")
+Rel(content, rabbitmq, "Publish events", "AMQP", $tags="messaging")
+Rel(submission, rabbitmq, "Pub/Sub", "AMQP", $tags="messaging")
+Rel(evaluation, rabbitmq, "Pub/Sub", "AMQP", $tags="messaging")
+Rel(notification, rabbitmq, "Subscribe", "AMQP", $tags="messaging")
+Rel(support, rabbitmq, "Publish events", "AMQP", $tags="messaging")
+
+@enduml

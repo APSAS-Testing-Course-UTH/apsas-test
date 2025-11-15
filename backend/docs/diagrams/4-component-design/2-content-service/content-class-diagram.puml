@@ -1,0 +1,339 @@
+@startuml Content Service Class Diagram
+' !pragma layout elk
+top to bottom direction
+skinparam linetype ortho
+
+title Content Service Class Diagram
+
+hide empty members
+
+
+class Assignment {
+    createdAt: LocalDateTime
+    creatorId: UUID
+    description: String
+    difficultyLevel: DifficultyLevel
+    dueDate: LocalDateTime
+    id: UUID
+    languages: String[]
+    maxScore: BigDecimal
+    skills: Set<Skill>
+    startDate: LocalDateTime
+    status: AssignmentStatus
+    testCases: List<TestCase>
+    title: String
+    tutorials: Set<Tutorial>
+    updatedAt: LocalDateTime
+}
+class AssignmentController {
+    + getAllAssignments(PageRequestParams): ResponseEntity<PageResponse<AssignmentResponse>>
+    + createAssignment(CreateAssignmentRequest, Authentication): ResponseEntity<AssignmentResponse>
+    + updateAssignmentSchedule(UUID, UpdateAssignmentScheduleRequest): ResponseEntity<AssignmentResponse>
+    + updateAssignment(UUID, UpdateAssignmentRequest, Authentication): ResponseEntity<AssignmentResponse>
+    + deleteAssignment(UUID, Authentication): ResponseEntity<Void>
+    + getAssignmentById(UUID): ResponseEntity<AssignmentResponse>
+    + publishAssignment(UUID, Authentication): ResponseEntity<AssignmentResponse>
+    + archiveAssignment(UUID, Authentication): ResponseEntity<AssignmentResponse>
+}
+interface AssignmentMapper << interface >> {
+    + mapTutorials(Set<Tutorial>): Set<TutorialResponse>
+    + toEntity(CreateAssignmentRequest, UUID): Assignment
+    + mapSkills(Set<Skill>): Set<SkillResponse>
+    + updateEntity(Assignment, UpdateAssignmentRequest): void
+    + toResponse(Assignment): AssignmentResponse
+}
+class AssignmentPublishedEvent {
+    assignmentId: UUID
+    publishedAt: LocalDateTime
+    title: String
+}
+interface JpaRepository<T, ID> << interface >> {
+    note right
+        Contains basic CRUD methods:
+        save(), findById(), findAll(),
+        delete(), deleteById(), etc.
+    end note
+}
+
+interface AssignmentRepository << interface >>
+class AssignmentResponse {
+    createdAt: LocalDateTime
+    creatorId: UUID
+    description: String
+    difficultyLevel: DifficultyLevel
+    dueDate: LocalDateTime
+    id: UUID
+    languages: String[]
+    maxScore: BigDecimal
+    skills: Set<SkillResponse>
+    startDate: LocalDateTime
+    status: AssignmentStatus
+    testCases: List<TestCase>
+    title: String
+    tutorials: Set<TutorialResponse>
+    updatedAt: LocalDateTime
+}
+class AssignmentScheduleUpdatedEvent {
+    assignmentId: UUID
+    dueDate: LocalDateTime
+    startDate: LocalDateTime
+    updatedAt: LocalDateTime
+}
+class AssignmentService {
+    + updateAssignment(UUID, UpdateAssignmentRequest, UUID): AssignmentResponse
+    + updateAssignmentSchedule(UUID, UpdateAssignmentScheduleRequest): AssignmentResponse
+    + archiveAssignment(UUID, UUID): AssignmentResponse
+    + createAssignment(CreateAssignmentRequest, UUID): AssignmentResponse
+    + deleteAssignment(UUID, UUID): void
+    + publishAssignment(UUID, UUID): AssignmentResponse
+    - validateDates(LocalDateTime, LocalDateTime): void
+    + getAssignmentById(UUID): AssignmentResponse
+    + getAllAssignments(Pageable): PageResponse<AssignmentResponse>
+}
+enum AssignmentStatus << enumeration >> {
+    DRAFT
+    PUBLISHED
+    ARCHIVED
+}
+class BaseEvent {
+    timestamp: Instant
+}
+class CreateAssignmentRequest {
+    description: String
+    difficultyLevel: DifficultyLevel
+    dueDate: LocalDateTime
+    languages: String[]
+    maxScore: BigDecimal
+    skillIds: Set<UUID>
+    startDate: LocalDateTime
+    testCases: List<TestCase>
+    title: String
+    tutorialIds: Set<UUID>
+}
+class CreateSkillRequest {
+    description: String
+    name: String
+}
+class CreateTutorialRequest {
+    content: String
+    tags: String[]
+    title: String
+}
+enum DifficultyLevel << enumeration >> {
+    EASY
+    MEDIUM
+    HARD
+}
+class EventPublisher {
+    + publish(String, BaseEvent): void
+}
+entity PageRequestParams << record >> {
+    page(): Integer
+    size(): Integer
+    toPageable(): Pageable
+}
+entity PageResponse<T> << record >> {
+    content(): List<T>
+    first(): boolean
+    hasNext(): boolean
+    hasPrevious(): boolean
+    last(): boolean
+    pageNumber(): int
+    pageSize(): int
+    totalElements(): long
+    totalPages(): int
+}
+class Skill {
+    assignments: Set<Assignment>
+    createdAt: LocalDateTime
+    description: String
+    id: UUID
+    name: String
+    updatedAt: LocalDateTime
+}
+class SkillController {
+    + createSkill(CreateSkillRequest): ResponseEntity<SkillResponse>
+    + deleteSkill(UUID): ResponseEntity<Void>
+    + getSkillById(UUID): ResponseEntity<SkillResponse>
+    + getAllSkills(PageRequestParams): ResponseEntity<PageResponse<SkillResponse>>
+    + updateSkill(UUID, UpdateSkillRequest): ResponseEntity<SkillResponse>
+}
+interface SkillMapper << interface >> {
+    + updateEntity(Skill, UpdateSkillRequest): void
+    + toEntity(CreateSkillRequest): Skill
+    + toResponse(Skill): SkillResponse
+}
+interface SkillRepository << interface >> {
+    + existsByName(String): boolean
+}
+class SkillResponse {
+    createdAt: LocalDateTime
+    description: String
+    id: UUID
+    name: String
+    updatedAt: LocalDateTime
+}
+class SkillService {
+    + createSkill(CreateSkillRequest): SkillResponse
+    + getAllSkills(Pageable): PageResponse<SkillResponse>
+    + getSkillById(UUID): SkillResponse
+    + deleteSkill(UUID): void
+    + updateSkill(UUID, UpdateSkillRequest): SkillResponse
+}
+class TestCase {
+    description: String
+    hidden: Boolean
+    input: String
+    memoryLimit: Integer
+    order: Integer
+    output: String
+    timeout: Integer
+    weight: Double
+}
+class Tutorial {
+    assignments: Set<Assignment>
+    content: String
+    createdAt: LocalDateTime
+    creatorId: UUID
+    id: UUID
+    tags: String[]
+    title: String
+    updatedAt: LocalDateTime
+}
+class TutorialController {
+    + getTutorialById(UUID): ResponseEntity<TutorialResponse>
+    + updateTutorial(UUID, UpdateTutorialRequest, Authentication): ResponseEntity<TutorialResponse>
+    + getAllTutorials(PageRequestParams): ResponseEntity<PageResponse<TutorialResponse>>
+    + deleteTutorial(UUID, Authentication): ResponseEntity<Void>
+    + createTutorial(CreateTutorialRequest, Authentication): ResponseEntity<TutorialResponse>
+}
+interface TutorialMapper << interface >> {
+    + updateEntity(Tutorial, UpdateTutorialRequest): void
+    + toResponse(Tutorial): TutorialResponse
+    + toEntity(CreateTutorialRequest, UUID): Tutorial
+}
+interface TutorialRepository << interface >>
+class TutorialResponse {
+    content: String
+    createdAt: LocalDateTime
+    creatorId: UUID
+    id: UUID
+    tags: String[]
+    title: String
+    updatedAt: LocalDateTime
+}
+class TutorialService {
+    + getAllTutorials(Pageable): PageResponse<TutorialResponse>
+    + deleteTutorial(UUID, UUID): void
+    + getTutorialById(UUID): TutorialResponse
+    + createTutorial(CreateTutorialRequest, UUID): TutorialResponse
+    + updateTutorial(UUID, UpdateTutorialRequest, UUID): TutorialResponse
+}
+class UpdateAssignmentRequest {
+    description: String
+    difficultyLevel: DifficultyLevel
+    dueDate: LocalDateTime
+    languages: String[]
+    maxScore: BigDecimal
+    skillIds: Set<UUID>
+    startDate: LocalDateTime
+    testCases: List<TestCase>
+    title: String
+    tutorialIds: Set<UUID>
+}
+class UpdateAssignmentScheduleRequest {
+    dueDate: LocalDateTime
+    startDate: LocalDateTime
+}
+class UpdateSkillRequest {
+    description: String
+    name: String
+}
+class UpdateTutorialRequest {
+    content: String
+    tags: String[]
+    title: String
+}
+
+Assignment                      "1" *-[#595959,plain]- "status\n1" AssignmentStatus
+Assignment                      "1" *-[#595959,plain]- "difficultyLevel\n1" DifficultyLevel
+Assignment                      "1" *-[#595959,plain]- "skills\n*" Skill
+Assignment                      "1" *-[#595959,plain]- "testCases\n*" TestCase
+Assignment                      "1" *-[#595959,plain]- "tutorials\n*" Tutorial
+AssignmentController             -[#595959,dashed]->  AssignmentResponse
+AssignmentController            "1" *-[#595959,plain]- "assignmentService\n1" AssignmentService
+AssignmentController             -[#595959,dashed]->  CreateAssignmentRequest
+AssignmentController             -[#595959,dashed]->  PageRequestParams
+AssignmentController             -[#595959,dashed]->  PageResponse
+AssignmentController             -[#595959,dashed]->  UpdateAssignmentRequest
+AssignmentController             -[#595959,dashed]->  UpdateAssignmentScheduleRequest
+AssignmentMapper                 -[#595959,dashed]->  Assignment
+AssignmentMapper                 -[#595959,dashed]->  AssignmentResponse
+AssignmentMapper                 -[#595959,dashed]->  CreateAssignmentRequest
+AssignmentMapper                 -[#595959,dashed]->  Skill
+AssignmentMapper                 -[#595959,dashed]->  SkillResponse
+AssignmentMapper                 -[#595959,dashed]->  Tutorial
+AssignmentMapper                 -[#595959,dashed]->  TutorialResponse
+AssignmentMapper                 -[#595959,dashed]->  UpdateAssignmentRequest
+AssignmentPublishedEvent         -[#000082,plain]-^  BaseEvent
+AssignmentResponse              "1" *-[#595959,plain]- "status\n1" AssignmentStatus
+AssignmentResponse              "1" *-[#595959,plain]- "difficultyLevel\n1" DifficultyLevel
+AssignmentResponse              "1" *-[#595959,plain]- "skills\n*" SkillResponse
+AssignmentResponse              "1" *-[#595959,plain]- "testCases\n*" TestCase
+AssignmentResponse              "1" *-[#595959,plain]- "tutorials\n*" TutorialResponse
+AssignmentScheduleUpdatedEvent   -[#000082,plain]-^  BaseEvent
+AssignmentService               "1" *-[#595959,plain]- "assignmentMapper\n1" AssignmentMapper
+AssignmentService               "1" *-[#595959,plain]- "assignmentRepository\n1" AssignmentRepository
+AssignmentService                -[#595959,dashed]->  AssignmentResponse
+AssignmentService                -[#595959,dashed]->  CreateAssignmentRequest
+AssignmentService               "1" *-[#595959,plain]- "eventPublisher\n1" EventPublisher
+AssignmentService                -[#595959,dashed]->  PageResponse
+AssignmentService               "1" *-[#595959,plain]- "skillRepository\n1" SkillRepository
+AssignmentService               "1" *-[#595959,plain]- "tutorialRepository\n1" TutorialRepository
+AssignmentService                -[#595959,dashed]->  UpdateAssignmentRequest
+AssignmentService                -[#595959,dashed]->  UpdateAssignmentScheduleRequest
+CreateAssignmentRequest         "1" *-[#595959,plain]- "difficultyLevel\n1" DifficultyLevel
+CreateAssignmentRequest         "1" *-[#595959,plain]- "testCases\n*" TestCase
+EventPublisher                   -[#595959,dashed]->  BaseEvent
+Skill                           "1" *-[#595959,plain]- "assignments\n*" Assignment
+SkillController                  -[#595959,dashed]->  CreateSkillRequest
+SkillController                  -[#595959,dashed]->  PageRequestParams
+SkillController                  -[#595959,dashed]->  PageResponse
+SkillController                  -[#595959,dashed]->  SkillResponse
+SkillController                 "1" *-[#595959,plain]- "skillService\n1" SkillService
+SkillController                  -[#595959,dashed]->  UpdateSkillRequest
+SkillMapper                      -[#595959,dashed]->  CreateSkillRequest
+SkillMapper                      -[#595959,dashed]->  Skill
+SkillMapper                      -[#595959,dashed]->  SkillResponse
+SkillMapper                      -[#595959,dashed]->  UpdateSkillRequest
+SkillService                     -[#595959,dashed]->  CreateSkillRequest
+SkillService                     -[#595959,dashed]->  PageResponse
+SkillService                    "1" *-[#595959,plain]- "skillMapper\n1" SkillMapper
+SkillService                    "1" *-[#595959,plain]- "skillRepository\n1" SkillRepository
+SkillService                     -[#595959,dashed]->  SkillResponse
+SkillService                     -[#595959,dashed]->  UpdateSkillRequest
+Tutorial                        "1" *-[#595959,plain]- "assignments\n*" Assignment
+TutorialController               -[#595959,dashed]->  CreateTutorialRequest
+TutorialController               -[#595959,dashed]->  PageRequestParams
+TutorialController               -[#595959,dashed]->  PageResponse
+TutorialController               -[#595959,dashed]->  TutorialResponse
+TutorialController              "1" *-[#595959,plain]- "tutorialService\n1" TutorialService
+TutorialController               -[#595959,dashed]->  UpdateTutorialRequest
+TutorialMapper                   -[#595959,dashed]->  CreateTutorialRequest
+TutorialMapper                   -[#595959,dashed]->  Tutorial
+TutorialMapper                   -[#595959,dashed]->  TutorialResponse
+TutorialMapper                   -[#595959,dashed]->  UpdateTutorialRequest
+TutorialService                  -[#595959,dashed]->  CreateTutorialRequest
+TutorialService                  -[#595959,dashed]->  PageResponse
+TutorialService                 "1" *-[#595959,plain]- "tutorialMapper\n1" TutorialMapper
+TutorialService                 "1" *-[#595959,plain]- "tutorialRepository\n1" TutorialRepository
+TutorialService                  -[#595959,dashed]->  TutorialResponse
+TutorialService                  -[#595959,dashed]->  UpdateTutorialRequest
+UpdateAssignmentRequest         "1" *-[#595959,plain]- "difficultyLevel\n1" DifficultyLevel
+UpdateAssignmentRequest         "1" *-[#595959,plain]- "testCases\n*" TestCase
+
+AssignmentRepository --|> JpaRepository : extends
+SkillRepository --|> JpaRepository : extends
+TutorialRepository --|> JpaRepository : extends
+
+@enduml

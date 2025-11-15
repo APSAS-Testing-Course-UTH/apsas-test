@@ -5,8 +5,7 @@ import apsas.evaluation.model.dto.PistonExecuteRequest;
 import apsas.evaluation.model.dto.PistonExecuteResponse;
 import apsas.evaluation.model.dto.RuntimeResponse;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatusCode;
@@ -19,9 +18,8 @@ import org.springframework.web.client.RestClient;
  * Client for interacting with Piston API v2
  */
 @Component
+@Slf4j
 public class PistonApiClient {
-  private static final Logger logger = LoggerFactory.getLogger(PistonApiClient.class);
-
   private final RestClient restClient;
 
   public PistonApiClient(
@@ -46,34 +44,27 @@ public class PistonApiClient {
       backoff = @Backoff(delay = 1000, multiplier = 2)
   )
   public List<RuntimeResponse> getRuntimes() {
-    logger.debug("Fetching supported runtimes from Piston API");
-
     try {
-      List<RuntimeResponse> runtimes =
-          restClient
-              .get()
-              .uri("/api/v2/runtimes")
-              .retrieve()
-              .onStatus(
-                  HttpStatusCode::is4xxClientError,
-                  (request, response) -> {
-                    throw new PistonApiException(
-                        "Client error when fetching runtimes: " + response.getStatusCode());
-                  }
-              )
-              .onStatus(
-                  HttpStatusCode::is5xxServerError,
-                  (request, response) -> {
-                    throw new PistonApiException(
-                        "Server error when fetching runtimes: " + response.getStatusCode());
-                  }
-              )
-              .body(new ParameterizedTypeReference<>() {});
-
-      logger.info("Successfully fetched {} runtimes from Piston API", runtimes.size());
-      return runtimes;
+      return restClient
+          .get()
+          .uri("/api/v2/runtimes")
+          .retrieve()
+          .onStatus(
+              HttpStatusCode::is4xxClientError,
+              (request, response) -> {
+                throw new PistonApiException(
+                    "Client error when fetching runtimes: " + response.getStatusCode());
+              }
+          )
+          .onStatus(
+              HttpStatusCode::is5xxServerError,
+              (request, response) -> {
+                throw new PistonApiException(
+                    "Server error when fetching runtimes: " + response.getStatusCode());
+              }
+          )
+          .body(new ParameterizedTypeReference<>() {});
     } catch (Exception e) {
-      logger.error("Failed to fetch runtimes from Piston API", e);
       throw new PistonApiException("Failed to fetch runtimes: " + e.getMessage(), e);
     }
   }
@@ -90,7 +81,7 @@ public class PistonApiClient {
       backoff = @Backoff(delay = 1000, multiplier = 2)
   )
   public PistonExecuteResponse execute(PistonExecuteRequest request) {
-    logger.debug(
+    log.debug(
         "Executing code with Piston API - Language: {}, Version: {}",
         request.language(),
         request.version()
@@ -117,10 +108,10 @@ public class PistonApiClient {
               )
               .body(PistonExecuteResponse.class);
 
-      logger.debug("Code execution completed successfully");
+      log.debug("Code execution completed successfully");
       return response;
     } catch (Exception e) {
-      logger.error("Failed to execute code with Piston API", e);
+      log.error("Failed to execute code with Piston API", e);
       throw new PistonApiException("Failed to execute code: " + e.getMessage(), e);
     }
   }

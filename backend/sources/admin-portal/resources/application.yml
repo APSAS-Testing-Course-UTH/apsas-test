@@ -1,0 +1,58 @@
+server:
+  port: ${ADMIN_PORTAL_PORT:9090}
+
+spring:
+  application:
+    name: admin-portal
+
+  cloud:
+    openfeign:
+      client:
+        config:
+          default:
+            connect-timeout: 5000
+            read-timeout: 5000
+
+  boot:
+    admin:
+      ui:
+        public-url: ${ADMIN_PORTAL_URL:http://localhost:9090}
+        title: APSAS Admin Portal
+        hide-instance-url: true
+        external-views:
+          - label: Users
+            url: /users
+            order: 2000
+        theme:
+          color: "#2563EB"
+          # noinspection SpringBootApplicationYaml
+          palette:
+            50: "#EFF4FF"
+            100: "#DBE6FE"
+            200: "#BFD3FE"
+            300: "#93B4FD"
+            400: "#6090FA"
+            500: "#3B76F6"
+            600: "#2563EB"
+            700: "#1D58D8"
+            800: "#1E4BAF"
+            900: "#1E408A"
+
+      discovery:
+        ignored-services: ADMIN-PORTAL
+
+      instance-auth:
+        default-user-name: ${ADMIN_USERNAME}
+        default-password: ${ADMIN_PASSWORD}
+
+  mvc:
+    static-path-pattern: /static/**
+
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
+
+jwt:
+  secret: ${JWT_SECRET}

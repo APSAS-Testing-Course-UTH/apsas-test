@@ -4,9 +4,14 @@ export type ClientOptions = {
   baseUrl: `${string}://${string}` | (string & {})
 }
 
-export type IdentityServiceUpdateProfileRequest = {
-  firstName?: string
-  lastName?: string
+export type IdentityServiceCreateUserRequest = {
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  role?: "STUDENT" | "INSTRUCTOR" | "CONTENT_PROVIDER" | "ADMIN"
+  isActive?: boolean
+  isEmailVerified?: boolean
 }
 
 export type IdentityServiceUserResponse = {
@@ -19,16 +24,6 @@ export type IdentityServiceUserResponse = {
   isEmailVerified?: boolean
   createdAt?: Date
   updatedAt?: Date
-}
-
-export type IdentityServiceCreateUserRequest = {
-  email: string
-  password: string
-  firstName: string
-  lastName: string
-  role?: "STUDENT" | "INSTRUCTOR" | "CONTENT_PROVIDER" | "ADMIN"
-  isActive?: boolean
-  isEmailVerified?: boolean
 }
 
 export type IdentityServiceChangePasswordRequest = {
@@ -65,6 +60,11 @@ export type IdentityServiceAuthResponse = {
 export type IdentityServiceLoginRequest = {
   email: string
   password: string
+}
+
+export type IdentityServiceUpdateProfileRequest = {
+  firstName?: string
+  lastName?: string
 }
 
 /**
@@ -387,9 +387,21 @@ export type ContentServiceProblemDetail = {
   instance?: unknown
 }
 
+/**
+ * Yêu cầu tạo bài nộp
+ */
 export type SubmissionServiceCreateSubmissionRequest = {
+  /**
+   * ID của bài tập
+   */
   assignmentId: string
+  /**
+   * Mã nguồn của bài nộp (Base64 encoded)
+   */
   code: string
+  /**
+   * Ngôn ngữ lập trình
+   */
   language: string
 }
 
@@ -403,12 +415,12 @@ export type SubmissionServiceSubmissionResponse = {
   language?: string
   result?: "PASSED" | "FAILED" | "PARTIAL"
   score?: number
-  testCaseResults?: Array<SubmissionServiceTestCaseResultDto>
+  testCaseResults?: Array<SubmissionServiceTestCaseResultResponse>
   evaluatedAt?: Date
   feedback?: string
 }
 
-export type SubmissionServiceTestCaseResultDto = {
+export type SubmissionServiceTestCaseResultResponse = {
   order?: number
   description?: string
   hidden?: boolean
@@ -548,8 +560,9 @@ export type SupportServiceCreateSupportSessionRequest = {
   initialMessage: string
 }
 
-export type SupportServiceSupportMessageDto = {
+export type SupportServiceSupportMessageResponse = {
   id?: string
+  sessionId?: string
   senderId?: string
   content?: string
   isInstructor?: boolean
@@ -557,24 +570,28 @@ export type SupportServiceSupportMessageDto = {
   createdAt?: Date
 }
 
-export type SupportServiceSupportSessionDto = {
+export type SupportServiceSupportSessionResponse = {
   id?: string
   studentId?: string
   instructorId?: string
   isClosed?: boolean
   createdAt?: Date
   closedAt?: Date
-  messages?: Array<SupportServiceSupportMessageDto>
+  messages?: Array<SupportServiceSupportMessageResponse>
+}
+
+export type SupportServiceSendMessageRequest = {
+  content: string
 }
 
 /**
  * Lớp bọc phản hồi phân trang
  */
-export type SupportServicePageResponseSupportSessionDto = {
+export type SupportServicePageResponseSupportSessionResponse = {
   /**
    * Danh sách phần tử trong trang hiện tại
    */
-  content?: Array<SupportServiceSupportSessionDto>
+  content?: Array<SupportServiceSupportSessionResponse>
   /**
    * Số trang hiện tại (bắt đầu từ 0)
    */
@@ -635,6 +652,22 @@ export type SupportServiceProblemDetail = {
   instance?: unknown
 }
 
+export type NotificationServiceRegisterDeviceRequest = {
+  token: string
+  deviceType: string
+  userAgent?: string
+}
+
+export type NotificationServiceDeviceTokenResponse = {
+  id?: string
+  token?: string
+  deviceType?: string
+  userAgent?: string
+  isActive?: boolean
+  createdAt?: Date
+  updatedAt?: Date
+}
+
 export type NotificationServiceNotificationPreferencesRequest = {
   emailEnabled?: boolean
   pushEnabled?: boolean
@@ -653,22 +686,6 @@ export type NotificationServiceNotificationPreferencesResponse = {
   emailSubmissionEvaluated?: boolean
   pushAssignmentPublished?: boolean
   pushSubmissionEvaluated?: boolean
-  createdAt?: Date
-  updatedAt?: Date
-}
-
-export type NotificationServiceRegisterDeviceRequest = {
-  token: string
-  deviceType: string
-  userAgent?: string
-}
-
-export type NotificationServiceDeviceTokenResponse = {
-  id?: string
-  token?: string
-  deviceType?: string
-  userAgent?: string
-  isActive?: boolean
   createdAt?: Date
   updatedAt?: Date
 }
@@ -698,118 +715,6 @@ export type NotificationServiceProblemDetail = {
    */
   instance?: unknown
 }
-
-export type IdentityServiceDeactivateUserData = {
-  body?: never
-  path: {
-    userId: string
-  }
-  query?: never
-  url: "/api/v1/users/{userId}/deactivate"
-}
-
-export type IdentityServiceDeactivateUserErrors = {
-  /**
-   * Phản hồi lỗi mặc định
-   */
-  default: IdentityServiceProblemDetail
-}
-
-export type IdentityServiceDeactivateUserError =
-  IdentityServiceDeactivateUserErrors[keyof IdentityServiceDeactivateUserErrors]
-
-export type IdentityServiceDeactivateUserResponses = {
-  /**
-   * No Content
-   */
-  204: void
-}
-
-export type IdentityServiceDeactivateUserResponse =
-  IdentityServiceDeactivateUserResponses[keyof IdentityServiceDeactivateUserResponses]
-
-export type IdentityServiceActivateUserData = {
-  body?: never
-  path: {
-    userId: string
-  }
-  query?: never
-  url: "/api/v1/users/{userId}/activate"
-}
-
-export type IdentityServiceActivateUserErrors = {
-  /**
-   * Phản hồi lỗi mặc định
-   */
-  default: IdentityServiceProblemDetail
-}
-
-export type IdentityServiceActivateUserError =
-  IdentityServiceActivateUserErrors[keyof IdentityServiceActivateUserErrors]
-
-export type IdentityServiceActivateUserResponses = {
-  /**
-   * No Content
-   */
-  204: void
-}
-
-export type IdentityServiceActivateUserResponse =
-  IdentityServiceActivateUserResponses[keyof IdentityServiceActivateUserResponses]
-
-export type IdentityServiceGetCurrentUserData = {
-  body?: never
-  path?: never
-  query?: never
-  url: "/api/v1/users/me"
-}
-
-export type IdentityServiceGetCurrentUserErrors = {
-  /**
-   * Phản hồi lỗi mặc định
-   */
-  default: IdentityServiceProblemDetail
-}
-
-export type IdentityServiceGetCurrentUserError =
-  IdentityServiceGetCurrentUserErrors[keyof IdentityServiceGetCurrentUserErrors]
-
-export type IdentityServiceGetCurrentUserResponses = {
-  /**
-   * OK
-   */
-  200: IdentityServiceUserResponse
-}
-
-export type IdentityServiceGetCurrentUserResponse =
-  IdentityServiceGetCurrentUserResponses[keyof IdentityServiceGetCurrentUserResponses]
-
-export type IdentityServiceUpdateCurrentUserProfileData = {
-  body: IdentityServiceUpdateProfileRequest
-  path?: never
-  query?: never
-  url: "/api/v1/users/me"
-}
-
-export type IdentityServiceUpdateCurrentUserProfileErrors = {
-  /**
-   * Phản hồi lỗi mặc định
-   */
-  default: IdentityServiceProblemDetail
-}
-
-export type IdentityServiceUpdateCurrentUserProfileError =
-  IdentityServiceUpdateCurrentUserProfileErrors[keyof IdentityServiceUpdateCurrentUserProfileErrors]
-
-export type IdentityServiceUpdateCurrentUserProfileResponses = {
-  /**
-   * OK
-   */
-  200: IdentityServiceUserResponse
-}
-
-export type IdentityServiceUpdateCurrentUserProfileResponse =
-  IdentityServiceUpdateCurrentUserProfileResponses[keyof IdentityServiceUpdateCurrentUserProfileResponses]
 
 export type IdentityServiceGetAllUsersData = {
   body?: never
@@ -871,6 +776,64 @@ export type IdentityServiceCreateUserResponses = {
 
 export type IdentityServiceCreateUserResponse =
   IdentityServiceCreateUserResponses[keyof IdentityServiceCreateUserResponses]
+
+export type IdentityServiceDeactivateUserData = {
+  body?: never
+  path: {
+    userId: string
+  }
+  query?: never
+  url: "/api/v1/users/{userId}/deactivate"
+}
+
+export type IdentityServiceDeactivateUserErrors = {
+  /**
+   * Phản hồi lỗi mặc định
+   */
+  default: IdentityServiceProblemDetail
+}
+
+export type IdentityServiceDeactivateUserError =
+  IdentityServiceDeactivateUserErrors[keyof IdentityServiceDeactivateUserErrors]
+
+export type IdentityServiceDeactivateUserResponses = {
+  /**
+   * No Content
+   */
+  204: void
+}
+
+export type IdentityServiceDeactivateUserResponse =
+  IdentityServiceDeactivateUserResponses[keyof IdentityServiceDeactivateUserResponses]
+
+export type IdentityServiceActivateUserData = {
+  body?: never
+  path: {
+    userId: string
+  }
+  query?: never
+  url: "/api/v1/users/{userId}/activate"
+}
+
+export type IdentityServiceActivateUserErrors = {
+  /**
+   * Phản hồi lỗi mặc định
+   */
+  default: IdentityServiceProblemDetail
+}
+
+export type IdentityServiceActivateUserError =
+  IdentityServiceActivateUserErrors[keyof IdentityServiceActivateUserErrors]
+
+export type IdentityServiceActivateUserResponses = {
+  /**
+   * No Content
+   */
+  204: void
+}
+
+export type IdentityServiceActivateUserResponse =
+  IdentityServiceActivateUserResponses[keyof IdentityServiceActivateUserResponses]
 
 export type IdentityServiceChangePasswordData = {
   body: IdentityServiceChangePasswordRequest
@@ -1055,6 +1018,60 @@ export type IdentityServiceRequestPasswordResetResponses = {
 
 export type IdentityServiceRequestPasswordResetResponse =
   IdentityServiceRequestPasswordResetResponses[keyof IdentityServiceRequestPasswordResetResponses]
+
+export type IdentityServiceGetCurrentUserData = {
+  body?: never
+  path?: never
+  query?: never
+  url: "/api/v1/users/me"
+}
+
+export type IdentityServiceGetCurrentUserErrors = {
+  /**
+   * Phản hồi lỗi mặc định
+   */
+  default: IdentityServiceProblemDetail
+}
+
+export type IdentityServiceGetCurrentUserError =
+  IdentityServiceGetCurrentUserErrors[keyof IdentityServiceGetCurrentUserErrors]
+
+export type IdentityServiceGetCurrentUserResponses = {
+  /**
+   * OK
+   */
+  200: IdentityServiceUserResponse
+}
+
+export type IdentityServiceGetCurrentUserResponse =
+  IdentityServiceGetCurrentUserResponses[keyof IdentityServiceGetCurrentUserResponses]
+
+export type IdentityServiceUpdateCurrentUserProfileData = {
+  body: IdentityServiceUpdateProfileRequest
+  path?: never
+  query?: never
+  url: "/api/v1/users/me"
+}
+
+export type IdentityServiceUpdateCurrentUserProfileErrors = {
+  /**
+   * Phản hồi lỗi mặc định
+   */
+  default: IdentityServiceProblemDetail
+}
+
+export type IdentityServiceUpdateCurrentUserProfileError =
+  IdentityServiceUpdateCurrentUserProfileErrors[keyof IdentityServiceUpdateCurrentUserProfileErrors]
+
+export type IdentityServiceUpdateCurrentUserProfileResponses = {
+  /**
+   * OK
+   */
+  200: IdentityServiceUserResponse
+}
+
+export type IdentityServiceUpdateCurrentUserProfileResponse =
+  IdentityServiceUpdateCurrentUserProfileResponses[keyof IdentityServiceUpdateCurrentUserProfileResponses]
 
 export type IdentityServiceDeleteUserData = {
   body?: never
@@ -1877,7 +1894,7 @@ export type SupportServiceListSessionsResponses = {
   /**
    * OK
    */
-  200: SupportServicePageResponseSupportSessionDto
+  200: SupportServicePageResponseSupportSessionResponse
 }
 
 export type SupportServiceListSessionsResponse =
@@ -1911,16 +1928,16 @@ export type SupportServiceCreateSessionResponses = {
   /**
    * Created
    */
-  201: SupportServiceSupportSessionDto
+  201: SupportServiceSupportSessionResponse
 }
 
 export type SupportServiceCreateSessionResponse =
   SupportServiceCreateSessionResponses[keyof SupportServiceCreateSessionResponses]
 
-export type SupportServiceCloseSessionData = {
-  body?: never
+export type SupportServiceSendMessageData = {
+  body: SupportServiceSendMessageRequest
   path: {
-    id: string
+    sessionId: string
   }
   query?: {
     userId?: string
@@ -1930,7 +1947,42 @@ export type SupportServiceCloseSessionData = {
     role?: string
     isActive?: boolean
   }
-  url: "/api/v1/support/sessions/{id}/close"
+  url: "/api/v1/support/sessions/{sessionId}/messages"
+}
+
+export type SupportServiceSendMessageErrors = {
+  /**
+   * Phản hồi lỗi mặc định
+   */
+  default: SupportServiceProblemDetail
+}
+
+export type SupportServiceSendMessageError = SupportServiceSendMessageErrors[keyof SupportServiceSendMessageErrors]
+
+export type SupportServiceSendMessageResponses = {
+  /**
+   * Created
+   */
+  201: SupportServiceSupportSessionResponse
+}
+
+export type SupportServiceSendMessageResponse =
+  SupportServiceSendMessageResponses[keyof SupportServiceSendMessageResponses]
+
+export type SupportServiceCloseSessionData = {
+  body?: never
+  path: {
+    sessionId: string
+  }
+  query?: {
+    userId?: string
+    email?: string
+    firstName?: string
+    lastName?: string
+    role?: string
+    isActive?: boolean
+  }
+  url: "/api/v1/support/sessions/{sessionId}/close"
 }
 
 export type SupportServiceCloseSessionErrors = {
@@ -1946,7 +1998,7 @@ export type SupportServiceCloseSessionResponses = {
   /**
    * OK
    */
-  200: SupportServiceSupportSessionDto
+  200: SupportServiceSupportSessionResponse
 }
 
 export type SupportServiceCloseSessionResponse =
@@ -1955,7 +2007,7 @@ export type SupportServiceCloseSessionResponse =
 export type SupportServiceGetSessionByIdData = {
   body?: never
   path: {
-    id: string
+    sessionId: string
   }
   query?: {
     userId?: string
@@ -1965,7 +2017,7 @@ export type SupportServiceGetSessionByIdData = {
     role?: string
     isActive?: boolean
   }
-  url: "/api/v1/support/sessions/{id}"
+  url: "/api/v1/support/sessions/{sessionId}"
 }
 
 export type SupportServiceGetSessionByIdErrors = {
@@ -1982,11 +2034,38 @@ export type SupportServiceGetSessionByIdResponses = {
   /**
    * OK
    */
-  200: SupportServiceSupportSessionDto
+  200: SupportServiceSupportSessionResponse
 }
 
 export type SupportServiceGetSessionByIdResponse =
   SupportServiceGetSessionByIdResponses[keyof SupportServiceGetSessionByIdResponses]
+
+export type NotificationServiceRegisterDeviceData = {
+  body: NotificationServiceRegisterDeviceRequest
+  path?: never
+  query?: never
+  url: "/api/v1/devices/register"
+}
+
+export type NotificationServiceRegisterDeviceErrors = {
+  /**
+   * Phản hồi lỗi mặc định
+   */
+  default: NotificationServiceProblemDetail
+}
+
+export type NotificationServiceRegisterDeviceError =
+  NotificationServiceRegisterDeviceErrors[keyof NotificationServiceRegisterDeviceErrors]
+
+export type NotificationServiceRegisterDeviceResponses = {
+  /**
+   * Created
+   */
+  201: NotificationServiceDeviceTokenResponse
+}
+
+export type NotificationServiceRegisterDeviceResponse =
+  NotificationServiceRegisterDeviceResponses[keyof NotificationServiceRegisterDeviceResponses]
 
 export type NotificationServiceGetPreferencesData = {
   body?: never
@@ -2041,33 +2120,6 @@ export type NotificationServiceUpdatePreferencesResponses = {
 
 export type NotificationServiceUpdatePreferencesResponse =
   NotificationServiceUpdatePreferencesResponses[keyof NotificationServiceUpdatePreferencesResponses]
-
-export type NotificationServiceRegisterDeviceData = {
-  body: NotificationServiceRegisterDeviceRequest
-  path?: never
-  query?: never
-  url: "/api/v1/devices/register"
-}
-
-export type NotificationServiceRegisterDeviceErrors = {
-  /**
-   * Phản hồi lỗi mặc định
-   */
-  default: NotificationServiceProblemDetail
-}
-
-export type NotificationServiceRegisterDeviceError =
-  NotificationServiceRegisterDeviceErrors[keyof NotificationServiceRegisterDeviceErrors]
-
-export type NotificationServiceRegisterDeviceResponses = {
-  /**
-   * Created
-   */
-  201: NotificationServiceDeviceTokenResponse
-}
-
-export type NotificationServiceRegisterDeviceResponse =
-  NotificationServiceRegisterDeviceResponses[keyof NotificationServiceRegisterDeviceResponses]
 
 export type NotificationServiceGetUserDevicesData = {
   body?: never

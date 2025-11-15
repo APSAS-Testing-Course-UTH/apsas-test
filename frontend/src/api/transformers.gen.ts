@@ -36,31 +36,8 @@ import type {
   SupportServiceCreateSessionResponse,
   SupportServiceGetSessionByIdResponse,
   SupportServiceListSessionsResponse,
+  SupportServiceSendMessageResponse,
 } from "./types.gen"
-
-export const identityServiceGetCurrentUserResponseTransformer = async (
-  data: any,
-): Promise<IdentityServiceGetCurrentUserResponse> => {
-  data = identityServiceUserResponseSchemaResponseTransformer(data)
-  return data
-}
-
-const identityServiceUserResponseSchemaResponseTransformer = (data: any) => {
-  if (data.createdAt) {
-    data.createdAt = new Date(data.createdAt)
-  }
-  if (data.updatedAt) {
-    data.updatedAt = new Date(data.updatedAt)
-  }
-  return data
-}
-
-export const identityServiceUpdateCurrentUserProfileResponseTransformer = async (
-  data: any,
-): Promise<IdentityServiceUpdateCurrentUserProfileResponse> => {
-  data = identityServiceUserResponseSchemaResponseTransformer(data)
-  return data
-}
 
 export const identityServiceGetAllUsersResponseTransformer = async (
   data: any,
@@ -77,6 +54,16 @@ const identityServicePageResponseUserResponseSchemaResponseTransformer = (data: 
   }
   if (data.totalElements) {
     data.totalElements = BigInt(data.totalElements.toString())
+  }
+  return data
+}
+
+const identityServiceUserResponseSchemaResponseTransformer = (data: any) => {
+  if (data.createdAt) {
+    data.createdAt = new Date(data.createdAt)
+  }
+  if (data.updatedAt) {
+    data.updatedAt = new Date(data.updatedAt)
   }
   return data
 }
@@ -104,6 +91,20 @@ const identityServiceAuthResponseSchemaResponseTransformer = (data: any) => {
 
 export const identityServiceLoginResponseTransformer = async (data: any): Promise<IdentityServiceLoginResponse> => {
   data = identityServiceAuthResponseSchemaResponseTransformer(data)
+  return data
+}
+
+export const identityServiceGetCurrentUserResponseTransformer = async (
+  data: any,
+): Promise<IdentityServiceGetCurrentUserResponse> => {
+  data = identityServiceUserResponseSchemaResponseTransformer(data)
+  return data
+}
+
+export const identityServiceUpdateCurrentUserProfileResponseTransformer = async (
+  data: any,
+): Promise<IdentityServiceUpdateCurrentUserProfileResponse> => {
+  data = identityServiceUserResponseSchemaResponseTransformer(data)
   return data
 }
 
@@ -361,14 +362,14 @@ export const submissionServiceGetSubmissionByIdResponseTransformer = async (
 export const supportServiceListSessionsResponseTransformer = async (
   data: any,
 ): Promise<SupportServiceListSessionsResponse> => {
-  data = supportServicePageResponseSupportSessionDtoSchemaResponseTransformer(data)
+  data = supportServicePageResponseSupportSessionResponseSchemaResponseTransformer(data)
   return data
 }
 
-const supportServicePageResponseSupportSessionDtoSchemaResponseTransformer = (data: any) => {
+const supportServicePageResponseSupportSessionResponseSchemaResponseTransformer = (data: any) => {
   if (data.content) {
     data.content = data.content.map((item: any) => {
-      return supportServiceSupportSessionDtoSchemaResponseTransformer(item)
+      return supportServiceSupportSessionResponseSchemaResponseTransformer(item)
     })
   }
   if (data.totalElements) {
@@ -377,7 +378,7 @@ const supportServicePageResponseSupportSessionDtoSchemaResponseTransformer = (da
   return data
 }
 
-const supportServiceSupportSessionDtoSchemaResponseTransformer = (data: any) => {
+const supportServiceSupportSessionResponseSchemaResponseTransformer = (data: any) => {
   if (data.createdAt) {
     data.createdAt = new Date(data.createdAt)
   }
@@ -386,13 +387,13 @@ const supportServiceSupportSessionDtoSchemaResponseTransformer = (data: any) => 
   }
   if (data.messages) {
     data.messages = data.messages.map((item: any) => {
-      return supportServiceSupportMessageDtoSchemaResponseTransformer(item)
+      return supportServiceSupportMessageResponseSchemaResponseTransformer(item)
     })
   }
   return data
 }
 
-const supportServiceSupportMessageDtoSchemaResponseTransformer = (data: any) => {
+const supportServiceSupportMessageResponseSchemaResponseTransformer = (data: any) => {
   if (data.createdAt) {
     data.createdAt = new Date(data.createdAt)
   }
@@ -402,21 +403,45 @@ const supportServiceSupportMessageDtoSchemaResponseTransformer = (data: any) => 
 export const supportServiceCreateSessionResponseTransformer = async (
   data: any,
 ): Promise<SupportServiceCreateSessionResponse> => {
-  data = supportServiceSupportSessionDtoSchemaResponseTransformer(data)
+  data = supportServiceSupportSessionResponseSchemaResponseTransformer(data)
+  return data
+}
+
+export const supportServiceSendMessageResponseTransformer = async (
+  data: any,
+): Promise<SupportServiceSendMessageResponse> => {
+  data = supportServiceSupportSessionResponseSchemaResponseTransformer(data)
   return data
 }
 
 export const supportServiceCloseSessionResponseTransformer = async (
   data: any,
 ): Promise<SupportServiceCloseSessionResponse> => {
-  data = supportServiceSupportSessionDtoSchemaResponseTransformer(data)
+  data = supportServiceSupportSessionResponseSchemaResponseTransformer(data)
   return data
 }
 
 export const supportServiceGetSessionByIdResponseTransformer = async (
   data: any,
 ): Promise<SupportServiceGetSessionByIdResponse> => {
-  data = supportServiceSupportSessionDtoSchemaResponseTransformer(data)
+  data = supportServiceSupportSessionResponseSchemaResponseTransformer(data)
+  return data
+}
+
+export const notificationServiceRegisterDeviceResponseTransformer = async (
+  data: any,
+): Promise<NotificationServiceRegisterDeviceResponse> => {
+  data = notificationServiceDeviceTokenResponseSchemaResponseTransformer(data)
+  return data
+}
+
+const notificationServiceDeviceTokenResponseSchemaResponseTransformer = (data: any) => {
+  if (data.createdAt) {
+    data.createdAt = new Date(data.createdAt)
+  }
+  if (data.updatedAt) {
+    data.updatedAt = new Date(data.updatedAt)
+  }
   return data
 }
 
@@ -441,23 +466,6 @@ export const notificationServiceUpdatePreferencesResponseTransformer = async (
   data: any,
 ): Promise<NotificationServiceUpdatePreferencesResponse> => {
   data = notificationServiceNotificationPreferencesResponseSchemaResponseTransformer(data)
-  return data
-}
-
-export const notificationServiceRegisterDeviceResponseTransformer = async (
-  data: any,
-): Promise<NotificationServiceRegisterDeviceResponse> => {
-  data = notificationServiceDeviceTokenResponseSchemaResponseTransformer(data)
-  return data
-}
-
-const notificationServiceDeviceTokenResponseSchemaResponseTransformer = (data: any) => {
-  if (data.createdAt) {
-    data.createdAt = new Date(data.createdAt)
-  }
-  if (data.updatedAt) {
-    data.updatedAt = new Date(data.updatedAt)
-  }
   return data
 }
 

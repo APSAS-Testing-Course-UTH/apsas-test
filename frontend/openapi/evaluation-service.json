@@ -1,123 +1,68 @@
 {
-    "openapi": "3.1.0",
-    "info": {
-        "title": "API APSAS evaluation-service",
-        "description": "Tài liệu API cho APSAS evaluation-service",
-        "version": "1.0"
-    },
-    "servers": [
-        {
-            "url": "/",
-            "description": "mặc định"
-        }
-    ],
-    "tags": [
-        {
-            "name": "Đánh giá mã nguồn",
-            "description": "Quản lý đánh giá và kiểm thử mã nguồn"
-        }
-    ],
-    "paths": {
-        "/api/v1/runtimes": {
-            "get": {
-                "tags": [
-                    "Đánh giá mã nguồn"
-                ],
-                "summary": "Lấy danh sách runtime hỗ trợ",
-                "description": "Trả về danh sách tất cả ngôn ngữ lập trình và phiên bản được hỗ trợ",
-                "operationId": "getSupportedRuntimes",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/RuntimeResponse"
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "default": {
-                        "description": "Phản hồi lỗi mặc định",
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ProblemDetail"
-                                }
-                            }
-                        }
-                    }
-                }
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API APSAS evaluation-service",
+    "description": "Tài liệu API cho APSAS evaluation-service",
+    "version": "1.0"
+  },
+  "servers": [{ "url": "/", "description": "mặc định" }],
+  "tags": [{ "name": "Đánh giá mã nguồn", "description": "Quản lý đánh giá và kiểm thử mã nguồn" }],
+  "paths": {
+    "/api/v1/runtimes": {
+      "get": {
+        "tags": ["Đánh giá mã nguồn"],
+        "summary": "Lấy danh sách runtime hỗ trợ",
+        "description": "Trả về danh sách tất cả ngôn ngữ lập trình và phiên bản được hỗ trợ",
+        "operationId": "getSupportedRuntimes",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/RuntimeResponse" } }
+              }
             }
+          },
+          "default": {
+            "description": "Phản hồi lỗi mặc định",
+            "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/ProblemDetail" } } }
+          }
         }
-    },
-    "components": {
-        "schemas": {
-            "RuntimeResponse": {
-                "type": "object",
-                "description": "Thông tin runtime của ngôn ngữ lập trình được hỗ trợ",
-                "properties": {
-                    "language": {
-                        "type": "string",
-                        "description": "Tên ngôn ngữ lập trình",
-                        "example": "java"
-                    },
-                    "version": {
-                        "type": "string",
-                        "description": "Phiên bản của runtime",
-                        "example": "21.0.0"
-                    },
-                    "aliases": {
-                        "type": "array",
-                        "description": "Danh sách tên thay thế cho ngôn ngữ",
-                        "example": [
-                            "java",
-                            "java-21"
-                        ],
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    "runtime": {
-                        "type": "string",
-                        "description": "Tên runtime, chỉ cung cấp nếu có nhiều runtime thay thế",
-                        "example": "openjdk"
-                    }
-                }
-            },
-            "ProblemDetail": {
-                "description": "Chi tiết lỗi theo chuẩn RFC 9457",
-                "properties": {
-                    "type": {
-                        "format": "uri",
-                        "description": "Loại lỗi (URI)"
-                    },
-                    "title": {
-                        "description": "Tiêu đề lỗi"
-                    },
-                    "status": {
-                        "format": "int32",
-                        "description": "Mã trạng thái HTTP"
-                    },
-                    "detail": {
-                        "description": "Mô tả chi tiết lỗi"
-                    },
-                    "instance": {
-                        "format": "uri",
-                        "description": "Đường dẫn instance lỗi"
-                    }
-                }
-            }
-        },
-        "securitySchemes": {
-            "Bearer Authentication": {
-                "type": "http",
-                "scheme": "bearer",
-                "bearerFormat": "JWT"
-            }
-        }
+      }
     }
+  },
+  "components": {
+    "schemas": {
+      "RuntimeResponse": {
+        "type": "object",
+        "description": "Thông tin runtime của ngôn ngữ lập trình được hỗ trợ",
+        "properties": {
+          "language": { "type": "string", "description": "Tên ngôn ngữ lập trình", "example": "java" },
+          "version": { "type": "string", "description": "Phiên bản của runtime", "example": "21.0.0" },
+          "aliases": {
+            "type": "array",
+            "description": "Danh sách tên thay thế cho ngôn ngữ",
+            "example": ["java", "java-21"],
+            "items": { "type": "string" }
+          },
+          "runtime": {
+            "type": "string",
+            "description": "Tên runtime, chỉ cung cấp nếu có nhiều runtime thay thế",
+            "example": "openjdk"
+          }
+        }
+      },
+      "ProblemDetail": {
+        "description": "Chi tiết lỗi theo chuẩn RFC 9457",
+        "properties": {
+          "type": { "format": "uri", "description": "Loại lỗi (URI)" },
+          "title": { "description": "Tiêu đề lỗi" },
+          "status": { "format": "int32", "description": "Mã trạng thái HTTP" },
+          "detail": { "description": "Mô tả chi tiết lỗi" },
+          "instance": { "format": "uri", "description": "Đường dẫn instance lỗi" }
+        }
+      }
+    },
+    "securitySchemes": { "Bearer Authentication": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" } }
+  }
 }

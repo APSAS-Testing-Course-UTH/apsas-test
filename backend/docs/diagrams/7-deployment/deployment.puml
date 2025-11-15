@@ -1,0 +1,198 @@
+@startuml APSAS Deployment Diagram
+'!theme plain
+' skinparam linetype ortho
+!pragma layout elk
+' skinparam rectangleBackgroundColor #f0f0f0
+' skinparam rectangleBorderColor #333333
+' skinparam nodesep 50
+' skinparam ranksep 50
+
+!define SERVICE_REGISTRY_COLOR #FFDD99
+!define CONFIG_SERVER_COLOR #99CCFF
+!define API_GATEWAY_COLOR #FF9999
+!define ADMIN_PORTAL_COLOR #CCFF99
+!define EXTERNAL_SERVICE_COLOR #DDDDDD
+!define RABBITMQ_COLOR #FFCCFF
+!define POSTGRESQL_COLOR #CCFFFF
+!define REDIS_COLOR #FFFF99
+
+title APSAS Production Deployment Architecture
+
+' ========== CLOUDFLARE WORKERS (CDN/Frontend) ==========
+frame "Cloudflare Platform" as cloudflare_platform{
+    node "Worker Edge" <<node>> as worker_edge {
+        artifact "React SPA" <<artifact>> as fe_portal
+    }
+}
+
+' External Systems
+cloud "Internet" as internet
+node "Piston API Server" as piston_ext <<external>> {
+    artifact "Piston API\n(Code Execution)" as piston_app
+}
+
+node "Email Service" as email_ext <<external>> {
+    artifact "SMTP/Mailpit\n(Email Delivery)" as email_app
+}
+
+node "Firebase" as fcm_ext <<external>> {
+    artifact "Firebase Cloud Messaging\n(Push Notifications)" as fcm_app
+}
+
+' User Clients
+actor "Students" as students
+actor "Instructors" as instructors
+actor "Content Providers" as content_providers
+actor "System Admin" as admin_user
+
+' Cloudflare DNS & CDN
+cloud "Cloudflare\n(DNS, Cache, DDoS)" as cloudflare_cdn
+
+' Docker Host
+frame "Docker Host (Production)" as docker_host {
+    ' ------- Infrastructure Services -------
+    node "PostgreSQL" <<container>> as postgres_node {
+        database "PostgreSQL 17\napsas-db\n[5432]" as postgres_db
+    }
+
+    node "RabbitMQ" <<container>> as rabbitmq_node {
+        queue "RabbitMQ\napsas-rabbitmq\n[5672, 15672]" as rabbitmq_queue
+    }
+
+    node "Redis" <<container>> as redis_node {
+        database "Redis Cache\napsas-redis\n[6379]" as redis_cache
+    }
+
+    ' ------- Service Registry & Config -------
+    node "Service Registry" <<container>> as eureka_node {
+        artifact "Netflix Eureka\napsas-service-registry\n[8761]" <<artifact>> as eureka_app
+    }
+
+    node "Config Server" <<container>> as config_node {
+        artifact "Spring Cloud Config\napsas-config-server\n[8888]" <<artifact>> as config_app
+    }
+
+    ' ------- API Gateway (Only External Entry Point) -------
+    node "API Gateway" <<container>> as gateway_node {
+        artifact "Spring Cloud Gateway\napsas-gateway\n[8080]" <<artifact>> as gateway_app
+    }
+
+    ' ------- Microservices -------
+    node "Identity Service" <<container>> as identity_node {
+        artifact "Spring Boot\napsas-identity\n[8081]" <<artifact>> as identity_app
+    }
+
+    node "Content Service" <<container>> as content_node {
+        artifact "Spring Boot\napsas-content\n[8082]" <<artifact>> as content_app
+    }
+
+    node "Submission Service" <<container>> as submission_node {
+        artifact "Spring Boot\napsas-submission\n[8083]" <<artifact>> as submission_app
+    }
+
+    node "Evaluation Service" <<container>> as evaluation_node {
+        artifact "Spring Boot\napsas-evaluation\n[8084]" <<artifact>> as evaluation_app
+    }
+
+    node "Support Service" <<container>> as support_node {
+        artifact "Spring Boot\napsas-support\n[8085]" <<artifact>> as support_app
+    }
+
+    node "Notification Service" <<container>> as notification_node {
+        artifact "Spring Boot\napsas-notification\n[8086]" <<artifact>> as notification_app
+    }
+
+    ' ------- Admin Portal -------
+    node "Admin Portal" <<container>> as admin_portal_node {
+        artifact "Spring Boot Admin\napsas-admin-portal\n[9090]" <<artifact>> as admin_portal_app
+    }
+}
+
+' ==============================================================
+' Relationships - Users to Frontend (Cloudflare Workers)
+' ==============================================================
+students --> cloudflare_cdn : DNS Lookup
+instructors --> cloudflare_cdn : DNS Lookup
+content_providers --> cloudflare_cdn : DNS Lookup
+
+cloudflare_cdn --> fe_portal : Serve
+
+fe_portal --> internet : API Requests
+
+internet --> gateway_app : :8080\n(exposed port)
+
+admin_user --> cloudflare_cdn : DNS Lookup
+internet --> admin_portal_app : :9090\n(exposed port)
+
+' ==============================================================
+' Relationships - Gateway to Microservices
+' ==============================================================
+gateway_app -[API_GATEWAY_COLOR]-> identity_app : HTTP
+gateway_app -[API_GATEWAY_COLOR]-> content_app : HTTP
+gateway_app -[API_GATEWAY_COLOR]-> submission_app : HTTP
+gateway_app -[API_GATEWAY_COLOR]-> evaluation_app : HTTP
+gateway_app -[API_GATEWAY_COLOR]-> support_app : HTTP/WebSocket
+gateway_app -[API_GATEWAY_COLOR]-> notification_app : HTTP
+' ==============================================================
+' Relationships - Services to Infrastructure
+' ==============================================================
+' Database connections
+identity_app -[POSTGRESQL_COLOR]-> postgres_db : JDBC\n(schema: identity)
+content_app -[POSTGRESQL_COLOR]-> postgres_db : JDBC\n(schema: content)
+submission_app -[POSTGRESQL_COLOR]-> postgres_db : JDBC\n(schema: submission)
+support_app -[POSTGRESQL_COLOR]-> postgres_db : JDBC\n(schema: support)
+notification_app -[POSTGRESQL_COLOR]-> postgres_db : JDBC\n(schema: notification)
+
+' Cache connections
+identity_app -[REDIS_COLOR]-> redis_cache : Redis Protocol
+content_app -[REDIS_COLOR]-> redis_cache : Redis Protocol
+submission_app -[REDIS_COLOR]-> redis_cache : Redis Protocol
+
+' Message Queue connections
+identity_app -[RABBITMQ_COLOR]-> rabbitmq_queue : AMQP\n(Publish)
+content_app -[RABBITMQ_COLOR]-> rabbitmq_queue : AMQP\n(Publish)
+submission_app -[RABBITMQ_COLOR]-> rabbitmq_queue : AMQP\n(Pub/Sub)
+evaluation_app -[RABBITMQ_COLOR]-> rabbitmq_queue : AMQP\n(Pub/Sub)
+notification_app -[RABBITMQ_COLOR]-> rabbitmq_queue : AMQP\n(Subscribe)
+support_app -[RABBITMQ_COLOR]-> rabbitmq_queue : AMQP\n(Publish)
+
+' ==============================================================
+' Relationships - Service Registry & Config
+' ==============================================================
+eureka_app -[SERVICE_REGISTRY_COLOR].-> config_app : discover
+gateway_app -[SERVICE_REGISTRY_COLOR].-> eureka_app : register/discover
+identity_app -[SERVICE_REGISTRY_COLOR].-> eureka_app : register/discover
+content_app -[SERVICE_REGISTRY_COLOR].-> eureka_app : register/discover
+submission_app -[SERVICE_REGISTRY_COLOR].-> eureka_app : register/discover
+evaluation_app -[SERVICE_REGISTRY_COLOR].-> eureka_app : register/discover
+support_app -[SERVICE_REGISTRY_COLOR].-> eureka_app : register/discover
+notification_app -[SERVICE_REGISTRY_COLOR].-> eureka_app : register/discover
+admin_portal_app -[SERVICE_REGISTRY_COLOR].-> eureka_app : discover
+
+gateway_app -[CONFIG_SERVER_COLOR].-> config_app : fetch config
+identity_app -[CONFIG_SERVER_COLOR].-> config_app : fetch config
+content_app -[CONFIG_SERVER_COLOR].-> config_app : fetch config
+submission_app -[CONFIG_SERVER_COLOR].-> config_app : fetch config
+evaluation_app -[CONFIG_SERVER_COLOR].-> config_app : fetch config
+support_app -[CONFIG_SERVER_COLOR].-> config_app : fetch config
+notification_app -[CONFIG_SERVER_COLOR].-> config_app : fetch config
+
+' ==============================================================
+' Relationships - External Services
+' ==============================================================
+evaluation_app -[EXTERNAL_SERVICE_COLOR]-> piston_app : HTTP\n(execute code)
+notification_app -[EXTERNAL_SERVICE_COLOR]-> email_app : SMTP\n(send email)
+notification_app -[EXTERNAL_SERVICE_COLOR]-> fcm_app : HTTP\n(push notification)
+
+' ==============================================================
+' Relationships - Admin Portal
+' ==============================================================
+admin_portal_app -[ADMIN_PORTAL_COLOR].-> eureka_app : service discovery
+admin_portal_app -[ADMIN_PORTAL_COLOR].-> identity_app : HTTP
+admin_portal_app -[ADMIN_PORTAL_COLOR].-> content_app : HTTP
+admin_portal_app -[ADMIN_PORTAL_COLOR].-> submission_app : HTTP
+admin_portal_app -[ADMIN_PORTAL_COLOR].-> evaluation_app : HTTP
+admin_portal_app -[ADMIN_PORTAL_COLOR].-> support_app : HTTP
+admin_portal_app -[ADMIN_PORTAL_COLOR].-> notification_app : HTTP
+
+@enduml

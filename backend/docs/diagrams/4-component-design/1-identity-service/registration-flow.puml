@@ -1,0 +1,51 @@
+@startuml RegistrationFlow
+actor Student
+participant "Identity Service" as IS
+participant "PostgreSQL" as DB
+participant "RabbitMQ" as RMQ
+participant "Notification Service" as NT
+participant "Email Server" as Email
+
+== User Registration ==
+Student -> IS: POST /auth/register\n{email, password, firstName, lastName}
+
+IS -> DB: Check if email exists
+
+alt Email exists
+    DB --> IS: Email exists
+    IS --> Student: 400 Bad Request\n"Email already registered"
+else Email available
+    DB --> IS: Email available
+    IS -> IS: Hash password (BCrypt)
+    IS -> DB: Save user account
+    DB --> IS: User saved
+
+    IS -> IS: Generate verification token (UUID)
+    IS -> DB: Save verification token
+    DB --> IS: Token saved
+
+    IS -> RMQ: Publish UserRegisteredEvent\n{userId, email, firstName, lastName, token}
+
+    IS -> IS: Generate JWT token
+    IS --> Student: 201 Created + AuthResponse\n{JWT, userDetails}
+
+    RMQ -> NT: Consume UserRegisteredEvent
+    NT -> Email: Send verification email\nwith token link
+    Email --> Student: Email delivered
+end
+
+== Email Verification ==
+Student -> IS: POST /auth/verify-email\n{token}
+
+IS -> DB: Find verification token
+
+alt Token valid
+    DB --> IS: Token found
+    IS -> DB: Mark email as verified
+    IS -> DB: Delete verification token
+    IS --> Student: 200 OK\n"Email verified successfully"
+else Token invalid/expired
+    DB --> IS: Token not found
+    IS --> Student: 400 Bad Request\n"Invalid or expired token"
+end
+@enduml

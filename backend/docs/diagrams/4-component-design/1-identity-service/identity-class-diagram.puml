@@ -1,0 +1,256 @@
+@startuml Identity Service Class Diagram
+' !pragma layout elk
+skinparam linetype ortho
+top to bottom direction
+skinparam classBackgroundColor #e8f4f8
+skinparam classBorderColor #333333
+skinparam arrowColor #333333
+skinparam backgroundColor #ffffff
+hide empty members
+
+title Identity Service Class Diagram
+
+
+class AuthController {
+    + requestPasswordReset(EmailRequest): ResponseEntity<Void>
+    + login(LoginRequest): ResponseEntity<AuthResponse>
+    + resendVerificationEmail(EmailRequest): ResponseEntity<Void>
+    + verifyEmail(TokenRequest): ResponseEntity<Void>
+    + resetPassword(ResetPasswordRequest): ResponseEntity<Void>
+    + register(RegisterRequest): ResponseEntity<AuthResponse>
+}
+class AuthResponse {
+    token: String
+    type: String
+    user: UserResponse
+}
+class AuthService {
+    + register(RegisterRequest): AuthResponse
+    + login(LoginRequest): AuthResponse
+    + verifyEmail(String): void
+    + resendVerificationEmail(EmailRequest): void
+    + requestPasswordReset(EmailRequest): void
+    + resetPassword(ResetPasswordRequest): void
+}
+class BaseEvent {
+    timestamp: Instant
+}
+class ChangePasswordRequest {
+    currentPassword: String
+    newPassword: String
+}
+class CreateUserRequest {
+    email: String
+    firstName: String
+    isActive: Boolean
+    isEmailVerified: Boolean
+    lastName: String
+    password: String
+    role: UserRole
+}
+class EmailRequest {
+    email: String
+}
+class EmailVerificationToken {
+    createdAt: LocalDateTime
+    expiresAt: LocalDateTime
+    id: UUID
+    token: String
+    user: User
+}
+interface JpaRepository<T, ID> << interface >> {
+}
+
+note bottom of JpaRepository
+    Contains basic CRUD methods:
+    save(), findById(), findAll(),
+    delete(), deleteById(), etc.
+end note
+
+interface EmailVerificationTokenRepository << interface >> {
+    + findByToken(String): Optional<EmailVerificationToken>
+    + findByUser(User): Optional<EmailVerificationToken>
+}
+class EventPublisher {
+    + publish(String, BaseEvent): void
+}
+class JwtTokenProvider {
+    + generateToken(User): String
+}
+class LoginRequest {
+    email: String
+    password: String
+}
+entity PageRequestParams << record >> {
+    page(): Integer
+    size(): Integer
+    toPageable(): Pageable
+}
+entity PageResponse<T> << record >> {
+    content(): List<T>
+    pageNumber(): int
+    pageSize(): int
+    totalPages(): int
+    totalElements(): long
+    first(): boolean
+    last(): boolean
+    hasNext(): boolean
+    hasPrevious(): boolean
+}
+class PasswordResetRequestedEvent {
+    email: String
+    firstName: String
+    resetToken: String
+}
+class PasswordResetToken {
+    createdAt: LocalDateTime
+    expiresAt: LocalDateTime
+    id: UUID
+    token: String
+    user: User
+}
+interface PasswordResetTokenRepository << interface >> {
+    + findByToken(String): Optional<PasswordResetToken>
+    + findByUser(User): Optional<PasswordResetToken>
+}
+class RegisterRequest {
+    email: String
+    firstName: String
+    lastName: String
+    password: String
+}
+class ResetPasswordRequest {
+    token: String
+    newPassword: String
+}
+class TokenRequest {
+    token: String
+}
+class UpdateProfileRequest {
+    firstName: String
+    lastName: String
+}
+class User {
+    createdAt: LocalDateTime
+    email: String
+    firstName: String
+    id: UUID
+    isActive: Boolean
+    isEmailVerified: Boolean
+    lastName: String
+    passwordHash: String
+    role: UserRole
+    updatedAt: LocalDateTime
+}
+class UserController {
+    + updateCurrentUserProfile(Authentication, UpdateProfileRequest): ResponseEntity<UserResponse>
+    + getUserById(UUID): ResponseEntity<UserResponse>
+    + getUsersByRole(UserRole, PageRequestParams): ResponseEntity<PageResponse<UserResponse>>
+    + deactivateUser(UUID): ResponseEntity<Void>
+    + changePassword(Authentication, ChangePasswordRequest): ResponseEntity<Void>
+    + createUser(CreateUserRequest): ResponseEntity<UserResponse>
+    + activateUser(UUID): ResponseEntity<Void>
+    + getCurrentUser(Authentication): ResponseEntity<UserResponse>
+    + deleteUser(UUID): ResponseEntity<Void>
+    + getAllUsers(PageRequestParams): ResponseEntity<PageResponse<UserResponse>>
+}
+class UserMapper {
+    + toUserFromRegisterRequest(RegisterRequest): User
+    + toUserResponse(User): UserResponse
+    + toUser(CreateUserRequest): User
+}
+class UserRegisteredEvent {
+    email: String
+    firstName: String
+    lastName: String
+    userId: UUID
+    verificationToken: String
+}
+interface UserRepository << interface >> {
+    + findByEmail(String): Optional<User>
+    + existsByEmail(String): boolean
+    + findByRole(UserRole): List<User>
+    + findByRole(UserRole, Pageable): Page<User>
+}
+class UserResponse {
+    createdAt: LocalDateTime
+    email: String
+    firstName: String
+    id: UUID
+    isActive: Boolean
+    isEmailVerified: Boolean
+    lastName: String
+    role: UserRole
+    updatedAt: LocalDateTime
+}
+enum UserRole << enumeration >> {
+    STUDENT
+    INSTRUCTOR
+    CONTENT_PROVIDER
+    ADMIN
+}
+class UserService {
+    + getUsersByRole(String): List<UserResponse>
+    + getAllUsers(Pageable): PageResponse<UserResponse>
+    + createUser(CreateUserRequest): UserResponse
+    + deactivateUser(UUID): void
+    + activateUser(UUID): void
+    + getUserById(UUID): UserResponse
+    + changePassword(UUID, ChangePasswordRequest): void
+    + updateProfile(UUID, UpdateProfileRequest): UserResponse
+    + findUsersByIds(List<UUID>): List<UserResponse>
+    + getUsersByRole(UserRole, Pageable): PageResponse<UserResponse>
+    + deleteUser(UUID): void
+}
+
+AuthController                   "1" *-[#595959,plain]- "authService\n1" AuthService
+AuthController                   "1" *-[#595959,plain]- "userService\n1" UserService
+AuthController                    -[#595959,dashed]->  AuthResponse
+AuthController                    -[#595959,dashed]->  UserResponse
+
+AuthResponse                     "1" *-[#595959,plain]- "user\n1" UserResponse
+
+AuthService                      "1" *-[#595959,plain]- "userRepository\n1" UserRepository
+AuthService                      "1" *-[#595959,plain]- "userMapper\n1" UserMapper
+AuthService                      "1" *-[#595959,plain]- "emailVerificationTokenRepository\n1" EmailVerificationTokenRepository
+AuthService                      "1" *-[#595959,plain]- "passwordResetTokenRepository\n1" PasswordResetTokenRepository
+AuthService                      "1" *-[#595959,plain]- "jwtTokenProvider\n1" JwtTokenProvider
+AuthService                      "1" *-[#595959,plain]- "eventPublisher\n1" EventPublisher
+AuthService                       -[#595959,dashed]->  AuthResponse
+AuthService                       -[#595959,dashed]->  User
+
+User                             "1" *-[#595959,plain]- "role\n1" UserRole
+
+UserController                   "1" *-[#595959,plain]- "userService\n1" UserService
+UserController                    -[#595959,dashed]->  UserResponse
+UserController                    -[#595959,dashed]->  PageResponse
+
+UserResponse                     "1" *-[#595959,plain]- "role\n1" UserRole
+
+UserService                      "1" *-[#595959,plain]- "userRepository\n1" UserRepository
+UserService                      "1" *-[#595959,plain]- "userMapper\n1" UserMapper
+UserService                       -[#595959,dashed]->  UserResponse
+UserService                       -[#595959,dashed]->  PageResponse
+
+UserMapper                        -[#595959,dashed]->  User
+UserMapper                        -[#595959,dashed]->  UserResponse
+
+EmailVerificationTokenRepository --|> JpaRepository : extends
+EmailVerificationTokenRepository  -[#595959,dashed]->  EmailVerificationToken
+EmailVerificationToken           "1" *-[#595959,plain]- "user\n1" User
+
+PasswordResetTokenRepository --|> JpaRepository : extends
+PasswordResetTokenRepository      -[#595959,dashed]->  PasswordResetToken
+PasswordResetToken               "1" *-[#595959,plain]- "user\n1" User
+
+CreateUserRequest                "1" *-[#595959,plain]- "role\n1" UserRole
+
+UserRepository --|> JpaRepository : extends
+
+PasswordResetRequestedEvent       -[#000082,plain]-^  BaseEvent
+UserRegisteredEvent               -[#000082,plain]-^  BaseEvent
+
+EventPublisher                    -[#595959,dashed]->  BaseEvent
+JwtTokenProvider                  -[#595959,dashed]->  User
+
+@enduml

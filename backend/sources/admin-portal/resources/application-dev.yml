@@ -1,0 +1,9 @@
+spring:
+  boot:
+    admin:
+      instance-auth:
+        default-user-name: admin
+        default-password: admin
+
+jwt:
+  secret: dev-secret-key-for-testing-only-change-in-production-minimum-256-bits-required

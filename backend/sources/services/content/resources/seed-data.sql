@@ -865,25 +865,28 @@ ON CONFLICT (assignment_id, skill_id) DO NOTHING;
 INSERT INTO content.tutorials (id, title, content, creator_id, tags)
 VALUES ('70000000-0000-0000-0000-000000000001',
         'Hướng Dẫn In Ra Dữ Liệu (Basic Output)',
-        $$# In Ra Dữ Liệu Lên Màn Hình
+        '# In Ra Dữ Liệu Lên Màn Hình
 
 ## Giới Thiệu
-Kỹ năng in ra dữ liệu là một trong những kỹ năng cơ bản nhất trong lập trình. Bạn sẽ sử dụng nó trong hầu hết các chương trình.
+
+Kỹ năng in ra dữ liệu là một trong những kỹ năng cơ bản nhất trong lập trình. Bạn sẽ sử dụng nó
+trong hầu hết các chương trình.
 
 ## Các Cách In Ra Trong Các Ngôn Ngữ Khác Nhau
 
 ### C
+
 ```c
 #include <stdio.h>
 int main() {
-    printf("Hello, World!\n")
-ON CONFLICT (id) DO NOTHING;
+    printf("Hello, World!\n");
     return 0;
 }
 ```
 
 ### C++
-```cpp
+
+```cp
 #include <iostream>
 using namespace std;
 int main() {
@@ -893,30 +896,33 @@ int main() {
 ```
 
 ### Java
+
 ```java
 public class Main {
-    public static void main(String[] args) {
-        System.out.println("Hello, World!")
-ON CONFLICT (id) DO NOTHING;
-    }
+  public static void main(String[] args) {
+    System.out.println("Hello, World!");
+  }
 }
 ```
 
 ### Python
+
 ```python
 print("Hello, World!")
 ```
 
 ### JavaScript
+
 ```javascript
-console.log("Hello, World!")
-ON CONFLICT (id) DO NOTHING;
+console.log("Hello, World!");
 ```
 
 ## Lưu Ý Quan Trọng
+
 - Luôn thêm **newline** (`\n`) ở cuối để xuống dòng
 - Kiểm tra định dạng output chính xác
-- Không in thêm khoảng trắng không cần thiết$$,
+- Không in thêm khoảng trắng không cần thiết
+',
         '29ada301-a1f4-41d5-a8fb-dbb8618f2f1d',
         '[
           "basics",
@@ -929,7 +935,7 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO content.tutorials (id, title, content, creator_id, tags)
 VALUES ('70000000-0000-0000-0000-000000000002',
         'Hướng Dẫn Đọc Dữ Liệu Từ Người Dùng (Basic Input)',
-        $$# Đọc Dữ Liệu Từ Input
+        '# Đọc Dữ Liệu Từ Input
 
 ## Giới Thiệu
 Để tương tác với người dùng, bạn cần học cách đọc dữ liệu đầu vào.
@@ -941,10 +947,8 @@ VALUES ('70000000-0000-0000-0000-000000000002',
 #include <stdio.h>
 int main() {
     int num;
-    scanf("%d", &num)
-ON CONFLICT (id) DO NOTHING;
-    printf("Bạn nhập: %d\n", num)
-ON CONFLICT (id) DO NOTHING;
+    scanf("%d", &num);
+    printf("Bạn nhập: %d\n", num);
     return 0;
 }
 ```
@@ -964,40 +968,34 @@ int main() {
 ### Java
 ```java
 import java.util.Scanner;
+
 public class Main {
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in)
-ON CONFLICT (id) DO NOTHING;
-        int num = scanner.nextInt()
-ON CONFLICT (id) DO NOTHING;
-        System.out.println("Bạn nhập: " + num)
-ON CONFLICT (id) DO NOTHING;
-    }
+  public static void main(String[] args) {
+    Scanner scanner = new Scanner(System.in);
+    int num = scanner.nextInt();
+    System.out.println("Bạn nhập: " + num);
+  }
 }
 ```
 
 ### JavaScript
 ```javascript
 // Node.js với readline
-const readline = require('readline')
-ON CONFLICT (id) DO NOTHING;
+const readline = require("readline");
 const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-})
-ON CONFLICT (id) DO NOTHING;
-rl.question('Nhập số: ', (answer) => {
-    console.log('Bạn nhập: ' + answer)
-ON CONFLICT (id) DO NOTHING;
-    rl.close()
-ON CONFLICT (id) DO NOTHING;
-})
-ON CONFLICT (id) DO NOTHING;
+  input: process.stdin,
+  output: process.stdout
+});
+rl.question("Nhập số: ", (answer) => {
+  console.log("Bạn nhập: " + answer);
+  rl.close();
+});
 ```
 
 ## Lưu Ý
 - Luôn kiểm tra định dạng dữ liệu đầu vào
-- Xử lý lỗi khi dữ liệu không hợp lệ$$,
+- Xử lý lỗi khi dữ liệu không hợp lệ
+',
         'bd3c3370-b0cd-4a3b-ab70-07028213daa0',
         '[
           "basics",
@@ -1010,24 +1008,26 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO content.tutorials (id, title, content, creator_id, tags)
 VALUES ('70000000-0000-0000-0000-000000000003',
         'Hướng Dẫn Phép Toán Cơ Bản (Arithmetic Operations)',
-        $$# Phép Toán Cơ Bản
+        '# Phép Toán Cơ Bản
 
 ## Giới Thiệu
+
 Phép toán cơ bản là nền tảng của hầu hết các chương trình tính toán.
 
 ## Các Phép Toán
 
-| Phép Toán | Ký Hiệu | Ví Dụ | Kết Quả |
-|-----------|---------|-------|---------|
-| Cộng | `+` | `5 + 3` | `8` |
-| Trừ | `-` | `5 - 3` | `2` |
-| Nhân | `*` | `5 * 3` | `15` |
-| Chia | `/` | `6 / 2` | `3` |
-| Chia lấy dư | `%` | `7 % 3` | `1` |
+| Phép Toán   | Ký Hiệu | Ví Dụ   | Kết Quả |
+|-------------|---------|---------|---------|
+| Cộng        | `+`     | `5 + 3` | `8`     |
+| Trừ         | `-`     | `5 - 3` | `2`     |
+| Nhân        | `*`     | `5 * 3` | `15`    |
+| Chia        | `/`     | `6 / 2` | `3`     |
+| Chia lấy dư | `%`     | `7 % 3` | `1`     |
 
 ## Ví Dụ Code
 
 ### C/C++
+
 ```c
 int a = 10, b = 3;
 int sum = a + b;        // 13
@@ -1038,6 +1038,7 @@ int mod = a % b;        // 1
 ```
 
 ### Java
+
 ```java
 int a = 10, b = 3;
 int sum = a + b;        // 13
@@ -1048,9 +1049,11 @@ int mod = a % b;        // 1
 ```
 
 ## Lưu Ý Quan Trọng
+
 - **Chia lấy dư** chỉ dùng cho số nguyên
 - **Thứ tự ưu tiên**: `*`, `/`, `%` trước `+`, `-`
-- Sử dụng **ngoặc đơn** để chỉ rõ thứ tự tính toán$$,
+- Sử dụng **ngoặc đơn** để chỉ rõ thứ tự tính toán
+',
         '29ada301-a1f4-41d5-a8fb-dbb8618f2f1d',
         '[
           "basics",
@@ -1064,14 +1067,16 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO content.tutorials (id, title, content, creator_id, tags)
 VALUES ('70000000-0000-0000-0000-000000000004',
         'Hướng Dẫn Điều Kiện (Conditional Logic)',
-        $$# Lệnh Điều Kiện (If/Else)
+        '# Lệnh Điều Kiện (If/Else)
 
 ## Giới Thiệu
+
 Điều kiện cho phép chương trình của bạn đưa ra quyết định dựa trên các giá trị.
 
 ## Cú Pháp If/Else
 
 ### C/C++/Java
+
 ```java
 if (condition) {
     // Code thực thi nếu điều kiện đúng
@@ -1084,14 +1089,14 @@ if (condition) {
 
 ## Các Toán Tử So Sánh
 
-| Toán Tử | Ý Nghĩa | Ví Dụ |
-|---------|---------|-------|
-| `==` | Bằng | `5 == 5` → `true` |
-| `!=` | Không bằng | `5 != 3` → `true` |
-| `<` | Nhỏ hơn | `3 < 5` → `true` |
-| `>` | Lớn hơn | `5 > 3` → `true` |
-| `<=` | Nhỏ hơn hoặc bằng | `5 <= 5` → `true` |
-| `>=` | Lớn hơn hoặc bằng | `5 >= 5` → `true` |
+| Toán Tử | Ý Nghĩa           | Ví Dụ             |
+|---------|-------------------|-------------------|
+| `==`    | Bằng              | `5 == 5` → `true` |
+| `!=`    | Không bằng        | `5 != 3` → `true` |
+| `<`     | Nhỏ hơn           | `3 < 5` → `true`  |
+| `>`     | Lớn hơn           | `5 > 3` → `true`  |
+| `<=`    | Nhỏ hơn hoặc bằng | `5 <= 5` → `true` |
+| `>=`    | Lớn hơn hoặc bằng | `5 >= 5` → `true` |
 
 ## Các Toán Tử Logic
 
@@ -1102,31 +1107,29 @@ if (condition) {
 ## Ví Dụ Thực Tế
 
 ### Kiểm Tra Chẵn Lẻ
+
 ```java
 int num = 4;
 if (num % 2 == 0) {
-    System.out.println("Even")
-ON CONFLICT (id) DO NOTHING;
+    System.out.println("Even");
 } else {
-    System.out.println("Odd")
-ON CONFLICT (id) DO NOTHING;
+    System.out.println("Odd");
 }
 ```
 
 ### Tìm Số Lớn Nhất
+
 ```java
 int a = 5, b = 10, c = 3;
 if (a >= b && a >= c) {
-    System.out.println(a)
-ON CONFLICT (id) DO NOTHING;
+    System.out.println(a);
 } else if (b >= a && b >= c) {
-    System.out.println(b)
-ON CONFLICT (id) DO NOTHING;
+    System.out.println(b);
 } else {
-    System.out.println(c)
-ON CONFLICT (id) DO NOTHING;
+    System.out.println(c);
 }
-```$$,
+```
+',
         'bd3c3370-b0cd-4a3b-ab70-07028213daa0',
         '[
           "basics",
@@ -1140,7 +1143,7 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO content.tutorials (id, title, content, creator_id, tags)
 VALUES ('70000000-0000-0000-0000-000000000005',
         'Hướng Dẫn Vòng Lặp (Loops and Iteration)',
-        $$# Vòng Lặp (Loops)
+        '# Vòng Lặp (Loops)
 
 ## Giới Thiệu
 Vòng lặp cho phép bạn lặp lại một block code nhiều lần.
@@ -1150,8 +1153,7 @@ Vòng lặp cho phép bạn lặp lại một block code nhiều lần.
 ### For Loop
 ```java
 for (int i = 0; i < 5; i++) {
-    System.out.println(i)
-ON CONFLICT (id) DO NOTHING;
+    System.out.println(i);
 }
 // Output: 0, 1, 2, 3, 4
 ```
@@ -1160,8 +1162,7 @@ ON CONFLICT (id) DO NOTHING;
 ```java
 int i = 0;
 while (i < 5) {
-    System.out.println(i)
-ON CONFLICT (id) DO NOTHING;
+    System.out.println(i);
     i++;
 }
 ```
@@ -1170,11 +1171,9 @@ ON CONFLICT (id) DO NOTHING;
 ```java
 int i = 0;
 do {
-    System.out.println(i)
-ON CONFLICT (id) DO NOTHING;
+    System.out.println(i);
     i++;
-} while (i < 5)
-ON CONFLICT (id) DO NOTHING;
+} while (i < 5);
 ```
 
 ## Ví Dụ: Tính Tổng
@@ -1189,7 +1188,8 @@ System.out.println(sum);  // Output: 15
 
 ## Control Statements
 - `break`: Thoát khỏi vòng lặp
-- `continue`: Bỏ qua vòng lặp hiện tại, chuyển sang vòng tiếp theo$$,
+- `continue`: Bỏ qua vòng lặp hiện tại, chuyển sang vòng tiếp theo
+',
         '29ada301-a1f4-41d5-a8fb-dbb8618f2f1d',
         '[
           "basics",
@@ -1203,7 +1203,7 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO content.tutorials (id, title, content, creator_id, tags)
 VALUES ('70000000-0000-0000-0000-000000000006',
         'Hướng Dẫn Hàm Đệ Quy (Recursion)',
-        $$# Hàm Đệ Quy (Recursion)
+        '# Hàm Đệ Quy (Recursion)
 
 ## Giới Thiệu
 Đệ quy (Recursion) là khi một hàm gọi chính nó để giải quyết một vấn đề.
@@ -1234,8 +1234,7 @@ int fibonacci(int n) {
     if (n <= 1) {
         return n;
     } else {
-        return fibonacci(n - 1) + fibonacci(n - 2)
-ON CONFLICT (id) DO NOTHING;
+        return fibonacci(n - 1) + fibonacci(n - 2);
     }
 }
 ```
@@ -1243,7 +1242,7 @@ ON CONFLICT (id) DO NOTHING;
 ## Lưu Ý Quan Trọng
 - **Luôn có base case** để tránh infinite recursion
 - Đệ quy có thể chậm hơn loop vì overhead của gọi hàm
-- Sử dụng **memoization** để tối ưu hóa$$,
+- Sử dụng **memoization** để tối ưu hóa',
         'bd3c3370-b0cd-4a3b-ab70-07028213daa0',
         '[
           "advanced",
@@ -1257,14 +1256,16 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO content.tutorials (id, title, content, creator_id, tags)
 VALUES ('70000000-0000-0000-0000-000000000007',
         'Hướng Dẫn Biến và Kiểu Dữ Liệu (Variables and Data Types)',
-        $$# Biến và Kiểu Dữ Liệu
+        '# Biến và Kiểu Dữ Liệu
 
 ## Giới Thiệu
+
 Biến là nơi lưu trữ dữ liệu, mỗi biến có một kiểu dữ liệu cụ thể.
 
 ## Các Kiểu Dữ Liệu Cơ Bản
 
 ### Số Nguyên (Integer)
+
 ```java
 byte a = 10;        // 1 byte: -128 to 127
 short b = 1000;     // 2 bytes
@@ -1273,23 +1274,27 @@ long d = 10000000000L;  // 8 bytes
 ```
 
 ### Số Thực (Float/Double)
+
 ```java
 float x = 3.14f;    // 4 bytes
 double y = 3.14159; // 8 bytes (thường dùng)
 ```
 
 ### Ký Tự (Char)
+
 ```java
-char letter = 'A';
+char letter = ''A'';
 ```
 
 ### Logic (Boolean)
+
 ```java
 boolean flag = true;
 boolean result = false;
 ```
 
 ### Chuỗi (String)
+
 ```java
 String name = "Hello";
 ```
@@ -1299,14 +1304,16 @@ String name = "Hello";
 ```java
 int age = 25;           // Khai báo và gán giá trị
 String name;            // Khai báo (giá trị mặc định là null)
-name = "John";          // Gán giá trị sau
+name ="John";          // Gán giá trị sau
 ```
 
 ## Quy Tắc Đặt Tên Biến
+
 - Bắt đầu bằng chữ cái hoặc underscore
 - Chỉ chứa chữ cái, chữ số, underscore
 - Phân biệt chữ hoa/thường
-- Không được là từ khóa (keyword)$$,
+- Không được là từ khóa (keyword)
+',
         '29ada301-a1f4-41d5-a8fb-dbb8618f2f1d',
         '[
           "basics",
@@ -1320,7 +1327,7 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO content.tutorials (id, title, content, creator_id, tags)
 VALUES ('70000000-0000-0000-0000-000000000008',
         'Hướng Dẫn Tính Toán Toán Học (Mathematical Calculation)',
-        $$# Tính Toán Toán Học
+        '# Tính Toán Toán Học
 
 ## Giới Thiệu
 Sử dụng các hàm toán học từ thư viện chuẩn để giải quyết các bài toán phức tạp.
@@ -1357,8 +1364,7 @@ Math.cos(0);        // Hàm cos
 
 ```java
 double radius = 5;
-double area = Math.PI * Math.pow(radius, 2)
-ON CONFLICT (id) DO NOTHING;
+double area = Math.PI * Math.pow(radius, 2);
 System.out.println(area);  // 78.53981633974483
 ```
 
@@ -1368,11 +1374,9 @@ System.out.println(area);  // 78.53981633974483
 // ax^2 + bx + c = 0
 double a = 1, b = -5, c = 6;
 double delta = b * b - 4 * a * c;
-double x1 = (-b + Math.sqrt(delta)) / (2 * a)
-ON CONFLICT (id) DO NOTHING;
-double x2 = (-b - Math.sqrt(delta)) / (2 * a)
-ON CONFLICT (id) DO NOTHING;
-```$$,
+double x1 = (-b + Math.sqrt(delta)) / (2 * a);
+double x2 = (-b - Math.sqrt(delta)) / (2 * a);
+```',
         'bd3c3370-b0cd-4a3b-ab70-07028213daa0',
         '[
           "math",

@@ -1,0 +1,87 @@
+@startuml Startup Order Diagram
+!pragma layout elk
+left to right direction
+title Services Startup Order Diagram
+
+map "Start" as start {
+}
+
+map "Admin Portal" as admin_portal {
+}
+
+map "Service Registry" as service_registry {
+}
+
+map "API Gateway" as api_gateway {
+}
+
+map "Config Server" as config_service {
+}
+
+map "PostgreSQL" as postgresql_db {
+}
+
+map "RabbitMQ" as rabbitmq {
+}
+
+map "Redis" as redis_cache {
+}
+
+map "Identity Service" as identity_service {
+}
+map "Content Service" as content_service {
+}
+map "Submission Service" as submission_service {
+}
+map "Evaluation Service" as evaluation_service {
+}
+map "Support Service" as support_service {
+}
+map "Notification Service" as notification_service {
+}
+map "Finish" as finish {
+}
+
+start --> admin_portal
+start --> service_registry
+start --> postgresql_db
+start --> rabbitmq
+start --> redis_cache
+service_registry --> config_service
+config_service --> api_gateway
+
+config_service --> identity_service
+config_service --> content_service
+config_service --> submission_service
+config_service --> evaluation_service
+config_service --> support_service
+config_service --> notification_service
+
+postgresql_db --> identity_service
+rabbitmq --> identity_service
+redis_cache --> identity_service
+
+postgresql_db --> content_service
+redis_cache --> content_service
+
+postgresql_db --> submission_service
+redis_cache --> submission_service
+rabbitmq --> submission_service
+
+redis_cache --> evaluation_service
+rabbitmq --> evaluation_service
+
+postgresql_db --> support_service
+rabbitmq --> support_service
+
+postgresql_db --> notification_service
+rabbitmq --> notification_service
+
+identity_service --> finish
+content_service --> finish
+submission_service --> finish
+evaluation_service --> finish
+support_service --> finish
+notification_service --> finish
+admin_portal --> finish
+@enduml

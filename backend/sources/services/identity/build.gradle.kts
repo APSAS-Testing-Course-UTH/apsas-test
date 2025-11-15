@@ -1,6 +1,5 @@
 plugins {
     id("spring-service.conventions")
-    id("spring-service-test.conventions")
 }
 
 dependencies {

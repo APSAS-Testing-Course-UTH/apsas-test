@@ -1,0 +1,80 @@
+@startuml Content Service ERD
+!pragma layout elk
+skinparam linetype ortho
+
+title Content Service ERD
+
+
+class "skills" as skills {
+    <b> id : UUID <<PK>>
+    --
+    name : VARCHAR(255)
+    description : TEXT
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+}
+
+class "assignments" as assignments {
+    <b> id : UUID <<PK>>
+    --
+    title : VARCHAR(255)
+    description : TEXT
+    difficulty_level : VARCHAR(50)
+    creator_id : UUID
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+    start_date : TIMESTAMP
+    due_date : TIMESTAMP
+    max_score : DECIMAL(5,2)
+    status : VARCHAR(50)
+    languages : JSONB
+    test_cases : JSONB
+}
+
+class "tutorials" as tutorials {
+    <b> id : UUID <<PK>>
+    --
+    title : VARCHAR(255)
+    content : TEXT
+    creator_id : UUID
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+    tags : JSONB
+}
+
+
+enum "DifficultyLevel" as DifficultyLevel {
+    EASY
+    MEDIUM
+    HARD
+}
+
+enum "AssignmentStatus" as AssignmentStatus {
+    DRAFT
+    PUBLISHED
+    ARCHIVED
+}
+
+json "TestCase (JSON)" as TestCase {
+    "order" : "Integer",
+    "description" : "String",
+    "hidden" : "Boolean",
+    "weight" : "Double",
+    "input" : "String",
+    "output" : "String",
+    "timeout" : "Integer",
+    "memoryLimit" : "Integer"
+}
+
+DifficultyLevel -- assignments::difficulty_level
+AssignmentStatus -- assignments::status
+TestCase -- assignments::test_cases
+
+assignments::id }o--o{ skills::id : "assignment_skills"
+assignments::id }o--o{ tutorials::id : "assignment_tutorials"
+
+hide skills circle
+hide assignments circle
+hide tutorials circle
+
+@enduml

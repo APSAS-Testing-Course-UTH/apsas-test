@@ -1,1538 +1,714 @@
 {
-    "openapi": "3.1.0",
-    "info": {
-        "title": "API APSAS content-service",
-        "description": "Tài liệu API cho APSAS content-service",
-        "version": "1.0"
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API APSAS content-service",
+    "description": "Tài liệu API cho APSAS content-service",
+    "version": "1.0"
+  },
+  "servers": [{ "url": "/", "description": "mặc định" }],
+  "tags": [
+    { "name": "Quản lý bài tập", "description": "Các API quản lý bài tập" },
+    { "name": "Quản lý kỹ năng", "description": "Các API quản lý kỹ năng" },
+    { "name": "Quản lý hướng dẫn", "description": "Các API quản lý hướng dẫn" }
+  ],
+  "paths": {
+    "/api/v1/tutorials": {
+      "get": {
+        "tags": ["Quản lý hướng dẫn"],
+        "summary": "Lấy tất cả hướng dẫn",
+        "description": "Lấy danh sách hướng dẫn có phân trang và sắp xếp",
+        "operationId": "getAllTutorials",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Số trang (bắt đầu từ 0)",
+            "required": false,
+            "schema": { "type": "string", "minimum": 0 },
+            "example": 0
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Số lượng phần tử mỗi trang",
+            "required": false,
+            "schema": { "type": "string", "maximum": 100, "minimum": 1 },
+            "example": 10
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/PageResponseTutorialResponse" } }
+            }
+          },
+          "default": {
+            "description": "Phản hồi lỗi mặc định",
+            "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/ProblemDetail" } } }
+          }
+        },
+        "security": [{ "Bearer Authentication": [] }]
+      },
+      "post": {
+        "tags": ["Quản lý hướng dẫn"],
+        "summary": "Tạo hướng dẫn mới",
+        "description": "Tạo mới hướng dẫn (chỉ Content Provider)",
+        "operationId": "createTutorial",
+        "requestBody": {
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreateTutorialRequest" } } },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TutorialResponse" } } }
+          },
+          "default": {
+            "description": "Phản hồi lỗi mặc định",
+            "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/ProblemDetail" } } }
+          }
+        },
+        "security": [{ "Bearer Authentication": [] }]
+      }
     },
-    "servers": [
-        {
-            "url": "/",
-            "description": "mặc định"
-        }
-    ],
-    "tags": [
-        {
-            "name": "Quản lý bài tập",
-            "description": "Các API quản lý bài tập"
-        },
-        {
-            "name": "Quản lý kỹ năng",
-            "description": "Các API quản lý kỹ năng"
-        },
-        {
-            "name": "Quản lý hướng dẫn",
-            "description": "Các API quản lý hướng dẫn"
-        }
-    ],
-    "paths": {
-        "/api/v1/tutorials": {
-            "get": {
-                "tags": [
-                    "Quản lý hướng dẫn"
-                ],
-                "summary": "Lấy tất cả hướng dẫn",
-                "description": "Lấy danh sách hướng dẫn có phân trang và sắp xếp",
-                "operationId": "getAllTutorials",
-                "parameters": [
-                    {
-                        "name": "page",
-                        "in": "query",
-                        "description": "Số trang (bắt đầu từ 0)",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "minimum": 0
-                        },
-                        "example": 0
-                    },
-                    {
-                        "name": "size",
-                        "in": "query",
-                        "description": "Số lượng phần tử mỗi trang",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "maximum": 100,
-                            "minimum": 1
-                        },
-                        "example": 10
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/PageResponseTutorialResponse"
-                                }
-                            }
-                        }
-                    },
-                    "default": {
-                        "description": "Phản hồi lỗi mặc định",
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ProblemDetail"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Bearer Authentication": []
-                    }
-                ]
-            },
-            "post": {
-                "tags": [
-                    "Quản lý hướng dẫn"
-                ],
-                "summary": "Tạo hướng dẫn mới",
-                "description": "Tạo mới hướng dẫn (chỉ Content Provider)",
-                "operationId": "createTutorial",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/CreateTutorialRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/TutorialResponse"
-                                }
-                            }
-                        }
-                    },
-                    "default": {
-                        "description": "Phản hồi lỗi mặc định",
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ProblemDetail"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Bearer Authentication": []
-                    }
-                ]
+    "/api/v1/skills": {
+      "get": {
+        "tags": ["Quản lý kỹ năng"],
+        "summary": "Lấy tất cả kỹ năng",
+        "description": "Lấy danh sách kỹ năng có phân trang và sắp xếp",
+        "operationId": "getAllSkills",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Số trang (bắt đầu từ 0)",
+            "required": false,
+            "schema": { "type": "string", "minimum": 0 },
+            "example": 0
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Số lượng phần tử mỗi trang",
+            "required": false,
+            "schema": { "type": "string", "maximum": 100, "minimum": 1 },
+            "example": 10
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/PageResponseSkillResponse" } }
             }
+          },
+          "default": {
+            "description": "Phản hồi lỗi mặc định",
+            "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/ProblemDetail" } } }
+          }
         },
-        "/api/v1/skills": {
-            "get": {
-                "tags": [
-                    "Quản lý kỹ năng"
-                ],
-                "summary": "Lấy tất cả kỹ năng",
-                "description": "Lấy danh sách kỹ năng có phân trang và sắp xếp",
-                "operationId": "getAllSkills",
-                "parameters": [
-                    {
-                        "name": "page",
-                        "in": "query",
-                        "description": "Số trang (bắt đầu từ 0)",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "minimum": 0
-                        },
-                        "example": 0
-                    },
-                    {
-                        "name": "size",
-                        "in": "query",
-                        "description": "Số lượng phần tử mỗi trang",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "maximum": 100,
-                            "minimum": 1
-                        },
-                        "example": 10
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/PageResponseSkillResponse"
-                                }
-                            }
-                        }
-                    },
-                    "default": {
-                        "description": "Phản hồi lỗi mặc định",
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ProblemDetail"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Bearer Authentication": []
-                    }
-                ]
-            },
-            "post": {
-                "tags": [
-                    "Quản lý kỹ năng"
-                ],
-                "summary": "Tạo kỹ năng mới",
-                "description": "Tạo mới kỹ năng (chỉ Content Provider)",
-                "operationId": "createSkill",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/CreateSkillRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/SkillResponse"
-                                }
-                            }
-                        }
-                    },
-                    "default": {
-                        "description": "Phản hồi lỗi mặc định",
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ProblemDetail"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Bearer Authentication": []
-                    }
-                ]
-            }
+        "security": [{ "Bearer Authentication": [] }]
+      },
+      "post": {
+        "tags": ["Quản lý kỹ năng"],
+        "summary": "Tạo kỹ năng mới",
+        "description": "Tạo mới kỹ năng (chỉ Content Provider)",
+        "operationId": "createSkill",
+        "requestBody": {
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreateSkillRequest" } } },
+          "required": true
         },
-        "/api/v1/assignments": {
-            "get": {
-                "tags": [
-                    "Quản lý bài tập"
-                ],
-                "summary": "Lấy tất cả bài tập",
-                "description": "Lấy danh sách bài tập có phân trang và sắp xếp",
-                "operationId": "getAllAssignments",
-                "parameters": [
-                    {
-                        "name": "page",
-                        "in": "query",
-                        "description": "Số trang (bắt đầu từ 0)",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "minimum": 0
-                        },
-                        "example": 0
-                    },
-                    {
-                        "name": "size",
-                        "in": "query",
-                        "description": "Số lượng phần tử mỗi trang",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "maximum": 100,
-                            "minimum": 1
-                        },
-                        "example": 10
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/PageResponseAssignmentResponse"
-                                }
-                            }
-                        }
-                    },
-                    "default": {
-                        "description": "Phản hồi lỗi mặc định",
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ProblemDetail"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Bearer Authentication": []
-                    }
-                ]
-            },
-            "post": {
-                "tags": [
-                    "Quản lý bài tập"
-                ],
-                "summary": "Tạo bài tập mới",
-                "description": "Tạo mới bài tập (chỉ Content Provider)",
-                "operationId": "createAssignment",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/CreateAssignmentRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/AssignmentResponse"
-                                }
-                            }
-                        }
-                    },
-                    "default": {
-                        "description": "Phản hồi lỗi mặc định",
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ProblemDetail"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Bearer Authentication": []
-                    }
-                ]
-            }
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SkillResponse" } } }
+          },
+          "default": {
+            "description": "Phản hồi lỗi mặc định",
+            "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/ProblemDetail" } } }
+          }
         },
-        "/api/v1/assignments/{id}/publish": {
-            "post": {
-                "tags": [
-                    "Quản lý bài tập"
-                ],
-                "summary": "Xuất bản bài tập",
-                "description": "Xuất bản bài tập nháp (chỉ Content Provider)",
-                "operationId": "publishAssignment",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/AssignmentResponse"
-                                }
-                            }
-                        }
-                    },
-                    "default": {
-                        "description": "Phản hồi lỗi mặc định",
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ProblemDetail"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Bearer Authentication": []
-                    }
-                ]
-            }
-        },
-        "/api/v1/assignments/{id}/archive": {
-            "post": {
-                "tags": [
-                    "Quản lý bài tập"
-                ],
-                "summary": "Lưu trữ bài tập",
-                "description": "Lưu trữ bài tập (chỉ Content Provider)",
-                "operationId": "archiveAssignment",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/AssignmentResponse"
-                                }
-                            }
-                        }
-                    },
-                    "default": {
-                        "description": "Phản hồi lỗi mặc định",
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ProblemDetail"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Bearer Authentication": []
-                    }
-                ]
-            }
-        },
-        "/api/v1/tutorials/{id}": {
-            "get": {
-                "tags": [
-                    "Quản lý hướng dẫn"
-                ],
-                "summary": "Lấy hướng dẫn theo ID",
-                "description": "Lấy chi tiết hướng dẫn theo ID",
-                "operationId": "getTutorialById",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/TutorialResponse"
-                                }
-                            }
-                        }
-                    },
-                    "default": {
-                        "description": "Phản hồi lỗi mặc định",
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ProblemDetail"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Bearer Authentication": []
-                    }
-                ]
-            },
-            "delete": {
-                "tags": [
-                    "Quản lý hướng dẫn"
-                ],
-                "summary": "Xóa hướng dẫn",
-                "description": "Xóa hướng dẫn (chỉ Content Provider)",
-                "operationId": "deleteTutorial",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "default": {
-                        "description": "Phản hồi lỗi mặc định",
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ProblemDetail"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Bearer Authentication": []
-                    }
-                ]
-            },
-            "patch": {
-                "tags": [
-                    "Quản lý hướng dẫn"
-                ],
-                "summary": "Cập nhật hướng dẫn",
-                "description": "Cập nhật thông tin hướng dẫn (chỉ Content Provider)",
-                "operationId": "updateTutorial",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UpdateTutorialRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/TutorialResponse"
-                                }
-                            }
-                        }
-                    },
-                    "default": {
-                        "description": "Phản hồi lỗi mặc định",
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ProblemDetail"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Bearer Authentication": []
-                    }
-                ]
-            }
-        },
-        "/api/v1/skills/{id}": {
-            "get": {
-                "tags": [
-                    "Quản lý kỹ năng"
-                ],
-                "summary": "Lấy kỹ năng theo ID",
-                "description": "Lấy chi tiết kỹ năng theo ID",
-                "operationId": "getSkillById",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/SkillResponse"
-                                }
-                            }
-                        }
-                    },
-                    "default": {
-                        "description": "Phản hồi lỗi mặc định",
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ProblemDetail"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Bearer Authentication": []
-                    }
-                ]
-            },
-            "delete": {
-                "tags": [
-                    "Quản lý kỹ năng"
-                ],
-                "summary": "Xóa kỹ năng",
-                "description": "Xóa kỹ năng (chỉ Content Provider)",
-                "operationId": "deleteSkill",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "default": {
-                        "description": "Phản hồi lỗi mặc định",
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ProblemDetail"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Bearer Authentication": []
-                    }
-                ]
-            },
-            "patch": {
-                "tags": [
-                    "Quản lý kỹ năng"
-                ],
-                "summary": "Cập nhật kỹ năng",
-                "description": "Cập nhật thông tin kỹ năng (chỉ Content Provider)",
-                "operationId": "updateSkill",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UpdateSkillRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/SkillResponse"
-                                }
-                            }
-                        }
-                    },
-                    "default": {
-                        "description": "Phản hồi lỗi mặc định",
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ProblemDetail"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Bearer Authentication": []
-                    }
-                ]
-            }
-        },
-        "/api/v1/assignments/{id}": {
-            "get": {
-                "tags": [
-                    "Quản lý bài tập"
-                ],
-                "summary": "Lấy bài tập theo ID",
-                "description": "Lấy chi tiết bài tập theo ID",
-                "operationId": "getAssignmentById",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/AssignmentResponse"
-                                }
-                            }
-                        }
-                    },
-                    "default": {
-                        "description": "Phản hồi lỗi mặc định",
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ProblemDetail"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Bearer Authentication": []
-                    }
-                ]
-            },
-            "delete": {
-                "tags": [
-                    "Quản lý bài tập"
-                ],
-                "summary": "Xóa bài tập",
-                "description": "Xóa bài tập (chỉ Content Provider)",
-                "operationId": "deleteAssignment",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "default": {
-                        "description": "Phản hồi lỗi mặc định",
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ProblemDetail"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Bearer Authentication": []
-                    }
-                ]
-            },
-            "patch": {
-                "tags": [
-                    "Quản lý bài tập"
-                ],
-                "summary": "Cập nhật bài tập",
-                "description": "Cập nhật thông tin bài tập (chỉ Content Provider)",
-                "operationId": "updateAssignment",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UpdateAssignmentRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/AssignmentResponse"
-                                }
-                            }
-                        }
-                    },
-                    "default": {
-                        "description": "Phản hồi lỗi mặc định",
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ProblemDetail"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Bearer Authentication": []
-                    }
-                ]
-            }
-        },
-        "/api/v1/assignments/{id}/schedule": {
-            "patch": {
-                "tags": [
-                    "Quản lý bài tập"
-                ],
-                "summary": "Cập nhật lịch bài tập",
-                "description": "Cập nhật lịch bài tập (start_date, due_date) (chỉ Giảng viên)",
-                "operationId": "updateAssignmentSchedule",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UpdateAssignmentScheduleRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/AssignmentResponse"
-                                }
-                            }
-                        }
-                    },
-                    "default": {
-                        "description": "Phản hồi lỗi mặc định",
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ProblemDetail"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Bearer Authentication": []
-                    }
-                ]
-            }
-        }
+        "security": [{ "Bearer Authentication": [] }]
+      }
     },
-    "components": {
-        "schemas": {
-            "CreateTutorialRequest": {
-                "type": "object",
-                "properties": {
-                    "title": {
-                        "type": "string",
-                        "maxLength": 255,
-                        "minLength": 0
-                    },
-                    "content": {
-                        "type": "string",
-                        "minLength": 1
-                    },
-                    "tags": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    }
-                },
-                "required": [
-                    "content",
-                    "title"
-                ]
-            },
-            "TutorialResponse": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string",
-                        "format": "uuid"
-                    },
-                    "title": {
-                        "type": "string"
-                    },
-                    "content": {
-                        "type": "string"
-                    },
-                    "creatorId": {
-                        "type": "string",
-                        "format": "uuid"
-                    },
-                    "createdAt": {
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "updatedAt": {
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "tags": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    }
-                }
-            },
-            "CreateSkillRequest": {
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "type": "string",
-                        "maxLength": 255,
-                        "minLength": 0
-                    },
-                    "description": {
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "name"
-                ]
-            },
-            "SkillResponse": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string",
-                        "format": "uuid"
-                    },
-                    "name": {
-                        "type": "string"
-                    },
-                    "description": {
-                        "type": "string"
-                    },
-                    "createdAt": {
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "updatedAt": {
-                        "type": "string",
-                        "format": "date-time"
-                    }
-                }
-            },
-            "CreateAssignmentRequest": {
-                "type": "object",
-                "properties": {
-                    "title": {
-                        "type": "string",
-                        "maxLength": 255,
-                        "minLength": 0
-                    },
-                    "description": {
-                        "type": "string",
-                        "minLength": 1
-                    },
-                    "difficultyLevel": {
-                        "type": "string",
-                        "enum": [
-                            "EASY",
-                            "MEDIUM",
-                            "HARD"
-                        ]
-                    },
-                    "startDate": {
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "dueDate": {
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "maxScore": {
-                        "type": "number",
-                        "maximum": 999.99,
-                        "minimum": 0.0
-                    },
-                    "languages": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        },
-                        "maxItems": 2147483647,
-                        "minItems": 1
-                    },
-                    "testCases": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/TestCase"
-                        },
-                        "maxItems": 2147483647,
-                        "minItems": 1
-                    },
-                    "skillIds": {
-                        "type": "array",
-                        "items": {
-                            "type": "string",
-                            "format": "uuid"
-                        },
-                        "uniqueItems": true
-                    },
-                    "tutorialIds": {
-                        "type": "array",
-                        "items": {
-                            "type": "string",
-                            "format": "uuid"
-                        },
-                        "uniqueItems": true
-                    }
-                },
-                "required": [
-                    "description",
-                    "difficultyLevel",
-                    "languages",
-                    "maxScore",
-                    "testCases",
-                    "title"
-                ]
-            },
-            "TestCase": {
-                "type": "object",
-                "properties": {
-                    "order": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "description": {
-                        "type": "string"
-                    },
-                    "hidden": {
-                        "type": "boolean"
-                    },
-                    "weight": {
-                        "type": "number",
-                        "format": "double"
-                    },
-                    "input": {
-                        "type": "string"
-                    },
-                    "output": {
-                        "type": "string"
-                    },
-                    "timeout": {
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    "memoryLimit": {
-                        "type": "integer",
-                        "format": "int32"
-                    }
-                }
-            },
-            "AssignmentResponse": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string",
-                        "format": "uuid"
-                    },
-                    "title": {
-                        "type": "string"
-                    },
-                    "description": {
-                        "type": "string"
-                    },
-                    "difficultyLevel": {
-                        "type": "string",
-                        "enum": [
-                            "EASY",
-                            "MEDIUM",
-                            "HARD"
-                        ]
-                    },
-                    "creatorId": {
-                        "type": "string",
-                        "format": "uuid"
-                    },
-                    "createdAt": {
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "updatedAt": {
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "startDate": {
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "dueDate": {
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "maxScore": {
-                        "type": "number"
-                    },
-                    "status": {
-                        "type": "string",
-                        "enum": [
-                            "DRAFT",
-                            "PUBLISHED",
-                            "ARCHIVED"
-                        ]
-                    },
-                    "languages": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    "testCases": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/TestCase"
-                        }
-                    },
-                    "skills": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/SkillResponse"
-                        },
-                        "uniqueItems": true
-                    },
-                    "tutorials": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/TutorialResponse"
-                        },
-                        "uniqueItems": true
-                    }
-                }
-            },
-            "UpdateTutorialRequest": {
-                "type": "object",
-                "properties": {
-                    "title": {
-                        "type": "string",
-                        "maxLength": 255,
-                        "minLength": 0
-                    },
-                    "content": {
-                        "type": "string"
-                    },
-                    "tags": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    }
-                }
-            },
-            "UpdateSkillRequest": {
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "type": "string",
-                        "maxLength": 255,
-                        "minLength": 0
-                    },
-                    "description": {
-                        "type": "string"
-                    }
-                }
-            },
-            "UpdateAssignmentRequest": {
-                "type": "object",
-                "properties": {
-                    "title": {
-                        "type": "string",
-                        "maxLength": 255,
-                        "minLength": 0
-                    },
-                    "description": {
-                        "type": "string"
-                    },
-                    "difficultyLevel": {
-                        "type": "string",
-                        "enum": [
-                            "EASY",
-                            "MEDIUM",
-                            "HARD"
-                        ]
-                    },
-                    "startDate": {
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "dueDate": {
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "maxScore": {
-                        "type": "number",
-                        "maximum": 999.99,
-                        "minimum": 0.0
-                    },
-                    "languages": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        },
-                        "maxItems": 2147483647,
-                        "minItems": 1
-                    },
-                    "testCases": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/TestCase"
-                        },
-                        "maxItems": 2147483647,
-                        "minItems": 1
-                    },
-                    "skillIds": {
-                        "type": "array",
-                        "items": {
-                            "type": "string",
-                            "format": "uuid"
-                        },
-                        "uniqueItems": true
-                    },
-                    "tutorialIds": {
-                        "type": "array",
-                        "items": {
-                            "type": "string",
-                            "format": "uuid"
-                        },
-                        "uniqueItems": true
-                    }
-                }
-            },
-            "UpdateAssignmentScheduleRequest": {
-                "type": "object",
-                "properties": {
-                    "startDate": {
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "dueDate": {
-                        "type": "string",
-                        "format": "date-time"
-                    }
-                },
-                "required": [
-                    "dueDate",
-                    "startDate"
-                ]
-            },
-            "PageResponseTutorialResponse": {
-                "type": "object",
-                "description": "Lớp bọc phản hồi phân trang",
-                "properties": {
-                    "content": {
-                        "type": "array",
-                        "description": "Danh sách phần tử trong trang hiện tại",
-                        "items": {
-                            "$ref": "#/components/schemas/TutorialResponse"
-                        }
-                    },
-                    "pageNumber": {
-                        "type": "integer",
-                        "format": "int32",
-                        "description": "Số trang hiện tại (bắt đầu từ 0)",
-                        "example": 0
-                    },
-                    "pageSize": {
-                        "type": "integer",
-                        "format": "int32",
-                        "description": "Số lượng phần tử mỗi trang",
-                        "example": 10
-                    },
-                    "totalElements": {
-                        "type": "integer",
-                        "format": "int64",
-                        "description": "Tổng số phần tử trên tất cả các trang",
-                        "example": 100
-                    },
-                    "totalPages": {
-                        "type": "integer",
-                        "format": "int32",
-                        "description": "Tổng số trang",
-                        "example": 10
-                    },
-                    "first": {
-                        "type": "boolean",
-                        "description": "Có phải trang đầu tiên không",
-                        "example": true
-                    },
-                    "last": {
-                        "type": "boolean",
-                        "description": "Có phải trang cuối cùng không",
-                        "example": false
-                    },
-                    "hasNext": {
-                        "type": "boolean",
-                        "description": "Có trang tiếp theo không",
-                        "example": true
-                    },
-                    "hasPrevious": {
-                        "type": "boolean",
-                        "description": "Có trang trước đó không",
-                        "example": false
-                    }
-                }
-            },
-            "PageResponseSkillResponse": {
-                "type": "object",
-                "description": "Lớp bọc phản hồi phân trang",
-                "properties": {
-                    "content": {
-                        "type": "array",
-                        "description": "Danh sách phần tử trong trang hiện tại",
-                        "items": {
-                            "$ref": "#/components/schemas/SkillResponse"
-                        }
-                    },
-                    "pageNumber": {
-                        "type": "integer",
-                        "format": "int32",
-                        "description": "Số trang hiện tại (bắt đầu từ 0)",
-                        "example": 0
-                    },
-                    "pageSize": {
-                        "type": "integer",
-                        "format": "int32",
-                        "description": "Số lượng phần tử mỗi trang",
-                        "example": 10
-                    },
-                    "totalElements": {
-                        "type": "integer",
-                        "format": "int64",
-                        "description": "Tổng số phần tử trên tất cả các trang",
-                        "example": 100
-                    },
-                    "totalPages": {
-                        "type": "integer",
-                        "format": "int32",
-                        "description": "Tổng số trang",
-                        "example": 10
-                    },
-                    "first": {
-                        "type": "boolean",
-                        "description": "Có phải trang đầu tiên không",
-                        "example": true
-                    },
-                    "last": {
-                        "type": "boolean",
-                        "description": "Có phải trang cuối cùng không",
-                        "example": false
-                    },
-                    "hasNext": {
-                        "type": "boolean",
-                        "description": "Có trang tiếp theo không",
-                        "example": true
-                    },
-                    "hasPrevious": {
-                        "type": "boolean",
-                        "description": "Có trang trước đó không",
-                        "example": false
-                    }
-                }
-            },
-            "PageResponseAssignmentResponse": {
-                "type": "object",
-                "description": "Lớp bọc phản hồi phân trang",
-                "properties": {
-                    "content": {
-                        "type": "array",
-                        "description": "Danh sách phần tử trong trang hiện tại",
-                        "items": {
-                            "$ref": "#/components/schemas/AssignmentResponse"
-                        }
-                    },
-                    "pageNumber": {
-                        "type": "integer",
-                        "format": "int32",
-                        "description": "Số trang hiện tại (bắt đầu từ 0)",
-                        "example": 0
-                    },
-                    "pageSize": {
-                        "type": "integer",
-                        "format": "int32",
-                        "description": "Số lượng phần tử mỗi trang",
-                        "example": 10
-                    },
-                    "totalElements": {
-                        "type": "integer",
-                        "format": "int64",
-                        "description": "Tổng số phần tử trên tất cả các trang",
-                        "example": 100
-                    },
-                    "totalPages": {
-                        "type": "integer",
-                        "format": "int32",
-                        "description": "Tổng số trang",
-                        "example": 10
-                    },
-                    "first": {
-                        "type": "boolean",
-                        "description": "Có phải trang đầu tiên không",
-                        "example": true
-                    },
-                    "last": {
-                        "type": "boolean",
-                        "description": "Có phải trang cuối cùng không",
-                        "example": false
-                    },
-                    "hasNext": {
-                        "type": "boolean",
-                        "description": "Có trang tiếp theo không",
-                        "example": true
-                    },
-                    "hasPrevious": {
-                        "type": "boolean",
-                        "description": "Có trang trước đó không",
-                        "example": false
-                    }
-                }
-            },
-            "ProblemDetail": {
-                "description": "Chi tiết lỗi theo chuẩn RFC 9457",
-                "properties": {
-                    "type": {
-                        "format": "uri",
-                        "description": "Loại lỗi (URI)"
-                    },
-                    "title": {
-                        "description": "Tiêu đề lỗi"
-                    },
-                    "status": {
-                        "format": "int32",
-                        "description": "Mã trạng thái HTTP"
-                    },
-                    "detail": {
-                        "description": "Mô tả chi tiết lỗi"
-                    },
-                    "instance": {
-                        "format": "uri",
-                        "description": "Đường dẫn instance lỗi"
-                    }
-                }
+    "/api/v1/assignments": {
+      "get": {
+        "tags": ["Quản lý bài tập"],
+        "summary": "Lấy tất cả bài tập",
+        "description": "Lấy danh sách bài tập có phân trang và sắp xếp",
+        "operationId": "getAllAssignments",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Số trang (bắt đầu từ 0)",
+            "required": false,
+            "schema": { "type": "string", "minimum": 0 },
+            "example": 0
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Số lượng phần tử mỗi trang",
+            "required": false,
+            "schema": { "type": "string", "maximum": 100, "minimum": 1 },
+            "example": 10
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/PageResponseAssignmentResponse" } }
             }
+          },
+          "default": {
+            "description": "Phản hồi lỗi mặc định",
+            "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/ProblemDetail" } } }
+          }
         },
-        "securitySchemes": {
-            "Bearer Authentication": {
-                "type": "http",
-                "scheme": "bearer",
-                "bearerFormat": "JWT"
-            }
-        }
+        "security": [{ "Bearer Authentication": [] }]
+      },
+      "post": {
+        "tags": ["Quản lý bài tập"],
+        "summary": "Tạo bài tập mới",
+        "description": "Tạo mới bài tập (chỉ Content Provider)",
+        "operationId": "createAssignment",
+        "requestBody": {
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreateAssignmentRequest" } } },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AssignmentResponse" } } }
+          },
+          "default": {
+            "description": "Phản hồi lỗi mặc định",
+            "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/ProblemDetail" } } }
+          }
+        },
+        "security": [{ "Bearer Authentication": [] }]
+      }
+    },
+    "/api/v1/assignments/{id}/publish": {
+      "post": {
+        "tags": ["Quản lý bài tập"],
+        "summary": "Xuất bản bài tập",
+        "description": "Xuất bản bài tập nháp (chỉ Content Provider)",
+        "operationId": "publishAssignment",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AssignmentResponse" } } }
+          },
+          "default": {
+            "description": "Phản hồi lỗi mặc định",
+            "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/ProblemDetail" } } }
+          }
+        },
+        "security": [{ "Bearer Authentication": [] }]
+      }
+    },
+    "/api/v1/assignments/{id}/archive": {
+      "post": {
+        "tags": ["Quản lý bài tập"],
+        "summary": "Lưu trữ bài tập",
+        "description": "Lưu trữ bài tập (chỉ Content Provider)",
+        "operationId": "archiveAssignment",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AssignmentResponse" } } }
+          },
+          "default": {
+            "description": "Phản hồi lỗi mặc định",
+            "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/ProblemDetail" } } }
+          }
+        },
+        "security": [{ "Bearer Authentication": [] }]
+      }
+    },
+    "/api/v1/tutorials/{id}": {
+      "get": {
+        "tags": ["Quản lý hướng dẫn"],
+        "summary": "Lấy hướng dẫn theo ID",
+        "description": "Lấy chi tiết hướng dẫn theo ID",
+        "operationId": "getTutorialById",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TutorialResponse" } } }
+          },
+          "default": {
+            "description": "Phản hồi lỗi mặc định",
+            "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/ProblemDetail" } } }
+          }
+        },
+        "security": [{ "Bearer Authentication": [] }]
+      },
+      "delete": {
+        "tags": ["Quản lý hướng dẫn"],
+        "summary": "Xóa hướng dẫn",
+        "description": "Xóa hướng dẫn (chỉ Content Provider)",
+        "operationId": "deleteTutorial",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "responses": {
+          "204": { "description": "No Content" },
+          "default": {
+            "description": "Phản hồi lỗi mặc định",
+            "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/ProblemDetail" } } }
+          }
+        },
+        "security": [{ "Bearer Authentication": [] }]
+      },
+      "patch": {
+        "tags": ["Quản lý hướng dẫn"],
+        "summary": "Cập nhật hướng dẫn",
+        "description": "Cập nhật thông tin hướng dẫn (chỉ Content Provider)",
+        "operationId": "updateTutorial",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "requestBody": {
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdateTutorialRequest" } } },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TutorialResponse" } } }
+          },
+          "default": {
+            "description": "Phản hồi lỗi mặc định",
+            "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/ProblemDetail" } } }
+          }
+        },
+        "security": [{ "Bearer Authentication": [] }]
+      }
+    },
+    "/api/v1/skills/{id}": {
+      "get": {
+        "tags": ["Quản lý kỹ năng"],
+        "summary": "Lấy kỹ năng theo ID",
+        "description": "Lấy chi tiết kỹ năng theo ID",
+        "operationId": "getSkillById",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SkillResponse" } } }
+          },
+          "default": {
+            "description": "Phản hồi lỗi mặc định",
+            "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/ProblemDetail" } } }
+          }
+        },
+        "security": [{ "Bearer Authentication": [] }]
+      },
+      "delete": {
+        "tags": ["Quản lý kỹ năng"],
+        "summary": "Xóa kỹ năng",
+        "description": "Xóa kỹ năng (chỉ Content Provider)",
+        "operationId": "deleteSkill",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "responses": {
+          "204": { "description": "No Content" },
+          "default": {
+            "description": "Phản hồi lỗi mặc định",
+            "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/ProblemDetail" } } }
+          }
+        },
+        "security": [{ "Bearer Authentication": [] }]
+      },
+      "patch": {
+        "tags": ["Quản lý kỹ năng"],
+        "summary": "Cập nhật kỹ năng",
+        "description": "Cập nhật thông tin kỹ năng (chỉ Content Provider)",
+        "operationId": "updateSkill",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "requestBody": {
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdateSkillRequest" } } },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SkillResponse" } } }
+          },
+          "default": {
+            "description": "Phản hồi lỗi mặc định",
+            "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/ProblemDetail" } } }
+          }
+        },
+        "security": [{ "Bearer Authentication": [] }]
+      }
+    },
+    "/api/v1/assignments/{id}": {
+      "get": {
+        "tags": ["Quản lý bài tập"],
+        "summary": "Lấy bài tập theo ID",
+        "description": "Lấy chi tiết bài tập theo ID",
+        "operationId": "getAssignmentById",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AssignmentResponse" } } }
+          },
+          "default": {
+            "description": "Phản hồi lỗi mặc định",
+            "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/ProblemDetail" } } }
+          }
+        },
+        "security": [{ "Bearer Authentication": [] }]
+      },
+      "delete": {
+        "tags": ["Quản lý bài tập"],
+        "summary": "Xóa bài tập",
+        "description": "Xóa bài tập (chỉ Content Provider)",
+        "operationId": "deleteAssignment",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "responses": {
+          "204": { "description": "No Content" },
+          "default": {
+            "description": "Phản hồi lỗi mặc định",
+            "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/ProblemDetail" } } }
+          }
+        },
+        "security": [{ "Bearer Authentication": [] }]
+      },
+      "patch": {
+        "tags": ["Quản lý bài tập"],
+        "summary": "Cập nhật bài tập",
+        "description": "Cập nhật thông tin bài tập (chỉ Content Provider)",
+        "operationId": "updateAssignment",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "requestBody": {
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdateAssignmentRequest" } } },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AssignmentResponse" } } }
+          },
+          "default": {
+            "description": "Phản hồi lỗi mặc định",
+            "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/ProblemDetail" } } }
+          }
+        },
+        "security": [{ "Bearer Authentication": [] }]
+      }
+    },
+    "/api/v1/assignments/{id}/schedule": {
+      "patch": {
+        "tags": ["Quản lý bài tập"],
+        "summary": "Cập nhật lịch bài tập",
+        "description": "Cập nhật lịch bài tập (start_date, due_date) (chỉ Giảng viên)",
+        "operationId": "updateAssignmentSchedule",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/UpdateAssignmentScheduleRequest" } }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AssignmentResponse" } } }
+          },
+          "default": {
+            "description": "Phản hồi lỗi mặc định",
+            "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/ProblemDetail" } } }
+          }
+        },
+        "security": [{ "Bearer Authentication": [] }]
+      }
     }
+  },
+  "components": {
+    "schemas": {
+      "CreateTutorialRequest": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string", "maxLength": 255, "minLength": 0 },
+          "content": { "type": "string", "minLength": 1 },
+          "tags": { "type": "array", "items": { "type": "string" } }
+        },
+        "required": ["content", "title"]
+      },
+      "TutorialResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "title": { "type": "string" },
+          "content": { "type": "string" },
+          "creatorId": { "type": "string", "format": "uuid" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" },
+          "tags": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "CreateSkillRequest": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "maxLength": 255, "minLength": 0 },
+          "description": { "type": "string" }
+        },
+        "required": ["name"]
+      },
+      "SkillResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "CreateAssignmentRequest": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string", "maxLength": 255, "minLength": 0 },
+          "description": { "type": "string", "minLength": 1 },
+          "difficultyLevel": { "type": "string", "enum": ["EASY", "MEDIUM", "HARD"] },
+          "startDate": { "type": "string", "format": "date-time" },
+          "dueDate": { "type": "string", "format": "date-time" },
+          "maxScore": { "type": "number", "maximum": 999.99, "minimum": 0.0 },
+          "languages": { "type": "array", "items": { "type": "string" }, "maxItems": 2147483647, "minItems": 1 },
+          "testCases": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/TestCase" },
+            "maxItems": 2147483647,
+            "minItems": 1
+          },
+          "skillIds": { "type": "array", "items": { "type": "string", "format": "uuid" }, "uniqueItems": true },
+          "tutorialIds": { "type": "array", "items": { "type": "string", "format": "uuid" }, "uniqueItems": true }
+        },
+        "required": ["description", "difficultyLevel", "languages", "maxScore", "testCases", "title"]
+      },
+      "TestCase": {
+        "type": "object",
+        "properties": {
+          "order": { "type": "integer", "format": "int32" },
+          "description": { "type": "string" },
+          "hidden": { "type": "boolean" },
+          "weight": { "type": "number", "format": "double" },
+          "input": { "type": "string" },
+          "output": { "type": "string" },
+          "timeout": { "type": "integer", "format": "int32" },
+          "memoryLimit": { "type": "integer", "format": "int32" }
+        }
+      },
+      "AssignmentResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "difficultyLevel": { "type": "string", "enum": ["EASY", "MEDIUM", "HARD"] },
+          "creatorId": { "type": "string", "format": "uuid" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" },
+          "startDate": { "type": "string", "format": "date-time" },
+          "dueDate": { "type": "string", "format": "date-time" },
+          "maxScore": { "type": "number" },
+          "status": { "type": "string", "enum": ["DRAFT", "PUBLISHED", "ARCHIVED"] },
+          "languages": { "type": "array", "items": { "type": "string" } },
+          "testCases": { "type": "array", "items": { "$ref": "#/components/schemas/TestCase" } },
+          "skills": { "type": "array", "items": { "$ref": "#/components/schemas/SkillResponse" }, "uniqueItems": true },
+          "tutorials": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/TutorialResponse" },
+            "uniqueItems": true
+          }
+        }
+      },
+      "UpdateTutorialRequest": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string", "maxLength": 255, "minLength": 0 },
+          "content": { "type": "string" },
+          "tags": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "UpdateSkillRequest": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "maxLength": 255, "minLength": 0 },
+          "description": { "type": "string" }
+        }
+      },
+      "UpdateAssignmentRequest": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string", "maxLength": 255, "minLength": 0 },
+          "description": { "type": "string" },
+          "difficultyLevel": { "type": "string", "enum": ["EASY", "MEDIUM", "HARD"] },
+          "startDate": { "type": "string", "format": "date-time" },
+          "dueDate": { "type": "string", "format": "date-time" },
+          "maxScore": { "type": "number", "maximum": 999.99, "minimum": 0.0 },
+          "languages": { "type": "array", "items": { "type": "string" }, "maxItems": 2147483647, "minItems": 1 },
+          "testCases": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/TestCase" },
+            "maxItems": 2147483647,
+            "minItems": 1
+          },
+          "skillIds": { "type": "array", "items": { "type": "string", "format": "uuid" }, "uniqueItems": true },
+          "tutorialIds": { "type": "array", "items": { "type": "string", "format": "uuid" }, "uniqueItems": true }
+        }
+      },
+      "UpdateAssignmentScheduleRequest": {
+        "type": "object",
+        "properties": {
+          "startDate": { "type": "string", "format": "date-time" },
+          "dueDate": { "type": "string", "format": "date-time" }
+        },
+        "required": ["dueDate", "startDate"]
+      },
+      "PageResponseTutorialResponse": {
+        "type": "object",
+        "description": "Lớp bọc phản hồi phân trang",
+        "properties": {
+          "content": {
+            "type": "array",
+            "description": "Danh sách phần tử trong trang hiện tại",
+            "items": { "$ref": "#/components/schemas/TutorialResponse" }
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Số trang hiện tại (bắt đầu từ 0)",
+            "example": 0
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Số lượng phần tử mỗi trang",
+            "example": 10
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Tổng số phần tử trên tất cả các trang",
+            "example": 100
+          },
+          "totalPages": { "type": "integer", "format": "int32", "description": "Tổng số trang", "example": 10 },
+          "first": { "type": "boolean", "description": "Có phải trang đầu tiên không", "example": true },
+          "last": { "type": "boolean", "description": "Có phải trang cuối cùng không", "example": false },
+          "hasNext": { "type": "boolean", "description": "Có trang tiếp theo không", "example": true },
+          "hasPrevious": { "type": "boolean", "description": "Có trang trước đó không", "example": false }
+        }
+      },
+      "PageResponseSkillResponse": {
+        "type": "object",
+        "description": "Lớp bọc phản hồi phân trang",
+        "properties": {
+          "content": {
+            "type": "array",
+            "description": "Danh sách phần tử trong trang hiện tại",
+            "items": { "$ref": "#/components/schemas/SkillResponse" }
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Số trang hiện tại (bắt đầu từ 0)",
+            "example": 0
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Số lượng phần tử mỗi trang",
+            "example": 10
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Tổng số phần tử trên tất cả các trang",
+            "example": 100
+          },
+          "totalPages": { "type": "integer", "format": "int32", "description": "Tổng số trang", "example": 10 },
+          "first": { "type": "boolean", "description": "Có phải trang đầu tiên không", "example": true },
+          "last": { "type": "boolean", "description": "Có phải trang cuối cùng không", "example": false },
+          "hasNext": { "type": "boolean", "description": "Có trang tiếp theo không", "example": true },
+          "hasPrevious": { "type": "boolean", "description": "Có trang trước đó không", "example": false }
+        }
+      },
+      "PageResponseAssignmentResponse": {
+        "type": "object",
+        "description": "Lớp bọc phản hồi phân trang",
+        "properties": {
+          "content": {
+            "type": "array",
+            "description": "Danh sách phần tử trong trang hiện tại",
+            "items": { "$ref": "#/components/schemas/AssignmentResponse" }
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Số trang hiện tại (bắt đầu từ 0)",
+            "example": 0
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Số lượng phần tử mỗi trang",
+            "example": 10
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Tổng số phần tử trên tất cả các trang",
+            "example": 100
+          },
+          "totalPages": { "type": "integer", "format": "int32", "description": "Tổng số trang", "example": 10 },
+          "first": { "type": "boolean", "description": "Có phải trang đầu tiên không", "example": true },
+          "last": { "type": "boolean", "description": "Có phải trang cuối cùng không", "example": false },
+          "hasNext": { "type": "boolean", "description": "Có trang tiếp theo không", "example": true },
+          "hasPrevious": { "type": "boolean", "description": "Có trang trước đó không", "example": false }
+        }
+      },
+      "ProblemDetail": {
+        "description": "Chi tiết lỗi theo chuẩn RFC 9457",
+        "properties": {
+          "type": { "format": "uri", "description": "Loại lỗi (URI)" },
+          "title": { "description": "Tiêu đề lỗi" },
+          "status": { "format": "int32", "description": "Mã trạng thái HTTP" },
+          "detail": { "description": "Mô tả chi tiết lỗi" },
+          "instance": { "format": "uri", "description": "Đường dẫn instance lỗi" }
+        }
+      }
+    },
+    "securitySchemes": { "Bearer Authentication": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" } }
+  }
 }

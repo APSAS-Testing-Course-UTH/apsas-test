@@ -1,7 +1,7 @@
 package apsas.evaluation.mapper;
 
 import apsas.feign.dto.TestCaseDto;
-import apsas.shared.models.submission.TestCaseResultDto;
+import apsas.shared.models.submission.TestCaseResultResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -22,5 +22,5 @@ public interface TestCaseMapper {
   @Mapping(target = "errorMessage", ignore = true)
   @Mapping(target = "executionTime", ignore = true)
   @Mapping(target = "memoryUsed", ignore = true)
-  TestCaseResultDto toTestCaseResult(TestCaseDto testCase);
+  TestCaseResultResponse toTestCaseResult(TestCaseDto testCase);
 }

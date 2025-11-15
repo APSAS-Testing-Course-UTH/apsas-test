@@ -23,8 +23,8 @@ public final class SubmissionCreatedEvent extends BaseEvent {
   private UUID assignmentId;
   /** ID của sinh viên nộp */
   private UUID studentId;
-  /** Mã code được nộp */
-  private String code;
+  /** Mã code được nộp (Base64 encoded) */
+  private String codeBase64;
   /** Ngôn ngữ lập trình */
   private String language;
 }

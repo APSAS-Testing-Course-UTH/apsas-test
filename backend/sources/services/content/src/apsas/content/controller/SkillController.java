@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,17 +23,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Bộ điều khiển quản lý kỹ năng cho hệ thống APSAS.
- * Cung cấp các API tạo, cập nhật, xóa và phân trang kỹ năng.
+ * Bộ điều khiển quản lý kỹ năng cho hệ thống APSAS. Cung cấp các API tạo, cập nhật, xóa và phân
+ * trang kỹ năng.
  */
 @RestController
 @RequestMapping(
-  value = "/api/v1/skills",
-  consumes = MediaType.APPLICATION_JSON_VALUE,
-  produces = MediaType.APPLICATION_JSON_VALUE
+    value = "/api/v1/skills",
+    produces = MediaType.APPLICATION_JSON_VALUE
 )
 @Tag(name = "Quản lý kỹ năng", description = "Các API quản lý kỹ năng")
 @SecurityRequirement(name = "Bearer Authentication")
@@ -44,6 +43,7 @@ public class SkillController {
 
   /**
    * Lấy danh sách tất cả kỹ năng có phân trang và sắp xếp.
+   *
    * @param pageParams Tham số phân trang
    * @return Danh sách kỹ năng
    */
@@ -61,10 +61,11 @@ public class SkillController {
 
   /**
    * Lấy chi tiết kỹ năng theo ID.
+   *
    * @param id ID kỹ năng
    * @return Thông tin kỹ năng
    */
-  @GetMapping("/{id}")
+  @GetMapping(value = "/{id}")
   @Operation(summary = "Lấy kỹ năng theo ID", description = "Lấy chi tiết kỹ năng theo ID")
   public ResponseEntity<SkillResponse> getSkillById(
       @PathVariable
@@ -76,10 +77,11 @@ public class SkillController {
 
   /**
    * Tạo mới kỹ năng (chỉ Content Provider).
+   *
    * @param request Dữ liệu kỹ năng mới
    * @return Thông tin kỹ năng vừa tạo
    */
-  @PostMapping
+  @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("hasRole('CONTENT_PROVIDER')")
   @Operation(
       summary = "Tạo kỹ năng mới",
@@ -97,13 +99,17 @@ public class SkillController {
 
   /**
    * Cập nhật thông tin kỹ năng (chỉ Content Provider).
-   * @param id ID kỹ năng
+   *
+   * @param id      ID kỹ năng
    * @param request Dữ liệu cập nhật
    * @return Thông tin kỹ năng đã cập nhật
    */
-  @PatchMapping("/{id}")
+  @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("hasRole('CONTENT_PROVIDER')")
-  @Operation(summary = "Cập nhật kỹ năng", description = "Cập nhật thông tin kỹ năng (chỉ Content Provider)")
+  @Operation(
+      summary = "Cập nhật kỹ năng",
+      description = "Cập nhật thông tin kỹ năng (chỉ Content Provider)"
+  )
   public ResponseEntity<SkillResponse> updateSkill(
       @PathVariable
       UUID id,
@@ -117,6 +123,7 @@ public class SkillController {
 
   /**
    * Xóa kỹ năng (chỉ Content Provider).
+   *
    * @param id ID kỹ năng
    */
   @DeleteMapping("/{id}")

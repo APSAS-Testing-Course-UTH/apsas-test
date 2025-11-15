@@ -1,8 +1,8 @@
 package apsas.submission.model.dto;
 
+import apsas.shared.models.submission.TestCaseResultResponse;
 import apsas.submission.model.entity.SubmissionResult;
 import apsas.submission.model.entity.SubmissionStatus;
-import apsas.shared.models.submission.TestCaseResultDto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,7 +26,7 @@ public class SubmissionResponse {
   private String language;
   private SubmissionResult result;
   private BigDecimal score;
-  private List<TestCaseResultDto> testCaseResults;
+  private List<TestCaseResultResponse> testCaseResults;
   private LocalDateTime evaluatedAt;
   private String feedback;
 

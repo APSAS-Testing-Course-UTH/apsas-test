@@ -1,0 +1,56 @@
+@startuml Submission Service ERD
+!pragma layout elk
+skinparam linetype ortho
+
+title Submission Service ERD
+
+class "submissions" as submissions {
+    <b> id : UUID <<PK>>
+    --
+    assignment_id : UUID
+    student_id : UUID
+    submitted_at : TIMESTAMP
+    status : VARCHAR(50)
+    code : TEXT
+    language : VARCHAR(100)
+    result : VARCHAR(50)
+    score : DECIMAL(5,2)
+    test_case_results : JSONB
+    evaluated_at : TIMESTAMP
+    feedback : TEXT
+}
+
+enum "SubmissionStatus" as SubmissionStatus {
+    PENDING
+    EVALUATED
+    FAILED
+}
+
+enum "SubmissionResult" as SubmissionResult {
+    PASSED
+    FAILED
+    PARTIAL
+}
+
+json "TestCaseResult (JSON)" as TestCaseResult {
+    "order" : "Integer",
+    "description" : "String",
+    "hidden" : "Boolean",
+    "weight" : "Double",
+    "input" : "String",
+    "output" : "String",
+    "timeout" : "Integer",
+    "memoryLimit" : "Integer",
+    "passed" : "Boolean",
+    "actualOutput" : "String",
+    "errorMessage" : "String",
+    "executionTime" : "Double",
+    "memoryUsed" : "Double"
+}
+
+SubmissionStatus -- submissions::status
+SubmissionResult -- submissions::result
+TestCaseResult -- submissions::test_case_results
+
+hide submissions circle
+@enduml

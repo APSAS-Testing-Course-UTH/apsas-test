@@ -2,3 +2,9 @@ logging:
   level:
     vn.id.tozydev.apsas: DEBUG
     org.springframework.security: DEBUG
+
+server:
+  error:
+    include-exception: true
+    include-message: always
+    include-stacktrace: always

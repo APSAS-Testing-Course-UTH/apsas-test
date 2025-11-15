@@ -1,0 +1,37 @@
+@startuml Notification Service ERD
+!pragma layout elk
+skinparam linetype ortho
+
+title Notification Service ERD
+
+class "device_tokens" as device_tokens {
+    <b> id : UUID <<PK>>
+    --
+    user_id : UUID
+    token : VARCHAR(255)
+    device_type : VARCHAR(20)
+    user_agent : VARCHAR(500)
+    is_active : BOOLEAN
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+}
+
+class "preferences" as preferences {
+    <b> id : UUID <<PK>>
+    --
+    user_id : UUID
+    email_enabled : BOOLEAN
+    push_enabled : BOOLEAN
+    email_assignment_published : BOOLEAN
+    email_submission_evaluated : BOOLEAN
+    push_assignment_published : BOOLEAN
+    push_submission_evaluated : BOOLEAN
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+}
+
+device_tokens::user_id -- preferences::user_id : "user_id"
+
+hide device_tokens circle
+hide preferences circle
+@enduml

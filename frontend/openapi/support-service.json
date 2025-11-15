@@ -1,586 +1,259 @@
 {
-    "openapi": "3.1.0",
-    "info": {
-        "title": "API APSAS support-service",
-        "description": "Tài liệu API cho APSAS support-service",
-        "version": "1.0"
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API APSAS support-service",
+    "description": "Tài liệu API cho APSAS support-service",
+    "version": "1.0"
+  },
+  "servers": [{ "url": "/", "description": "mặc định" }],
+  "tags": [{ "name": "Quản lý hỗ trợ", "description": "API quản lý phiên hỗ trợ và tin nhắn" }],
+  "paths": {
+    "/api/v1/support/sessions": {
+      "get": {
+        "tags": ["Quản lý hỗ trợ"],
+        "summary": "Liệt kê các phiên hỗ trợ",
+        "description": "Giảng viên xem tất cả phiên, sinh viên chỉ xem phiên của mình",
+        "operationId": "listSessions",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Số trang (bắt đầu từ 0)",
+            "required": false,
+            "schema": { "type": "string", "minimum": 0 },
+            "example": 0
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Số lượng phần tử mỗi trang",
+            "required": false,
+            "schema": { "type": "string", "maximum": 100, "minimum": 1 },
+            "example": 10
+          },
+          { "name": "userId", "in": "query", "required": false, "schema": { "type": "string", "format": "uuid" } },
+          { "name": "email", "in": "query", "required": false, "schema": { "type": "string" } },
+          { "name": "firstName", "in": "query", "required": false, "schema": { "type": "string" } },
+          { "name": "lastName", "in": "query", "required": false, "schema": { "type": "string" } },
+          { "name": "role", "in": "query", "required": false, "schema": { "type": "string" } },
+          { "name": "isActive", "in": "query", "required": false, "schema": { "type": "boolean" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/PageResponseSupportSessionResponse" } }
+            }
+          },
+          "default": {
+            "description": "Phản hồi lỗi mặc định",
+            "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/ProblemDetail" } } }
+          }
+        },
+        "security": [{ "Bearer Authentication": [] }]
+      },
+      "post": {
+        "tags": ["Quản lý hỗ trợ"],
+        "summary": "Tạo phiên hỗ trợ mới",
+        "description": "Sinh viên có thể tạo phiên hỗ trợ mới",
+        "operationId": "createSession",
+        "parameters": [
+          { "name": "userId", "in": "query", "required": false, "schema": { "type": "string", "format": "uuid" } },
+          { "name": "email", "in": "query", "required": false, "schema": { "type": "string" } },
+          { "name": "firstName", "in": "query", "required": false, "schema": { "type": "string" } },
+          { "name": "lastName", "in": "query", "required": false, "schema": { "type": "string" } },
+          { "name": "role", "in": "query", "required": false, "schema": { "type": "string" } },
+          { "name": "isActive", "in": "query", "required": false, "schema": { "type": "boolean" } }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/CreateSupportSessionRequest" } }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SupportSessionResponse" } } }
+          },
+          "default": {
+            "description": "Phản hồi lỗi mặc định",
+            "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/ProblemDetail" } } }
+          }
+        },
+        "security": [{ "Bearer Authentication": [] }]
+      }
     },
-    "servers": [
-        {
-            "url": "/",
-            "description": "mặc định"
-        }
-    ],
-    "tags": [
-        {
-            "name": "Quản lý hỗ trợ",
-            "description": "Quản lý phiên hỗ trợ giữa sinh viên và giảng viên"
-        }
-    ],
-    "paths": {
-        "/api/v1/support/sessions": {
-            "get": {
-                "tags": [
-                    "Quản lý hỗ trợ"
-                ],
-                "summary": "Lấy danh sách phiên hỗ trợ",
-                "description": "Giảng viên xem tất cả phiên hỗ trợ với phân trang, sinh viên chỉ xem phiên của mình",
-                "operationId": "listSessions",
-                "parameters": [
-                    {
-                        "name": "page",
-                        "in": "query",
-                        "description": "Số trang (bắt đầu từ 0)",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "minimum": 0
-                        },
-                        "example": 0
-                    },
-                    {
-                        "name": "size",
-                        "in": "query",
-                        "description": "Số lượng phần tử mỗi trang",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "maximum": 100,
-                            "minimum": 1
-                        },
-                        "example": 10
-                    },
-                    {
-                        "name": "userId",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    },
-                    {
-                        "name": "email",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "firstName",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "lastName",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "role",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "isActive",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "boolean"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/PageResponseSupportSessionDto"
-                                }
-                            }
-                        }
-                    },
-                    "default": {
-                        "description": "Phản hồi lỗi mặc định",
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ProblemDetail"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Bearer Authentication": []
-                    }
-                ]
-            },
-            "post": {
-                "tags": [
-                    "Quản lý hỗ trợ"
-                ],
-                "summary": "Tạo phiên hỗ trợ mới",
-                "description": "Sinh viên có thể tạo phiên hỗ trợ mới",
-                "operationId": "createSession",
-                "parameters": [
-                    {
-                        "name": "userId",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    },
-                    {
-                        "name": "email",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "firstName",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "lastName",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "role",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "isActive",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "boolean"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/CreateSupportSessionRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/SupportSessionDto"
-                                }
-                            }
-                        }
-                    },
-                    "default": {
-                        "description": "Phản hồi lỗi mặc định",
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ProblemDetail"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Bearer Authentication": []
-                    }
-                ]
-            }
+    "/api/v1/support/sessions/{sessionId}/messages": {
+      "post": {
+        "tags": ["Quản lý hỗ trợ"],
+        "summary": "Gửi tin nhắn trong phiên hỗ trợ",
+        "description": "Gửi tin nhắn trong một phiên hỗ trợ",
+        "operationId": "sendMessage",
+        "parameters": [
+          { "name": "sessionId", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } },
+          { "name": "userId", "in": "query", "required": false, "schema": { "type": "string", "format": "uuid" } },
+          { "name": "email", "in": "query", "required": false, "schema": { "type": "string" } },
+          { "name": "firstName", "in": "query", "required": false, "schema": { "type": "string" } },
+          { "name": "lastName", "in": "query", "required": false, "schema": { "type": "string" } },
+          { "name": "role", "in": "query", "required": false, "schema": { "type": "string" } },
+          { "name": "isActive", "in": "query", "required": false, "schema": { "type": "boolean" } }
+        ],
+        "requestBody": {
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SendMessageRequest" } } },
+          "required": true
         },
-        "/api/v1/support/sessions/{id}/close": {
-            "post": {
-                "tags": [
-                    "Quản lý hỗ trợ"
-                ],
-                "summary": "Đóng phiên hỗ trợ",
-                "description": "Chỉ sinh viên tạo phiên mới được đóng phiên hỗ trợ",
-                "operationId": "closeSession",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    },
-                    {
-                        "name": "userId",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    },
-                    {
-                        "name": "email",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "firstName",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "lastName",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "role",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "isActive",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "boolean"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/SupportSessionDto"
-                                }
-                            }
-                        }
-                    },
-                    "default": {
-                        "description": "Phản hồi lỗi mặc định",
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ProblemDetail"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Bearer Authentication": []
-                    }
-                ]
-            }
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SupportSessionResponse" } } }
+          },
+          "default": {
+            "description": "Phản hồi lỗi mặc định",
+            "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/ProblemDetail" } } }
+          }
         },
-        "/api/v1/support/sessions/{id}": {
-            "get": {
-                "tags": [
-                    "Quản lý hỗ trợ"
-                ],
-                "summary": "Lấy phiên hỗ trợ theo ID",
-                "description": "Giảng viên xem được tất cả, sinh viên chỉ xem phiên của mình",
-                "operationId": "getSessionById",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    },
-                    {
-                        "name": "userId",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    },
-                    {
-                        "name": "email",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "firstName",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "lastName",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "role",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "isActive",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "boolean"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/SupportSessionDto"
-                                }
-                            }
-                        }
-                    },
-                    "default": {
-                        "description": "Phản hồi lỗi mặc định",
-                        "content": {
-                            "application/problem+json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ProblemDetail"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "Bearer Authentication": []
-                    }
-                ]
-            }
-        }
+        "security": [{ "Bearer Authentication": [] }]
+      }
     },
-    "components": {
-        "schemas": {
-            "CreateSupportSessionRequest": {
-                "type": "object",
-                "properties": {
-                    "initialMessage": {
-                        "type": "string",
-                        "minLength": 1
-                    }
-                },
-                "required": [
-                    "initialMessage"
-                ]
-            },
-            "SupportMessageDto": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string",
-                        "format": "uuid"
-                    },
-                    "senderId": {
-                        "type": "string",
-                        "format": "uuid"
-                    },
-                    "content": {
-                        "type": "string"
-                    },
-                    "isInstructor": {
-                        "type": "boolean"
-                    },
-                    "isRead": {
-                        "type": "boolean"
-                    },
-                    "createdAt": {
-                        "type": "string",
-                        "format": "date-time"
-                    }
-                }
-            },
-            "SupportSessionDto": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string",
-                        "format": "uuid"
-                    },
-                    "studentId": {
-                        "type": "string",
-                        "format": "uuid"
-                    },
-                    "instructorId": {
-                        "type": "string",
-                        "format": "uuid"
-                    },
-                    "isClosed": {
-                        "type": "boolean"
-                    },
-                    "createdAt": {
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "closedAt": {
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "messages": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/SupportMessageDto"
-                        }
-                    }
-                }
-            },
-            "PageResponseSupportSessionDto": {
-                "type": "object",
-                "description": "Lớp bọc phản hồi phân trang",
-                "properties": {
-                    "content": {
-                        "type": "array",
-                        "description": "Danh sách phần tử trong trang hiện tại",
-                        "items": {
-                            "$ref": "#/components/schemas/SupportSessionDto"
-                        }
-                    },
-                    "pageNumber": {
-                        "type": "integer",
-                        "format": "int32",
-                        "description": "Số trang hiện tại (bắt đầu từ 0)",
-                        "example": 0
-                    },
-                    "pageSize": {
-                        "type": "integer",
-                        "format": "int32",
-                        "description": "Số lượng phần tử mỗi trang",
-                        "example": 10
-                    },
-                    "totalElements": {
-                        "type": "integer",
-                        "format": "int64",
-                        "description": "Tổng số phần tử trên tất cả các trang",
-                        "example": 100
-                    },
-                    "totalPages": {
-                        "type": "integer",
-                        "format": "int32",
-                        "description": "Tổng số trang",
-                        "example": 10
-                    },
-                    "first": {
-                        "type": "boolean",
-                        "description": "Có phải trang đầu tiên không",
-                        "example": true
-                    },
-                    "last": {
-                        "type": "boolean",
-                        "description": "Có phải trang cuối cùng không",
-                        "example": false
-                    },
-                    "hasNext": {
-                        "type": "boolean",
-                        "description": "Có trang tiếp theo không",
-                        "example": true
-                    },
-                    "hasPrevious": {
-                        "type": "boolean",
-                        "description": "Có trang trước đó không",
-                        "example": false
-                    }
-                }
-            },
-            "ProblemDetail": {
-                "description": "Chi tiết lỗi theo chuẩn RFC 9457",
-                "properties": {
-                    "type": {
-                        "format": "uri",
-                        "description": "Loại lỗi (URI)"
-                    },
-                    "title": {
-                        "description": "Tiêu đề lỗi"
-                    },
-                    "status": {
-                        "format": "int32",
-                        "description": "Mã trạng thái HTTP"
-                    },
-                    "detail": {
-                        "description": "Mô tả chi tiết lỗi"
-                    },
-                    "instance": {
-                        "format": "uri",
-                        "description": "Đường dẫn instance lỗi"
-                    }
-                }
-            }
+    "/api/v1/support/sessions/{sessionId}/close": {
+      "post": {
+        "tags": ["Quản lý hỗ trợ"],
+        "summary": "Đóng phiên hỗ trợ",
+        "description": "Chỉ sinh viên tạo phiên mới được đóng phiên",
+        "operationId": "closeSession",
+        "parameters": [
+          { "name": "sessionId", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } },
+          { "name": "userId", "in": "query", "required": false, "schema": { "type": "string", "format": "uuid" } },
+          { "name": "email", "in": "query", "required": false, "schema": { "type": "string" } },
+          { "name": "firstName", "in": "query", "required": false, "schema": { "type": "string" } },
+          { "name": "lastName", "in": "query", "required": false, "schema": { "type": "string" } },
+          { "name": "role", "in": "query", "required": false, "schema": { "type": "string" } },
+          { "name": "isActive", "in": "query", "required": false, "schema": { "type": "boolean" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SupportSessionResponse" } } }
+          },
+          "default": {
+            "description": "Phản hồi lỗi mặc định",
+            "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/ProblemDetail" } } }
+          }
         },
-        "securitySchemes": {
-            "Bearer Authentication": {
-                "type": "http",
-                "scheme": "bearer",
-                "bearerFormat": "JWT"
-            }
-        }
+        "security": [{ "Bearer Authentication": [] }]
+      }
+    },
+    "/api/v1/support/sessions/{sessionId}": {
+      "get": {
+        "tags": ["Quản lý hỗ trợ"],
+        "summary": "Xem chi tiết phiên hỗ trợ",
+        "description": "Giảng viên xem mọi phiên, sinh viên chỉ xem phiên của mình",
+        "operationId": "getSessionById",
+        "parameters": [
+          { "name": "sessionId", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } },
+          { "name": "userId", "in": "query", "required": false, "schema": { "type": "string", "format": "uuid" } },
+          { "name": "email", "in": "query", "required": false, "schema": { "type": "string" } },
+          { "name": "firstName", "in": "query", "required": false, "schema": { "type": "string" } },
+          { "name": "lastName", "in": "query", "required": false, "schema": { "type": "string" } },
+          { "name": "role", "in": "query", "required": false, "schema": { "type": "string" } },
+          { "name": "isActive", "in": "query", "required": false, "schema": { "type": "boolean" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SupportSessionResponse" } } }
+          },
+          "default": {
+            "description": "Phản hồi lỗi mặc định",
+            "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/ProblemDetail" } } }
+          }
+        },
+        "security": [{ "Bearer Authentication": [] }]
+      }
     }
+  },
+  "components": {
+    "schemas": {
+      "CreateSupportSessionRequest": {
+        "type": "object",
+        "properties": { "initialMessage": { "type": "string", "minLength": 1 } },
+        "required": ["initialMessage"]
+      },
+      "SupportMessageResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "sessionId": { "type": "string", "format": "uuid" },
+          "senderId": { "type": "string", "format": "uuid" },
+          "content": { "type": "string" },
+          "isInstructor": { "type": "boolean" },
+          "isRead": { "type": "boolean" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "SupportSessionResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "studentId": { "type": "string", "format": "uuid" },
+          "instructorId": { "type": "string", "format": "uuid" },
+          "isClosed": { "type": "boolean" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "closedAt": { "type": "string", "format": "date-time" },
+          "messages": { "type": "array", "items": { "$ref": "#/components/schemas/SupportMessageResponse" } }
+        }
+      },
+      "SendMessageRequest": {
+        "type": "object",
+        "properties": { "content": { "type": "string", "minLength": 1 } },
+        "required": ["content"]
+      },
+      "PageResponseSupportSessionResponse": {
+        "type": "object",
+        "description": "Lớp bọc phản hồi phân trang",
+        "properties": {
+          "content": {
+            "type": "array",
+            "description": "Danh sách phần tử trong trang hiện tại",
+            "items": { "$ref": "#/components/schemas/SupportSessionResponse" }
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Số trang hiện tại (bắt đầu từ 0)",
+            "example": 0
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Số lượng phần tử mỗi trang",
+            "example": 10
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Tổng số phần tử trên tất cả các trang",
+            "example": 100
+          },
+          "totalPages": { "type": "integer", "format": "int32", "description": "Tổng số trang", "example": 10 },
+          "first": { "type": "boolean", "description": "Có phải trang đầu tiên không", "example": true },
+          "last": { "type": "boolean", "description": "Có phải trang cuối cùng không", "example": false },
+          "hasNext": { "type": "boolean", "description": "Có trang tiếp theo không", "example": true },
+          "hasPrevious": { "type": "boolean", "description": "Có trang trước đó không", "example": false }
+        }
+      },
+      "ProblemDetail": {
+        "description": "Chi tiết lỗi theo chuẩn RFC 9457",
+        "properties": {
+          "type": { "format": "uri", "description": "Loại lỗi (URI)" },
+          "title": { "description": "Tiêu đề lỗi" },
+          "status": { "format": "int32", "description": "Mã trạng thái HTTP" },
+          "detail": { "description": "Mô tả chi tiết lỗi" },
+          "instance": { "format": "uri", "description": "Đường dẫn instance lỗi" }
+        }
+      }
+    },
+    "securitySchemes": { "Bearer Authentication": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" } }
+  }
 }

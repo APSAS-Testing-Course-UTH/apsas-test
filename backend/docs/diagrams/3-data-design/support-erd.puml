@@ -1,0 +1,32 @@
+@startuml Support Service ERD
+!pragma layout elk
+skinparam linetype ortho
+
+title Support Service ERD
+
+class "support_sessions" as support_sessions {
+    <b> id : UUID <<PK>>
+    --
+    student_id : UUID
+    instructor_id : UUID
+    is_closed : BOOLEAN
+    created_at : TIMESTAMP
+    closed_at : TIMESTAMP
+}
+
+class "support_messages" as support_messages {
+    <b> id : UUID <<PK>>
+    --
+    session_id : UUID
+    sender_id : UUID
+    content : TEXT
+    is_instructor : BOOLEAN
+    is_read : BOOLEAN
+    created_at : TIMESTAMP
+}
+
+support_sessions::id ||--o{ support_messages::session_id : "session_id"
+
+hide support_sessions circle
+hide support_messages circle
+@enduml

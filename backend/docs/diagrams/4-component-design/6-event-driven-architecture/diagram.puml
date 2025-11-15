@@ -1,0 +1,43 @@
+@startuml Event-Driven Architecture
+!define Publisher(name) component name <<publisher>>
+!define Consumer(name) component name <<consumer>>
+!define Exchange(name) queue name <<exchange>>
+
+left to right direction
+
+title Event-Driven Architecture
+
+package "Publishers" {
+    Publisher(ID) as "Identity Service"
+    Publisher(CT) as "Content Service"
+    Publisher(SB) as "Submission Service"
+    Publisher(EV) as "Evaluation Service"
+    Publisher(SP) as "Support Service"
+}
+
+package "RabbitMQ - apsas.exchange (Topic)" {
+    Exchange(EX) as "Topic Exchange"
+}
+
+package "Consumers" {
+    Consumer(NT) as "Notification Service"
+    Consumer(SB2) as "Submission Service"
+    Consumer(EV2) as "Evaluation Service"
+}
+
+
+ID --> EX : user.registered
+ID --> EX : password.reset.requested
+CT --> EX : assignment.published
+SB --> EX : submission.created
+EV --> EX : submission.evaluated
+SP --> EX : support.requested
+
+EX --> NT : user.*
+EX --> NT : assignment.*
+EX --> EV2 : submission.created
+EX --> SB2 : submission.evaluated
+EX --> NT : submission.evaluated
+EX --> NT : support.*
+
+@enduml

@@ -1,0 +1,54 @@
+@startuml Submission and Evaluation Flow
+
+title Code Submission and Evaluation Flow
+
+actor Student
+participant "Submission Service" as SB
+participant "Evaluation Service" as EV
+participant "Content Service" as CS
+participant "Notification Service" as NT
+participant "RabbitMQ" as RMQ
+participant "PostgreSQL" as DB
+participant "Redis" as Redis
+participant "Piston API" as PS
+
+== Submission Phase ==
+Student -> SB: POST /api/v1/submissions\n{assignmentId, code (base64), language}
+
+SB -> DB: INSERT submission\n(status=PENDING)
+DB --> SB: submission saved
+
+SB -> RMQ: Publish SubmissionCreatedEvent
+SB --> Student: 201 Created + SubmissionResponse
+
+== Evaluation Phase ==
+RMQ -> EV: Consume SubmissionCreatedEvent
+
+EV -> CS: GET /assignments/{assignmentId}
+CS --> EV: Assignment details with test cases
+
+EV -> EV: Validate language support
+
+alt Language not supported
+    EV -> RMQ: Publish SubmissionEvaluatedEvent\n(status=FAILED, result=FAILED, error)
+else Language supported
+    par For each test case
+        EV -> PS: POST /api/v2/execute\n{code, input, language}
+        PS --> EV: {stdout, stderr, exitCode}
+        EV -> EV: Compare output
+    end
+
+    EV -> EV: Calculate overall score and result
+
+    EV -> RMQ: Publish SubmissionEvaluatedEvent\n{status=EVALUATED, result, score, testCaseResults}
+end
+
+RMQ -> SB: Consume SubmissionEvaluatedEvent
+SB -> DB: UPDATE submission\n(status=EVALUATED, result, score)
+SB -> Redis: Evict cache
+
+RMQ -> NT: Consume SubmissionEvaluatedEvent
+NT -> Student: Send email/push notification
+
+Note over Student: Poll or refresh to see results
+@enduml

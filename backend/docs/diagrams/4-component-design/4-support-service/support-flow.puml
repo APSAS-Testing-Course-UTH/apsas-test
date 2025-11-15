@@ -1,0 +1,57 @@
+@startuml Support Flow
+
+title Real-time Support Chat Flow
+
+actor Student
+actor Instructor
+participant "WebSocket" as WS
+participant "Support Service" as SS
+participant "Notification Service" as NT
+participant "PostgreSQL" as DB
+participant "RabbitMQ" as RMQ
+
+== Create Support Session ==
+Student -> WS: SEND /app/support/sessions/create\n{initialMessage}
+WS -> SS: createSession(studentId, email, name, message)
+
+SS -> DB: Save session and initial message
+DB --> SS: Saved
+
+SS -> RMQ: Publish SupportRequestedEvent\n{sessionId, studentId, email, name, message}
+RMQ -> NT: Consume SupportRequestedEvent
+NT -> Instructor: Send email/push notification
+
+WS -> Student: SEND /topic/support\nWebSocketMessage.NEW_SESSION
+WS -> Instructor: SEND /topic/support\nWebSocketMessage.NEW_SESSION
+
+== Instructor Joins Session ==
+Instructor -> WS: SUBSCRIBE /topic/support/sessions/{sessionId}
+WS -> SS: getSessionById(sessionId, userPrincipal)
+
+SS -> DB: Retrieve session and mark messages as read
+DB --> SS: Session data
+
+WS -> Instructor: SEND /topic/support/{sessionId}\nWebSocketMessage.SESSION_JOINED
+WS -> Student: SEND /topic/support\nWebSocketMessage.SESSION_JOINED
+
+== Send Message ==
+Instructor -> WS: SEND /app/support/sessions/{sessionId}/messages/send\n{content}
+WS -> SS: sendMessage(userPrincipal, sessionId, request)
+
+SS -> DB: Save message and assign instructor if needed
+DB --> SS: Message saved
+
+WS -> Student: SEND /topic/support\nWebSocketMessage.NEW_MESSAGE
+WS -> Instructor: SEND /topic/support/{sessionId}\nWebSocketMessage.NEW_MESSAGE
+
+== Close Session ==
+Student -> WS: SEND /app/support/sessions/{sessionId}/close
+WS -> SS: closeSession(sessionId, userId)
+
+SS -> DB: Close session
+DB --> SS: Session updated
+
+WS -> Student: SEND /topic/support/{sessionId}\nWebSocketMessage.SESSION_CLOSED
+WS -> Instructor: SEND /topic/support\nWebSocketMessage.SESSION_CLOSED
+
+@enduml

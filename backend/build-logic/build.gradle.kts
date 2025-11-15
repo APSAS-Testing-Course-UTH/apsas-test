@@ -17,9 +17,6 @@ java {
 dependencies {
     implementation(plugin(libs.plugins.spring.boot))
     implementation(plugin(libs.plugins.spring.dependency.management))
-    implementation(plugin(libs.plugins.kotlin.jvm))
-    implementation(plugin(libs.plugins.kotlin.spring))
-    implementation(plugin(libs.plugins.kotlin.jpa))
 }
 
 fun plugin(plugin: Provider<PluginDependency>): Provider<String> =

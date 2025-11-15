@@ -4,6 +4,7 @@ import apsas.shared.models.pagination.PageRequestParams;
 import apsas.shared.models.pagination.PageResponse;
 import apsas.shared.security.UserPrincipal;
 import apsas.submission.model.dto.CreateSubmissionRequest;
+import apsas.submission.model.dto.SubmissionFeedbackRequest;
 import apsas.submission.model.dto.SubmissionResponse;
 import apsas.submission.model.entity.SubmissionStatus;
 import apsas.submission.service.SubmissionService;
@@ -15,8 +16,8 @@ import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -35,7 +36,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(
     value = "/api/v1/submissions",
-    consumes = MediaType.APPLICATION_JSON_VALUE,
     produces = MediaType.APPLICATION_JSON_VALUE
 )
 @Tag(name = "Quản lý bài nộp", description = "Quản lý và xử lý bài nộp của sinh viên")
@@ -45,7 +45,8 @@ public class SubmissionController {
   private final SubmissionService submissionService;
 
   /**
-   * Lấy danh sách bài nộp với phân trang và sắp xếp. Sinh viên chỉ xem bài của mình, giảng viên có thể lọc theo bài tập và sinh viên.
+   * Lấy danh sách bài nộp với phân trang và sắp xếp. Sinh viên chỉ xem bài của mình, giảng viên có
+   * thể lọc theo bài tập và sinh viên.
    */
   @GetMapping
   @Operation(
@@ -105,7 +106,7 @@ public class SubmissionController {
   /**
    * Tạo bài nộp mới cho bài tập (chỉ sinh viên).
    */
-  @PostMapping
+  @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("hasRole('STUDENT')")
   @Operation(
       summary = "Tạo bài nộp mới",
@@ -123,23 +124,23 @@ public class SubmissionController {
     return new ResponseEntity<>(submission, HttpStatus.CREATED);
   }
 
-    /**
-     * Thêm nhận xét của giảng viên cho bài nộp (chỉ giảng viên).
-     */
-    @PostMapping("/{id}/feedback")
-    @PreAuthorize("hasRole('INSTRUCTOR')")
-    @Operation(
-            summary = "Thêm nhận xét cho bài nộp",
-            description = "Thêm nhận xét của giảng viên cho bài nộp (chỉ giảng viên)"
-    )
-    public ResponseEntity<SubmissionResponse> provideFeedback(
-            @PathVariable
-            UUID id,
-            @Valid
-            @RequestBody
-            apsas.submission.model.dto.SubmissionFeedbackRequest request
-    ) {
-        SubmissionResponse submission = submissionService.provideFeedback(id, request.getFeedback());
-        return ResponseEntity.ok(submission);
-    }
+  /**
+   * Thêm nhận xét của giảng viên cho bài nộp (chỉ giảng viên).
+   */
+  @PostMapping(path = "/{id}/feedback", consumes = MediaType.APPLICATION_JSON_VALUE)
+  @PreAuthorize("hasRole('INSTRUCTOR')")
+  @Operation(
+      summary = "Thêm nhận xét cho bài nộp",
+      description = "Thêm nhận xét của giảng viên cho bài nộp (chỉ giảng viên)"
+  )
+  public ResponseEntity<SubmissionResponse> provideFeedback(
+      @PathVariable
+      UUID id,
+      @Valid
+      @RequestBody
+      SubmissionFeedbackRequest request
+  ) {
+    SubmissionResponse submission = submissionService.provideFeedback(id, request.getFeedback());
+    return ResponseEntity.ok(submission);
+  }
 }

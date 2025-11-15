@@ -2,9 +2,14 @@
 
 import { z } from "zod"
 
-export const zIdentityServiceUpdateProfileRequest = z.object({
-  firstName: z.optional(z.string().min(0).max(100)),
-  lastName: z.optional(z.string().min(0).max(100)),
+export const zIdentityServiceCreateUserRequest = z.object({
+  email: z.email().min(1),
+  password: z.string().min(8).max(2147483647),
+  firstName: z.string().min(0).max(100),
+  lastName: z.string().min(0).max(100),
+  role: z.optional(z.enum(["STUDENT", "INSTRUCTOR", "CONTENT_PROVIDER", "ADMIN"])),
+  isActive: z.optional(z.boolean()),
+  isEmailVerified: z.optional(z.boolean()),
 })
 
 export const zIdentityServiceUserResponse = z.object({
@@ -17,16 +22,6 @@ export const zIdentityServiceUserResponse = z.object({
   isEmailVerified: z.optional(z.boolean()),
   createdAt: z.optional(z.iso.datetime()),
   updatedAt: z.optional(z.iso.datetime()),
-})
-
-export const zIdentityServiceCreateUserRequest = z.object({
-  email: z.email().min(1),
-  password: z.string().min(8).max(2147483647),
-  firstName: z.string().min(0).max(100),
-  lastName: z.string().min(0).max(100),
-  role: z.optional(z.enum(["STUDENT", "INSTRUCTOR", "CONTENT_PROVIDER", "ADMIN"])),
-  isActive: z.optional(z.boolean()),
-  isEmailVerified: z.optional(z.boolean()),
 })
 
 export const zIdentityServiceChangePasswordRequest = z.object({
@@ -63,6 +58,11 @@ export const zIdentityServiceAuthResponse = z.object({
 export const zIdentityServiceLoginRequest = z.object({
   email: z.email().min(1),
   password: z.string().min(1),
+})
+
+export const zIdentityServiceUpdateProfileRequest = z.object({
+  firstName: z.optional(z.string().min(0).max(100)),
+  lastName: z.optional(z.string().min(0).max(100)),
 })
 
 /**
@@ -247,13 +247,16 @@ export const zContentServiceProblemDetail = z.object({
   instance: z.optional(z.unknown()),
 })
 
+/**
+ * Yêu cầu tạo bài nộp
+ */
 export const zSubmissionServiceCreateSubmissionRequest = z.object({
   assignmentId: z.uuid(),
   code: z.string().min(1),
   language: z.string().min(1),
 })
 
-export const zSubmissionServiceTestCaseResultDto = z.object({
+export const zSubmissionServiceTestCaseResultResponse = z.object({
   order: z.optional(z.int()),
   description: z.optional(z.string()),
   hidden: z.optional(z.boolean()),
@@ -279,7 +282,7 @@ export const zSubmissionServiceSubmissionResponse = z.object({
   language: z.optional(z.string()),
   result: z.optional(z.enum(["PASSED", "FAILED", "PARTIAL"])),
   score: z.optional(z.number()),
-  testCaseResults: z.optional(z.array(zSubmissionServiceTestCaseResultDto)),
+  testCaseResults: z.optional(z.array(zSubmissionServiceTestCaseResultResponse)),
   evaluatedAt: z.optional(z.iso.datetime()),
   feedback: z.optional(z.string()),
 })
@@ -339,8 +342,9 @@ export const zSupportServiceCreateSupportSessionRequest = z.object({
   initialMessage: z.string().min(1),
 })
 
-export const zSupportServiceSupportMessageDto = z.object({
+export const zSupportServiceSupportMessageResponse = z.object({
   id: z.optional(z.uuid()),
+  sessionId: z.optional(z.uuid()),
   senderId: z.optional(z.uuid()),
   content: z.optional(z.string()),
   isInstructor: z.optional(z.boolean()),
@@ -348,21 +352,25 @@ export const zSupportServiceSupportMessageDto = z.object({
   createdAt: z.optional(z.iso.datetime()),
 })
 
-export const zSupportServiceSupportSessionDto = z.object({
+export const zSupportServiceSupportSessionResponse = z.object({
   id: z.optional(z.uuid()),
   studentId: z.optional(z.uuid()),
   instructorId: z.optional(z.uuid()),
   isClosed: z.optional(z.boolean()),
   createdAt: z.optional(z.iso.datetime()),
   closedAt: z.optional(z.iso.datetime()),
-  messages: z.optional(z.array(zSupportServiceSupportMessageDto)),
+  messages: z.optional(z.array(zSupportServiceSupportMessageResponse)),
+})
+
+export const zSupportServiceSendMessageRequest = z.object({
+  content: z.string().min(1),
 })
 
 /**
  * Lớp bọc phản hồi phân trang
  */
-export const zSupportServicePageResponseSupportSessionDto = z.object({
-  content: z.optional(z.array(zSupportServiceSupportSessionDto)),
+export const zSupportServicePageResponseSupportSessionResponse = z.object({
+  content: z.optional(z.array(zSupportServiceSupportSessionResponse)),
   pageNumber: z.optional(z.int()),
   pageSize: z.optional(z.int()),
   totalElements: z.optional(z.coerce.bigint()),
@@ -382,6 +390,22 @@ export const zSupportServiceProblemDetail = z.object({
   status: z.optional(z.unknown()),
   detail: z.optional(z.unknown()),
   instance: z.optional(z.unknown()),
+})
+
+export const zNotificationServiceRegisterDeviceRequest = z.object({
+  token: z.string().min(1),
+  deviceType: z.string().min(1),
+  userAgent: z.optional(z.string()),
+})
+
+export const zNotificationServiceDeviceTokenResponse = z.object({
+  id: z.optional(z.uuid()),
+  token: z.optional(z.string()),
+  deviceType: z.optional(z.string()),
+  userAgent: z.optional(z.string()),
+  isActive: z.optional(z.boolean()),
+  createdAt: z.optional(z.iso.datetime()),
+  updatedAt: z.optional(z.iso.datetime()),
 })
 
 export const zNotificationServiceNotificationPreferencesRequest = z.object({
@@ -406,22 +430,6 @@ export const zNotificationServiceNotificationPreferencesResponse = z.object({
   updatedAt: z.optional(z.iso.datetime()),
 })
 
-export const zNotificationServiceRegisterDeviceRequest = z.object({
-  token: z.string().min(1),
-  deviceType: z.string().min(1),
-  userAgent: z.optional(z.string()),
-})
-
-export const zNotificationServiceDeviceTokenResponse = z.object({
-  id: z.optional(z.uuid()),
-  token: z.optional(z.string()),
-  deviceType: z.optional(z.string()),
-  userAgent: z.optional(z.string()),
-  isActive: z.optional(z.boolean()),
-  createdAt: z.optional(z.iso.datetime()),
-  updatedAt: z.optional(z.iso.datetime()),
-})
-
 /**
  * Chi tiết lỗi theo chuẩn RFC 9457
  */
@@ -432,54 +440,6 @@ export const zNotificationServiceProblemDetail = z.object({
   detail: z.optional(z.unknown()),
   instance: z.optional(z.unknown()),
 })
-
-export const zIdentityServiceDeactivateUserData = z.object({
-  body: z.optional(z.never()),
-  path: z.object({
-    userId: z.uuid(),
-  }),
-  query: z.optional(z.never()),
-})
-
-/**
- * No Content
- */
-export const zIdentityServiceDeactivateUserResponse = z.void()
-
-export const zIdentityServiceActivateUserData = z.object({
-  body: z.optional(z.never()),
-  path: z.object({
-    userId: z.uuid(),
-  }),
-  query: z.optional(z.never()),
-})
-
-/**
- * No Content
- */
-export const zIdentityServiceActivateUserResponse = z.void()
-
-export const zIdentityServiceGetCurrentUserData = z.object({
-  body: z.optional(z.never()),
-  path: z.optional(z.never()),
-  query: z.optional(z.never()),
-})
-
-/**
- * OK
- */
-export const zIdentityServiceGetCurrentUserResponse = zIdentityServiceUserResponse
-
-export const zIdentityServiceUpdateCurrentUserProfileData = z.object({
-  body: zIdentityServiceUpdateProfileRequest,
-  path: z.optional(z.never()),
-  query: z.optional(z.never()),
-})
-
-/**
- * OK
- */
-export const zIdentityServiceUpdateCurrentUserProfileResponse = zIdentityServiceUserResponse
 
 export const zIdentityServiceGetAllUsersData = z.object({
   body: z.optional(z.never()),
@@ -507,6 +467,32 @@ export const zIdentityServiceCreateUserData = z.object({
  * Created
  */
 export const zIdentityServiceCreateUserResponse = zIdentityServiceUserResponse
+
+export const zIdentityServiceDeactivateUserData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    userId: z.uuid(),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * No Content
+ */
+export const zIdentityServiceDeactivateUserResponse = z.void()
+
+export const zIdentityServiceActivateUserData = z.object({
+  body: z.optional(z.never()),
+  path: z.object({
+    userId: z.uuid(),
+  }),
+  query: z.optional(z.never()),
+})
+
+/**
+ * No Content
+ */
+export const zIdentityServiceActivateUserResponse = z.void()
 
 export const zIdentityServiceChangePasswordData = z.object({
   body: zIdentityServiceChangePasswordRequest,
@@ -584,6 +570,28 @@ export const zIdentityServiceRequestPasswordResetData = z.object({
  * No Content
  */
 export const zIdentityServiceRequestPasswordResetResponse = z.void()
+
+export const zIdentityServiceGetCurrentUserData = z.object({
+  body: z.optional(z.never()),
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * OK
+ */
+export const zIdentityServiceGetCurrentUserResponse = zIdentityServiceUserResponse
+
+export const zIdentityServiceUpdateCurrentUserProfileData = z.object({
+  body: zIdentityServiceUpdateProfileRequest,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * OK
+ */
+export const zIdentityServiceUpdateCurrentUserProfileResponse = zIdentityServiceUserResponse
 
 export const zIdentityServiceDeleteUserData = z.object({
   body: z.optional(z.never()),
@@ -953,7 +961,7 @@ export const zSupportServiceListSessionsData = z.object({
 /**
  * OK
  */
-export const zSupportServiceListSessionsResponse = zSupportServicePageResponseSupportSessionDto
+export const zSupportServiceListSessionsResponse = zSupportServicePageResponseSupportSessionResponse
 
 export const zSupportServiceCreateSessionData = z.object({
   body: zSupportServiceCreateSupportSessionRequest,
@@ -973,12 +981,34 @@ export const zSupportServiceCreateSessionData = z.object({
 /**
  * Created
  */
-export const zSupportServiceCreateSessionResponse = zSupportServiceSupportSessionDto
+export const zSupportServiceCreateSessionResponse = zSupportServiceSupportSessionResponse
+
+export const zSupportServiceSendMessageData = z.object({
+  body: zSupportServiceSendMessageRequest,
+  path: z.object({
+    sessionId: z.uuid(),
+  }),
+  query: z.optional(
+    z.object({
+      userId: z.optional(z.uuid()),
+      email: z.optional(z.string()),
+      firstName: z.optional(z.string()),
+      lastName: z.optional(z.string()),
+      role: z.optional(z.string()),
+      isActive: z.optional(z.boolean()),
+    }),
+  ),
+})
+
+/**
+ * Created
+ */
+export const zSupportServiceSendMessageResponse = zSupportServiceSupportSessionResponse
 
 export const zSupportServiceCloseSessionData = z.object({
   body: z.optional(z.never()),
   path: z.object({
-    id: z.uuid(),
+    sessionId: z.uuid(),
   }),
   query: z.optional(
     z.object({
@@ -995,12 +1025,12 @@ export const zSupportServiceCloseSessionData = z.object({
 /**
  * OK
  */
-export const zSupportServiceCloseSessionResponse = zSupportServiceSupportSessionDto
+export const zSupportServiceCloseSessionResponse = zSupportServiceSupportSessionResponse
 
 export const zSupportServiceGetSessionByIdData = z.object({
   body: z.optional(z.never()),
   path: z.object({
-    id: z.uuid(),
+    sessionId: z.uuid(),
   }),
   query: z.optional(
     z.object({
@@ -1017,7 +1047,18 @@ export const zSupportServiceGetSessionByIdData = z.object({
 /**
  * OK
  */
-export const zSupportServiceGetSessionByIdResponse = zSupportServiceSupportSessionDto
+export const zSupportServiceGetSessionByIdResponse = zSupportServiceSupportSessionResponse
+
+export const zNotificationServiceRegisterDeviceData = z.object({
+  body: zNotificationServiceRegisterDeviceRequest,
+  path: z.optional(z.never()),
+  query: z.optional(z.never()),
+})
+
+/**
+ * Created
+ */
+export const zNotificationServiceRegisterDeviceResponse = zNotificationServiceDeviceTokenResponse
 
 export const zNotificationServiceGetPreferencesData = z.object({
   body: z.optional(z.never()),
@@ -1040,17 +1081,6 @@ export const zNotificationServiceUpdatePreferencesData = z.object({
  * OK
  */
 export const zNotificationServiceUpdatePreferencesResponse = zNotificationServiceNotificationPreferencesResponse
-
-export const zNotificationServiceRegisterDeviceData = z.object({
-  body: zNotificationServiceRegisterDeviceRequest,
-  path: z.optional(z.never()),
-  query: z.optional(z.never()),
-})
-
-/**
- * Created
- */
-export const zNotificationServiceRegisterDeviceResponse = zNotificationServiceDeviceTokenResponse
 
 export const zNotificationServiceGetUserDevicesData = z.object({
   body: z.optional(z.never()),

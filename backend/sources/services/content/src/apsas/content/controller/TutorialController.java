@@ -16,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,17 +25,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Bộ điều khiển quản lý hướng dẫn cho hệ thống APSAS.
- * Cung cấp các API tạo, cập nhật, xóa và phân trang hướng dẫn.
+ * Bộ điều khiển quản lý hướng dẫn cho hệ thống APSAS. Cung cấp các API tạo, cập nhật, xóa và phân
+ * trang hướng dẫn.
  */
 @RestController
 @RequestMapping(
-  value = "/api/v1/tutorials",
-  consumes = MediaType.APPLICATION_JSON_VALUE,
-  produces = MediaType.APPLICATION_JSON_VALUE
+    value = "/api/v1/tutorials",
+    produces = MediaType.APPLICATION_JSON_VALUE
 )
 @Tag(name = "Quản lý hướng dẫn", description = "Các API quản lý hướng dẫn")
 @SecurityRequirement(name = "Bearer Authentication")
@@ -44,26 +43,28 @@ import org.springframework.web.bind.annotation.RestController;
 public class TutorialController {
   private final TutorialService tutorialService;
 
-    /**
-     * Lấy danh sách tất cả hướng dẫn có phân trang và sắp xếp.
-     * @param pageParams Tham số phân trang
-     * @return Danh sách hướng dẫn
-     */
-    @GetMapping
-    @Operation(
+  /**
+   * Lấy danh sách tất cả hướng dẫn có phân trang và sắp xếp.
+   *
+   * @param pageParams Tham số phân trang
+   * @return Danh sách hướng dẫn
+   */
+  @GetMapping
+  @Operation(
       summary = "Lấy tất cả hướng dẫn",
       description = "Lấy danh sách hướng dẫn có phân trang và sắp xếp"
-    )
-    public ResponseEntity<PageResponse<TutorialResponse>> getAllTutorials(
+  )
+  public ResponseEntity<PageResponse<TutorialResponse>> getAllTutorials(
       PageRequestParams pageParams
-    ) {
+  ) {
     PageResponse<TutorialResponse> tutorials =
-      tutorialService.getAllTutorials(pageParams.toPageable());
+        tutorialService.getAllTutorials(pageParams.toPageable());
     return ResponseEntity.ok(tutorials);
-    }
+  }
 
   /**
    * Lấy chi tiết hướng dẫn theo ID.
+   *
    * @param id ID hướng dẫn
    * @return Thông tin hướng dẫn
    */
@@ -79,11 +80,12 @@ public class TutorialController {
 
   /**
    * Tạo mới hướng dẫn (chỉ Content Provider).
-   * @param request Dữ liệu hướng dẫn mới
+   *
+   * @param request        Dữ liệu hướng dẫn mới
    * @param authentication Thông tin xác thực
    * @return Thông tin hướng dẫn vừa tạo
    */
-  @PostMapping
+  @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("hasRole('CONTENT_PROVIDER')")
   @Operation(
       summary = "Tạo hướng dẫn mới",
@@ -103,12 +105,13 @@ public class TutorialController {
 
   /**
    * Cập nhật thông tin hướng dẫn (chỉ Content Provider).
-   * @param id ID hướng dẫn
-   * @param request Dữ liệu cập nhật
+   *
+   * @param id             ID hướng dẫn
+   * @param request        Dữ liệu cập nhật
    * @param authentication Thông tin xác thực
    * @return Thông tin hướng dẫn đã cập nhật
    */
-  @PatchMapping("/{id}")
+  @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("hasRole('CONTENT_PROVIDER')")
   @Operation(
       summary = "Cập nhật hướng dẫn",
@@ -130,7 +133,8 @@ public class TutorialController {
 
   /**
    * Xóa hướng dẫn (chỉ Content Provider).
-   * @param id ID hướng dẫn
+   *
+   * @param id             ID hướng dẫn
    * @param authentication Thông tin xác thực
    */
   @DeleteMapping("/{id}")

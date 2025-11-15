@@ -6,7 +6,10 @@ import apsas.shared.exception.NotFoundException;
 import apsas.shared.messaging.config.RabbitMqConfig;
 import apsas.shared.messaging.event.EventPublisher;
 import apsas.shared.messaging.event.SubmissionCreatedEvent;
+import apsas.shared.messaging.event.SubmissionEvaluatedEvent.Result;
+import apsas.shared.messaging.event.SubmissionEvaluatedEvent.Status;
 import apsas.shared.models.pagination.PageResponse;
+import apsas.shared.models.submission.TestCaseResultResponse;
 import apsas.submission.mapper.SubmissionEventMapper;
 import apsas.submission.mapper.SubmissionMapper;
 import apsas.submission.model.dto.CreateSubmissionRequest;
@@ -107,10 +110,10 @@ public class SubmissionService {
   @Transactional
   public void handleSubmissionEvaluated(
       UUID submissionId,
-      apsas.shared.messaging.model.SubmissionStatus status,
-      apsas.shared.messaging.model.SubmissionResult result,
+      Status status,
+      Result result,
       BigDecimal score,
-      List<apsas.shared.models.submission.TestCaseResultDto> testCaseResults,
+      List<TestCaseResultResponse> testCaseResults,
       LocalDateTime evaluatedAt
   ) {
     Submission submission =
