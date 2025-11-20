@@ -9,13 +9,14 @@
     "build:analyze": "ANALYZE=true tsc -b && vite build",
     "lint": "eslint .",
     "type-check": "tsc --noEmit",
-    "preview": "vite preview",
+    "preview": "bun run build && wrangler dev",
     "format": "prettier --write .",
     "openapi-ts": "openapi-ts",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
-    "test:coverage": "vitest --coverage"
+    "test:coverage": "vitest --coverage",
+    "deploy": "bun run build && wrangler deploy"
   },
   "dependencies": {
     "@mantine/core": "^8.3.4",
@@ -81,7 +82,8 @@
     "typescript-eslint": "^8.46.0",
     "undici": "^7.16.0",
     "vite": "npm:rolldown-vite@7.1.16",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "wrangler": "^4.49.1"
   },
   "overrides": {
     "vite": "npm:rolldown-vite@7.1.14"
