@@ -1,64 +1,39 @@
 /**
  * NotificationSettings Component
  * Settings for email and push notification preferences
+ * Auto-saves on each change
  */
 
-import { Switch, Stack, Title, Button, Group } from '@mantine/core'
-import { useState } from 'react'
+import { Switch, Stack, Title } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 import { useNotificationSettings } from '../hooks/useSettings'
 import {
   SECTION_TITLES,
   FIELD_LABELS,
-  BUTTON_LABELS,
   NOTIFICATION_MESSAGES,
 } from '../types'
 
 export function NotificationSettings() {
   const { notifications: prefs, updateNotifications, isLoading } = useNotificationSettings()
-  
-  // Local state cho form
-  const [emailNotifications, setEmailNotifications] = useState(prefs.emailNotifications)
-  const [pushNotifications, setPushNotifications] = useState(prefs.pushNotifications)
-  const [assignmentUpdates, setAssignmentUpdates] = useState(prefs.assignmentUpdates)
-  const [feedbackNotifications, setFeedbackNotifications] = useState(prefs.feedbackNotifications)
-  const [deadlineReminders, setDeadlineReminders] = useState(prefs.deadlineReminders)
 
-  // Check if có thay đổi
-  const hasChanges = 
-    emailNotifications !== prefs.emailNotifications ||
-    pushNotifications !== prefs.pushNotifications ||
-    assignmentUpdates !== prefs.assignmentUpdates ||
-    feedbackNotifications !== prefs.feedbackNotifications ||
-    deadlineReminders !== prefs.deadlineReminders
-
-  const handleSave = () => {
+  // Auto-save khi user thay đổi setting
+  const handleToggle = (field: keyof typeof prefs, value: boolean) => {
     try {
       updateNotifications({
-        emailNotifications,
-        pushNotifications,
-        assignmentUpdates,
-        feedbackNotifications,
-        deadlineReminders,
+        ...prefs,
+        [field]: value,
       })
       notifications.show({
         message: NOTIFICATION_MESSAGES.saveSuccess,
         color: 'green',
+        autoClose: 2000,
       })
-    } catch (error) {
+    } catch {
       notifications.show({
         message: NOTIFICATION_MESSAGES.saveError,
         color: 'red',
       })
     }
-  }
-
-  const handleReset = () => {
-    setEmailNotifications(prefs.emailNotifications)
-    setPushNotifications(prefs.pushNotifications)
-    setAssignmentUpdates(prefs.assignmentUpdates)
-    setFeedbackNotifications(prefs.feedbackNotifications)
-    setDeadlineReminders(prefs.deadlineReminders)
   }
 
   return (
@@ -68,59 +43,42 @@ export function NotificationSettings() {
       <Switch
         label={FIELD_LABELS.emailNotifications}
         description="Nhận thông báo qua email"
-        checked={emailNotifications}
-        onChange={(event) => setEmailNotifications(event.currentTarget.checked)}
+        checked={prefs.emailNotifications}
+        onChange={(event) => handleToggle('emailNotifications', event.currentTarget.checked)}
         disabled={isLoading}
       />
 
       <Switch
         label={FIELD_LABELS.pushNotifications}
         description="Nhận thông báo đẩy trên trình duyệt"
-        checked={pushNotifications}
-        onChange={(event) => setPushNotifications(event.currentTarget.checked)}
+        checked={prefs.pushNotifications}
+        onChange={(event) => handleToggle('pushNotifications', event.currentTarget.checked)}
         disabled={isLoading}
       />
 
       <Switch
         label={FIELD_LABELS.assignmentUpdates}
         description="Thông báo khi có bài tập mới"
-        checked={assignmentUpdates}
-        onChange={(event) => setAssignmentUpdates(event.currentTarget.checked)}
+        checked={prefs.assignmentUpdates}
+        onChange={(event) => handleToggle('assignmentUpdates', event.currentTarget.checked)}
         disabled={isLoading}
       />
 
       <Switch
         label={FIELD_LABELS.feedbackNotifications}
         description="Thông báo khi có phản hồi mới"
-        checked={feedbackNotifications}
-        onChange={(event) => setFeedbackNotifications(event.currentTarget.checked)}
+        checked={prefs.feedbackNotifications}
+        onChange={(event) => handleToggle('feedbackNotifications', event.currentTarget.checked)}
         disabled={isLoading}
       />
 
       <Switch
         label={FIELD_LABELS.deadlineReminders}
         description="Nhắc nhở về hạn nộp bài"
-        checked={deadlineReminders}
-        onChange={(event) => setDeadlineReminders(event.currentTarget.checked)}
+        checked={prefs.deadlineReminders}
+        onChange={(event) => handleToggle('deadlineReminders', event.currentTarget.checked)}
         disabled={isLoading}
       />
-
-      <Group justify="flex-end" mt="md">
-        <Button
-          variant="default"
-          onClick={handleReset}
-          disabled={!hasChanges || isLoading}
-        >
-          {BUTTON_LABELS.reset}
-        </Button>
-        <Button
-          onClick={handleSave}
-          disabled={!hasChanges}
-          loading={isLoading}
-        >
-          {BUTTON_LABELS.save}
-        </Button>
-      </Group>
     </Stack>
   )
 }

@@ -10,6 +10,8 @@ import type {
   ContentServiceAssignmentResponse,
 } from '@/api/types.gen'
 import { mapApiError } from '@/configs/api-error-handler'
+import { submissionKeys } from './queryKeys'
+import { assignmentKeys } from '@/features/assignments/api/useAssignmentsQuery'
 
 /**
  * Hook to fetch supported programming language runtimes
@@ -54,7 +56,7 @@ import { mapApiError } from '@/configs/api-error-handler'
  */
 export function useRuntimesQuery() {
   return useQuery({
-    queryKey: ['runtimes'],
+    queryKey: submissionKeys.runtimes(),
     queryFn: async () => {
       // Use generated SDK client (type-safe)
       // This automatically handles API errors and response validation
@@ -181,7 +183,7 @@ export function useFileUploadMutation() {
       // Invalidate submissions cache after successful upload
       // This triggers a refetch of submissions list
       queryClient.invalidateQueries({
-        queryKey: ['submissions'],
+        queryKey: submissionKeys.lists(),
       })
     },
     onError: (error) => {
@@ -235,7 +237,7 @@ function isRetryableError(errorCode: string | undefined): boolean {
  */
 export function useAssignmentDetails(assignmentId?: string) {
   return useQuery<ContentServiceAssignmentResponse | null, Error>({
-    queryKey: ['assignment', assignmentId],
+    queryKey: assignmentKeys.detail(assignmentId || 'none'),
     queryFn: async () => {
       if (!assignmentId) return null
 
@@ -304,7 +306,7 @@ export function useAssignmentDetails(assignmentId?: string) {
 export function useSubmissionDetails(submissionId?: string) {
   return useQuery<SubmissionServiceSubmissionResponse | null, Error>(
     {
-      queryKey: ['submission', submissionId],
+      queryKey: submissionKeys.detail(submissionId || 'none'),
       queryFn: async () => {
         if (!submissionId) return null
         

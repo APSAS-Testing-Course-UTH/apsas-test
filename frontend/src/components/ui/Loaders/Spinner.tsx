@@ -93,5 +93,3 @@ function getSizePixels(size: SpinnerProps['size']): number {
   };
   return sizeMap[size || 'md'];
 }
-
-export default Spinner;

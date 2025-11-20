@@ -22,6 +22,12 @@ const envSchema = z.object({
   VITE_ENABLE_NOTIFICATIONS: z.string().transform(val => val === 'true'),
   VITE_ENABLE_WEBSOCKET: z.string().transform(val => val === 'true').optional().default(false),
 
+  // Firebase Configuration
+  VITE_FIREBASE_VAPID_KEY: z.string().min(1, 'FIREBASE_VAPID_KEY không được rỗng'),
+
+  // WebSocket Configuration (required when VITE_ENABLE_WEBSOCKET=true)
+  VITE_WEBSOCKET_URL: z.string().url('WEBSOCKET_URL phải là URL hợp lệ').optional(),
+
   // Security
   VITE_CSP_ENABLED: z.string().transform(val => val === 'true'),
 

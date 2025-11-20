@@ -90,7 +90,7 @@ export const VerifyEmailForm = ({ token }: VerifyEmailFormProps) => {
         {/* Hiển thị token nếu có */}
         {token && (
           <Alert color="blue" title="Token đã được tự động điền" mb="md">
-            Token xác minh email đã được lấy từ URL.
+            Mã xác minh email đã được lấy từ URL.
           </Alert>
         )}
 
@@ -122,8 +122,8 @@ export const VerifyEmailForm = ({ token }: VerifyEmailFormProps) => {
 
         <form onSubmit={form.onSubmit(handleSubmit)}>
           <TextInput
-            label="Token xác minh"
-            placeholder="Nhập token xác minh email"
+            label="Mã xác minh"
+            placeholder="Nhập mã xác minh email"
             size="md"
             radius="md"
             mb="xl"

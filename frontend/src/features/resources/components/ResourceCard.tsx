@@ -1,12 +1,12 @@
 import { Card, Text, Badge, Stack, Group, ActionIcon } from '@mantine/core'
 import { IconDownload } from '@tabler/icons-react'
 import { useNavigate } from '@tanstack/react-router'
-import type { ContentServiceTutorialResponse } from '@/api/types.gen'
+import type { ContentServiceTutorialResponse, ContentServiceSkillResponse } from '@/api/types.gen'
 import styles from './ResourceCard.module.css'
 
 interface ResourceCardProps {
-  resource: ContentServiceTutorialResponse
-  onDownload?: (resource: ContentServiceTutorialResponse) => void
+  resource: ContentServiceTutorialResponse | ContentServiceSkillResponse
+  onDownload?: (resource: ContentServiceTutorialResponse | ContentServiceSkillResponse) => void
   type?: 'tutorials' | 'skills'
 }
 
@@ -19,6 +19,15 @@ export function ResourceCard({ resource, onDownload, type = 'tutorials' }: Resou
   const createdDate = resource.createdAt
     ? new Date(resource.createdAt).toLocaleDateString('vi-VN')
     : 'N/A'
+
+  // Get title and content based on type
+  const title = type === 'skills' 
+    ? (resource as ContentServiceSkillResponse).name 
+    : (resource as ContentServiceTutorialResponse).title
+
+  const content = type === 'skills'
+    ? (resource as ContentServiceSkillResponse).description
+    : (resource as ContentServiceTutorialResponse).content
 
   const handleCardClick = () => {
     if (type === 'skills') {
@@ -53,7 +62,7 @@ export function ResourceCard({ resource, onDownload, type = 'tutorials' }: Resou
         <Group justify="space-between" align="flex-start" style={autoFlexStyle}>
           <div>
             <Text fw={600} size="lg" lineClamp={2}>
-              {resource.title || 'Không có tiêu đề'}
+              {title || 'Không có tiêu đề'}
             </Text>
             <Text size="xs" c="dimmed" mt="xs">
               Tạo: {createdDate}
@@ -65,14 +74,14 @@ export function ResourceCard({ resource, onDownload, type = 'tutorials' }: Resou
         </Group>
 
         <Text size="sm" c="dimmed" lineClamp={3} style={{ flex: 1 }}>
-          {resource.content
-            ? resource.content.substring(0, 150) + '...'
+          {content
+            ? content.substring(0, 150) + '...'
             : 'Không có mô tả'}
         </Text>
 
-        {resource.tags && resource.tags.length > 0 && (
+        {'tags' in resource && resource.tags && resource.tags.length > 0 && (
           <Group gap="xs" style={autoFlexStyle}>
-            {resource.tags.map((tag, idx) => (
+            {resource.tags.map((tag: string, idx: number) => (
               <Badge key={idx} size="xs" variant="dot">
                 {tag}
               </Badge>

@@ -1,10 +1,15 @@
 import { useForm } from '@mantine/form'
 import { zod4Resolver } from 'mantine-form-zod-resolver'
-import { TextInput, PasswordInput, Button, Checkbox, Text, Title, Anchor, Paper, Stack } from '@mantine/core'
+import { TextInput, PasswordInput, Button, Text, Title, Anchor, Paper, Stack } from '@mantine/core'
 import { Link } from '@tanstack/react-router'
 
 import { useLogin } from '../hooks/useLogin'
 import { loginSchema } from '../schemas/loginSchema'
+import z from 'zod'
+
+const customeLoginSchema = loginSchema.extend({
+  email: z.string()
+})
 
 // Component form đăng nhập
 interface LoginFormProps {
@@ -14,7 +19,7 @@ interface LoginFormProps {
 export const LoginForm = ({ redirectTo }: LoginFormProps) => {
   // Khởi tạo form với zod4Resolver và loginSchema
   const form = useForm({
-    validate: zod4Resolver(loginSchema),
+    validate: zod4Resolver(customeLoginSchema),
     initialValues: {
       email: '',
       password: ''
@@ -56,12 +61,6 @@ export const LoginForm = ({ redirectTo }: LoginFormProps) => {
               radius="md"
               mb="xl"
               {...form.getInputProps('password')}
-            />
-
-            <Checkbox
-              label="Ghi nhớ đăng nhập"
-              size="md"
-              mb="xl"
             />
 
             <Button

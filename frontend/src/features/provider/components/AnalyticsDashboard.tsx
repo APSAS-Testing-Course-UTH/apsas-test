@@ -6,15 +6,11 @@ import {
   Stack,
   Title,
   Text,
-  RingProgress,
   SimpleGrid,
   Group,
   ThemeIcon,
-  Box,
-  Badge,
   Skeleton,
   Center,
-  Flex,
 } from '@mantine/core'
 import {
   BarChart as ReChartsBarChart,
@@ -296,65 +292,6 @@ export function AnalyticsDashboard() {
             </Paper>
           </Grid.Col>
         </Grid>
-
-        {/* Summary Stats */}
-        <Paper p="md" radius="md" withBorder bg="gray.0">
-          <Stack gap="md">
-            <div>
-              <Title order={3}>Tóm tắt nhanh</Title>
-            </div>
-            <Group grow>
-              <Box>
-                <Group gap="xs">
-                  <RingProgress
-                    thickness={4}
-                    size={80}
-                    sections={[
-                      {
-                        value:
-                          stats.totalAssignments > 0
-                            ? (stats.publishedAssignments / stats.totalAssignments) * 100
-                            : 0,
-                        color: 'blue',
-                      },
-                    ]}
-                  />
-                  <Stack gap="xs">
-                    <div>
-                      <Text size="sm" fw={500}>
-                        Tỷ lệ xuất bản
-                      </Text>
-                      <Text size="lg" fw={700}>
-                        {stats.totalAssignments > 0
-                          ? ((stats.publishedAssignments / stats.totalAssignments) * 100).toFixed(0)
-                          : 0}
-                        %
-                      </Text>
-                    </div>
-                  </Stack>
-                </Group>
-              </Box>
-              <Box>
-                <Stack gap="xs">
-                  <Text size="sm" fw={500} c="dimmed">
-                    Tổng nội dung
-                  </Text>
-                  <Flex gap="sm">
-                    <Badge variant="light" color="blue">
-                      {stats.totalAssignments} Bài tập
-                    </Badge>
-                    <Badge variant="light" color="teal">
-                      {stats.totalSkills} Kỹ năng
-                    </Badge>
-                    <Badge variant="light" color="green">
-                      {stats.totalTutorials} Hướng dẫn
-                    </Badge>
-                  </Flex>
-                </Stack>
-              </Box>
-            </Group>
-          </Stack>
-        </Paper>
       </Stack>
     </Container>
   )

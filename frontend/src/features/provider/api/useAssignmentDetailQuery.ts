@@ -7,7 +7,7 @@
  */
 
 import { useQuery } from '@tanstack/react-query'
-import type { AxiosError } from 'axios'
+import type { ApiErrorResponse } from '@/configs/api-error-handler'
 import type { ContentServiceAssignmentResponse } from '@/api/types.gen'
 import { contentServiceGetAssignmentById } from '@/api/sdk.gen'
 import { assignmentQueryKeys } from './useAssignmentsQuery'
@@ -15,7 +15,7 @@ import { assignmentQueryKeys } from './useAssignmentsQuery'
 export function useAssignmentDetailQuery(id: string) {
   return useQuery<
     ContentServiceAssignmentResponse,
-    AxiosError,
+    ApiErrorResponse,
     ContentServiceAssignmentResponse,
     readonly ['assignments', 'detail', string]
   >({

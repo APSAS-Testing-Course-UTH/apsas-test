@@ -1,14 +1,16 @@
 // Import and re-export generated types from API
 import type {
-  SupportServiceSupportSessionDto,
-  SupportServiceSupportMessageDto,
+  SupportServiceSupportSessionResponse,
+  SupportServiceSupportMessageResponse,
   SupportServiceCreateSupportSessionRequest,
-  SupportServicePageResponseSupportSessionDto,
+  SupportServiceSendMessageRequest,
+  SupportServicePageResponseSupportSessionResponse,
 } from '@/api/types.gen'
 
 // Local type aliases for convenience
-export type SupportSession = SupportServiceSupportSessionDto
-export type SupportMessage = SupportServiceSupportMessageDto
+export type SupportSession = SupportServiceSupportSessionResponse
+export type SupportMessage = SupportServiceSupportMessageResponse
 export type CreateSupportSessionInput = SupportServiceCreateSupportSessionRequest
-export type SupportSessionsPage = SupportServicePageResponseSupportSessionDto
+export type SendMessageInput = SupportServiceSendMessageRequest
+export type SupportSessionsPage = SupportServicePageResponseSupportSessionResponse
 

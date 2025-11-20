@@ -121,5 +121,3 @@ export function AdvancedFilter({
     </Paper>
   )
 }
-
-export default AdvancedFilter

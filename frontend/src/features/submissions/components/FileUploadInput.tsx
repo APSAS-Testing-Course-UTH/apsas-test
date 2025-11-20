@@ -21,6 +21,7 @@ import {
 } from '@tabler/icons-react'
 import { Dropzone } from '@mantine/dropzone'
 import { notifications } from '@mantine/notifications'
+import { encodeToBase64 } from '@/utils/encoding'
 import styles from './FileUploadInput.module.css'
 
 // Supported file types mapping
@@ -230,8 +231,11 @@ export function FileUploadInput({
           })
         }, 200)
 
-        // Submit with code string instead of file object
-        await onSubmit({ code: fileContent, language })
+        // Submit with Base64 encoded code string (as required by BE)
+        await onSubmit({ 
+          code: encodeToBase64(fileContent), 
+          language 
+        })
 
       clearInterval(progressInterval)
       setUploadProgress(100)
@@ -355,22 +359,23 @@ export function FileUploadInput({
             }
           }}
           maxSize={MAX_FILE_SIZE}
-          accept={[
-            'text/plain',
-            'text/x-java',
-            'text/x-python',
-            'text/x-c++src',
-            'text/x-csrc',
-            'text/javascript',
-            'text/typescript',
-            'text/x-csharp',
-            'text/x-go',
-            'text/x-rust',
-            'text/x-php',
-            'text/x-ruby',
-            'application/x-shellscript',
-            'application/sql',
-          ]}
+          accept={{
+            'text/plain': ['.txt'],
+            'text/x-java-source': ['.java'],
+            'text/x-python': ['.py'],
+            'text/x-c++src': ['.cpp'],
+            'text/x-c': ['.c'],
+            'application/javascript': ['.js'],
+            'application/typescript': ['.ts'],
+            'text/x-csharp': ['.cs'],
+            'text/x-go': ['.go'],
+            'text/x-rust': ['.rs'],
+            'text/x-php': ['.php'],
+            'text/x-ruby': ['.rb'],
+            'text/x-perl': ['.pl'],
+            'application/x-sh': ['.sh'],
+            'application/sql': ['.sql'],
+          }}
           multiple={false}
         >
           <Group justify="center" gap="xl" mih={220} style={{ pointerEvents: 'none' }}>
@@ -436,7 +441,7 @@ export function FileUploadInput({
         ...
       </Text>
 
-      {/* Language Selection */}
+      {/* Language Selection - Auto-detected from file extension */}
       {selectedFile && (
         <Select
           label={UI_LABELS.language}
@@ -446,6 +451,8 @@ export function FileUploadInput({
           data={languageOptions}
           required
           searchable
+          disabled // ✅ DISABLE: Prevent user from changing auto-detected language
+          description="Ngôn ngữ được tự động phát hiện từ phần mở rộng tệp"
         />
       )}
 

@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { AxiosError } from 'axios'
+import type { ApiErrorResponse } from '@/configs/api-error-handler'
 import { notifications } from '@mantine/notifications'
 
 import { authService } from '../api'
@@ -31,8 +31,8 @@ export const useCurrentUser = () => {
     // Retry logic
     retry: (failureCount: number, error: Error) => {
       // Không retry cho 401 errors
-      const axiosError = error as AxiosError
-      if (axiosError?.response?.status === 401) {
+      const ApiErrorResponse = error as ApiErrorResponse
+      if (ApiErrorResponse?.response?.status === 401) {
         return false
       }
       // Retry tối đa 2 lần cho lỗi khác
@@ -74,12 +74,12 @@ export const handleCurrentUserResult = (
   if (error) {
     // Nếu 401, token hết hạn → logout
     const mappedError = mapApiError(error)
-    const axiosError = error as AxiosError
+    const ApiErrorResponse = error as ApiErrorResponse
 
     if (
       mappedError.code === 'AUTH_FAILED' ||
       mappedError.code === 'HTTP_401' ||
-      axiosError?.response?.status === 401
+      ApiErrorResponse?.response?.status === 401
     ) {
       logout()
 

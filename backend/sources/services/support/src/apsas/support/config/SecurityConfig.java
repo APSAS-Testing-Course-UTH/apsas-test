@@ -28,7 +28,7 @@ public class SecurityConfig {
                     .requestMatchers("/actuator/**")
                     .permitAll()
                     .requestMatchers("/ws/**")
-                    .permitAll() // WebSocket endpoint will be secured by @PreAuthorize
+                    .permitAll() // WebSocket endpoint will be secured via interceptor
                     .anyRequest()
                     .authenticated())
         .addFilterBefore(headerAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

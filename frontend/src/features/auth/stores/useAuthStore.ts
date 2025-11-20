@@ -93,6 +93,8 @@ export const useAuthStore = create<AuthStore>()(
 
       /**
        * Logout user hiện tại
+       * CRITICAL FIX: Must clear BOTH Zustand persist storage AND token storage
+       * to prevent "double-click login" bug after logout
        */
       logout: () => {
         // Clear state
@@ -106,6 +108,11 @@ export const useAuthStore = create<AuthStore>()(
 
         // Clear token from localStorage using centralized helper
         removeTokenStorage();
+
+        // ✅ FIX: Clear Zustand persist storage to prevent state conflict
+        // This fixes the bug where user must click login button twice after logout
+        // Without this, old persisted state conflicts with new login state
+        useAuthStore.persist.clearStorage();
 
         // Optional: Clear other auth-related data
         // localStorage.removeItem('apsas_refresh_token');

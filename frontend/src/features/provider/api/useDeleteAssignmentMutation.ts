@@ -8,15 +8,19 @@
  */
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import type { AxiosError } from 'axios'
+import type { ApiErrorResponse } from '@/configs/api-error-handler'
 import { contentServiceDeleteAssignment } from '@/api/sdk.gen'
 import { assignmentQueryKeys } from './useAssignmentsQuery'
-import { showErrorNotification, showSuccessNotification } from '../utils/errorHandler'
+import { 
+  handleApiError,
+  showErrorNotification, 
+  showSuccessNotification 
+} from '@/configs/api-error-handler'
 
 export function useDeleteAssignmentMutation() {
   const queryClient = useQueryClient()
 
-  return useMutation<void, AxiosError, { id: string; title: string }>({
+  return useMutation<void, ApiErrorResponse, { id: string; title: string }>({
     mutationFn: async ({ id }) => {
       await contentServiceDeleteAssignment({
         path: { id },
@@ -35,8 +39,9 @@ export function useDeleteAssignmentMutation() {
         queryKey: assignmentQueryKeys.lists(),
       })
     },
-    onError: (error: AxiosError) => {
-      showErrorNotification('Lỗi xóa bài tập', undefined, error)
+    onError: (error: ApiErrorResponse) => {
+      const errorMessage = handleApiError(error)
+      showErrorNotification(errorMessage, 'Lỗi xóa bài tập')
     },
   })
 }

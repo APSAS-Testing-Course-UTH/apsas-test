@@ -43,7 +43,7 @@ import { mapApiError } from '@/configs/api-error-handler'
  */
 export const useResendVerificationEmail = () => {
   return useMutation<void, Error, { body: { email: string } }>({
-    mutationFn: authService.forgotPassword.mutationFn,
+    mutationFn: authService.resendVerificationEmail.mutationFn,
 
     onSuccess: () => {
       // Hiển thị success notification

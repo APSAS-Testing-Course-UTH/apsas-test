@@ -4,6 +4,7 @@ import apsas.evaluation.model.dto.PistonExecuteRequest;
 import apsas.evaluation.model.dto.PistonExecuteRequest.FileContent;
 import apsas.feign.dto.TestCaseDto;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +30,8 @@ public class PistonRequestMapper {
     List<PistonExecuteRequest.FileContent> files = new ArrayList<>();
 
     var fileName = getFileName(language);
-    files.add(new FileContent(fileName, codeBase64, FileContent.BASE64_ENCODING));
+    var codeDecoded = new String(Base64.getDecoder().decode(codeBase64));
+    files.add(new FileContent(fileName, codeDecoded, FileContent.UTF8_ENCODING));
 
     var timeout = testCase.getTimeout() != null ? testCase.getTimeout() : 5000;
     var memoryLimit =

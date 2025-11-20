@@ -1,6 +1,5 @@
 import type { ContentServiceAssignmentResponse } from '@/api/types.gen'
 import { mockUsers, mockTokens } from '../data/users'
-import { enhancedMockAssignments } from '../data/assignments'
 import { consolidatedMockAssignments, verifyConsolidatedDataConsistency, type ConsolidatedAssignment } from '../data/assignments-consolidated'
 import { mockSubmissions } from '../data/submissions'
 import { mockTutorials } from '../data/tutorials'
@@ -104,9 +103,9 @@ export const MOCK_DATA_REGISTRY = {
   users: mockUsers,
   tokens: mockTokens,
 
-  // Assignments - immutable, from src/mocks/data/assignments.ts
-  // NO EXTRA ASSIGNMENTS! Only enhancedMockAssignments
-  assignments: enhancedMockAssignments,
+  // Assignments - immutable, from src/mocks/data/assignments-consolidated.ts
+  // Using consolidatedMockAssignments with full markdown descriptions
+  assignments: consolidatedMockAssignments,
 
   // Submissions - immutable, from src/mocks/data/submissions.ts
   submissions: mockSubmissions,

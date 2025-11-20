@@ -5,7 +5,7 @@
  */
 
 import { useQuery, useQueries } from '@tanstack/react-query'
-import type { AxiosError } from 'axios'
+import type { ApiErrorResponse } from '@/configs/api-error-handler'
 import {
   contentServiceGetAllAssignments,
   contentServiceGetAssignmentById,
@@ -40,7 +40,7 @@ export const assignmentKeys = {
  * @returns {
  *   data: ContentServicePageResponseAssignmentResponse | undefined,
  *   isLoading: boolean,
- *   error: AxiosError | null,
+ *   error: ApiErrorResponse | null,
  *   isPreviousData: boolean
  * }
  *
@@ -52,7 +52,7 @@ export function useAssignmentsQuery(
   page: number = 0,
   size: number = 10,
 ) {
-  return useQuery<ContentServicePageResponseAssignmentResponse, AxiosError>({
+  return useQuery<ContentServicePageResponseAssignmentResponse, ApiErrorResponse>({
     queryKey: assignmentKeys.list(page, size),
     queryFn: async () => {
       const result = await contentServiceGetAllAssignments({
@@ -78,7 +78,7 @@ export function useAssignmentsQuery(
  * @returns {
  *   data: ContentServiceAssignmentResponse | undefined,
  *   isLoading: boolean,
- *   error: AxiosError | null
+ *   error: ApiErrorResponse | null
  * }
  *
  * @example
@@ -86,7 +86,7 @@ export function useAssignmentsQuery(
  * // Fetches full assignment details with test cases and constraints
  */
 export function useAssignmentQuery(id: string) {
-  return useQuery<ContentServiceAssignmentResponse, AxiosError>({
+  return useQuery<ContentServiceAssignmentResponse, ApiErrorResponse>({
     queryKey: assignmentKeys.detail(id),
     queryFn: async () => {
       const result = await contentServiceGetAssignmentById({
@@ -144,7 +144,7 @@ export function useAssignmentsQueriesByIds(ids: string[]) {
  * // Searches for assignments with 'fibonacci' in title/description
  */
 export function useAssignmentSearchQuery(query: string, page: number = 0, size: number = 10) {
-  return useQuery<ContentServicePageResponseAssignmentResponse, AxiosError>({
+  return useQuery<ContentServicePageResponseAssignmentResponse, ApiErrorResponse>({
     queryKey: [...assignmentKeys.lists(), 'search', { query, page, size }],
     queryFn: async () => {
       // If no query, return empty results

@@ -189,57 +189,6 @@ import type {
   SupportServiceSendMessageErrors,
   SupportServiceSendMessageResponses,
 } from "./types.gen"
-import {
-  zContentServiceArchiveAssignmentData,
-  zContentServiceCreateAssignmentData,
-  zContentServiceCreateSkillData,
-  zContentServiceCreateTutorialData,
-  zContentServiceDeleteAssignmentData,
-  zContentServiceDeleteSkillData,
-  zContentServiceDeleteTutorialData,
-  zContentServiceGetAllAssignmentsData,
-  zContentServiceGetAllSkillsData,
-  zContentServiceGetAllTutorialsData,
-  zContentServiceGetAssignmentByIdData,
-  zContentServiceGetSkillByIdData,
-  zContentServiceGetTutorialByIdData,
-  zContentServicePublishAssignmentData,
-  zContentServiceUpdateAssignmentData,
-  zContentServiceUpdateAssignmentScheduleData,
-  zContentServiceUpdateSkillData,
-  zContentServiceUpdateTutorialData,
-  zEvaluationServiceGetSupportedRuntimesData,
-  zIdentityServiceActivateUserData,
-  zIdentityServiceChangePasswordData,
-  zIdentityServiceCreateUserData,
-  zIdentityServiceDeactivateUserData,
-  zIdentityServiceDeleteUserData,
-  zIdentityServiceGetAllUsersData,
-  zIdentityServiceGetCurrentUserData,
-  zIdentityServiceGetUserByIdData,
-  zIdentityServiceGetUsersByRoleData,
-  zIdentityServiceLoginData,
-  zIdentityServiceRegisterData,
-  zIdentityServiceRequestPasswordResetData,
-  zIdentityServiceResendVerificationEmailData,
-  zIdentityServiceResetPasswordData,
-  zIdentityServiceUpdateCurrentUserProfileData,
-  zIdentityServiceVerifyEmailData,
-  zNotificationServiceGetPreferencesData,
-  zNotificationServiceGetUserDevicesData,
-  zNotificationServiceRegisterDeviceData,
-  zNotificationServiceRemoveDeviceData,
-  zNotificationServiceUpdatePreferencesData,
-  zSubmissionServiceCreateSubmissionData,
-  zSubmissionServiceGetAllSubmissionsData,
-  zSubmissionServiceGetSubmissionByIdData,
-  zSubmissionServiceProvideFeedbackData,
-  zSupportServiceCloseSessionData,
-  zSupportServiceCreateSessionData,
-  zSupportServiceGetSessionByIdData,
-  zSupportServiceListSessionsData,
-  zSupportServiceSendMessageData,
-} from "./zod.gen"
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<
   TData,
@@ -271,9 +220,6 @@ export const identityServiceGetAllUsers = <ThrowOnError extends boolean = false>
     IdentityServiceGetAllUsersErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zIdentityServiceGetAllUsersData.parseAsync(data)
-    },
     responseTransformer: identityServiceGetAllUsersResponseTransformer,
     url: "/api/v1/users",
     ...options,
@@ -293,9 +239,6 @@ export const identityServiceCreateUser = <ThrowOnError extends boolean = false>(
     IdentityServiceCreateUserErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zIdentityServiceCreateUserData.parseAsync(data)
-    },
     responseTransformer: identityServiceCreateUserResponseTransformer,
     url: "/api/v1/users",
     ...options,
@@ -319,9 +262,6 @@ export const identityServiceDeactivateUser = <ThrowOnError extends boolean = fal
     IdentityServiceDeactivateUserErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zIdentityServiceDeactivateUserData.parseAsync(data)
-    },
     url: "/api/v1/users/{userId}/deactivate",
     ...options,
   })
@@ -340,9 +280,6 @@ export const identityServiceActivateUser = <ThrowOnError extends boolean = false
     IdentityServiceActivateUserErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zIdentityServiceActivateUserData.parseAsync(data)
-    },
     url: "/api/v1/users/{userId}/activate",
     ...options,
   })
@@ -361,9 +298,6 @@ export const identityServiceChangePassword = <ThrowOnError extends boolean = fal
     IdentityServiceChangePasswordErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zIdentityServiceChangePasswordData.parseAsync(data)
-    },
     url: "/api/v1/users/me/change-password",
     ...options,
     headers: {
@@ -386,9 +320,6 @@ export const identityServiceVerifyEmail = <ThrowOnError extends boolean = false>
     IdentityServiceVerifyEmailErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zIdentityServiceVerifyEmailData.parseAsync(data)
-    },
     url: "/api/auth/verify-email",
     ...options,
     headers: {
@@ -411,9 +342,6 @@ export const identityServiceResetPassword = <ThrowOnError extends boolean = fals
     IdentityServiceResetPasswordErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zIdentityServiceResetPasswordData.parseAsync(data)
-    },
     url: "/api/auth/reset-password",
     ...options,
     headers: {
@@ -436,9 +364,6 @@ export const identityServiceResendVerificationEmail = <ThrowOnError extends bool
     IdentityServiceResendVerificationEmailErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zIdentityServiceResendVerificationEmailData.parseAsync(data)
-    },
     url: "/api/auth/resend-verification",
     ...options,
     headers: {
@@ -458,9 +383,6 @@ export const identityServiceRegister = <ThrowOnError extends boolean = false>(
 ) => {
   return (options.client ?? client).post<IdentityServiceRegisterResponses, IdentityServiceRegisterErrors, ThrowOnError>(
     {
-      requestValidator: async (data) => {
-        return await zIdentityServiceRegisterData.parseAsync(data)
-      },
       responseTransformer: identityServiceRegisterResponseTransformer,
       url: "/api/auth/register",
       ...options,
@@ -481,9 +403,6 @@ export const identityServiceLogin = <ThrowOnError extends boolean = false>(
   options: Options<IdentityServiceLoginData, ThrowOnError>,
 ) => {
   return (options.client ?? client).post<IdentityServiceLoginResponses, IdentityServiceLoginErrors, ThrowOnError>({
-    requestValidator: async (data) => {
-      return await zIdentityServiceLoginData.parseAsync(data)
-    },
     responseTransformer: identityServiceLoginResponseTransformer,
     url: "/api/auth/login",
     ...options,
@@ -507,9 +426,6 @@ export const identityServiceRequestPasswordReset = <ThrowOnError extends boolean
     IdentityServiceRequestPasswordResetErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zIdentityServiceRequestPasswordResetData.parseAsync(data)
-    },
     url: "/api/auth/forgot-password",
     ...options,
     headers: {
@@ -532,9 +448,6 @@ export const identityServiceGetCurrentUser = <ThrowOnError extends boolean = fal
     IdentityServiceGetCurrentUserErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zIdentityServiceGetCurrentUserData.parseAsync(data)
-    },
     responseTransformer: identityServiceGetCurrentUserResponseTransformer,
     url: "/api/v1/users/me",
     ...options,
@@ -554,9 +467,6 @@ export const identityServiceUpdateCurrentUserProfile = <ThrowOnError extends boo
     IdentityServiceUpdateCurrentUserProfileErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zIdentityServiceUpdateCurrentUserProfileData.parseAsync(data)
-    },
     responseTransformer: identityServiceUpdateCurrentUserProfileResponseTransformer,
     url: "/api/v1/users/me",
     ...options,
@@ -580,9 +490,6 @@ export const identityServiceDeleteUser = <ThrowOnError extends boolean = false>(
     IdentityServiceDeleteUserErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zIdentityServiceDeleteUserData.parseAsync(data)
-    },
     url: "/api/v1/users/{userId}",
     ...options,
   })
@@ -601,9 +508,6 @@ export const identityServiceGetUserById = <ThrowOnError extends boolean = false>
     IdentityServiceGetUserByIdErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zIdentityServiceGetUserByIdData.parseAsync(data)
-    },
     responseTransformer: identityServiceGetUserByIdResponseTransformer,
     url: "/api/v1/users/{userId}",
     ...options,
@@ -623,9 +527,6 @@ export const identityServiceGetUsersByRole = <ThrowOnError extends boolean = fal
     IdentityServiceGetUsersByRoleErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zIdentityServiceGetUsersByRoleData.parseAsync(data)
-    },
     responseTransformer: identityServiceGetUsersByRoleResponseTransformer,
     url: "/api/v1/users/role/{role}",
     ...options,
@@ -645,9 +546,6 @@ export const contentServiceGetAllTutorials = <ThrowOnError extends boolean = fal
     ContentServiceGetAllTutorialsErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zContentServiceGetAllTutorialsData.parseAsync(data)
-    },
     responseTransformer: contentServiceGetAllTutorialsResponseTransformer,
     url: "/api/v1/tutorials",
     ...options,
@@ -667,9 +565,6 @@ export const contentServiceCreateTutorial = <ThrowOnError extends boolean = fals
     ContentServiceCreateTutorialErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zContentServiceCreateTutorialData.parseAsync(data)
-    },
     responseTransformer: contentServiceCreateTutorialResponseTransformer,
     url: "/api/v1/tutorials",
     ...options,
@@ -693,9 +588,6 @@ export const contentServiceGetAllSkills = <ThrowOnError extends boolean = false>
     ContentServiceGetAllSkillsErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zContentServiceGetAllSkillsData.parseAsync(data)
-    },
     responseTransformer: contentServiceGetAllSkillsResponseTransformer,
     url: "/api/v1/skills",
     ...options,
@@ -715,9 +607,6 @@ export const contentServiceCreateSkill = <ThrowOnError extends boolean = false>(
     ContentServiceCreateSkillErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zContentServiceCreateSkillData.parseAsync(data)
-    },
     responseTransformer: contentServiceCreateSkillResponseTransformer,
     url: "/api/v1/skills",
     ...options,
@@ -741,9 +630,6 @@ export const contentServiceGetAllAssignments = <ThrowOnError extends boolean = f
     ContentServiceGetAllAssignmentsErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zContentServiceGetAllAssignmentsData.parseAsync(data)
-    },
     responseTransformer: contentServiceGetAllAssignmentsResponseTransformer,
     url: "/api/v1/assignments",
     ...options,
@@ -763,9 +649,6 @@ export const contentServiceCreateAssignment = <ThrowOnError extends boolean = fa
     ContentServiceCreateAssignmentErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zContentServiceCreateAssignmentData.parseAsync(data)
-    },
     responseTransformer: contentServiceCreateAssignmentResponseTransformer,
     url: "/api/v1/assignments",
     ...options,
@@ -789,9 +672,6 @@ export const contentServicePublishAssignment = <ThrowOnError extends boolean = f
     ContentServicePublishAssignmentErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zContentServicePublishAssignmentData.parseAsync(data)
-    },
     responseTransformer: contentServicePublishAssignmentResponseTransformer,
     url: "/api/v1/assignments/{id}/publish",
     ...options,
@@ -811,9 +691,6 @@ export const contentServiceArchiveAssignment = <ThrowOnError extends boolean = f
     ContentServiceArchiveAssignmentErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zContentServiceArchiveAssignmentData.parseAsync(data)
-    },
     responseTransformer: contentServiceArchiveAssignmentResponseTransformer,
     url: "/api/v1/assignments/{id}/archive",
     ...options,
@@ -833,9 +710,6 @@ export const contentServiceDeleteTutorial = <ThrowOnError extends boolean = fals
     ContentServiceDeleteTutorialErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zContentServiceDeleteTutorialData.parseAsync(data)
-    },
     url: "/api/v1/tutorials/{id}",
     ...options,
   })
@@ -854,9 +728,6 @@ export const contentServiceGetTutorialById = <ThrowOnError extends boolean = fal
     ContentServiceGetTutorialByIdErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zContentServiceGetTutorialByIdData.parseAsync(data)
-    },
     responseTransformer: contentServiceGetTutorialByIdResponseTransformer,
     url: "/api/v1/tutorials/{id}",
     ...options,
@@ -876,9 +747,6 @@ export const contentServiceUpdateTutorial = <ThrowOnError extends boolean = fals
     ContentServiceUpdateTutorialErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zContentServiceUpdateTutorialData.parseAsync(data)
-    },
     responseTransformer: contentServiceUpdateTutorialResponseTransformer,
     url: "/api/v1/tutorials/{id}",
     ...options,
@@ -902,9 +770,6 @@ export const contentServiceDeleteSkill = <ThrowOnError extends boolean = false>(
     ContentServiceDeleteSkillErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zContentServiceDeleteSkillData.parseAsync(data)
-    },
     url: "/api/v1/skills/{id}",
     ...options,
   })
@@ -923,9 +788,6 @@ export const contentServiceGetSkillById = <ThrowOnError extends boolean = false>
     ContentServiceGetSkillByIdErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zContentServiceGetSkillByIdData.parseAsync(data)
-    },
     responseTransformer: contentServiceGetSkillByIdResponseTransformer,
     url: "/api/v1/skills/{id}",
     ...options,
@@ -945,9 +807,6 @@ export const contentServiceUpdateSkill = <ThrowOnError extends boolean = false>(
     ContentServiceUpdateSkillErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zContentServiceUpdateSkillData.parseAsync(data)
-    },
     responseTransformer: contentServiceUpdateSkillResponseTransformer,
     url: "/api/v1/skills/{id}",
     ...options,
@@ -971,9 +830,6 @@ export const contentServiceDeleteAssignment = <ThrowOnError extends boolean = fa
     ContentServiceDeleteAssignmentErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zContentServiceDeleteAssignmentData.parseAsync(data)
-    },
     url: "/api/v1/assignments/{id}",
     ...options,
   })
@@ -992,9 +848,6 @@ export const contentServiceGetAssignmentById = <ThrowOnError extends boolean = f
     ContentServiceGetAssignmentByIdErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zContentServiceGetAssignmentByIdData.parseAsync(data)
-    },
     responseTransformer: contentServiceGetAssignmentByIdResponseTransformer,
     url: "/api/v1/assignments/{id}",
     ...options,
@@ -1014,9 +867,6 @@ export const contentServiceUpdateAssignment = <ThrowOnError extends boolean = fa
     ContentServiceUpdateAssignmentErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zContentServiceUpdateAssignmentData.parseAsync(data)
-    },
     responseTransformer: contentServiceUpdateAssignmentResponseTransformer,
     url: "/api/v1/assignments/{id}",
     ...options,
@@ -1040,9 +890,6 @@ export const contentServiceUpdateAssignmentSchedule = <ThrowOnError extends bool
     ContentServiceUpdateAssignmentScheduleErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zContentServiceUpdateAssignmentScheduleData.parseAsync(data)
-    },
     responseTransformer: contentServiceUpdateAssignmentScheduleResponseTransformer,
     url: "/api/v1/assignments/{id}/schedule",
     ...options,
@@ -1066,9 +913,6 @@ export const submissionServiceGetAllSubmissions = <ThrowOnError extends boolean 
     SubmissionServiceGetAllSubmissionsErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zSubmissionServiceGetAllSubmissionsData.parseAsync(data)
-    },
     responseTransformer: submissionServiceGetAllSubmissionsResponseTransformer,
     url: "/api/v1/submissions",
     ...options,
@@ -1088,9 +932,6 @@ export const submissionServiceCreateSubmission = <ThrowOnError extends boolean =
     SubmissionServiceCreateSubmissionErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zSubmissionServiceCreateSubmissionData.parseAsync(data)
-    },
     responseTransformer: submissionServiceCreateSubmissionResponseTransformer,
     url: "/api/v1/submissions",
     ...options,
@@ -1114,9 +955,6 @@ export const submissionServiceProvideFeedback = <ThrowOnError extends boolean = 
     SubmissionServiceProvideFeedbackErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zSubmissionServiceProvideFeedbackData.parseAsync(data)
-    },
     responseTransformer: submissionServiceProvideFeedbackResponseTransformer,
     url: "/api/v1/submissions/{id}/feedback",
     ...options,
@@ -1140,9 +978,6 @@ export const submissionServiceGetSubmissionById = <ThrowOnError extends boolean 
     SubmissionServiceGetSubmissionByIdErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zSubmissionServiceGetSubmissionByIdData.parseAsync(data)
-    },
     responseTransformer: submissionServiceGetSubmissionByIdResponseTransformer,
     url: "/api/v1/submissions/{id}",
     ...options,
@@ -1162,9 +997,6 @@ export const evaluationServiceGetSupportedRuntimes = <ThrowOnError extends boole
     EvaluationServiceGetSupportedRuntimesErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zEvaluationServiceGetSupportedRuntimesData.parseAsync(data)
-    },
     url: "/api/v1/runtimes",
     ...options,
   })
@@ -1183,9 +1015,6 @@ export const supportServiceListSessions = <ThrowOnError extends boolean = false>
     SupportServiceListSessionsErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zSupportServiceListSessionsData.parseAsync(data)
-    },
     responseTransformer: supportServiceListSessionsResponseTransformer,
     url: "/api/v1/support/sessions",
     ...options,
@@ -1205,9 +1034,6 @@ export const supportServiceCreateSession = <ThrowOnError extends boolean = false
     SupportServiceCreateSessionErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zSupportServiceCreateSessionData.parseAsync(data)
-    },
     responseTransformer: supportServiceCreateSessionResponseTransformer,
     url: "/api/v1/support/sessions",
     ...options,
@@ -1231,9 +1057,6 @@ export const supportServiceSendMessage = <ThrowOnError extends boolean = false>(
     SupportServiceSendMessageErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zSupportServiceSendMessageData.parseAsync(data)
-    },
     responseTransformer: supportServiceSendMessageResponseTransformer,
     url: "/api/v1/support/sessions/{sessionId}/messages",
     ...options,
@@ -1257,9 +1080,6 @@ export const supportServiceCloseSession = <ThrowOnError extends boolean = false>
     SupportServiceCloseSessionErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zSupportServiceCloseSessionData.parseAsync(data)
-    },
     responseTransformer: supportServiceCloseSessionResponseTransformer,
     url: "/api/v1/support/sessions/{sessionId}/close",
     ...options,
@@ -1279,9 +1099,6 @@ export const supportServiceGetSessionById = <ThrowOnError extends boolean = fals
     SupportServiceGetSessionByIdErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zSupportServiceGetSessionByIdData.parseAsync(data)
-    },
     responseTransformer: supportServiceGetSessionByIdResponseTransformer,
     url: "/api/v1/support/sessions/{sessionId}",
     ...options,
@@ -1301,9 +1118,6 @@ export const notificationServiceRegisterDevice = <ThrowOnError extends boolean =
     NotificationServiceRegisterDeviceErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zNotificationServiceRegisterDeviceData.parseAsync(data)
-    },
     responseTransformer: notificationServiceRegisterDeviceResponseTransformer,
     url: "/api/v1/devices/register",
     ...options,
@@ -1327,9 +1141,6 @@ export const notificationServiceGetPreferences = <ThrowOnError extends boolean =
     NotificationServiceGetPreferencesErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zNotificationServiceGetPreferencesData.parseAsync(data)
-    },
     responseTransformer: notificationServiceGetPreferencesResponseTransformer,
     url: "/api/v1/preferences",
     ...options,
@@ -1349,9 +1160,6 @@ export const notificationServiceUpdatePreferences = <ThrowOnError extends boolea
     NotificationServiceUpdatePreferencesErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zNotificationServiceUpdatePreferencesData.parseAsync(data)
-    },
     responseTransformer: notificationServiceUpdatePreferencesResponseTransformer,
     url: "/api/v1/preferences",
     ...options,
@@ -1375,9 +1183,6 @@ export const notificationServiceGetUserDevices = <ThrowOnError extends boolean =
     NotificationServiceGetUserDevicesErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zNotificationServiceGetUserDevicesData.parseAsync(data)
-    },
     responseTransformer: notificationServiceGetUserDevicesResponseTransformer,
     url: "/api/v1/devices",
     ...options,
@@ -1397,9 +1202,6 @@ export const notificationServiceRemoveDevice = <ThrowOnError extends boolean = f
     NotificationServiceRemoveDeviceErrors,
     ThrowOnError
   >({
-    requestValidator: async (data) => {
-      return await zNotificationServiceRemoveDeviceData.parseAsync(data)
-    },
     url: "/api/v1/devices/{token}",
     ...options,
   })

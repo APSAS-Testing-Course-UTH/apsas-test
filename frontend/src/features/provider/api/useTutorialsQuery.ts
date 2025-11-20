@@ -7,14 +7,14 @@
  */
 
 import { useQuery } from '@tanstack/react-query'
-import type { AxiosError } from 'axios'
+import type { ApiErrorResponse } from '@/configs/api-error-handler'
 import type { ContentServicePageResponseTutorialResponse } from '@/api/types.gen'
 import { contentServiceGetAllTutorials } from '@/api/sdk.gen'
 
 export const tutorialQueryKeys = {
   all: ['tutorials'] as const,
   lists: () => [...tutorialQueryKeys.all, 'list'] as const,
-  list: (filters: { page: number; size: number; sort: string }) =>
+  list: (filters: { page: number; size: number }) =>
     [...tutorialQueryKeys.lists(), filters] as const,
   details: () => [...tutorialQueryKeys.all, 'detail'] as const,
   detail: (id: string) => [...tutorialQueryKeys.details(), id] as const,
@@ -23,15 +23,14 @@ export const tutorialQueryKeys = {
 export function useTutorialsQuery({
   page = 0,
   size = 10,
-  sort = 'createdAt:DESC',
-}: { page?: number; size?: number; sort?: string } = {}) {
+}: { page?: number; size?: number } = {}) {
   return useQuery<
     ContentServicePageResponseTutorialResponse,
-    AxiosError,
+    ApiErrorResponse,
     ContentServicePageResponseTutorialResponse,
-    readonly ['tutorials', 'list', { page: number; size: number; sort: string }]
+    readonly ['tutorials', 'list', { page: number; size: number }]
   >({
-    queryKey: ['tutorials', 'list', { page, size, sort }] as const,
+    queryKey: ['tutorials', 'list', { page, size }] as const,
     queryFn: async () => {
       const response = await contentServiceGetAllTutorials({
         query: { page: String(page), size: String(size) },

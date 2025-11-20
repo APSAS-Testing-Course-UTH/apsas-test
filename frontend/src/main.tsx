@@ -8,33 +8,133 @@ import { client } from '@/api/client.gen'
 import { router } from '@/router'
 import { queryClient } from '@/query-client'
 import { initializeAuth } from '@/features/auth/stores/useAuthStore'
+import { mapApiError } from '@/configs/api-error-handler'
+import { env } from '@/configs/env'
 
 // Configure client base URL for MSW (dev) or production API
-// In DEV mode, use http://localhost:8080 to match MSW handlers and OpenAPI specs
-// In PROD mode, use VITE_API_BASE_URL from env
-const baseUrl = import.meta.env.DEV ? 'http://localhost:8080' : (import.meta.env.VITE_API_BASE_URL || '')
-client.setConfig({ baseUrl })
+// Use VITE_API_BASE_URL from env (validated by Zod)
+client.setConfig({
+  baseUrl: env.VITE_API_BASE_URL,
+})
 
-// Setup auth interceptor
-client.interceptors.request.use(async (request) => {
+// Setup auth interceptor - add JWT token to requests
+client.interceptors.request.use(async (request) =>  {
   const token = localStorage.getItem('apsas_token')
-  
+
   if (token) {
     request.headers.set('Authorization', `Bearer ${token}`)
   }
-  
+
+  // Log requests in debug mode
+  if (env.VITE_ENABLE_DEVTOOLS) {
+    console.log('🚀 [API Request]', {
+      method: request.method,
+      url: request.url,
+      headers: Object.fromEntries(request.headers.entries()),
+    })
+  }
+
   return request
 })
 
-// Start MSW in development and wait for it to be ready before rendering
-async function startApp() {
-  // 🔴 CRITICAL: Initialize auth from localStorage FIRST, before rendering app
-  // This ensures auth state is ready before Router's beforeLoad hooks run
-  initializeAuth()
+// Setup response interceptor - log successful responses in debug mode
+client.interceptors.response.use((response) => {
+  if (env.VITE_ENABLE_DEVTOOLS) {
+    console.log('✅ [API Response]', {
+      status: response.status,
+      url: response.url,
+    })
+  }
+  return response
+})
+
+// Setup error interceptor - handle API errors globally
+// Note: The 'error' parameter is the already-parsed ProblemDetail object from the API
+// Structure: { type, title, status, detail, instance, ...extensions }
+client.interceptors.error.use(async (error, response) => {
+  // Wrap ProblemDetail in hey-api error structure for mapApiError compatibility
+  const wrappedError = {
+    response: {
+      status: response.status,
+      statusText: response.statusText,
+    },
+    error, // This is the ProblemDetail object
+  }
   
-  if (import.meta.env.DEV) {
+  const mappedError = mapApiError(wrappedError)
+
+  // Log errors in debug mode
+  if (env.VITE_ENABLE_DEVTOOLS) {
+    console.error('❌ [API Error]', {
+      problemDetail: error, // Raw ProblemDetail
+      mapped: {
+        message: mappedError.message,
+        code: mappedError.code,
+        details: mappedError.details,
+        timestamp: mappedError.timestamp,
+      },
+    })
+  }
+
+  // For 401 errors, clear auth and redirect to login
+  if (response.status === 401) {
+    localStorage.removeItem('apsas_token')
+    localStorage.removeItem('apsas_user')
+
+    // Redirect to login (if not already there)
+    if (window.location.pathname !== '/login') {
+      window.location.href = '/login'
+    }
+  }
+
+  // Return the original error (ProblemDetail) to maintain consistency
+  // with the hey-api client error handling
+  return error
+})
+
+async function startApp() {
+  initializeAuth()
+
+  // Only start MSW if explicitly enabled via environment variable
+  const enableMSW = import.meta.env.VITE_ENABLE_MSW === 'true'
+
+  if (import.meta.env.DEV && enableMSW) {
+    console.log('🔴 MSW Enabled: Using mock API responses')
     const { startWorker } = await import('./mocks/browser')
     await startWorker()
+  } else if (import.meta.env.DEV) {
+    console.log('✅ MSW Disabled: Connecting to real Backend API')
+
+    // Register Firebase Messaging Service Worker for push notifications
+    if ('serviceWorker' in navigator) {
+      // if (false) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker
+          .register('/firebase-messaging-sw.js', {
+            scope: '/',
+            updateViaCache: 'none', // Always fetch fresh SW
+          })
+          .then((registration) => {
+            console.log('[ServiceWorker] Firebase Messaging SW registered:', registration.scope)
+
+            // Listen for Service Worker updates
+            registration.addEventListener('updatefound', () => {
+              const newWorker = registration.installing
+              if (newWorker) {
+                console.log('[ServiceWorker] New version found, installing...')
+                newWorker.addEventListener('statechange', () => {
+                  if (newWorker.state === 'activated') {
+                    console.log('[ServiceWorker] New version activated')
+                  }
+                })
+              }
+            })
+          })
+          .catch((error) => {
+            console.error('[ServiceWorker] Firebase Messaging SW registration failed:', error)
+          })
+      })
+    }
   }
 
   createRoot(document.getElementById("root")!).render(
@@ -42,92 +142,6 @@ async function startApp() {
       <App />
     </StrictMode>,
   )
-  
-  // Expose debugging helpers to window in development
-  if (import.meta.env.DEV) {
-    // Router instance for manual navigation
-    window.router = router
-    
-    // QueryClient for cache inspection
-    window.queryClient = queryClient
-    
-    // Helper to log current state
-    window.debugState = () => {
-      console.group('📊 Debug State')
-      console.log('Router State:', router.state)
-      console.log('Router Location:', router.state.location)
-      console.log('Query Cache:', queryClient.getQueryCache())
-      console.log('Query Cache Size:', queryClient.getQueryCache().getAll().length)
-      console.log('Mutation Cache:', queryClient.getMutationCache())
-      console.log('Mutation Cache Size:', queryClient.getMutationCache().getAll().length)
-      console.groupEnd()
-    }
-    
-    // Helper to inspect router tree
-    window.debugRoutes = () => {
-      console.group('🗺️ Route Tree')
-      console.log('All Routes:', router.flatRoutes)
-      console.log('Route Tree:', router.routeTree)
-      console.groupEnd()
-    }
-    
-    // Helper to clear caches
-    window.clearCaches = () => {
-      queryClient.clear()
-      console.log('✅ Caches cleared')
-    }
-
-    // Helper to inspect query cache details
-    window.debugQueryCache = () => {
-      console.group('🔍 Query Cache Details')
-      const queries = queryClient.getQueryCache().getAll()
-      queries.forEach((query: any) => {
-        const key = query.queryKey?.join('/') || 'unknown'
-        console.log(`Query: ${key}`, {
-          status: query.state.status,
-          data: query.state.data,
-          dataUpdatedAt: new Date(query.state.dataUpdatedAt),
-          error: query.state.error,
-          errorUpdatedAt: query.state.errorUpdatedAt ? new Date(query.state.errorUpdatedAt) : null,
-        })
-      })
-      console.groupEnd()
-    }
-
-    // Helper to inspect mutation cache details
-    window.debugMutationCache = () => {
-      console.group('🔍 Mutation Cache Details')
-      const mutations = queryClient.getMutationCache().getAll()
-      mutations.forEach((mutation: any, idx: number) => {
-        console.log(`Mutation ${idx + 1}`, {
-          status: mutation.state.status,
-          data: mutation.state.data,
-          error: mutation.state.error,
-        })
-      })
-      console.groupEnd()
-    }
-
-    // Helper to list all cached query keys
-    window.debugQueryKeys = () => {
-      console.group('🔑 Cached Query Keys')
-      const queries = queryClient.getQueryCache().getAll()
-      queries.forEach((query: any) => {
-        const key = query.queryKey?.join('/') || 'unknown'
-        const status = query.state.status
-        console.log(`${key} [${status}]`)
-      })
-      console.groupEnd()
-    }
-    
-    console.log('🎯 Debug tools available:')
-    console.log('  window.debugState() - Show router & cache state')
-    console.log('  window.debugRoutes() - Show route tree')
-    console.log('  window.debugQueryCache() - Show query cache details')
-    console.log('  window.debugMutationCache() - Show mutation cache details')
-    console.log('  window.debugQueryKeys() - List all cached query keys')
-    console.log('  window.clearCaches() - Clear all caches')
-  }
 }
 
 startApp()

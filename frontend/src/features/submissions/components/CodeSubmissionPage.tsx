@@ -16,6 +16,7 @@ import { SubmissionEditor } from './SubmissionEditor'
 import { submissionServiceCreateSubmission } from '@/api/sdk.gen'
 import { mapApiError } from '@/configs/api-error-handler'
 import { showSuccessNotification, showErrorNotification } from '@/utils/notifications'
+import { MarkdownContent } from '@/components/MarkdownContent'
 import styles from './CodeSubmissionPage.module.css'
 
 const labels = {
@@ -75,7 +76,7 @@ export function CodeSubmissionPage() {
 
   // Success callback - show notification
   const handleSuccess = useCallback(() => {
-    showSuccessNotification('Mã của bạn đang được kiểm tra...', 'Bài nộp thành công!')
+    showSuccessNotification('Code của bạn đang được kiểm tra...', 'Bài nộp thành công!')
   }, [])
 
   // Error callback - show error notification
@@ -153,9 +154,7 @@ export function CodeSubmissionPage() {
                   {labels.description}
                 </Text>
                 {assignment.description ? (
-                  <Text size="sm" c="dimmed" style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>
-                    {assignment.description}
-                  </Text>
+                  <MarkdownContent content={assignment.description} />
                 ) : (
                   <Text size="sm" c="dimmed" fs="italic">
                     Không có mô tả

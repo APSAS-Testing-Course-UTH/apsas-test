@@ -7,6 +7,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { submissionServiceGetAllSubmissions } from '@/api/sdk.gen'
+import { instructorKeys } from './queryKeys'
 import type { FeedbackStats, FeedbackItem } from '../components/FeedbackOverview'
 
 /**
@@ -15,7 +16,7 @@ import type { FeedbackStats, FeedbackItem } from '../components/FeedbackOverview
  */
 export function useFeedbackStats() {
   return useQuery({
-    queryKey: ['instructor', 'feedback', 'stats'],
+    queryKey: instructorKeys.feedback.stats(),
     queryFn: async (): Promise<FeedbackStats> => {
       // Fetch all submissions (large page size to get all for stats)
       const result = await submissionServiceGetAllSubmissions({
@@ -71,7 +72,7 @@ export function useFeedbackStats() {
  */
 export function useFeedbackHistory() {
   return useQuery({
-    queryKey: ['instructor', 'feedback', 'history'],
+    queryKey: instructorKeys.feedback.history(),
     queryFn: async (): Promise<FeedbackItem[]> => {
       // Fetch submissions with pagination
       const result = await submissionServiceGetAllSubmissions({

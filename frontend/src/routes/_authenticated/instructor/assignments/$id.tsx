@@ -13,6 +13,7 @@ import { SkillBadges } from '@/features/assignments/components/SkillBadges'
 import { TutorialLinks } from '@/features/assignments/components/TutorialLinks'
 import { EditScheduleModal } from '@/features/assignments/components/EditScheduleModal'
 import { InstructorSubmissionsList } from '@/features/submissions/components'
+import { MarkdownContent } from '@/components/MarkdownContent'
 
 /**
  * Instructor Assignment Detail Page
@@ -138,7 +139,13 @@ const InstructorAssignmentDetailPage = () => {
                   <Title order={3}>Mô tả bài toán</Title>
                 </Card.Section>
                 <Card.Section inheritPadding py="md">
-                  <Text>{assignment.description || 'Không có mô tả'}</Text>
+                  {assignment.description ? (
+                    <MarkdownContent content={assignment.description} />
+                  ) : (
+                    <Text c="dimmed" fs="italic">
+                      Không có mô tả
+                    </Text>
+                  )}
                 </Card.Section>
               </Card>
 

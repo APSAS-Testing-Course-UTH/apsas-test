@@ -40,7 +40,7 @@ function areFiltersEmpty(filters: FilterState): boolean {
 /**
  * Build query parameters from filters (removes undefined/empty values)
  */
-export function buildFilterParams(filters: FilterState): Record<string, string> {
+function buildFilterParams(filters: FilterState): Record<string, string> {
   const params: Record<string, string> = {}
 
   Object.entries(filters).forEach(([key, value]) => {
@@ -56,6 +56,7 @@ export function buildFilterParams(filters: FilterState): Record<string, string> 
  * useAssignmentFilter - Hook for managing assignment filters
  * @param initialFilters - Initial filter values (optional)
  * @returns Filter state and control functions
+ * @deprecated Use useAdvancedFilter instead
  */
 export function useAssignmentFilter(
   initialFilters: Partial<AssignmentFilterState> = {}
@@ -98,6 +99,7 @@ export function useAssignmentFilter(
  * useSubmissionFilter - Hook for managing submission filters
  * @param initialFilters - Initial filter values (optional)
  * @returns Filter state and control functions
+ * @deprecated Use useAdvancedFilter instead
  */
 export function useSubmissionFilter(
   initialFilters: Partial<SubmissionFilterState> = {}
@@ -177,6 +179,7 @@ export function useAdvancedFilter<T extends FilterState>(
 /**
  * Apply filters to search term (client-side text search)
  * Useful for combined server and client-side filtering
+ * @internal
  */
 export function applyTextFilter(
   items: Array<{ title?: string; name?: string; description?: string }>,
@@ -196,5 +199,3 @@ export function applyTextFilter(
     return title.includes(lowerSearch) || name.includes(lowerSearch) || description.includes(lowerSearch)
   })
 }
-
-export default useAdvancedFilter

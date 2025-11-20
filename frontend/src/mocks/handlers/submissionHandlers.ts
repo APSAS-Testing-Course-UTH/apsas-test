@@ -3,65 +3,24 @@ import { withAuth } from '../middleware/withAuth'
 import { UserRole } from '../middleware/withAuth'
 import { errorResponses } from '../middleware/errorHandler'
 import { submissionUrl, MSW_BASE_URL } from '../config'
+// Import generated types from OpenAPI spec
+import type {
+  SubmissionServiceSubmissionResponse,
+  SubmissionServiceCreateSubmissionRequest,
+  // SubmissionServiceSubmissionFeedbackRequest, // ❌ Removed - POST feedback deleted
+  SubmissionServicePageResponseSubmissionResponse,
+} from '@/api/types.gen'
 
 console.log('[Submission Handlers] Using base URL:', MSW_BASE_URL)
 
-// Define submission-related types based on OpenAPI spec
-export type SubmissionStatus = 'PENDING' | 'EVALUATED' | 'FAILED'
-export type SubmissionResult = 'PASSED' | 'FAILED' | 'PARTIAL'
+// Type aliases for convenience (using generated types)
+type SubmissionResponse = SubmissionServiceSubmissionResponse
+type CreateSubmissionRequest = SubmissionServiceCreateSubmissionRequest
+// type SubmissionFeedbackRequest = SubmissionServiceSubmissionFeedbackRequest // ❌ Removed
+type PageResponseSubmissionResponse = SubmissionServicePageResponseSubmissionResponse
 
-export type TestCaseResultResponse = {
-  order: number
-  description: string
-  hidden: boolean
-  weight: number
-  input: string
-  output: string
-  timeout: number
-  memoryLimit: number
-  passed: boolean
-  actualOutput?: string
-  errorMessage?: string
-  executionTime: number
-  memoryUsed: number
-}
-
-export type SubmissionResponse = {
-  id: string
-  assignmentId: string
-  studentId: string
-  submittedAt: string
-  status: SubmissionStatus
-  code: string
-  language: string
-  result?: SubmissionResult
-  score?: number
-  testCaseResults?: TestCaseResultResponse[]
-  evaluatedAt?: string
-  feedback?: string
-}
-
-export type CreateSubmissionRequest = {
-  assignmentId: string
-  code: string
-  language: string
-}
-
-export type SubmissionFeedbackRequest = {
-  feedback: string
-}
-
-export type PageResponseSubmissionResponse = {
-  content: SubmissionResponse[]
-  pageNumber: number
-  pageSize: number
-  totalElements: number
-  totalPages: number
-  first: boolean
-  last: boolean
-  hasNext: boolean
-  hasPrevious: boolean
-}
+// Status type from OpenAPI
+type SubmissionStatus = SubmissionResponse['status']
 
 // Mock submissions database - use generated mock data with valid UUIDs
 // Import from centralized mock data registry
@@ -73,9 +32,10 @@ MOCK_DATA_REGISTRY.submissions.forEach((sub) => {
   if (sub.id) {
     mockSubmissions[sub.id] = {
       ...sub,
-      submittedAt: sub.submittedAt ? sub.submittedAt.toISOString() : new Date().toISOString(),
-      evaluatedAt: sub.evaluatedAt ? sub.evaluatedAt.toISOString() : undefined,
-    } as SubmissionResponse
+      // Ensure Date objects for submittedAt and evaluatedAt
+      submittedAt: sub.submittedAt ? sub.submittedAt : new Date(),
+      evaluatedAt: sub.evaluatedAt ? sub.evaluatedAt : undefined,
+    }
   }
 })
 
@@ -132,7 +92,7 @@ export const submissionHandlers = [
         content: filtered.slice(page * size, (page + 1) * size),
         pageNumber: page,
         pageSize: size,
-        totalElements: filtered.length,
+        totalElements: filtered.length as any, // Cast to number for JSON serialization (backend int64 → bigint in types)
         totalPages: Math.ceil(filtered.length / size),
         first: page === 0,
         last: page >= Math.ceil(filtered.length / size) - 1,
@@ -172,7 +132,7 @@ export const submissionHandlers = [
         id: crypto.randomUUID(),
         assignmentId: body.assignmentId,
         studentId: 'student-001', // In real app, get from token
-        submittedAt: new Date().toISOString(),
+        submittedAt: new Date(),
         status: 'PENDING',
         code: body.code,
         language: body.language,
@@ -180,9 +140,12 @@ export const submissionHandlers = [
       }
 
       // Store in mock database
-      mockSubmissions[newSubmission.id] = newSubmission
+      if (newSubmission.id) {
+        mockSubmissions[newSubmission.id] = newSubmission
+      }
 
-      return HttpResponse.json(newSubmission, { status: 200 })
+      // ✅ MATCHES Backend OpenAPI spec (submission-service.json line 80): 201 Created
+      return HttpResponse.json(newSubmission, { status: 201 })
     })
   ),
 
@@ -214,61 +177,8 @@ export const submissionHandlers = [
     })
   ),
 
-  /**
-   * POST /api/v1/submissions/{id}/feedback
-   * Provide feedback for submission (Instructors only)
-   */
-  http.post('**/api/v1/submissions/:id/feedback',
-    withAuth(async ({ request, params, user }: { request: Request, params: { id: string }, user: MockUser }) => {
-      const { id } = params
-
-      // Only instructors can provide feedback
-      if (user.role !== UserRole.INSTRUCTOR) {
-        return errorResponses.forbidden('Only instructors can provide feedback')
-      }
-
-      const submission = mockSubmissions[id]
-
-      if (!submission) {
-        return errorResponses.notFound('Submission not found')
-      }
-
-      const body: SubmissionFeedbackRequest = await request.json()
-
-      if (!body.feedback || body.feedback.trim().length === 0) {
-        return errorResponses.badRequest('Feedback cannot be empty')
-      }
-
-      // Update submission with feedback
-      const updatedSubmission: SubmissionResponse = {
-        ...submission,
-        feedback: body.feedback,
-        status: 'EVALUATED',
-        evaluatedAt: new Date().toISOString(),
-        // Simulate evaluation result
-        result: Math.random() > 0.3 ? 'PASSED' : 'FAILED',
-        score: Math.floor(Math.random() * 101),
-        testCaseResults: submission.testCaseResults || [
-          {
-            order: 1,
-            description: 'Automated test case',
-            hidden: false,
-            weight: 1.0,
-            input: 'test input',
-            output: 'expected output',
-            timeout: 5000,
-            memoryLimit: 128,
-            passed: Math.random() > 0.3,
-            actualOutput: Math.random() > 0.3 ? 'expected output' : 'wrong output',
-            executionTime: Math.random() * 100,
-            memoryUsed: Math.random() * 50,
-          },
-        ],
-      }
-
-      mockSubmissions[id] = updatedSubmission
-
-      return HttpResponse.json(updatedSubmission, { status: 200 })
-    })
-  ),
+  // ❌ REMOVED: POST /api/v1/submissions/{id}/feedback - Provide feedback
+  // Backend OpenAPI spec KHÔNG CÓ endpoint này
+  // BE chưa hỗ trợ submit feedback trực tiếp
+  // TODO: Khi BE implement feedback API, thêm lại handler này
 ]

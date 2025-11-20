@@ -1,5 +1,7 @@
+import 'dayjs/locale/vi'
 import { MantineProvider } from "@mantine/core"
 import { Notifications } from "@mantine/notifications"
+import { DatesProvider } from "@mantine/dates"
 import { QueryClientProvider } from "@tanstack/react-query"
 import { queryClient } from "@/query-client"
 import { RouterProvider } from "@tanstack/react-router"
@@ -72,9 +74,11 @@ function InnerApp() {
 export default function App() {
   return (
     <MantineProvider>
-      <AuthProvider>
-        <InnerApp />
-      </AuthProvider>
+      <DatesProvider settings={{ locale: 'vi', firstDayOfWeek: 1, weekendDays: [0, 6] }}>
+        <AuthProvider>
+          <InnerApp />
+        </AuthProvider>
+      </DatesProvider>
     </MantineProvider>
   )
 }

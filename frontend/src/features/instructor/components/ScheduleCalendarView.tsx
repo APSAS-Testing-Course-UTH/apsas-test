@@ -3,7 +3,7 @@
  * Vietnamese: Xem lịch trình bài tập
  * 
  * Displays assignment deadlines in calendar format with:
- * - Monthly calendar view
+ * - Monthly calendar view with month/year selectors
  * - Assignment count per day
  * - Click to see details
  * - Color coding for urgency
@@ -11,11 +11,33 @@
 
 import { useState, useMemo } from 'react'
 import { 
-  Card, Stack, Title, Text, Badge, Group, Button, Modal, Table, Skeleton, Alert, Grid 
+  Card, Stack, Title, Text, Badge, Group, Button, Modal, Table, Skeleton, Alert, Grid, Select 
 } from '@mantine/core'
 import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react'
 import { useNavigate } from '@tanstack/react-router'
 import type { UpcomingDeadline } from '../types/instructor.types'
+
+const VIETNAMESE_MONTHS = [
+  'Tháng 1',
+  'Tháng 2',
+  'Tháng 3',
+  'Tháng 4',
+  'Tháng 5',
+  'Tháng 6',
+  'Tháng 7',
+  'Tháng 8',
+  'Tháng 9',
+  'Tháng 10',
+  'Tháng 11',
+  'Tháng 12',
+]
+
+// Generate year options: current year ± 5 years
+const currentYear = new Date().getFullYear()
+const YEAR_OPTIONS = Array.from({ length: 11 }, (_, i) => {
+  const year = currentYear - 5 + i
+  return { value: String(year), label: `Năm ${year}` }
+})
 
 interface ScheduleCalendarViewProps {
   deadlines: UpcomingDeadline[] | undefined
@@ -98,40 +120,85 @@ export function ScheduleCalendarView({ deadlines, isLoading }: ScheduleCalendarV
   }
 
   const monthName = currentDate.toLocaleDateString('vi-VN', { month: 'long', year: 'numeric' })
+  // monthName is available for debugging if needed
+  console.debug('[ScheduleCalendar] Current month:', monthName)
   const weekDays = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
+  const month = currentDate.getMonth()
+  const year = currentDate.getFullYear()
 
   return (
     <Stack gap="lg">
       {/* Calendar Card */}
       <Card withBorder shadow="sm" p="lg" radius="md">
         <Stack gap="md">
-          {/* Header */}
-          <Group justify="space-between" align="center">
-            <Title order={3}>{monthName}</Title>
-            <Group gap="xs">
+          {/* Header with month/year selectors */}
+          <Stack gap="xs">
+            <Title order={3}>Lịch trình bài tập</Title>
+            
+            <Group gap="xs" justify="space-between">
               <Button
                 variant="subtle"
                 size="sm"
-                onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1))}
+                onClick={() => setCurrentDate(new Date(year, month - 1))}
+                px="xs"
               >
                 <IconChevronLeft size={16} />
               </Button>
+
+              <Group gap="xs" style={{ flex: 1, justifyContent: 'center' }}>
+                <Select
+                  value={String(month)}
+                  onChange={(value) => {
+                    if (value) {
+                      const newDate = new Date(year, parseInt(value), 1)
+                      setCurrentDate(newDate)
+                    }
+                  }}
+                  data={VIETNAMESE_MONTHS.map((label, index) => ({
+                    value: String(index),
+                    label,
+                  }))}
+                  size="xs"
+                  w={110}
+                  allowDeselect={false}
+                  aria-label="Chọn tháng"
+                />
+
+                <Select
+                  value={String(year)}
+                  onChange={(value) => {
+                    if (value) {
+                      const newDate = new Date(parseInt(value), month, 1)
+                      setCurrentDate(newDate)
+                    }
+                  }}
+                  data={YEAR_OPTIONS}
+                  size="xs"
+                  w={110}
+                  allowDeselect={false}
+                  aria-label="Chọn năm"
+                />
+              </Group>
+
               <Button
                 variant="subtle"
                 size="sm"
-                onClick={() => setCurrentDate(new Date())}
-              >
-                Hôm nay
-              </Button>
-              <Button
-                variant="subtle"
-                size="sm"
-                onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1))}
+                onClick={() => setCurrentDate(new Date(year, month + 1))}
+                px="xs"
               >
                 <IconChevronRight size={16} />
               </Button>
             </Group>
-          </Group>
+
+            <Button
+              variant="light"
+              size="xs"
+              onClick={() => setCurrentDate(new Date())}
+              fullWidth
+            >
+              Hôm nay
+            </Button>
+          </Stack>
 
           {/* Week day headers */}
           <Grid gutter={4}>

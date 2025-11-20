@@ -200,7 +200,8 @@ export function ContentProviderLayout() {
                 label={item.label}
                 active={isActive(item.href)}
                 onClick={() => {
-                  navigate({ to: item.href as any })
+                  // Type-safe navigation: href is validated by navigation constants
+                  navigate({ to: item.href as typeof item.href })
                   if (opened) toggle() // Close mobile menu after navigation
                 }}
                 className={classes.navLink}
@@ -217,5 +218,3 @@ export function ContentProviderLayout() {
     </AppShell>
   )
 }
-
-export const MemoizedContentProviderLayout = ContentProviderLayout

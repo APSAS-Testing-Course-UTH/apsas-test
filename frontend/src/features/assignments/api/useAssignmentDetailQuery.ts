@@ -7,7 +7,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { contentServiceGetAssignmentById } from '@/api/sdk.gen'
 import type { ContentServiceAssignmentResponse } from '@/api/types.gen'
-import type { AxiosError } from 'axios'
+import type { ApiErrorResponse } from '@/configs/api-error-handler'
 
 /**
  * Query key factory for assignment detail
@@ -30,7 +30,7 @@ export const assignmentDetailKeys = {
  * @returns {
  *   data: ContentServiceAssignmentResponse | undefined,
  *   isLoading: boolean,
- *   error: AxiosError | null,
+ *   error: ApiErrorResponse | null,
  *   refetch: () => Promise<...>
  * }
  *
@@ -40,7 +40,7 @@ export const assignmentDetailKeys = {
  * return <div>{assignment?.title}</div>
  */
 export function useAssignmentDetailQuery(id: string) {
-  return useQuery<ContentServiceAssignmentResponse, AxiosError>({
+  return useQuery<ContentServiceAssignmentResponse, ApiErrorResponse>({
     queryKey: assignmentDetailKeys.detail(id),
     queryFn: async () => {
       const response = await contentServiceGetAssignmentById({

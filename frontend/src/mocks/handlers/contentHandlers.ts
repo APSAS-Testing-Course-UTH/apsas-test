@@ -9,7 +9,7 @@ import type {
   ContentServiceCreateTutorialRequest,
   ContentServiceCreateSkillRequest,
   ContentServiceCreateAssignmentRequest,
-  ContentServiceUpdateTutorialRequest,
+  // ContentServiceUpdateTutorialRequest, // ❌ Removed - PATCH /tutorials/{id} deleted
   ContentServiceUpdateSkillRequest,
   ContentServiceUpdateAssignmentRequest,
   ContentServiceUpdateAssignmentScheduleRequest,
@@ -107,7 +107,8 @@ export const contentHandlers = [
 
       mockTutorials[tutorialId] = newTutorial
 
-      return HttpResponse.json(newTutorial, { status: 200 })
+      // ✅ MATCHES Backend OpenAPI spec (content-service.json line 63): 201 Created
+      return HttpResponse.json(newTutorial, { status: 201 })
     })
   ),
 
@@ -136,49 +137,15 @@ export const contentHandlers = [
     })
   ),
 
-  /**
-   * PATCH /api/v1/tutorials/{id}
-   * Update tutorial (Provider only)
-   */
-  http.patch('**/api/v1/tutorials/:id',
-    withAuth(async ({ request, params, user }: any) => {
-      const userRole = user.role
-
-      // Only providers can update tutorials
-      if (userRole !== UserRole.PROVIDER) {
-        return HttpResponse.json(
-          { error: 'Forbidden', message: 'Only content providers can update tutorials' },
-          { status: 403 }
-        )
-      }
-
-      const tutorial = mockTutorials[params.id]
-      if (!tutorial) {
-        return HttpResponse.json(
-          { error: 'Not Found', message: 'Tutorial not found' },
-          { status: 404 }
-        )
-      }
-
-      const body: ContentServiceUpdateTutorialRequest = await request.json()
-
-      const updatedTutorial: ContentServiceTutorialResponse = {
-        ...tutorial,
-        title: body.title ?? tutorial.title,
-        content: body.content ?? tutorial.content,
-        tags: body.tags ?? tutorial.tags,
-        updatedAt: new Date(),
-      }
-
-      mockTutorials[params.id] = updatedTutorial
-
-      return HttpResponse.json(updatedTutorial, { status: 200 })
-    })
-  ),
+  // ❌ REMOVED: PATCH /api/v1/tutorials/{id} - Update tutorial
+  // Backend OpenAPI spec KHÔNG CÓ endpoint này
+  // BE chỉ có GET và DELETE cho tutorials/{id}
+  // TODO: Khi BE implement update tutorial, thêm lại handler này
 
   /**
    * DELETE /api/v1/tutorials/{id}
    * Delete tutorial (Provider only)
+   * ✅ MATCHES Backend OpenAPI spec
    */
   http.delete('**/api/v1/tutorials/:id',
     withAuth(({ params, user }: any) => {
@@ -282,7 +249,8 @@ export const contentHandlers = [
 
       mockSkills[skillId] = newSkill
 
-      return HttpResponse.json(newSkill, { status: 200 })
+      // ✅ MATCHES Backend OpenAPI spec (content-service.json line 123): 201 Created
+      return HttpResponse.json(newSkill, { status: 201 })
     })
   ),
 
@@ -460,7 +428,8 @@ export const contentHandlers = [
 
       mockAssignments[assignmentId] = newAssignment
 
-      return HttpResponse.json(newAssignment, { status: 200 })
+      // ✅ MATCHES Backend OpenAPI spec (content-service.json line 183): 201 Created
+      return HttpResponse.json(newAssignment, { status: 201 })
     })
   ),
 

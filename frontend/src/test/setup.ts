@@ -230,6 +230,7 @@ beforeAll(async () => {
 
     // Step 7: Configure SDK client with auth interceptor for tests
     const { client } = await import('@/api/client.gen')
+    client.setConfig({ baseUrl: 'http://localhost:8080' })
     client.interceptors.request.use(async (request) => {
       if (typeof localStorage !== 'undefined') {
         const token = localStorage.getItem('apsas_token')

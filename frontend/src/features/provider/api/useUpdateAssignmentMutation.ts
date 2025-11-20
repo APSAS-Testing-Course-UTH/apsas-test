@@ -8,14 +8,18 @@
  */
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import type { AxiosError } from 'axios'
+import type { ApiErrorResponse } from '@/configs/api-error-handler'
 import type {
   ContentServiceUpdateAssignmentRequest,
   ContentServiceAssignmentResponse,
 } from '@/api/types.gen'
 import { contentServiceUpdateAssignment } from '@/api/sdk.gen'
 import { assignmentQueryKeys } from './useAssignmentsQuery'
-import { showErrorNotification, showSuccessNotification } from '../utils/errorHandler'
+import { 
+  handleApiError,
+  showErrorNotification, 
+  showSuccessNotification 
+} from '@/configs/api-error-handler'
 
 interface UpdateAssignmentParams {
   id: string
@@ -27,7 +31,7 @@ export function useUpdateAssignmentMutation() {
 
   return useMutation<
     ContentServiceAssignmentResponse,
-    AxiosError,
+    ApiErrorResponse,
     UpdateAssignmentParams
   >({
     mutationFn: async ({ id, data }: UpdateAssignmentParams) => {
@@ -51,8 +55,9 @@ export function useUpdateAssignmentMutation() {
         queryKey: assignmentQueryKeys.lists(),
       })
     },
-    onError: (error: AxiosError) => {
-      showErrorNotification('Lỗi cập nhật bài tập', undefined, error)
+    onError: (error: ApiErrorResponse) => {
+      const errorMessage = handleApiError(error)
+      showErrorNotification(errorMessage, 'Lỗi cập nhật bài tập')
     },
   })
 }

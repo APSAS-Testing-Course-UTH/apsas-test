@@ -15,7 +15,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import type { AxiosError } from 'axios'
+import type { ApiErrorResponse } from '@/configs/api-error-handler'
 import { Container, Grid, Stack, Paper, Title, Group, Button, Loader, Center, Text, ActionIcon, Pagination, Alert } from '@mantine/core'
 import { IconPlus, IconRefresh, IconAlertCircle } from '@tabler/icons-react'
 import { useSupportSessions, useSupportSession } from '../api'
@@ -148,8 +148,8 @@ export function SupportPage() {
                     icon={<IconAlertCircle size={16} />}
                     title="Lỗi tải danh sách"
                     color={
-                      isNetworkError(sessionError as AxiosError) ||
-                      isTimeoutError(sessionError as AxiosError)
+                      isNetworkError(sessionError as ApiErrorResponse) ||
+                      isTimeoutError(sessionError as ApiErrorResponse)
                         ? 'orange'
                         : 'red'
                     }
@@ -195,7 +195,10 @@ export function SupportPage() {
           {/* Right Panel: Chat Window */}
           <Grid.Col span={{ base: 12, md: 9 }} className={styles.rightPanel}>
             {selectedSession ? (
-              <ChatWindow session={selectedSession} onRefresh={() => refetchSession()} />
+              <ChatWindow 
+                session={selectedSession} 
+                onRefresh={() => refetchSession()} 
+              />
             ) : sessionError ? (
               <Paper withBorder p="md" h="100%">
                 <Center h="100%">
@@ -204,8 +207,8 @@ export function SupportPage() {
                       icon={<IconAlertCircle size={16} />}
                       title="Lỗi tải yêu cầu"
                       color={
-                        isNetworkError(sessionError as AxiosError) ||
-                        isTimeoutError(sessionError as AxiosError)
+                        isNetworkError(sessionError as ApiErrorResponse) ||
+                        isTimeoutError(sessionError as ApiErrorResponse)
                           ? 'orange'
                           : 'red'
                       }

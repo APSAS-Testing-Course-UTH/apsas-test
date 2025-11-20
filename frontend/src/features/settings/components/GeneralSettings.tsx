@@ -1,11 +1,11 @@
 /**
  * GeneralSettings Component
  * Settings for theme, language, and timezone
+ * Auto-saves on each change
  */
 
-import { Select, Stack, Title, Button, Group } from '@mantine/core'
+import { Select, Stack, Title } from '@mantine/core'
 import { IconPalette, IconWorld, IconClock } from '@tabler/icons-react'
-import { useState } from 'react'
 import { notifications } from '@mantine/notifications'
 import { useGeneralSettings } from '../hooks/useSettings'
 import {
@@ -14,7 +14,6 @@ import {
   THEME_LABELS,
   LANGUAGE_LABELS,
   TIMEZONE_LABELS,
-  BUTTON_LABELS,
   NOTIFICATION_MESSAGES,
   type Theme,
   type Language,
@@ -23,37 +22,25 @@ import {
 
 export function GeneralSettings() {
   const { general, updateGeneral, isLoading } = useGeneralSettings()
-  
-  // Local state cho form
-  const [theme, setTheme] = useState<Theme>(general.theme)
-  const [language, setLanguage] = useState<Language>(general.language)
-  const [timezone, setTimezone] = useState<Timezone>(general.timezone)
 
-  // Check if có thay đổi
-  const hasChanges = 
-    theme !== general.theme || 
-    language !== general.language || 
-    timezone !== general.timezone
-
-  const handleSave = () => {
+  // Auto-save khi user thay đổi setting
+  const handleChange = (field: keyof typeof general, value: Theme | Language | Timezone) => {
     try {
-      updateGeneral({ theme, language, timezone })
+      updateGeneral({
+        ...general,
+        [field]: value,
+      })
       notifications.show({
         message: NOTIFICATION_MESSAGES.saveSuccess,
         color: 'green',
+        autoClose: 2000,
       })
-    } catch (error) {
+    } catch {
       notifications.show({
         message: NOTIFICATION_MESSAGES.saveError,
         color: 'red',
       })
     }
-  }
-
-  const handleReset = () => {
-    setTheme(general.theme)
-    setLanguage(general.language)
-    setTimezone(general.timezone)
   }
 
   return (
@@ -68,8 +55,8 @@ export function GeneralSettings() {
           { value: 'dark', label: THEME_LABELS.dark },
           { value: 'auto', label: THEME_LABELS.auto },
         ]}
-        value={theme}
-        onChange={(value) => setTheme(value as Theme)}
+        value={general.theme}
+        onChange={(value) => handleChange('theme', value as Theme)}
         leftSection={<IconPalette size={16} />}
         disabled={isLoading}
       />
@@ -81,8 +68,8 @@ export function GeneralSettings() {
           { value: 'vi', label: LANGUAGE_LABELS.vi },
           { value: 'en', label: LANGUAGE_LABELS.en },
         ]}
-        value={language}
-        onChange={(value) => setLanguage(value as Language)}
+        value={general.language}
+        onChange={(value) => handleChange('language', value as Language)}
         leftSection={<IconWorld size={16} />}
         disabled={isLoading}
       />
@@ -95,28 +82,11 @@ export function GeneralSettings() {
           { value: 'Asia/Bangkok', label: TIMEZONE_LABELS['Asia/Bangkok'] },
           { value: 'Asia/Singapore', label: TIMEZONE_LABELS['Asia/Singapore'] },
         ]}
-        value={timezone}
-        onChange={(value) => setTimezone(value as Timezone)}
+        value={general.timezone}
+        onChange={(value) => handleChange('timezone', value as Timezone)}
         leftSection={<IconClock size={16} />}
         disabled={isLoading}
       />
-
-      <Group justify="flex-end" mt="md">
-        <Button
-          variant="default"
-          onClick={handleReset}
-          disabled={!hasChanges || isLoading}
-        >
-          {BUTTON_LABELS.reset}
-        </Button>
-        <Button
-          onClick={handleSave}
-          disabled={!hasChanges}
-          loading={isLoading}
-        >
-          {BUTTON_LABELS.save}
-        </Button>
-      </Group>
     </Stack>
   )
 }

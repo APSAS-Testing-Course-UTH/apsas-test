@@ -6,16 +6,18 @@ import {
   identityServiceVerifyEmailMutation,
   identityServiceGetCurrentUserOptions,
   identityServiceChangePasswordMutation,
+  identityServiceResendVerificationEmailMutation,
 } from '@/api/@tanstack/react-query.gen'
 
-import type {
-  IdentityServiceLoginRequest,
-  IdentityServiceRegisterRequest,
-  IdentityServiceEmailRequest,
-  IdentityServiceResetPasswordRequest,
-  IdentityServiceTokenRequest,
-  IdentityServiceChangePasswordRequest,
-} from '@/api/types.gen'
+// Note: Type imports removed - generated API functions handle types internally
+// import type {
+//   IdentityServiceLoginRequest,
+//   IdentityServiceRegisterRequest,
+//   IdentityServiceEmailRequest,
+//   IdentityServiceResetPasswordRequest,
+//   IdentityServiceTokenRequest,
+//   IdentityServiceChangePasswordRequest,
+// } from '@/api/types.gen'
 
 // Auth service - wrapper cho generated API functions
 // Sử dụng TanStack Query mutations và queries
@@ -35,6 +37,9 @@ export const authService = {
   // Verify email - sử dụng generated mutation
   verifyEmail: identityServiceVerifyEmailMutation(),
 
+  // Resend verification email - sử dụng generated mutation
+  resendVerificationEmail: identityServiceResendVerificationEmailMutation(),
+
   // Change password - sử dụng generated mutation
   changePassword: identityServiceChangePasswordMutation(),
 
@@ -42,12 +47,13 @@ export const authService = {
   getCurrentUser: identityServiceGetCurrentUserOptions(),
 }
 
-// Type exports cho convenience
-export type {
-  IdentityServiceLoginRequest as LoginRequest,
-  IdentityServiceRegisterRequest as RegisterRequest,
-  IdentityServiceEmailRequest as EmailRequest,
-  IdentityServiceResetPasswordRequest as ResetPasswordRequest,
-  IdentityServiceTokenRequest as TokenRequest,
-  IdentityServiceChangePasswordRequest as ChangePasswordRequest,
-}
+/**
+ * @deprecated Type aliases removed - use generated types directly from @/api/types.gen
+ * Import IdentityService* types instead:
+ * - IdentityServiceLoginRequest
+ * - IdentityServiceRegisterRequest  
+ * - IdentityServiceEmailRequest
+ * - IdentityServiceResetPasswordRequest
+ * - IdentityServiceTokenRequest
+ * - IdentityServiceChangePasswordRequest
+ */

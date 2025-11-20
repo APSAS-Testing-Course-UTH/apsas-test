@@ -11,7 +11,7 @@
  * - useCreateSupportSession hook
  */
 
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -20,6 +20,17 @@ import { SessionsList } from './SessionsList'
 import { ChatWindow } from './ChatWindow'
 import { CreateSessionModal } from './CreateSessionModal'
 import type { SupportSession, SupportMessage } from '../types'
+import type { UseWebSocketConnectionReturn } from '../hooks/useWebSocketConnection'
+import { MOCK_DATA_REGISTRY } from '@/mocks/factory/mockDataRegistry'
+
+// Mock WebSocket connection
+const mockWebSocket: UseWebSocketConnectionReturn = {
+  isConnected: true,
+  error: null,
+  subscribe: vi.fn(),
+  send: vi.fn(),
+  disconnect: vi.fn(),
+}
 
 // Mock data
 const mockMessage: SupportMessage = {
@@ -78,6 +89,13 @@ const TestWrapper = ({ children }: { children: React.ReactNode }) => {
 }
 
 describe('Support Feature', () => {
+  beforeEach(() => {
+    // Register mock session for MSW handlers
+    if (mockSession.id) {
+      MOCK_DATA_REGISTRY.supportSessions[mockSession.id] = mockSession as any
+    }
+  })
+
   describe('SessionsList Component', () => {
     it('should render list of sessions', () => {
       const handleSelect = vi.fn()
@@ -174,7 +192,7 @@ describe('Support Feature', () => {
   describe('ChatWindow Component', () => {
     it('should render chat messages', () => {
       const handleRefresh = vi.fn()
-      render(<ChatWindow session={mockSession} onRefresh={handleRefresh} />, { wrapper: TestWrapper })
+      render(<ChatWindow session={mockSession} webSocket={mockWebSocket} onRefresh={handleRefresh} />, { wrapper: TestWrapper })
 
       expect(screen.getByText('I need help with the assignment')).toBeInTheDocument()
       expect(screen.getByText('I can help you with that')).toBeInTheDocument()
@@ -182,7 +200,7 @@ describe('Support Feature', () => {
 
     it('should display student and instructor messages with different styling', () => {
       const handleRefresh = vi.fn()
-      render(<ChatWindow session={mockSession} onRefresh={handleRefresh} />, { wrapper: TestWrapper })
+      render(<ChatWindow session={mockSession} webSocket={mockWebSocket} onRefresh={handleRefresh} />, { wrapper: TestWrapper })
 
       // Check for student and instructor messages by content
       expect(screen.getByText('I need help with the assignment')).toBeInTheDocument()
@@ -191,7 +209,7 @@ describe('Support Feature', () => {
 
     it('should show session header with id and status', () => {
       const handleRefresh = vi.fn()
-      render(<ChatWindow session={mockSession} onRefresh={handleRefresh} />, { wrapper: TestWrapper })
+      render(<ChatWindow session={mockSession} webSocket={mockWebSocket} onRefresh={handleRefresh} />, { wrapper: TestWrapper })
 
       expect(screen.getByText(/sess-001/)).toBeInTheDocument()
       expect(screen.getByText('Mở')).toBeInTheDocument()
@@ -199,14 +217,14 @@ describe('Support Feature', () => {
 
     it('should display creation date in header', () => {
       const handleRefresh = vi.fn()
-      render(<ChatWindow session={mockSession} onRefresh={handleRefresh} />, { wrapper: TestWrapper })
+      render(<ChatWindow session={mockSession} webSocket={mockWebSocket} onRefresh={handleRefresh} />, { wrapper: TestWrapper })
 
       expect(screen.getByText(/Tạo lúc:/)).toBeInTheDocument()
     })
 
     it('should show close button for open sessions', () => {
       const handleRefresh = vi.fn()
-      render(<ChatWindow session={mockSession} onRefresh={handleRefresh} />, { wrapper: TestWrapper })
+      render(<ChatWindow session={mockSession} webSocket={mockWebSocket} onRefresh={handleRefresh} />, { wrapper: TestWrapper })
 
       // Check for refresh button exists (close button is ActionIcon without accessible name, shows with X icon)
       expect(screen.getByRole('button', { name: /làm mới/i })).toBeInTheDocument()
@@ -214,7 +232,7 @@ describe('Support Feature', () => {
 
     it('should not show close button for closed sessions', () => {
       const handleRefresh = vi.fn()
-      render(<ChatWindow session={mockClosedSession} onRefresh={handleRefresh} />, { wrapper: TestWrapper })
+      render(<ChatWindow session={mockClosedSession} webSocket={mockWebSocket} onRefresh={handleRefresh} />, { wrapper: TestWrapper })
 
       const closeButton = screen.queryByRole('button', { name: /đóng yêu cầu/i })
       expect(closeButton).not.toBeInTheDocument()
@@ -222,7 +240,7 @@ describe('Support Feature', () => {
 
     it('should show closed message for closed sessions', () => {
       const handleRefresh = vi.fn()
-      render(<ChatWindow session={mockClosedSession} onRefresh={handleRefresh} />, { wrapper: TestWrapper })
+      render(<ChatWindow session={mockClosedSession} webSocket={mockWebSocket} onRefresh={handleRefresh} />, { wrapper: TestWrapper })
 
       // Text is split by checkmark (✓), so use flexible matcher
       expect(screen.getByText((content) => content.includes('Yêu cầu này đã được đóng'))).toBeInTheDocument()
@@ -234,14 +252,14 @@ describe('Support Feature', () => {
         messages: [],
       }
       const handleRefresh = vi.fn()
-      render(<ChatWindow session={sessionWithoutMessages} onRefresh={handleRefresh} />, { wrapper: TestWrapper })
+      render(<ChatWindow session={sessionWithoutMessages} webSocket={mockWebSocket} onRefresh={handleRefresh} />, { wrapper: TestWrapper })
 
       expect(screen.getByText('Chưa có tin nhắn')).toBeInTheDocument()
     })
 
     it('should display message timestamps', () => {
       const handleRefresh = vi.fn()
-      render(<ChatWindow session={mockSession} onRefresh={handleRefresh} />, { wrapper: TestWrapper })
+      render(<ChatWindow session={mockSession} webSocket={mockWebSocket} onRefresh={handleRefresh} />, { wrapper: TestWrapper })
 
       // Should have timestamps (time format varies by locale)
       const timestamps = screen.getAllByText(/\d{1,2}:\d{2}/)
@@ -252,12 +270,32 @@ describe('Support Feature', () => {
       const handleRefresh = vi.fn()
       const user = userEvent.setup()
       
-      render(<ChatWindow session={mockSession} onRefresh={handleRefresh} />, { wrapper: TestWrapper })
+      render(<ChatWindow session={mockSession} webSocket={mockWebSocket} onRefresh={handleRefresh} />, { wrapper: TestWrapper })
 
       const refreshButton = screen.getByRole('button', { name: /làm mới/i })
       await user.click(refreshButton)
 
       expect(handleRefresh).toHaveBeenCalled()
+    })
+
+    it('should send message via REST when WebSocket is disconnected', async () => {
+      const handleRefresh = vi.fn()
+      const user = userEvent.setup()
+      
+      const disconnectedWebSocket = {
+        ...mockWebSocket,
+        isConnected: false,
+      }
+
+      render(<ChatWindow session={mockSession} webSocket={disconnectedWebSocket} onRefresh={handleRefresh} />, { wrapper: TestWrapper })
+
+      const input = screen.getByPlaceholderText(/Nhập tin nhắn/)
+      await user.type(input, 'New message via REST')
+      await user.keyboard('{Enter}')
+
+      await waitFor(() => {
+        expect(screen.getByText('New message via REST')).toBeInTheDocument()
+      })
     })
   })
 
@@ -384,7 +422,7 @@ describe('Support Feature', () => {
 
     it('should display all Vietnamese labels in ChatWindow', () => {
       const handleRefresh = vi.fn()
-      render(<ChatWindow session={mockSession} onRefresh={handleRefresh} />, { wrapper: TestWrapper })
+      render(<ChatWindow session={mockSession} webSocket={mockWebSocket} onRefresh={handleRefresh} />, { wrapper: TestWrapper })
 
       expect(screen.getByText(/Yêu cầu #/)).toBeInTheDocument()
       expect(screen.getByText('Mở')).toBeInTheDocument()

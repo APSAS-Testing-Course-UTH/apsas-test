@@ -177,5 +177,3 @@ export function Tabs({
     </div>
   );
 }
-
-export default Tabs;

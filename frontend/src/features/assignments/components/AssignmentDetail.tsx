@@ -8,8 +8,8 @@
  */
 
 import { useParams, useNavigate } from '@tanstack/react-router'
-import type { AxiosError } from 'axios'
-import { Container, Stack, Text, Button, Group, Loader, Center, Alert } from '@mantine/core'
+import type { ApiErrorResponse } from '@/configs/api-error-handler'
+import { Container, Stack, Text, Button, Group, Loader, Center, Alert, Paper } from '@mantine/core'
 import { IconArrowLeft, IconAlertCircle, IconRefresh } from '@tabler/icons-react'
 import { useAssignmentDetailQuery } from '../api/useAssignmentDetailQuery'
 import { AssignmentMetadata } from './AssignmentMetadata'
@@ -17,6 +17,7 @@ import { AssignmentTimeline } from './AssignmentTimeline'
 import { TestCaseList } from './TestCaseList'
 import { SkillBadges } from './SkillBadges'
 import { TutorialLinks } from './TutorialLinks'
+import { MarkdownContent } from '@/components/MarkdownContent'
 import { 
   getErrorMessage,
   isNetworkError,
@@ -60,10 +61,10 @@ export function AssignmentDetail() {
 
   // Error state
   if (error) {
-    const statusCode = (error as AxiosError)?.response?.status
+    const statusCode = (error as ApiErrorResponse)?.response?.status
     const isNotFound = statusCode === 404
-    const isNetwork = isNetworkError(error as AxiosError)
-    const isTimeout = isTimeoutError(error as AxiosError)
+    const isNetwork = isNetworkError(error as ApiErrorResponse)
+    const isTimeout = isTimeoutError(error as ApiErrorResponse)
     const errorMessage = getErrorMessage(error)
 
     return (
@@ -161,14 +162,12 @@ export function AssignmentDetail() {
 
         {/* Description */}
         {assignment.description && (
-          <div>
+          <Paper withBorder p="lg" radius="md" shadow="sm">
             <Text fw={600} size="lg" mb="md">
               {labels.description}
             </Text>
-            <Text component="div" style={{ whiteSpace: 'pre-wrap' }}>
-              {assignment.description}
-            </Text>
-          </div>
+            <MarkdownContent content={assignment.description} />
+          </Paper>
         )}
 
         {/* Test Cases */}

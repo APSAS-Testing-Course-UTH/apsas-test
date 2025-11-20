@@ -95,7 +95,12 @@ export const useLogin = ({ redirectTo }: UseLoginOptions = {}) => {
         finalRedirectUrl = redirectTo
       }
 
-      navigate({ to: finalRedirectUrl, replace: true })
+      // ✅ FIX: Delay navigation until next tick to ensure auth context updates
+      // This fixes the race condition where navigate() runs before AuthProvider re-renders
+      // Without this, router's beforeLoad checks stale context.auth.isAuthenticated (still false)
+      queueMicrotask(() => {
+        navigate({ to: finalRedirectUrl, replace: true })
+      })
     },
 
     onError: (error: Error) => {

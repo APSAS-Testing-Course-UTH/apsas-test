@@ -53,6 +53,61 @@
   cursor: not-allowed;
 }
 
+/* Markdown Editor Height Fix */
+.markdownEditor :global(.w-md-editor-text) {
+  min-height: 350px !important;
+}
+
+.markdownEditor :global(.w-md-editor-text-input) {
+  min-height: 350px !important;
+}
+
+/* Fix scrollbar styling */
+.markdownEditor :global(.w-md-editor-text-input) {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.3) transparent;
+}
+
+.markdownEditor :global(.w-md-editor-text-input)::-webkit-scrollbar {
+  width: 8px;
+}
+
+.markdownEditor :global(.w-md-editor-text-input)::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.markdownEditor :global(.w-md-editor-text-input)::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+}
+
+.markdownEditor :global(.w-md-editor-text-input)::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Fix preview pane scrollbar styling */
+.markdownEditor :global(.w-md-editor-preview) {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.3) transparent;
+}
+
+.markdownEditor :global(.w-md-editor-preview)::-webkit-scrollbar {
+  width: 8px;
+}
+
+.markdownEditor :global(.w-md-editor-preview)::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.markdownEditor :global(.w-md-editor-preview)::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+}
+
+.markdownEditor :global(.w-md-editor-preview)::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
 @media (max-width: 768px) {
   .container {
     padding: 1rem;

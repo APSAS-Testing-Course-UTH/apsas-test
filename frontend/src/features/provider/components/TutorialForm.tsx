@@ -18,6 +18,7 @@
 
 import '@uiw/react-md-editor/markdown-editor.css'
 import '@uiw/react-markdown-preview/markdown.css'
+import styles from './TutorialForm.module.css'
 
 import { useEffect } from 'react'
 import * as React from 'react'
@@ -205,7 +206,7 @@ export function TutorialForm({ mode, tutorialId, onSuccess, onCancel }: Tutorial
   // Show error if fetch failed
   if (mode === 'edit' && !tutorialData && tutorialId) {
     return (
-      <Container size="sm" py="xl">
+      <Container size="md" py="xl">
         <Alert icon={<IconAlertCircle size={16} />} color="red" title="Lỗi">
           Không thể tải thông tin hướng dẫn
         </Alert>
@@ -218,7 +219,7 @@ export function TutorialForm({ mode, tutorialId, onSuccess, onCancel }: Tutorial
 
   return (
     <Container size="md" py="xl">
-      <Paper p="md" radius="md" withBorder>
+      <Paper p="xl" radius="md" withBorder shadow="sm">
         <Stack gap="lg">
           {/* Title */}
           <Title order={2}>
@@ -248,17 +249,19 @@ export function TutorialForm({ mode, tutorialId, onSuccess, onCancel }: Tutorial
                 {...form.getInputProps('title')}
                 required
                 disabled={isMutating}
+                size="md"
               />
 
               {/* Content input - Markdown Editor with separate state */}
               <div data-color-mode="light">
-                <Text component="label" fw={500} mb="xs">
+                <Text component="label" fw={500} size="sm" mb="xs">
                   Nội dung (Markdown)
                 </Text>
-                <Text size="xs" c="dimmed" mb="sm">
+                <Text size="xs" c="dimmed" mb="md">
                   Nhập nội dung bằng Markdown. Hỗ trợ in đậm, in nghiêng, code blocks, v.v.
                 </Text>
                 <MDEditor
+                  className={styles.markdownEditor}
                   key={`tutorial-editor-${mode}-${tutorialId || 'create'}`}
                   value={editorContent}
                   onChange={(val) => {
@@ -266,11 +269,19 @@ export function TutorialForm({ mode, tutorialId, onSuccess, onCancel }: Tutorial
                     setEditorContent(val || '')
                   }}
                   preview="live"
-                  height={300}
+                  height={400}
                   visibleDragbar={false}
                   hideToolbar={false}
+                  highlightEnable={false}
+                  previewOptions={{
+                    skipHtml: false,
+                    remarkPlugins: [],
+                    rehypePlugins: [],
+                  }}
                   textareaProps={{
                     disabled: isMutating,
+                    placeholder: 'Nhập mô tả bằng Markdown...',
+                    style: { minHeight: '350px' },
                   }}
                   style={{
                     borderRadius: '4px',
@@ -288,15 +299,16 @@ export function TutorialForm({ mode, tutorialId, onSuccess, onCancel }: Tutorial
               </div>
 
               {/* Action buttons */}
-              <Group justify="flex-end" gap="sm">
+              <Group justify="flex-end" gap="md" mt="md">
                 <Button
                   variant="light"
+                  size="md"
                   onClick={() => onCancel?.() || navigate({ to: '/provider/dashboard' })}
                   disabled={isMutating}
                 >
                   Hủy
                 </Button>
-                <Button type="submit" loading={isMutating}>
+                <Button type="submit" size="md" loading={isMutating}>
                   {mode === 'create' ? 'Tạo hướng dẫn' : 'Cập nhật hướng dẫn'}
                 </Button>
               </Group>
@@ -307,5 +319,3 @@ export function TutorialForm({ mode, tutorialId, onSuccess, onCancel }: Tutorial
     </Container>
   )
 }
-
-export default TutorialForm

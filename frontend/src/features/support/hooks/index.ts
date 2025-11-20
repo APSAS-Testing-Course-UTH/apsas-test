@@ -1,3 +1,3 @@
 // Export hooks
-export { useWebSocketConnection } from './useWebSocketConnection'
-export { useStompSession } from './useStompSession'
+export { useWebSocket } from './useWebSocket'
+export { useSupportSession } from './useSupportSession'

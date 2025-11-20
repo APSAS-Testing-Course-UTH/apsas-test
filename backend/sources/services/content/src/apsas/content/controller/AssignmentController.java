@@ -19,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -56,26 +57,31 @@ public class AssignmentController {
       description = "Lấy danh sách bài tập có phân trang và sắp xếp"
   )
   public ResponseEntity<PageResponse<AssignmentResponse>> getAllAssignments(
-      PageRequestParams pageParams
+      PageRequestParams pageParams,
+      @AuthenticationPrincipal
+      UserPrincipal principal
   ) {
     PageResponse<AssignmentResponse> assignments =
-        assignmentService.getAllAssignments(pageParams.toPageable());
+        assignmentService.getAllAssignments(pageParams.toPageable(), principal);
     return ResponseEntity.ok(assignments);
   }
 
   /**
    * Lấy chi tiết bài tập theo ID.
    *
-   * @param id ID bài tập
+   * @param id        ID bài tập
+   * @param principal Thông tin xác thực
    * @return Thông tin bài tập
    */
   @GetMapping("/{id}")
   @Operation(summary = "Lấy bài tập theo ID", description = "Lấy chi tiết bài tập theo ID")
   public ResponseEntity<AssignmentResponse> getAssignmentById(
       @PathVariable
-      UUID id
+      UUID id,
+      @AuthenticationPrincipal
+      UserPrincipal principal
   ) {
-    AssignmentResponse assignment = assignmentService.getAssignmentById(id);
+    AssignmentResponse assignment = assignmentService.getAssignmentById(id, principal);
     return ResponseEntity.ok(assignment);
   }
 

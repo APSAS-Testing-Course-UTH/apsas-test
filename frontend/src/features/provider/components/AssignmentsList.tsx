@@ -576,7 +576,7 @@ export function AssignmentsList({ onSelectAssignment }: AssignmentsListProps) {
                 </Table.Td>
 
                 <Table.Td w="17%" style={{ textAlign: 'right' }}>
-                  <Group gap={0} justify="flex-end">
+                  <Group gap="sm" justify="flex-end">
                     <Tooltip label="Xem chi tiết">
                       <ActionIcon
                         variant="light"
@@ -706,5 +706,3 @@ export function AssignmentsList({ onSelectAssignment }: AssignmentsListProps) {
     </Stack>
   )
 }
-
-export default AssignmentsList

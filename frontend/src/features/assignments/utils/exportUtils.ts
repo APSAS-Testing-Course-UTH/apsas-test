@@ -3,6 +3,8 @@
  * Supports both assignments and submissions data types
  */
 
+import { formatDateShort } from '@/utils/dateUtils';
+
 /**
  * Type definitions
  */
@@ -39,7 +41,7 @@ function formatAssignmentRow(item: any): string[] {
     (item.description || '').substring(0, 100),
     item.difficulty || '',
     item.status || '',
-    item.createdAt ? formatDate(item.createdAt) : '',
+    item.createdAt ? formatDateShort(item.createdAt) : '',
   ];
 }
 
@@ -55,22 +57,8 @@ function formatSubmissionRow(item: any): string[] {
     item.language || '',
     item.status || '',
     item.score?.toString() || '',
-    item.submittedAt ? formatDate(item.submittedAt) : '',
+    item.submittedAt ? formatDateShort(item.submittedAt) : '',
   ];
-}
-
-/**
- * Format date to Vietnamese format (DD/MM/YYYY)
- * @param dateString - ISO date string
- * @returns Formatted date string
- */
-function formatDate(dateString: string): string {
-  try {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('vi-VN');
-  } catch {
-    return '';
-  }
 }
 
 /**

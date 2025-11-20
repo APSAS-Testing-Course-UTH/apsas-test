@@ -11,9 +11,8 @@
  * Vietnamese UI
  */
 
-import { useState } from 'react'
 import { TextInput, Select, Group, Stack, Button, Paper, NumberInput } from '@mantine/core'
-import { IconSearch, IconFilter, IconX } from '@tabler/icons-react'
+import { IconSearch, IconX } from '@tabler/icons-react'
 
 export interface SubmissionFilters {
   searchEmail: string

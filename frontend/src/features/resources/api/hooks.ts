@@ -11,6 +11,7 @@ import type {
   ContentServicePageResponseSkillResponse,
   ContentServiceSkillResponse,
 } from '@/api/types.gen'
+import { resourceKeys } from './queryKeys'
 
 interface UseTutorialsOptions {
   page?: number
@@ -30,7 +31,7 @@ interface UseSkillsOptions {
  */
 export function useTutorials({ page = 0, size = 10 }: UseTutorialsOptions = {}) {
   return useQuery<ContentServicePageResponseTutorialResponse | undefined>({
-    queryKey: ['tutorials', page, size],
+    queryKey: resourceKeys.tutorials.list({ page, size }),
     queryFn: async () => {
       const response = await contentServiceGetAllTutorials({
         query: { page: String(page), size: String(size) },
@@ -60,7 +61,7 @@ export function useTutorials({ page = 0, size = 10 }: UseTutorialsOptions = {}) 
  */
 export function useSkillsQuery({ page = 0, size = 10 }: UseSkillsOptions = {}) {
   return useQuery<ContentServicePageResponseSkillResponse | undefined>({
-    queryKey: ['skills', page, size],
+    queryKey: resourceKeys.skills.list({ page, size }),
     queryFn: async () => {
       const response = await contentServiceGetAllSkills({
         query: { page: String(page), size: String(size) },
@@ -88,7 +89,7 @@ export function useSkillsQuery({ page = 0, size = 10 }: UseSkillsOptions = {}) {
  */
 export function useSkillDetailQuery(skillId?: string) {
   return useQuery<ContentServiceSkillResponse | null, Error>({
-    queryKey: ['skill', skillId],
+    queryKey: resourceKeys.skills.detail(skillId || 'none'),
     queryFn: async () => {
       if (!skillId) return null
 
@@ -124,7 +125,7 @@ export function useSkillDetailQuery(skillId?: string) {
  */
 export function useTutorialDetailQuery(tutorialId?: string) {
   return useQuery<ContentServiceTutorialResponse | null, Error>({
-    queryKey: ['tutorial', tutorialId],
+    queryKey: resourceKeys.tutorials.detail(tutorialId || 'none'),
     queryFn: async () => {
       if (!tutorialId) return null
 

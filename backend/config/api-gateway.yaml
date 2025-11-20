@@ -22,6 +22,13 @@ spring:
             locator:
               enabled: true
 
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowedOrigins: "*"
+                allowedMethods: "*"
+                allowedHeaders: "*"
+
           routes:
             - id: identity-service
               uri: lb://identity-service

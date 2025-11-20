@@ -1,12 +1,14 @@
+/*
 declare module 'sockjs-client' {
   interface SockJSStatic {
-    (url: string, _reserved?: any, options?: SockJSOptions): SockJSSocket
+    (url: string, _reserved?: null, options?: SockJSOptions): SockJSSocket
   }
 
   interface SockJSOptions {
     transports?: string[]
     timeout?: number
-    [key: string]: any
+    server?: string
+    sessionId?: number | (() => string)
   }
 
   interface SockJSSocket {
@@ -14,7 +16,7 @@ declare module 'sockjs-client' {
     close(): void
     onopen?: () => void
     onclose?: () => void
-    onerror?: (error: any) => void
+    onerror?: (error: Error | Event) => void
     onmessage?: (event: MessageEvent) => void
     readyState?: number
     protocol?: string
@@ -24,3 +26,5 @@ declare module 'sockjs-client' {
   const SockJS: SockJSStatic
   export default SockJS
 }
+
+*/

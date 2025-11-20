@@ -12,7 +12,7 @@
  */
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import type { AxiosError } from 'axios'
+import type { ApiErrorResponse } from '@/configs/api-error-handler'
 import type { ContentServiceAssignmentResponse } from '@/api/types.gen'
 import { contentServiceUpdateAssignmentSchedule } from '@/api/sdk.gen'
 import { assignmentQueryKeys } from './useAssignmentsQuery'
@@ -28,7 +28,7 @@ export function useScheduleAssignmentMutation() {
 
   return useMutation<
     ContentServiceAssignmentResponse,
-    AxiosError,
+    ApiErrorResponse,
     ScheduleAssignmentParams
   >({
     mutationFn: async ({ id, startDate, dueDate }: ScheduleAssignmentParams) => {

@@ -73,26 +73,7 @@ describe('GeneralSettings', () => {
     expect(timezoneSelect).toHaveValue('Hồ Chí Minh (UTC+7)')
   })
 
-  it('should enable save button when settings are changed', async () => {
-    renderComponent()
-    const user = userEvent.setup()
-
-    // Change theme
-    const themeSelect = screen.getByPlaceholderText('Chọn giao diện')
-    await user.click(themeSelect)
-    
-    // Wait for dropdown to appear and click option
-    const darkOption = await screen.findByText('Tối')
-    await user.click(darkOption)
-
-    // Verify save button is enabled after change
-    await waitFor(() => {
-      const saveButton = screen.getByText('Lưu thay đổi')
-      expect(saveButton).toBeEnabled()
-    })
-  })
-
-  it('should save settings to localStorage when save button is clicked', async () => {
+  it('should auto-save settings to localStorage when changed', async () => {
     renderComponent()
     const user = userEvent.setup()
 
@@ -101,10 +82,6 @@ describe('GeneralSettings', () => {
     await user.click(themeSelect)
     const darkOption = await screen.findByText('Tối')
     await user.click(darkOption)
-
-    // Click save
-    const saveButton = screen.getByText('Lưu thay đổi')
-    await user.click(saveButton)
 
     await waitFor(() => {
       const stored = localStorage.getItem('apsas_user_settings')
@@ -116,7 +93,7 @@ describe('GeneralSettings', () => {
     })
   })
 
-  it('should show success notification when settings are saved', async () => {
+  it('should show success notification when settings are changed', async () => {
     renderComponent()
     const user = userEvent.setup()
 
@@ -126,13 +103,16 @@ describe('GeneralSettings', () => {
     const englishOption = await screen.findByText('English')
     await user.click(englishOption)
 
-    // Save
-    const saveButton = screen.getByText('Lưu thay đổi')
-    await user.click(saveButton)
-
     await waitFor(() => {
       const notifications = screen.getAllByText('Đã lưu cài đặt thành công')
       expect(notifications.length).toBeGreaterThan(0)
     })
+  })
+
+  it('should not display save or reset buttons', () => {
+    renderComponent()
+
+    expect(screen.queryByText('Lưu thay đổi')).not.toBeInTheDocument()
+    expect(screen.queryByText('Đặt lại')).not.toBeInTheDocument()
   })
 })

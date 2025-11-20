@@ -90,7 +90,8 @@ export function InstructorAssignmentsList({
       // Start date range filter
       if (filters.startDateFrom && assignment.startDate) {
         const startDate = new Date(assignment.startDate)
-        if (startDate < filters.startDateFrom) {
+        const filterDate = new Date(filters.startDateFrom)
+        if (startDate < filterDate) {
           return false
         }
       }
@@ -107,7 +108,8 @@ export function InstructorAssignmentsList({
       // Due date range filter
       if (filters.dueDateFrom && assignment.dueDate) {
         const dueDate = new Date(assignment.dueDate)
-        if (dueDate < filters.dueDateFrom) {
+        const filterDate = new Date(filters.dueDateFrom)
+        if (dueDate < filterDate) {
           return false
         }
       }
@@ -240,11 +242,11 @@ export function InstructorAssignmentsList({
           <Table.Thead>
             <Table.Tr>
               <Table.Th>Tiêu đề</Table.Th>
-              <Table.Th>Độ khó</Table.Th>
-              <Table.Th>Ngày bắt đầu</Table.Th>
-              <Table.Th>Hạn chót</Table.Th>
-              <Table.Th>Trạng thái</Table.Th>
-              <Table.Th className={styles.actionsHeader}>Hành động</Table.Th>
+              <Table.Th style={{ textAlign: 'center' }}>Độ khó</Table.Th>
+              <Table.Th style={{ textAlign: 'center' }}>Ngày bắt đầu</Table.Th>
+              <Table.Th style={{ textAlign: 'center' }}>Hạn chót</Table.Th>
+              <Table.Th style={{ textAlign: 'center' }}>Trạng thái</Table.Th>
+              <Table.Th className={styles.actionsHeader} style={{ textAlign: 'center' }}>Hành động</Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>

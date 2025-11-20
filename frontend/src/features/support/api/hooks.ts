@@ -4,6 +4,7 @@ import {
   supportServiceCreateSession,
   supportServiceGetSessionById,
   supportServiceCloseSession,
+  supportServiceSendMessage,
 } from '@/api/sdk.gen'
 import type {
   SupportSession,
@@ -57,7 +58,7 @@ export function useSupportSession(id?: string) {
     queryKey: supportKeys.detail(id!),
     queryFn: async () => {
       const result = await supportServiceGetSessionById({
-        path: { id: id! },
+        path: { sessionId: id! },
       })
       if (result.error) throw result.error
       if (!result.data) throw new Error('No data returned from API')
@@ -100,7 +101,7 @@ export function useCloseSupportSession() {
   return useMutation({
     mutationFn: async (sessionId: string) => {
       const result = await supportServiceCloseSession({
-        path: { id: sessionId },
+        path: { sessionId },
       })
       if (result.error) throw result.error
       if (!result.data) throw new Error('No data returned from API')
@@ -110,6 +111,31 @@ export function useCloseSupportSession() {
       // Invalidate lists and the specific session detail
       queryClient.invalidateQueries({ queryKey: supportKeys.lists() })
       queryClient.invalidateQueries({ queryKey: supportKeys.detail(sessionId) })
+    },
+  })
+}
+
+/**
+ * Hook to send a message in a support session
+ */
+export function useSendMessage() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (params: { sessionId: string; content: string }) => {
+      const result = await supportServiceSendMessage({
+        path: { sessionId: params.sessionId },
+        body: { content: params.content },
+      })
+      if (result.error) throw result.error
+      if (!result.data) throw new Error('No data returned from API')
+      return result.data
+    },
+    onSuccess: (_, variables) => {
+      // Invalidate the session detail to refetch with new message
+      queryClient.invalidateQueries({ queryKey: supportKeys.detail(variables.sessionId) })
+      // Also invalidate lists in case unread count changed
+      queryClient.invalidateQueries({ queryKey: supportKeys.lists() })
     },
   })
 }

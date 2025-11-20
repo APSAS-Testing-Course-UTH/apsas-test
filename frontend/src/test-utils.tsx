@@ -3,6 +3,13 @@ import type { RenderOptions } from '@testing-library/react';
 import { MantineProvider } from '@mantine/core';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactElement } from 'react';
+import { beforeEach } from 'vitest';
+
+// Mock localStorage for testing
+beforeEach(() => {
+  // Set mock instructor token in localStorage (key matches test/setup.ts)
+  localStorage.setItem('apsas_token', 'instructor-token');
+});
 
 // Create a custom render function that includes providers
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {

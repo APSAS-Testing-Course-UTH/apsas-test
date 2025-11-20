@@ -4,7 +4,7 @@
  */
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import type { AxiosError } from 'axios'
+import type { ApiErrorResponse } from '@/configs/api-error-handler'
 import type {
   ContentServiceCreateTutorialRequest,
   ContentServiceUpdateTutorialRequest,
@@ -17,13 +17,17 @@ import {
   contentServiceGetTutorialById,
 } from '@/api/sdk.gen'
 import { tutorialQueryKeys } from './useTutorialsQuery'
-import { showErrorNotification, showSuccessNotification } from '../utils/errorHandler'
+import { 
+  handleApiError,
+  showErrorNotification, 
+  showSuccessNotification 
+} from '@/configs/api-error-handler'
 
 /**
  * Fetch tutorial by ID
  */
 export function useTutorialDetailQuery(id: string | null) {
-  return useQuery<ContentServiceTutorialResponse, AxiosError>({
+  return useQuery<ContentServiceTutorialResponse, ApiErrorResponse>({
     queryKey: tutorialQueryKeys.detail(id || ''),
     queryFn: async () => {
       if (!id) throw new Error('Tutorial ID required')
@@ -43,7 +47,7 @@ export function useCreateTutorialMutation() {
 
   return useMutation<
     ContentServiceTutorialResponse,
-    AxiosError,
+    ApiErrorResponse,
     ContentServiceCreateTutorialRequest
   >({
     mutationFn: async (data: ContentServiceCreateTutorialRequest) => {
@@ -61,8 +65,9 @@ export function useCreateTutorialMutation() {
       // Add the new tutorial to the cache
       queryClient.setQueryData(tutorialQueryKeys.detail(newTutorial.id!), newTutorial)
     },
-    onError: (error: AxiosError) => {
-      showErrorNotification('Lỗi tạo hướng dẫn', undefined, error)
+    onError: (error: ApiErrorResponse) => {
+      const errorMessage = handleApiError(error)
+      showErrorNotification(errorMessage, 'Lỗi tạo hướng dẫn')
     },
   })
 }
@@ -75,7 +80,7 @@ export function useUpdateTutorialMutation() {
 
   return useMutation<
     ContentServiceTutorialResponse,
-    AxiosError,
+    ApiErrorResponse,
     { id: string; data: ContentServiceUpdateTutorialRequest }
   >({
     mutationFn: async ({ id, data }) => {
@@ -96,8 +101,9 @@ export function useUpdateTutorialMutation() {
         queryKey: tutorialQueryKeys.lists(),
       })
     },
-    onError: (error: AxiosError) => {
-      showErrorNotification('Lỗi cập nhật hướng dẫn', undefined, error)
+    onError: (error: ApiErrorResponse) => {
+      const errorMessage = handleApiError(error)
+      showErrorNotification(errorMessage, 'Lỗi cập nhật hướng dẫn')
     },
   })
 }
@@ -108,7 +114,7 @@ export function useUpdateTutorialMutation() {
 export function useDeleteTutorialMutation() {
   const queryClient = useQueryClient()
 
-  return useMutation<void, AxiosError, { id: string; title: string }>({
+  return useMutation<void, ApiErrorResponse, { id: string; title: string }>({
     mutationFn: async ({ id }) => {
       await contentServiceDeleteTutorial({ path: { id } })
     },
@@ -123,8 +129,9 @@ export function useDeleteTutorialMutation() {
         queryKey: tutorialQueryKeys.lists(),
       })
     },
-    onError: (error: AxiosError) => {
-      showErrorNotification('Lỗi xóa hướng dẫn', undefined, error)
+    onError: (error: ApiErrorResponse) => {
+      const errorMessage = handleApiError(error)
+      showErrorNotification(errorMessage, 'Lỗi xóa hướng dẫn')
     },
   })
 }

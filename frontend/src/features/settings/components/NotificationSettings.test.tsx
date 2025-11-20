@@ -67,32 +67,13 @@ describe('NotificationSettings', () => {
     expect(pushSwitch).not.toBeChecked()
   })
 
-  it('should enable save button when notification preference is toggled', async () => {
-    renderComponent()
-    const user = userEvent.setup()
-
-    const saveButton = screen.getByText('Lưu thay đổi')
-
-    // Toggle email notifications (from true to false)
-    const emailSwitch = screen.getByRole('switch', { name: /Thông báo qua email/i })
-    await user.click(emailSwitch)
-
-    await waitFor(() => {
-      expect(saveButton).toBeEnabled()
-    })
-  })
-
-  it('should save notification preferences to localStorage', async () => {
+  it('should auto-save notification preferences to localStorage when toggled', async () => {
     renderComponent()
     const user = userEvent.setup()
 
     // Toggle push notifications
     const pushSwitch = screen.getByRole('switch', { name: /Thông báo đẩy/i })
     await user.click(pushSwitch)
-
-    // Save
-    const saveButton = screen.getByText('Lưu thay đổi')
-    await user.click(saveButton)
 
     await waitFor(() => {
       const stored = localStorage.getItem('apsas_user_settings')
@@ -104,7 +85,7 @@ describe('NotificationSettings', () => {
     })
   })
 
-  it('should show success notification when preferences are saved', async () => {
+  it('should show success notification when preference is toggled', async () => {
     renderComponent()
     const user = userEvent.setup()
 
@@ -112,13 +93,16 @@ describe('NotificationSettings', () => {
     const deadlineSwitch = screen.getByRole('switch', { name: /Nhắc nhở hạn nộp/i })
     await user.click(deadlineSwitch)
 
-    // Save
-    const saveButton = screen.getByText('Lưu thay đổi')
-    await user.click(saveButton)
-
     await waitFor(() => {
       const notifications = screen.getAllByText('Đã lưu cài đặt thành công')
       expect(notifications.length).toBeGreaterThan(0)
     })
+  })
+
+  it('should not display save or reset buttons', () => {
+    renderComponent()
+
+    expect(screen.queryByText('Lưu thay đổi')).not.toBeInTheDocument()
+    expect(screen.queryByText('Đặt lại')).not.toBeInTheDocument()
   })
 })

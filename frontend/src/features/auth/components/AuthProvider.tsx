@@ -123,6 +123,7 @@ export function useAuth(): AuthContextType {
  * For use in beforeLoad hooks where hooks cannot be called
  * 
  * @returns Current auth context value or null if not hydrated
+ * @internal - Not currently used
  */
 export function getAuthContextValue(): AuthContextType | null {
   // Get store state directly for beforeLoad (cannot use hooks there)

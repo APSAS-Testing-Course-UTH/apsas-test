@@ -1,5 +1,5 @@
 import { Stack, Paper, Group, Text, Button, Avatar, Badge, Loader, Alert } from '@mantine/core'
-import type { AxiosError } from 'axios'
+import type { ApiErrorResponse } from '@/configs/api-error-handler'
 import { IconUser, IconEdit, IconLock, IconAlertCircle } from '@tabler/icons-react'
 import { useCurrentUser } from '../api/hooks'
 import {
@@ -57,8 +57,8 @@ export function ProfileView({ onEditProfile, onChangePassword }: ProfileViewProp
 
   // Error state
   if (error) {
-    const isNetwork = isNetworkError(error as AxiosError)
-    const isTimeout = isTimeoutError(error as AxiosError)
+    const isNetwork = isNetworkError(error as ApiErrorResponse)
+    const isTimeout = isTimeoutError(error as ApiErrorResponse)
     const errorMessage = getErrorMessage(error)
 
     return (

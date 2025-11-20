@@ -1,37 +1,15 @@
-/**
- * Instructor Dashboard API Hooks
- * 
- * Cung cấp các hook type-safe để:
- * - Lấy thống kê bảng điều khiển
- * - Lấy bài nộp gần đây cần chấm
- * - Lấy deadline sắp tới
- * 
- * Vietnamese: Các hook API cho Bảng điều khiển Giảng viên
- */
-
 import { useQuery } from '@tanstack/react-query'
 import {
   submissionServiceGetAllSubmissions,
   contentServiceGetAllAssignments,
 } from '@/api/sdk.gen'
 import { handleApiError } from '@/configs/api-error-handler'
+import { instructorKeys } from './queryKeys'
 import type {
   InstructorDashboardStats,
   RecentSubmissionSummary,
   UpcomingDeadline,
 } from '../types/instructor.types'
-
-/**
- * Query key factory for dashboard data
- * Enables intelligent cache management
- */
-export const instructorDashboardKeys = {
-  all: ['instructor-dashboard'],
-  stats: () => [...instructorDashboardKeys.all, 'stats'],
-  recentSubmissions: () => [...instructorDashboardKeys.all, 'recent-submissions'],
-  upcomingDeadlines: () => [...instructorDashboardKeys.all, 'upcoming-deadlines'],
-  analytics: () => [...instructorDashboardKeys.all, 'analytics'],
-}
 
 /**
  * Fetch dashboard statistics
@@ -50,7 +28,7 @@ export const instructorDashboardKeys = {
  */
 export function useDashboardStats() {
   return useQuery({
-    queryKey: instructorDashboardKeys.stats(),
+    queryKey: instructorKeys.dashboard.stats(),
     queryFn: async (): Promise<InstructorDashboardStats> => {
       try {
         // Lấy assignments đang hoạt động
@@ -103,7 +81,7 @@ export function useDashboardStats() {
 export function useRecentSubmissions(limit: number = 5) {
   return useQuery({
     queryKey: [
-      ...instructorDashboardKeys.recentSubmissions(),
+      ...instructorKeys.dashboard.recentSubmissions(),
       { limit },
     ],
     queryFn: async (): Promise<RecentSubmissionSummary[]> => {
@@ -151,7 +129,7 @@ export function useRecentSubmissions(limit: number = 5) {
 export function useUpcomingDeadlines(daysAhead: number = 7, limit: number = 5) {
   return useQuery({
     queryKey: [
-      ...instructorDashboardKeys.upcomingDeadlines(),
+      ...instructorKeys.dashboard.upcomingDeadlines(),
       { daysAhead, limit },
     ],
     queryFn: async (): Promise<UpcomingDeadline[]> => {

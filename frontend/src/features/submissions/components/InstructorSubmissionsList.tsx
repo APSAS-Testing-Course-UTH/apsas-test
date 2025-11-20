@@ -14,6 +14,7 @@ import { useState, useMemo } from 'react'
 import { Table, Pagination, Badge, Button, Group, Stack, Text, Center, Loader, Alert } from '@mantine/core'
 import { IconEye, IconMessageCircle } from '@tabler/icons-react'
 import { useInstructorSubmissions } from '../api/useInstructorSubmissions'
+import { useStudentsData } from '../api/useStudentData'
 import { SubmissionsFilter, type SubmissionFilters } from './SubmissionsFilter'
 import styles from './InstructorSubmissionsList.module.css'
 
@@ -51,11 +52,46 @@ export function InstructorSubmissionsList({
     pageSize
   )
   
-  // Client-side filtering
-  const filteredSubmissions = useMemo(() => {
+  // Fetch student data for all submissions
+  // Extract student IDs from submissions content
+  const studentIds = useMemo(() => {
+    return data?.content?.map((s: any) => s.studentId).filter(Boolean) || []
+  }, [data])
+  
+  const { studentMap, isLoading: studentsLoading } = useStudentsData(studentIds)
+  
+  // Enrich submissions with student data and calculated fields
+  const enrichedSubmissions = useMemo(() => {
     const submissions = data?.content || []
     
-    return submissions.filter((submission: any) => {
+    return submissions.map((sub: any) => {
+      const student = studentMap.get(sub.studentId || '')
+      
+      // Calculate test case statistics from testCaseResults array
+      const testTotal = sub.testCaseResults?.length || 0
+      const testPassed = sub.testCaseResults?.filter((tc: any) => tc.passed).length || 0
+      
+      // Derive feedback status from feedback field
+      const hasFeedback = !!(sub.feedback && sub.feedback.trim().length > 0)
+      
+      return {
+        ...sub,
+        // Student information from Identity Service
+        studentName: student 
+          ? `${student.firstName} ${student.lastName}` 
+          : 'N/A',
+        studentEmail: student?.email || 'N/A',
+        // Calculated fields from Backend data
+        testTotal,
+        testPassed,
+        hasFeedback,
+      }
+    })
+  }, [data, studentMap])
+  
+  // Client-side filtering on enriched data
+  const filteredSubmissions = useMemo(() => {
+    return enrichedSubmissions.filter((submission: any) => {
       // Email search filter
       if (filters.searchEmail && 
           !submission.studentEmail?.toLowerCase().includes(filters.searchEmail.toLowerCase())) {
@@ -95,9 +131,9 @@ export function InstructorSubmissionsList({
       
       return true
     })
-  }, [data, filters])
+  }, [enrichedSubmissions, filters])
 
-  if (isLoading) {
+  if (isLoading || studentsLoading) {
     return (
       <Center py={40}>
         <Stack align="center">

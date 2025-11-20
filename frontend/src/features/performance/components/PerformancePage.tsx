@@ -3,7 +3,7 @@
  */
 
 import { useState, useMemo } from 'react'
-import { Container, Grid, Stack, Group, Text, ThemeIcon, Paper, Skeleton, Button, Center, Pagination } from '@mantine/core'
+import { Container, Grid, Stack, Group, Text, ThemeIcon, Paper, Skeleton, Center, Pagination } from '@mantine/core'
 import { IconTrendingUp, IconTarget, IconCheck, IconX } from '@tabler/icons-react'
 import { useStudentPerformance, useStudentHistory, useAllAssignments } from '../api/hooks'
 import { PerformanceChart, PassRateChart } from './PerformanceChart'
@@ -127,11 +127,11 @@ export function PerformancePage() {
                 Xem chi tiết hiệu suất học tập và tiến độ của bạn
               </Text>
             </div>
-            {!isLoading && (
+            {/* {!isLoading && (
               <Button variant="light" size="sm" onClick={() => window.location.reload()}>
                 {PERFORMANCE_LABELS.refresh}
               </Button>
-            )}
+            )} */}
           </Group>
         </div>
 

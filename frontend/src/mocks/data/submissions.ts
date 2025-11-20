@@ -4,13 +4,13 @@
 
 import type {
   SubmissionServiceSubmissionResponse,
-  SubmissionServiceTestCaseResultDto,
+  SubmissionServiceTestCaseResultResponse,
 } from '@/api/types.gen'
 
 /**
  * Mock test case results
  */
-const mockTestCases: SubmissionServiceTestCaseResultDto[] = [
+const mockTestCases: SubmissionServiceTestCaseResultResponse[] = [
   {
     order: 1,
     description: 'Test case 1: Basic input',

@@ -1,5 +1,6 @@
 import { Card, Text, Group, Stack, Box, Badge, Divider, Button } from '@mantine/core'
 import { IconMessageCircle } from '@tabler/icons-react'
+import { MarkdownContent } from '@/components/MarkdownContent'
 import styles from './InstructorFeedback.module.css'
 
 /**
@@ -203,9 +204,7 @@ export function InstructorFeedback({
 
                 {/* Entry Content */}
                 <Box className={styles.feedbackContent}>
-                  <Text size="sm" style={{ whiteSpace: 'pre-wrap' }}>
-                    {entry.content}
-                  </Text>
+                  <MarkdownContent content={entry.content} />
                 </Box>
               </Stack>
             </Card>

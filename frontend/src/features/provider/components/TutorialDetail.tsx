@@ -31,6 +31,7 @@ import {
 import { IconAlertCircle, IconArrowLeft } from '@tabler/icons-react'
 import { useTutorialDetailQuery } from '../api'
 import { formatDateTime } from '@/utils/dateUtils'
+import { MarkdownContent } from '@/components/MarkdownContent'
 import styles from './TutorialDetail.module.css'
 
 interface TutorialDetailProps {
@@ -155,16 +156,22 @@ export function TutorialDetail({ tutorialId, onEdit }: TutorialDetailProps) {
             <Text size="sm" c="dimmed" fw={500}>
               Nội dung
             </Text>
-            <Text
-              mt="xs"
-              style={{ whiteSpace: 'pre-wrap' }}
+            <div
               className={styles.contentPreview}
             >
-              {tutorial.content
-                ? tutorial.content.substring(0, 500) +
-                  (tutorial.content.length > 500 ? '...' : '')
-                : 'Không có nội dung'}
-            </Text>
+              {tutorial.content ? (
+                <MarkdownContent 
+                  content={
+                    tutorial.content.substring(0, 500) +
+                    (tutorial.content.length > 500 ? '...' : '')
+                  } 
+                />
+              ) : (
+                <Text c="dimmed" fs="italic">
+                  Không có nội dung
+                </Text>
+              )}
+            </div>
           </div>
 
           {/* Metadata */}
@@ -216,5 +223,3 @@ export function TutorialDetail({ tutorialId, onEdit }: TutorialDetailProps) {
     </Container>
   )
 }
-
-export default TutorialDetail

@@ -18,6 +18,7 @@
 
 import '@uiw/react-md-editor/markdown-editor.css'
 import '@uiw/react-markdown-preview/markdown.css'
+import styles from './SkillForm.module.css'
 
 import { useEffect } from 'react'
 import * as React from 'react'
@@ -206,7 +207,7 @@ export function SkillForm({ mode, skillId, onSuccess, onCancel }: SkillFormProps
   // Show error if fetch failed
   if (mode === 'edit' && !skillData && skillId) {
     return (
-      <Container size="sm" py="xl">
+      <Container size="md" py="xl">
         <Alert icon={<IconAlertCircle size={16} />} color="red" title="Lỗi">
           Không thể tải thông tin kỹ năng
         </Alert>
@@ -218,8 +219,8 @@ export function SkillForm({ mode, skillId, onSuccess, onCancel }: SkillFormProps
   }
 
   return (
-    <Container size="sm" py="xl">
-      <Paper p="md" radius="md" withBorder>
+    <Container size="md" py="xl">
+      <Paper p="xl" radius="md" withBorder shadow="sm">
         <Stack gap="lg">
           {/* Title */}
           <Title order={2}>
@@ -249,17 +250,19 @@ export function SkillForm({ mode, skillId, onSuccess, onCancel }: SkillFormProps
                 {...form.getInputProps('name')}
                 required
                 disabled={isMutating}
+                size="md"
               />
 
               {/* Description input - Markdown Editor with separate state */}
               <div data-color-mode="light">
-                <Text component="label" fw={500} mb="xs">
+                <Text component="label" fw={500} size="sm" mb="xs">
                   Mô tả (Markdown)
                 </Text>
-                <Text size="xs" c="dimmed" mb="sm">
+                <Text size="xs" c="dimmed" mb="md">
                   Nhập mô tả bằng Markdown. Hỗ trợ in đậm, in nghiêng, code blocks, v.v.
                 </Text>
                 <MDEditor
+                  className={styles.markdownEditor}
                   key={`skill-editor-${mode}-${skillId || 'create'}`}
                   value={editorContent}
                   onChange={(val) => {
@@ -270,11 +273,19 @@ export function SkillForm({ mode, skillId, onSuccess, onCancel }: SkillFormProps
                     setEditorContent(val || '')
                   }}
                   preview="live"
-                  height={300}
+                  height={400}
                   visibleDragbar={false}
                   hideToolbar={false}
+                  highlightEnable={false}
+                  previewOptions={{
+                    skipHtml: false,
+                    remarkPlugins: [],
+                    rehypePlugins: [],
+                  }}
                   textareaProps={{
                     disabled: isMutating,
+                    placeholder: 'Nhập mô tả bằng Markdown...',
+                    style: { minHeight: '350px' },
                   }}
                   style={{
                     borderRadius: '4px',
@@ -292,15 +303,16 @@ export function SkillForm({ mode, skillId, onSuccess, onCancel }: SkillFormProps
               </div>
 
               {/* Action buttons */}
-              <Group justify="flex-end" gap="sm">
+              <Group justify="flex-end" gap="md" mt="md">
                 <Button
                   variant="light"
+                  size="md"
                   onClick={() => onCancel?.() || navigate({ to: '/provider/dashboard' })}
                   disabled={isMutating}
                 >
                   Hủy
                 </Button>
-                <Button type="submit" loading={isMutating}>
+                <Button type="submit" size="md" loading={isMutating}>
                   {mode === 'create' ? 'Tạo kỹ năng' : 'Cập nhật kỹ năng'}
                 </Button>
               </Group>
@@ -311,5 +323,3 @@ export function SkillForm({ mode, skillId, onSuccess, onCancel }: SkillFormProps
     </Container>
   )
 }
-
-export default SkillForm

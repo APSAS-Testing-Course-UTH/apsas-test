@@ -11,7 +11,7 @@
  * - Logs errors for debugging
  */
 
-import type { AxiosError } from 'axios'
+import type { ApiErrorResponse as GeneratedApiError } from '@/configs/api-error-handler'
 import { notifications } from '@mantine/notifications'
 import {
   IconAlertCircle,
@@ -42,7 +42,7 @@ export interface StudentPortalError {
   status?: number
   details?: Record<string, unknown>
   timestamp: string
-  originalError?: Error | AxiosError
+  originalError?: Error | GeneratedApiError
 }
 
 /**
@@ -143,10 +143,10 @@ const ERROR_CODE_MAP: Record<string, string> = {
  *   console.error(message) // "Kiểm tra kết nối mạng của bạn..."
  * }
  */
-export function getErrorMessage(error: AxiosError | Error | unknown): string {
+export function getErrorMessage(error: GeneratedApiError | Error | unknown): string {
   // Handle Axios errors
   if (error && typeof error === 'object' && 'isAxiosError' in error) {
-    const axiosError = error as AxiosError
+    const axiosError = error as GeneratedApiError
     const status = axiosError.response?.status
     const data = axiosError.response?.data as ApiErrorResponse | undefined
 
@@ -194,7 +194,8 @@ export function getErrorMessage(error: AxiosError | Error | unknown): string {
   // Handle network errors
   if (error && typeof error === 'object') {
     const errorObj = error as Record<string, unknown>
-    const code = errorObj.code as string | undefined
+    // Use type guard instead of type assertion
+    const code = typeof errorObj.code === 'string' ? errorObj.code : undefined
 
     if (code && code in ERROR_CODE_MAP) {
       return ERROR_CODE_MAP[code]
@@ -220,11 +221,11 @@ export function getErrorMessage(error: AxiosError | Error | unknown): string {
  * @param error - Error object from API call
  * @returns Extended error with message, code, and status
  */
-export function mapApiError(error: AxiosError | Error | unknown): StudentPortalError {
+export function mapApiError(error: GeneratedApiError | Error | unknown): StudentPortalError {
   const timestamp = new Date().toISOString()
 
   if (error && typeof error === 'object' && 'isAxiosError' in error) {
-    const axiosError = error as AxiosError
+    const axiosError = error as GeneratedApiError
     const status = axiosError.response?.status || 0
     const data = axiosError.response?.data as ApiErrorResponse | undefined
 
@@ -266,7 +267,7 @@ export function mapApiError(error: AxiosError | Error | unknown): StudentPortalE
 export function showErrorNotification(
   title: string,
   message?: string,
-  error?: AxiosError | Error | unknown
+  error?: GeneratedApiError | Error | unknown
 ) {
   const finalMessage = message || getErrorMessage(error)
 
@@ -353,7 +354,7 @@ export function showInfoNotification(title: string, message?: string) {
  * @example
  * showNetworkErrorNotification(error)
  */
-export function showNetworkErrorNotification(error?: AxiosError | Error | unknown) {
+export function showNetworkErrorNotification(error?: GeneratedApiError | Error | unknown) {
   const message = getErrorMessage(error)
 
   notifications.show({
@@ -420,9 +421,9 @@ export function showValidationErrorNotification(errors: ValidationError[]) {
  * const errors = extractValidationErrors(error)
  * // [{ field: 'email', message: 'Email không hợp lệ' }]
  */
-export function extractValidationErrors(error: AxiosError | Error | unknown): ValidationError[] {
+export function extractValidationErrors(error: GeneratedApiError | Error | unknown): ValidationError[] {
   if (error && typeof error === 'object' && 'isAxiosError' in error) {
-    const axiosError = error as AxiosError
+    const axiosError = error as GeneratedApiError
     const data = axiosError.response?.data as ApiErrorResponse | undefined
 
     if (data?.details && typeof data.details === 'object') {
@@ -442,7 +443,7 @@ export function extractValidationErrors(error: AxiosError | Error | unknown): Va
  * @param error - Error object
  * @returns true if error is network-related
  */
-export function isNetworkError(error: AxiosError | Error | unknown): boolean {
+export function isNetworkError(error: GeneratedApiError | Error | unknown): boolean {
   if (error && typeof error === 'object') {
     const errorObj = error as Record<string, unknown>
     const code = String(errorObj.code || '')
@@ -464,7 +465,7 @@ export function isNetworkError(error: AxiosError | Error | unknown): boolean {
  * @param error - Error object
  * @returns true if error is timeout-related
  */
-export function isTimeoutError(error: AxiosError | Error | unknown): boolean {
+export function isTimeoutError(error: GeneratedApiError | Error | unknown): boolean {
   if (error && typeof error === 'object') {
     const errorObj = error as Record<string, unknown>
     const code = String(errorObj.code || '')
@@ -485,12 +486,12 @@ export function isTimeoutError(error: AxiosError | Error | unknown): boolean {
  * @param error - Error object
  * @returns Error category: 'network' | 'timeout' | 'validation' | 'auth' | 'server' | 'unknown'
  */
-export function getErrorCategory(error: AxiosError | Error | unknown): string {
+export function getErrorCategory(error: GeneratedApiError | Error | unknown): string {
   if (isNetworkError(error)) return 'network'
   if (isTimeoutError(error)) return 'timeout'
 
   if (error && typeof error === 'object' && 'isAxiosError' in error) {
-    const axiosError = error as AxiosError
+    const axiosError = error as GeneratedApiError
     const status = axiosError.response?.status
 
     if (status === 400 || status === 422) return 'validation'

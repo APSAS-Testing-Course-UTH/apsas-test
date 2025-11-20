@@ -7,14 +7,14 @@
  */
 
 import { useQuery } from '@tanstack/react-query'
-import type { AxiosError } from 'axios'
+import type { ApiErrorResponse } from '@/configs/api-error-handler'
 import type { ContentServicePageResponseAssignmentResponse } from '@/api/types.gen'
 import { contentServiceGetAllAssignments } from '@/api/sdk.gen'
 
 export const assignmentQueryKeys = {
   all: ['assignments'] as const,
   lists: () => [...assignmentQueryKeys.all, 'list'] as const,
-  list: (filters: { page: number; size: number; sort: string }) =>
+  list: (filters: { page: number; size: number }) =>
     [...assignmentQueryKeys.lists(), filters] as const,
   details: () => [...assignmentQueryKeys.all, 'detail'] as const,
   detail: (id: string) => [...assignmentQueryKeys.details(), id] as const,
@@ -23,15 +23,14 @@ export const assignmentQueryKeys = {
 export function useAssignmentsQuery({
   page = 0,
   size = 10,
-  sort = 'createdAt:DESC',
-}: { page?: number; size?: number; sort?: string } = {}) {
+}: { page?: number; size?: number } = {}) {
   return useQuery<
     ContentServicePageResponseAssignmentResponse,
-    AxiosError,
+    ApiErrorResponse,
     ContentServicePageResponseAssignmentResponse,
-    readonly ['assignments', 'list', { page: number; size: number; sort: string }]
+    readonly ['assignments', 'list', { page: number; size: number }]
   >({
-    queryKey: ['assignments', 'list', { page, size, sort }] as const,
+    queryKey: ['assignments', 'list', { page, size }] as const,
     queryFn: async () => {
       const response = await contentServiceGetAllAssignments({
         query: { page: String(page), size: String(size) },

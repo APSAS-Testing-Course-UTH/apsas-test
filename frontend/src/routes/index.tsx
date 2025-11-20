@@ -43,10 +43,8 @@ export const Route = createFileRoute('/')({
         // Redirect to login with message that admin should use separate admin portal
         throw redirect({ 
           to: '/login',
-          search: {
-            redirect: undefined,
-            message: 'Admin users should access the Admin Portal directly',
-          },
+          search: { redirect: undefined },
+          // Note: Admin users should access Admin Portal directly
         })
       } else if (user?.role === USER_ROLES.CONTENT_PROVIDER) {
         throw redirect({ to: '/provider/dashboard' })

@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Container, Title, Stack, TextInput, Button, Group } from '@mantine/core'
 import { IconSearch, IconRefresh } from '@tabler/icons-react'
 import { useState } from 'react'
@@ -8,6 +8,7 @@ import { SkillsList } from '@/features/resources/components'
 import { USER_ROLES } from '@/constants/roles'
 
 function SkillsPageContent() {
+  const navigate = useNavigate()
   const [page, setPage] = useState(0)
   const [searchQuery, setSearchQuery] = useState('')
   const { data, isLoading, error, refetch } = useSkillsQuery({ page, size: 12 })
@@ -22,6 +23,12 @@ function SkillsPageContent() {
 
   const handleRefresh = () => {
     refetch()
+  }
+
+  const handleSelectSkill = (skill: ContentServiceSkillResponse) => {
+    if (skill.id) {
+      navigate({ to: `/student/resources/skills/${skill.id}` })
+    }
   }
 
   return (
@@ -62,6 +69,7 @@ function SkillsPageContent() {
           currentPage={page + 1}
           onPageChange={(newPage) => setPage(newPage - 1)}
           onRefresh={handleRefresh}
+          onSelectSkill={handleSelectSkill}
         />
       </Stack>
     </Container>

@@ -16,6 +16,9 @@ console.log('[Handlers] ✅ Loaded contentHandlers:', contentHandlers?.length ||
 import { supportHandlers } from './supportHandlers'
 console.log('[Handlers] ✅ Loaded supportHandlers:', supportHandlers?.length || 0)
 
+import { notificationHandlers } from './notificationHandlers'
+console.log('[Handlers] ✅ Loaded notificationHandlers:', notificationHandlers?.length || 0)
+
 export const handlers = [
   // Identity Service handlers
   ...identityHandlers,
@@ -31,6 +34,9 @@ export const handlers = [
 
   // Support Service handlers
   ...supportHandlers,
+
+  // Notification Service handlers
+  ...notificationHandlers,
 ]
 
 console.log('[Handlers] ✅ Total handlers exported:', handlers?.length || 0)

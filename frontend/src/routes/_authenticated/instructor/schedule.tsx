@@ -27,7 +27,7 @@ const InstructorSchedulePage = () => {
       <Stack gap="xl">
         {/* Header */}
         <div>
-          <Title order={1}>📅 Lịch trình</Title>
+          <Title order={1}>Lịch trình</Title>
           <Text c="dimmed" mt="xs">
             Quản lý lịch trình bài tập, deadline, và thời gian bắt đầu
           </Text>

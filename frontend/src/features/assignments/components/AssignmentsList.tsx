@@ -11,7 +11,7 @@
 
 import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import type { AxiosError } from 'axios'
+import type { ApiErrorResponse } from '@/configs/api-error-handler'
 import {
   Table,
   Button,
@@ -88,8 +88,8 @@ export function AssignmentsList({ onSelectAssignment }: AssignmentsListProps) {
 
   // Render error state
   if (error) {
-    const isNetwork = isNetworkError(error as AxiosError)
-    const isTimeout = isTimeoutError(error as AxiosError)
+    const isNetwork = isNetworkError(error as ApiErrorResponse)
+    const isTimeout = isTimeoutError(error as ApiErrorResponse)
     const errorMessage = getErrorMessage(error)
 
     return (
@@ -275,5 +275,3 @@ export function AssignmentsList({ onSelectAssignment }: AssignmentsListProps) {
     </Stack>
   )
 }
-
-export default AssignmentsList

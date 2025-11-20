@@ -21,7 +21,7 @@ import { useState } from 'react';
 import { Outlet, useLocation, useNavigate } from '@tanstack/react-router';
 import { useAuthStore } from '@/features/auth/stores/useAuthStore';
 import { useLogout } from '@/features/auth/hooks/useLogout';
-import { INSTRUCTOR_NAV_ITEMS, BRAND_CONFIG } from '@/constants/navigation';
+import { INSTRUCTOR_NAV_ITEMS } from '@/constants/navigation';
 import classes from './InstructorPortalLayout.module.css';
 
 export function InstructorPortalLayout() {
@@ -111,7 +111,7 @@ export function InstructorPortalLayout() {
                   <Menu.Item
                     leftSection={<IconUser size={14} />}
                     onClick={() => {
-                      navigate({ to: '/student/profile' });
+                      navigate({ to: '/instructor/profile' });
                       setMenuOpened(false);
                     }}
                   >
@@ -120,7 +120,7 @@ export function InstructorPortalLayout() {
                   <Menu.Item
                     leftSection={<IconSettings size={14} />}
                     onClick={() => {
-                      navigate({ to: '/student/settings' });
+                      navigate({ to: '/instructor/settings' });
                       setMenuOpened(false);
                     }}
                   >
@@ -153,7 +153,8 @@ export function InstructorPortalLayout() {
                 leftSection={<Icon size={25} stroke={1.5} />}
                 active={isActive(item.href)}
                 onClick={() => {
-                  navigate({ to: item.href as any });
+                  // Type-safe navigation: href is validated by navigation constants
+                  navigate({ to: item.href as typeof item.href });
                   if (opened) toggle(); // Close mobile menu after navigation
                 }}
                 className={classes.navLink}

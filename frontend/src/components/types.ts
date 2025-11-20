@@ -4,7 +4,6 @@
  */
 
 import type { ReactNode } from 'react';
-import type { StatusType } from './constants/statusLabels';
 
 /**
  * Button Component Types
@@ -309,35 +308,10 @@ export interface BadgeProps {
   fullWidth?: boolean;
 }
 
-export interface StatusBadgeProps {
-  /**
-   * Status type (uses Vietnamese label)
-   */
-  status: StatusType;
-
-  /**
-   * Badge size
-   * @default 'md'
-   */
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-
-  /**
-   * Badge variant
-   * @default 'filled'
-   */
-  variant?: 'default' | 'filled' | 'light' | 'outline' | 'dot';
-
-  /**
-   * Additional CSS class
-   */
-  className?: string;
-
-  /**
-   * Full width badge
-   * @default false
-   */
-  fullWidth?: boolean;
-}
+/**
+ * @deprecated StatusBadgeProps removed - duplicate of Badge.tsx definition
+ * Import from: @/components/ui/Badge/Badge
+ */
 
 /**
  * Modal Component Types

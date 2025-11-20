@@ -109,10 +109,8 @@ export function subscribeToToasts(listener: () => void): () => void {
 
 /**
  * Get current toasts
- * Internal use only
+ * @internal - Use subscribeToToasts for reactive updates
  */
 export function getToasts(): ToastMessage[] {
   return Array.from(toasts);
 }
-
-export default useToast;

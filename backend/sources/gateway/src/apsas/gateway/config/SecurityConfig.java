@@ -3,6 +3,7 @@ package apsas.gateway.config;
 import apsas.shared.security.HeaderAuthenticationToken;
 import apsas.shared.security.JwtClaims;
 import apsas.shared.security.UserPrincipal;
+import java.util.List;
 import java.util.UUID;
 import javax.crypto.spec.SecretKeySpec;
 import lombok.RequiredArgsConstructor;
@@ -27,9 +28,13 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
+import org.springframework.security.oauth2.server.resource.web.server.authentication.ServerBearerTokenAuthenticationConverter;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.util.matcher.PathPatternParserServerWebExchangeMatcher;
 import org.springframework.stereotype.Component;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.reactive.CorsConfigurationSource;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 import reactor.core.publisher.Mono;
 
 @Configuration
@@ -59,7 +64,20 @@ public class SecurityConfig {
         .httpBasic(Customizer.withDefaults())
         .csrf(CsrfSpec::disable)
         .formLogin(FormLoginSpec::disable)
+        .cors(Customizer.withDefaults())
         .build();
+  }
+
+  @Bean
+  public CorsConfigurationSource corsConfigurationSource() {
+    var configuration = new CorsConfiguration();
+    configuration.setAllowedOriginPatterns(List.of("*"));
+    configuration.setAllowedMethods(List.of("*"));
+    configuration.setAllowedHeaders(List.of("*"));
+    configuration.setAllowCredentials(true);
+    var source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", configuration);
+    return source;
   }
 
   @Bean
@@ -74,7 +92,10 @@ public class SecurityConfig {
   @Bean
   @Order(2)
   public SecurityWebFilterChain securityWebFilterChain(
-      ServerHttpSecurity http, JwtToAuthenticationTokenConverter jwtConverter) {
+      ServerHttpSecurity http,
+      ServerBearerTokenAuthenticationConverter bearerTokenConverter,
+      JwtToAuthenticationTokenConverter jwtConverter
+  ) {
     return http.authorizeExchange(
             exchanges ->
                 exchanges
@@ -82,14 +103,25 @@ public class SecurityConfig {
                     .permitAll()
                     .pathMatchers("/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
                     .permitAll()
+                    .pathMatchers("/ws/support/**")
+                    .permitAll()
                     .anyExchange()
                     .authenticated())
         .oauth2ResourceServer(
-            oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtConverter)))
+            oauth2 -> oauth2
+                .bearerTokenConverter(bearerTokenConverter)
+                .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtConverter)))
         .csrf(CsrfSpec::disable)
         .httpBasic(HttpBasicSpec::disable)
         .formLogin(FormLoginSpec::disable)
         .build();
+  }
+
+  @Bean
+  ServerBearerTokenAuthenticationConverter serverBearerTokenAuthenticationConverter() {
+    var converter = new ServerBearerTokenAuthenticationConverter();
+    converter.setAllowUriQueryParameter(true);
+    return converter;
   }
 
   @Component

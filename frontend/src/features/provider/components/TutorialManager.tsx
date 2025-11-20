@@ -32,6 +32,7 @@ import {
   Modal,
   Badge,
   TextInput,
+  Checkbox,
 } from '@mantine/core'
 import { DatePickerInput } from '@mantine/dates'
 import {
@@ -66,6 +67,7 @@ export function TutorialManager({ onSelectTutorial }: TutorialManagerProps) {
     null,
     null,
   ])
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
   const [deleteConfirm, setDeleteConfirm] = useState<{
     open: boolean
     tutorialId?: string
@@ -121,14 +123,50 @@ export function TutorialManager({ onSelectTutorial }: TutorialManagerProps) {
 
   // Confirm delete
   const handleConfirmDelete = useCallback(async () => {
-    if (deleteConfirm.tutorialId && deleteConfirm.tutorialTitle) {
+    if (deleteConfirm.tutorialId === 'bulk' && selectedRows.size > 0) {
+      // Bulk delete
+      for (const id of selectedRows) {
+        const tutorialTitle = filteredTutorials.find(t => t.id === id)?.title || 'Unknown'
+        await deleteTutorial.mutateAsync({ id, title: tutorialTitle })
+      }
+      setSelectedRows(new Set())
+    } else if (deleteConfirm.tutorialId && deleteConfirm.tutorialTitle) {
+      // Single delete
       await deleteTutorial.mutateAsync({
         id: deleteConfirm.tutorialId,
         title: deleteConfirm.tutorialTitle,
       })
-      setDeleteConfirm({ open: false })
     }
-  }, [deleteConfirm.tutorialId, deleteConfirm.tutorialTitle, deleteTutorial])
+    setDeleteConfirm({ open: false })
+  }, [deleteConfirm.tutorialId, deleteConfirm.tutorialTitle, deleteTutorial, selectedRows, filteredTutorials])
+
+  // Toggle row selection
+  const toggleRow = useCallback((id: string) => {
+    setSelectedRows(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(id)) newSet.delete(id)
+      else newSet.add(id)
+      return newSet
+    })
+  }, [])
+
+  // Toggle all rows
+  const toggleAllRows = useCallback(() => {
+    if (selectedRows.size === filteredTutorials.length) {
+      setSelectedRows(new Set())
+    } else {
+      setSelectedRows(new Set(filteredTutorials.map(t => t.id || '')))
+    }
+  }, [selectedRows.size, filteredTutorials])
+
+  // TODO: Implement bulk delete feature
+  // const handleBulkDelete = useCallback(() => {
+  //   setDeleteConfirm({
+  //     open: true,
+  //     tutorialId: 'bulk',
+  //     tutorialTitle: `${selectedRows.size} hướng dẫn`,
+  //   })
+  // }, [selectedRows.size])
 
   // Render loading state
   if (isLoading) {
@@ -260,49 +298,66 @@ export function TutorialManager({ onSelectTutorial }: TutorialManagerProps) {
           <Table striped highlightOnHover stickyHeader layout="fixed">
             <Table.Thead>
               <Table.Tr>
-                <Table.Th w="31%">Tiêu đề</Table.Th>
-                <Table.Th w="31%">Thẻ</Table.Th>
+                <Table.Th w="5%">
+                  <Checkbox
+                    checked={selectedRows.size === filteredTutorials.length}
+                    indeterminate={selectedRows.size > 0 && selectedRows.size < filteredTutorials.length}
+                    onChange={toggleAllRows}
+                  />
+                </Table.Th>
+                <Table.Th w="26%">Tiêu đề</Table.Th>
+                <Table.Th w="26%">Thẻ</Table.Th>
                 <Table.Th w="12%" style={{ textAlign: 'center' }}>Ngày tạo</Table.Th>
                 <Table.Th w="12%" style={{ textAlign: 'center' }}>Cập nhật</Table.Th>
-                <Table.Th w="14%" style={{ textAlign: 'right' }}>Hành động</Table.Th>
+                <Table.Th w="19%" style={{ textAlign: 'right' }}>Hành động</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
-              {filteredTutorials.map((tutorial) => (
-                <Table.Tr
-                  key={tutorial.id}
-                  className={styles.row}
-                  onClick={() => handleSelectTutorial(tutorial.id!)}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <Table.Td w="31%">
-                    <Text size="sm" fw={500}>
-                      {tutorial.title}
-                    </Text>
+              {filteredTutorials.map((tutorial) => {
+                const isSelected = selectedRows.has(tutorial.id || '')
+                return (
+                  <Table.Tr
+                    key={tutorial.id}
+                    className={styles.row}
+                    style={{
+                      backgroundColor: isSelected ? 'var(--mantine-color-blue-0)' : undefined,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <Table.Td w="5%" onClick={(e) => e.stopPropagation()}>
+                      <Checkbox
+                        checked={isSelected}
+                        onChange={() => toggleRow(tutorial.id || '')}
+                      />
+                    </Table.Td>
+                    <Table.Td w="26%" onClick={() => handleSelectTutorial(tutorial.id!)}>
+                      <Text size="sm" fw={500}>
+                        {tutorial.title}
+                      </Text>
+                    </Table.Td>
+
+                  <Table.Td w="26%" onClick={() => handleSelectTutorial(tutorial.id!)}>
+                    {Array.isArray(tutorial.tags) && tutorial.tags.length > 0 ? (
+                      <Group gap={4}>
+                        {tutorial.tags.slice(0, 3).map((tag, idx) => (
+                          <Badge key={idx} size="sm" variant="light">
+                            {tag}
+                          </Badge>
+                        ))}
+                        {tutorial.tags.length > 3 && (
+                          <Badge size="sm" variant="light">
+                            +{tutorial.tags.length - 3}
+                          </Badge>
+                        )}
+                      </Group>
+                    ) : (
+                      <Text size="xs" c="dimmed">
+                        Không có thẻ
+                      </Text>
+                    )}
                   </Table.Td>
 
-                <Table.Td w="31%">
-                  {Array.isArray(tutorial.tags) && tutorial.tags.length > 0 ? (
-                    <Group gap={4}>
-                      {tutorial.tags.slice(0, 3).map((tag, idx) => (
-                        <Badge key={idx} size="sm" variant="light">
-                          {tag}
-                        </Badge>
-                      ))}
-                      {tutorial.tags.length > 3 && (
-                        <Badge size="sm" variant="light">
-                          +{tutorial.tags.length - 3}
-                        </Badge>
-                      )}
-                    </Group>
-                  ) : (
-                    <Text size="xs" c="dimmed">
-                      Không có thẻ
-                    </Text>
-                  )}
-                </Table.Td>
-
-                <Table.Td w="12%" style={{ textAlign: 'center' }}>
+                <Table.Td w="12%" style={{ textAlign: 'center' }} onClick={() => handleSelectTutorial(tutorial.id!)}>
                   <Text size="sm">
                     {tutorial.createdAt
                       ? formatDateShort(new Date(tutorial.createdAt))
@@ -310,7 +365,7 @@ export function TutorialManager({ onSelectTutorial }: TutorialManagerProps) {
                   </Text>
                 </Table.Td>
 
-                <Table.Td w="12%" style={{ textAlign: 'center' }}>
+                <Table.Td w="12%" style={{ textAlign: 'center' }} onClick={() => handleSelectTutorial(tutorial.id!)}>
                   <Text size="sm">
                     {tutorial.updatedAt
                       ? formatDateShort(new Date(tutorial.updatedAt))
@@ -318,8 +373,8 @@ export function TutorialManager({ onSelectTutorial }: TutorialManagerProps) {
                   </Text>
                 </Table.Td>
 
-                <Table.Td w="14%" style={{ textAlign: 'right' }}>
-                  <Group gap={0} justify="flex-end">
+                <Table.Td w="19%" style={{ textAlign: 'right' }}>
+                  <Group gap="sm" justify="flex-end">
                     <Tooltip label="Xem chi tiết">
                       <ActionIcon
                         variant="light"
@@ -370,7 +425,8 @@ export function TutorialManager({ onSelectTutorial }: TutorialManagerProps) {
                   </Group>
                 </Table.Td>
               </Table.Tr>
-            ))}
+                )
+              })}
             </Table.Tbody>
           </Table>
         </div>
@@ -422,5 +478,3 @@ export function TutorialManager({ onSelectTutorial }: TutorialManagerProps) {
     </Stack>
   )
 }
-
-export default TutorialManager

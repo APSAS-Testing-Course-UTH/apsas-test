@@ -18,6 +18,7 @@ import { useFormAutoSave, AUTO_SAVE_LABELS } from '../hooks';
 import { AdvancedCodeEditor } from './AdvancedCodeEditor';
 import { useSubmissionErrorHandler } from '@/features/student/hooks';
 import { getErrorCategory, isNetworkError, isTimeoutError } from '@/features/student/utils';
+import { encodeToBase64 } from '@/utils/encoding';
 import styles from './CodeSubmissionForm.module.css';
 
 interface CodeSubmissionFormProps {
@@ -45,13 +46,13 @@ const UI_LABELS = {
     clearDraft: 'Xóa bản nháp',
   },
   placeholders: {
-    code: 'Viết mã của bạn tại đây...',
+    code: 'Viết code của bạn tại đây...',
     language: 'Chọn ngôn ngữ lập trình',
   },
   errors: {
     selectLanguage: 'Vui lòng chọn ngôn ngữ',
-    codeEmpty: 'Mã không được trống',
-    codeTooLong: 'Mã quá dài (tối đa 10,000 ký tự)',
+    codeEmpty: 'Code không được trống',
+    codeTooLong: 'Code quá dài (tối đa 10,000 ký tự)',
     submitFailed: 'Lỗi nộp bài',
   },
   loading: 'Đang nộp...',
@@ -187,7 +188,7 @@ export function CodeSubmissionForm({
       try {
         const submissionRequest = {
           assignmentId,
-          code: code.trim(),
+          code: encodeToBase64(code.trim()), // ✅ Base64 encoded as required by BE
           language: selectedRuntime.language || '',
         };
 
@@ -201,10 +202,12 @@ export function CodeSubmissionForm({
 
         clearAutoSaveDraft();
 
-        setCode('');
-        setErrors({});
-
-        setTimeout(() => setSubmitSuccess(false), 3000);
+        // Clear code and errors after a small delay to avoid editor readonly race condition
+        setTimeout(() => {
+          setCode('');
+          setErrors({});
+          setSubmitSuccess(false);
+        }, 100);
       } catch (error) {
         const errorCategory = getErrorCategory(error);
         const isNetwork = isNetworkError(error);
@@ -220,7 +223,7 @@ export function CodeSubmissionForm({
           errorMessage = 'Yêu cầu hết thời gian chờ. Máy chủ phản hồi quá chậm. Vui lòng thử lại.';
           errorTypeCategory = 'timeout';
         } else if (errorCategory === 'validation') {
-          errorMessage = 'Dữ liệu không hợp lệ. Vui lòng kiểm tra mã lại.';
+          errorMessage = 'Dữ liệu không hợp lệ. Vui lòng kiểm tra Code lại.';
           errorTypeCategory = 'validation';
         } else if (error instanceof Error) {
           errorMessage = error.message;
@@ -266,7 +269,7 @@ export function CodeSubmissionForm({
       <Stack gap="lg">
         {isDraft && (
           <Alert icon={<IconCheck />} color="blue" title={UI_LABELS.draft.indicator}>
-            Mã của bạn từ phiên làm việc trước đã được khôi phục. Hãy tiếp tục hoặc xóa và bắt đầu lại.
+            Code của bạn từ phiên làm việc trước đã được khôi phục. Hãy tiếp tục hoặc xóa và bắt đầu lại.
           </Alert>
         )}
 
@@ -368,7 +371,7 @@ export function CodeSubmissionForm({
 
         {submitSuccess && (
           <Alert icon={<IconCheck />} color="green" title={UI_LABELS.success}>
-            Mã của bạn đang được kiểm tra. Vui lòng chờ kết quả...
+            Code của bạn đang được kiểm tra. Vui lòng chờ kết quả...
           </Alert>
         )}
 
@@ -406,7 +409,7 @@ export function CodeSubmissionForm({
         )}
 
         <Group justify="flex-start" gap="sm" className={styles.buttonsGroup}>
-          <Tooltip label={isCharCountError ? 'Mã quá dài' : 'Nộp bài giải'} disabled={!isSubmitDisabled}>
+          <Tooltip label={isCharCountError ? 'Code quá dài' : 'Nộp bài giải'} disabled={!isSubmitDisabled}>
             <Button
               type="submit"
               disabled={isSubmitDisabled}

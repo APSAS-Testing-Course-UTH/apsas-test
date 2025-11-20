@@ -36,7 +36,9 @@ import { Route as AuthenticatedProviderAssignmentsRouteImport } from "./routes/_
 import { Route as AuthenticatedProviderAnalyticsRouteImport } from "./routes/_authenticated/provider/analytics"
 import { Route as AuthenticatedInstructorSupportRouteImport } from "./routes/_authenticated/instructor/support"
 import { Route as AuthenticatedInstructorSubmissionsRouteImport } from "./routes/_authenticated/instructor/submissions"
+import { Route as AuthenticatedInstructorSettingsRouteImport } from "./routes/_authenticated/instructor/settings"
 import { Route as AuthenticatedInstructorScheduleRouteImport } from "./routes/_authenticated/instructor/schedule"
+import { Route as AuthenticatedInstructorProfileRouteImport } from "./routes/_authenticated/instructor/profile"
 import { Route as AuthenticatedInstructorFeedbackRouteImport } from "./routes/_authenticated/instructor/feedback"
 import { Route as AuthenticatedInstructorDashboardRouteImport } from "./routes/_authenticated/instructor/dashboard"
 import { Route as AuthenticatedInstructorAssignmentsRouteImport } from "./routes/_authenticated/instructor/assignments"
@@ -216,10 +218,22 @@ const AuthenticatedInstructorSubmissionsRoute =
     path: "/instructor/submissions",
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedInstructorSettingsRoute =
+  AuthenticatedInstructorSettingsRouteImport.update({
+    id: "/instructor/settings",
+    path: "/instructor/settings",
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedInstructorScheduleRoute =
   AuthenticatedInstructorScheduleRouteImport.update({
     id: "/instructor/schedule",
     path: "/instructor/schedule",
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedInstructorProfileRoute =
+  AuthenticatedInstructorProfileRouteImport.update({
+    id: "/instructor/profile",
+    path: "/instructor/profile",
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedInstructorFeedbackRoute =
@@ -391,7 +405,9 @@ export interface FileRoutesByFullPath {
   "/instructor/assignments": typeof AuthenticatedInstructorAssignmentsRouteWithChildren
   "/instructor/dashboard": typeof AuthenticatedInstructorDashboardRoute
   "/instructor/feedback": typeof AuthenticatedInstructorFeedbackRoute
+  "/instructor/profile": typeof AuthenticatedInstructorProfileRoute
   "/instructor/schedule": typeof AuthenticatedInstructorScheduleRoute
+  "/instructor/settings": typeof AuthenticatedInstructorSettingsRoute
   "/instructor/submissions": typeof AuthenticatedInstructorSubmissionsRouteWithChildren
   "/instructor/support": typeof AuthenticatedInstructorSupportRoute
   "/provider/analytics": typeof AuthenticatedProviderAnalyticsRoute
@@ -445,7 +461,9 @@ export interface FileRoutesByTo {
   "/instructor/assignments": typeof AuthenticatedInstructorAssignmentsRouteWithChildren
   "/instructor/dashboard": typeof AuthenticatedInstructorDashboardRoute
   "/instructor/feedback": typeof AuthenticatedInstructorFeedbackRoute
+  "/instructor/profile": typeof AuthenticatedInstructorProfileRoute
   "/instructor/schedule": typeof AuthenticatedInstructorScheduleRoute
+  "/instructor/settings": typeof AuthenticatedInstructorSettingsRoute
   "/instructor/submissions": typeof AuthenticatedInstructorSubmissionsRouteWithChildren
   "/instructor/support": typeof AuthenticatedInstructorSupportRoute
   "/provider/analytics": typeof AuthenticatedProviderAnalyticsRoute
@@ -497,7 +515,9 @@ export interface FileRoutesById {
   "/_authenticated/instructor/assignments": typeof AuthenticatedInstructorAssignmentsRouteWithChildren
   "/_authenticated/instructor/dashboard": typeof AuthenticatedInstructorDashboardRoute
   "/_authenticated/instructor/feedback": typeof AuthenticatedInstructorFeedbackRoute
+  "/_authenticated/instructor/profile": typeof AuthenticatedInstructorProfileRoute
   "/_authenticated/instructor/schedule": typeof AuthenticatedInstructorScheduleRoute
+  "/_authenticated/instructor/settings": typeof AuthenticatedInstructorSettingsRoute
   "/_authenticated/instructor/submissions": typeof AuthenticatedInstructorSubmissionsRouteWithChildren
   "/_authenticated/instructor/support": typeof AuthenticatedInstructorSupportRoute
   "/_authenticated/provider/analytics": typeof AuthenticatedProviderAnalyticsRoute
@@ -554,7 +574,9 @@ export interface FileRouteTypes {
     | "/instructor/assignments"
     | "/instructor/dashboard"
     | "/instructor/feedback"
+    | "/instructor/profile"
     | "/instructor/schedule"
+    | "/instructor/settings"
     | "/instructor/submissions"
     | "/instructor/support"
     | "/provider/analytics"
@@ -608,7 +630,9 @@ export interface FileRouteTypes {
     | "/instructor/assignments"
     | "/instructor/dashboard"
     | "/instructor/feedback"
+    | "/instructor/profile"
     | "/instructor/schedule"
+    | "/instructor/settings"
     | "/instructor/submissions"
     | "/instructor/support"
     | "/provider/analytics"
@@ -659,7 +683,9 @@ export interface FileRouteTypes {
     | "/_authenticated/instructor/assignments"
     | "/_authenticated/instructor/dashboard"
     | "/_authenticated/instructor/feedback"
+    | "/_authenticated/instructor/profile"
     | "/_authenticated/instructor/schedule"
+    | "/_authenticated/instructor/settings"
     | "/_authenticated/instructor/submissions"
     | "/_authenticated/instructor/support"
     | "/_authenticated/provider/analytics"
@@ -905,11 +931,25 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AuthenticatedInstructorSubmissionsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    "/_authenticated/instructor/settings": {
+      id: "/_authenticated/instructor/settings"
+      path: "/instructor/settings"
+      fullPath: "/instructor/settings"
+      preLoaderRoute: typeof AuthenticatedInstructorSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     "/_authenticated/instructor/schedule": {
       id: "/_authenticated/instructor/schedule"
       path: "/instructor/schedule"
       fullPath: "/instructor/schedule"
       preLoaderRoute: typeof AuthenticatedInstructorScheduleRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    "/_authenticated/instructor/profile": {
+      id: "/_authenticated/instructor/profile"
+      path: "/instructor/profile"
+      fullPath: "/instructor/profile"
+      preLoaderRoute: typeof AuthenticatedInstructorProfileRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     "/_authenticated/instructor/feedback": {
@@ -1299,7 +1339,9 @@ interface AuthenticatedRouteChildren {
   AuthenticatedInstructorAssignmentsRoute: typeof AuthenticatedInstructorAssignmentsRouteWithChildren
   AuthenticatedInstructorDashboardRoute: typeof AuthenticatedInstructorDashboardRoute
   AuthenticatedInstructorFeedbackRoute: typeof AuthenticatedInstructorFeedbackRoute
+  AuthenticatedInstructorProfileRoute: typeof AuthenticatedInstructorProfileRoute
   AuthenticatedInstructorScheduleRoute: typeof AuthenticatedInstructorScheduleRoute
+  AuthenticatedInstructorSettingsRoute: typeof AuthenticatedInstructorSettingsRoute
   AuthenticatedInstructorSubmissionsRoute: typeof AuthenticatedInstructorSubmissionsRouteWithChildren
   AuthenticatedInstructorSupportRoute: typeof AuthenticatedInstructorSupportRoute
   AuthenticatedStudentAssignmentsRoute: typeof AuthenticatedStudentAssignmentsRouteWithChildren
@@ -1321,7 +1363,9 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
     AuthenticatedInstructorAssignmentsRouteWithChildren,
   AuthenticatedInstructorDashboardRoute: AuthenticatedInstructorDashboardRoute,
   AuthenticatedInstructorFeedbackRoute: AuthenticatedInstructorFeedbackRoute,
+  AuthenticatedInstructorProfileRoute: AuthenticatedInstructorProfileRoute,
   AuthenticatedInstructorScheduleRoute: AuthenticatedInstructorScheduleRoute,
+  AuthenticatedInstructorSettingsRoute: AuthenticatedInstructorSettingsRoute,
   AuthenticatedInstructorSubmissionsRoute:
     AuthenticatedInstructorSubmissionsRouteWithChildren,
   AuthenticatedInstructorSupportRoute: AuthenticatedInstructorSupportRoute,

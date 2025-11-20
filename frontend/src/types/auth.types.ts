@@ -14,12 +14,9 @@
 import type {
   IdentityServiceUserResponse,
   IdentityServiceAuthResponse,
-  IdentityServiceLoginRequest,
-  IdentityServiceRegisterRequest,
-  IdentityServiceResetPasswordRequest,
-  IdentityServiceEmailRequest,
-  IdentityServiceTokenRequest,
 } from '@/api/types.gen';
+import type { LoginFormData } from '@/features/auth/schemas/loginSchema'
+import type { RegisterFormData } from '@/features/auth/schemas/registerSchema'
 
 // ============================================================================
 // USER TYPES
@@ -117,40 +114,16 @@ export type AuthStore = AuthState & AuthActions;
 // ============================================================================
 
 /**
- * Login form data
+ * @deprecated Form data types moved to schema files
+ * Import from:
+ * - src/features/auth/schemas/loginSchema.ts (LoginFormData)
+ * - src/features/auth/schemas/registerSchema.ts (RegisterFormData)
+ * - src/features/auth/schemas/forgotPasswordSchema.ts (ForgotPasswordFormData)
+ * - src/features/auth/schemas/resetPasswordSchema.ts (ResetPasswordFormData)
+ * - src/features/auth/schemas/verifyEmailSchema.ts (VerifyEmailFormData)
+ * 
+ * ChangePasswordFormData and UpdateProfileFormData remain here (not schema-based)
  */
-export interface LoginFormData extends IdentityServiceLoginRequest {
-  /** Remember me option */
-  rememberMe?: boolean;
-}
-
-/**
- * Register form data
- */
-export interface RegisterFormData extends IdentityServiceRegisterRequest {
-  /** Password confirmation */
-  confirmPassword: string;
-  /** Terms and conditions agreement */
-  agreeToTerms: boolean;
-}
-
-/**
- * Forgot password form data - uses IdentityServiceEmailRequest directly
- */
-export type ForgotPasswordFormData = IdentityServiceEmailRequest;
-
-/**
- * Reset password form data
- */
-export interface ResetPasswordFormData extends IdentityServiceResetPasswordRequest {
-  /** Password confirmation */
-  confirmPassword: string;
-}
-
-/**
- * Verify email form data - uses IdentityServiceTokenRequest directly
- */
-export type VerifyEmailFormData = IdentityServiceTokenRequest;
 
 /**
  * Change password form data

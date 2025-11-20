@@ -9,7 +9,7 @@
  */
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import type { AxiosError } from 'axios'
+import type { ApiErrorResponse } from '@/configs/api-error-handler'
 import {
   contentServiceGetAllAssignments,
   contentServiceGetAssignmentById,
@@ -47,7 +47,7 @@ export const instructorAssignmentKeys = {
  * @returns Assignment list with pagination info
  */
 export function useInstructorAssignments(page: number = 0, size: number = 10) {
-  return useQuery<ContentServicePageResponseAssignmentResponse, AxiosError>({
+  return useQuery<ContentServicePageResponseAssignmentResponse, ApiErrorResponse>({
     queryKey: instructorAssignmentKeys.list(page, size),
     queryFn: async () => {
       const result = await contentServiceGetAllAssignments({
@@ -71,7 +71,7 @@ export function useInstructorAssignments(page: number = 0, size: number = 10) {
  * @returns Single assignment with all details
  */
 export function useInstructorAssignmentDetail(assignmentId: string) {
-  return useQuery<ContentServiceAssignmentResponse, AxiosError>({
+  return useQuery<ContentServiceAssignmentResponse, ApiErrorResponse>({
     queryKey: instructorAssignmentKeys.detail(assignmentId),
     queryFn: async () => {
       const result = await contentServiceGetAssignmentById({
@@ -106,7 +106,7 @@ export function useUpdateAssignmentSchedule() {
 
   return useMutation<
     ContentServiceAssignmentResponse,
-    AxiosError,
+    ApiErrorResponse,
     {
       assignmentId: string
       startDate: Date

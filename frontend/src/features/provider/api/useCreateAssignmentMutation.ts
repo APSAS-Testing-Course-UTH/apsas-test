@@ -8,21 +8,25 @@
  */
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import type { AxiosError } from 'axios'
+import type { ApiErrorResponse } from '@/configs/api-error-handler'
 import type {
   ContentServiceCreateAssignmentRequest,
   ContentServiceAssignmentResponse,
 } from '@/api/types.gen'
 import { contentServiceCreateAssignment } from '@/api/sdk.gen'
 import { assignmentQueryKeys } from './useAssignmentsQuery'
-import { showErrorNotification, showSuccessNotification } from '../utils/errorHandler'
+import { 
+  handleApiError,
+  showErrorNotification, 
+  showSuccessNotification 
+} from '@/configs/api-error-handler'
 
 export function useCreateAssignmentMutation() {
   const queryClient = useQueryClient()
 
   return useMutation<
     ContentServiceAssignmentResponse,
-    AxiosError,
+    ApiErrorResponse,
     ContentServiceCreateAssignmentRequest
   >({
     mutationFn: async (data: ContentServiceCreateAssignmentRequest) => {
@@ -45,8 +49,9 @@ export function useCreateAssignmentMutation() {
         newAssignment
       )
     },
-    onError: (error: AxiosError) => {
-      showErrorNotification('Lỗi tạo bài tập', undefined, error)
+    onError: (error: ApiErrorResponse) => {
+      const errorMessage = handleApiError(error)
+      showErrorNotification(errorMessage, 'Lỗi tạo bài tập')
     },
   })
 }

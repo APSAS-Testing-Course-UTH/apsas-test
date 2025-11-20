@@ -8,7 +8,7 @@
  */
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import type { AxiosError } from 'axios'
+import type { ApiErrorResponse } from '@/configs/api-error-handler'
 import type { ContentServiceAssignmentResponse } from '@/api/types.gen'
 import { contentServicePublishAssignment } from '@/api/sdk.gen'
 import { assignmentQueryKeys } from './useAssignmentsQuery'
@@ -16,7 +16,7 @@ import { assignmentQueryKeys } from './useAssignmentsQuery'
 export function usePublishAssignmentMutation() {
   const queryClient = useQueryClient()
 
-  return useMutation<ContentServiceAssignmentResponse, AxiosError, string>({
+  return useMutation<ContentServiceAssignmentResponse, ApiErrorResponse, string>({
     mutationFn: async (id: string) => {
       const response = await contentServicePublishAssignment({
         path: { id },

@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS notification.preferences
     id                         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id                    UUID NOT NULL UNIQUE,
     email_enabled              BOOLEAN          DEFAULT true,
-    push_enabled               BOOLEAN          DEFAULT true,
+    push_enabled               BOOLEAN          DEFAULT false,
 
     -- Email preferences by type
     email_assignment_published BOOLEAN          DEFAULT true,

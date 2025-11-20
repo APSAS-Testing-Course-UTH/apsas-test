@@ -3,7 +3,14 @@ import { IconMail, IconUser, IconCalendar } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
 import { identityServiceGetCurrentUser } from '@/api/sdk.gen'
 import type { IdentityServiceUserResponse } from '@/api/types.gen'
+import type { CSSProperties } from 'react'
+import { authKeys } from '@/features/auth/api/queryKeys'
 import classes from './StudentInfoCard.module.css'
+
+interface StudentInfoCardProps {
+  style?: CSSProperties
+  className?: string
+}
 
 /**
  * StudentInfoCard - Thẻ hiển thị thông tin sinh viên
@@ -20,10 +27,10 @@ import classes from './StudentInfoCard.module.css'
  * <StudentInfoCard />
  * ```
  */
-export function StudentInfoCard() {
+export function StudentInfoCard({ style, className }: StudentInfoCardProps = {}) {
   // Fetch current user data
   const { data: response, isLoading, error } = useQuery({
-    queryKey: ['user', 'current'],
+    queryKey: authKeys.currentUser(),
     queryFn: () => identityServiceGetCurrentUser(),
   })
 
@@ -31,7 +38,7 @@ export function StudentInfoCard() {
 
   if (isLoading) {
     return (
-      <Card withBorder shadow="sm" p="lg" className={classes.card}>
+      <Card withBorder shadow="sm" p="lg" className={className || classes.card} style={style}>
         <Stack gap="md">
           <Skeleton height={60} circle />
           <Skeleton height={16} width="60%" />
@@ -44,7 +51,7 @@ export function StudentInfoCard() {
 
   if (error || !user) {
     return (
-      <Card withBorder shadow="sm" p="lg" className={classes.card}>
+      <Card withBorder shadow="sm" p="lg" className={className || classes.card} style={style}>
         <Text c="red" size="sm">
           Không thể tải thông tin sinh viên
         </Text>
@@ -62,7 +69,7 @@ export function StudentInfoCard() {
     : 'N/A'
 
   return (
-    <Card withBorder shadow="sm" p="lg" className={classes.card}>
+    <Card withBorder shadow="sm" p="lg" className={className || classes.card} style={style}>
       <Stack gap="md">
         {/* Header with Avatar and Basic Info */}
         <Group>

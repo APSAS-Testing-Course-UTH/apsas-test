@@ -21,6 +21,7 @@ import apsas.shared.messaging.event.AssignmentPublishedEvent;
 import apsas.shared.messaging.event.AssignmentScheduleUpdatedEvent;
 import apsas.shared.messaging.event.EventPublisher;
 import apsas.shared.models.pagination.PageResponse;
+import apsas.shared.security.UserPrincipal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -44,21 +45,75 @@ public class AssignmentService {
   private final EventPublisher eventPublisher;
 
   @Transactional(readOnly = true)
-  public PageResponse<AssignmentResponse> getAllAssignments(Pageable pageable) {
-    Page<Assignment> assignmentPage = assignmentRepository.findAll(pageable);
-    Page<AssignmentResponse> responsePage = assignmentPage.map(assignmentMapper::toResponse);
+  public PageResponse<AssignmentResponse> getAllAssignments(
+      Pageable pageable,
+      UserPrincipal principal
+  ) {
+    Page<Assignment> assignmentPage;
+
+    // Content providers see only their own assignments (all statuses)
+    if (principal != null && "CONTENT_PROVIDER".equals(principal.role())) {
+      assignmentPage = assignmentRepository.findByCreatorId(principal.userId(), pageable);
+    } else {
+      // Non-content providers (students, instructors) see only published assignments
+      assignmentPage = assignmentRepository.findByStatus(AssignmentStatus.PUBLISHED, pageable);
+    }
+
+    Page<AssignmentResponse> responsePage = assignmentPage.map(assignment -> {
+      AssignmentResponse response = assignmentMapper.toResponse(assignment);
+
+      // Hide hidden test cases for students
+      if (principal != null && !"INSTRUCTOR".equals(principal.role())
+          && !"CONTENT_PROVIDER".equals(principal.role())) {
+        maskHiddenTestCases(response);
+      }
+
+      return response;
+    });
     return PageResponse.of(responsePage);
   }
 
   @Cacheable(value = CacheConfig.ASSIGNMENTS_CACHE, key = "#id", unless = "#result == null")
   @Transactional(readOnly = true)
   public AssignmentResponse getAssignmentById(UUID id) {
+    return getAssignmentById(id, null);
+  }
+
+  @Transactional(readOnly = true)
+  public AssignmentResponse getAssignmentById(UUID id, UserPrincipal principal) {
     Assignment assignment =
         assignmentRepository
             .findById(id)
             .orElseThrow(
                 () -> new NotFoundException("Assignment not found with id: " + id));
-    return assignmentMapper.toResponse(assignment);
+
+    // Permission check: non-content providers can only view published assignments
+    // Content providers can only view their own assignments
+    if (principal != null) {
+      boolean isContentProvider = "CONTENT_PROVIDER".equals(principal.role());
+
+      if (isContentProvider) {
+        // Content providers can only view their own assignments
+        if (!assignment.getCreatorId().equals(principal.userId())) {
+          throw new UnauthorizedException("You are not authorized to view this assignment");
+        }
+      } else {
+        // Non-content providers can only view published assignments
+        if (assignment.getStatus() != AssignmentStatus.PUBLISHED) {
+          throw new NotFoundException("Assignment not found with id: " + id);
+        }
+      }
+    }
+
+    AssignmentResponse response = assignmentMapper.toResponse(assignment);
+
+    // Hide hidden test cases for students
+    if (principal != null && !"INSTRUCTOR".equals(principal.role())
+        && !"CONTENT_PROVIDER".equals(principal.role())) {
+      maskHiddenTestCases(response);
+    }
+
+    return response;
   }
 
   @Transactional
@@ -236,6 +291,22 @@ public class AssignmentService {
   private void validateDates(LocalDateTime startDate, LocalDateTime dueDate) {
     if (startDate != null && dueDate != null && dueDate.isBefore(startDate)) {
       throw new BadRequestException("Due date must be after start date");
+    }
+  }
+
+  /**
+   * Mask input and output of hidden test cases with asterisks for students.
+   *
+   * @param response The assignment response to mask
+   */
+  private void maskHiddenTestCases(AssignmentResponse response) {
+    if (response.getTestCases() != null) {
+      response.getTestCases().forEach(testCase -> {
+        if (Boolean.TRUE.equals(testCase.getHidden())) {
+          testCase.setInput("***");
+          testCase.setOutput("***");
+        }
+      });
     }
   }
 }

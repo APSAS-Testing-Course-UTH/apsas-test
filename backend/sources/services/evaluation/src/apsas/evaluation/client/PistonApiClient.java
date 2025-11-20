@@ -4,7 +4,10 @@ import apsas.evaluation.exception.PistonApiException;
 import apsas.evaluation.model.dto.PistonExecuteRequest;
 import apsas.evaluation.model.dto.PistonExecuteResponse;
 import apsas.evaluation.model.dto.RuntimeResponse;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -97,7 +100,13 @@ public class PistonApiClient {
               .onStatus(
                   HttpStatusCode::is4xxClientError,
                   (req, res) -> {
-                    throw new PistonApiException("Piston API client error: " + res.getStatusCode());
+                    var reader = new BufferedReader(new InputStreamReader(res.getBody()));
+                    var errorMsg =
+                        reader.lines().collect(Collectors.joining(System.lineSeparator()));
+                    throw new PistonApiException("Piston API client error (%d): %s".formatted(
+                        res.getStatusCode().value(),
+                        errorMsg
+                    ));
                   }
               )
               .onStatus(

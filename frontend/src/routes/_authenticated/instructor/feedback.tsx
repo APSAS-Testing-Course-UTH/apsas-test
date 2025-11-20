@@ -1,5 +1,5 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import { Container, Stack, Title, Text, Card, Alert } from '@mantine/core'
+import { Container, Stack, Title, Text, Card } from '@mantine/core'
 import { useAuthStore } from '@/features/auth/stores/useAuthStore'
 import { USER_ROLES } from '@/constants/roles'
 import { checkRoleAccess, logRoleAccessAttempt } from '@/features/auth/utils/roleGuards'
@@ -31,19 +31,11 @@ const InstructorFeedbackPage = () => {
       <Stack gap="xl">
         {/* Header */}
         <div>
-          <Title order={1}>💬 Phản hồi</Title>
+          <Title order={1}>Phản hồi</Title>
           <Text c="dimmed" mt="xs">
             Quản lý phản hồi, điểm số và theo dõi tiến độ chấm bài
           </Text>
         </div>
-
-        {/* Info Alert */}
-        <Alert icon="ℹ️" color="blue" title="Gợi ý">
-          <Text size="sm">
-            Phản hồi chi tiết giúp sinh viên cải thiện kỹ năng lập trình. 
-            Hãy cung cấp phản hồi xây dựng và gợi ý cải thiện.
-          </Text>
-        </Alert>
 
         {/* Error State */}
         {error && (

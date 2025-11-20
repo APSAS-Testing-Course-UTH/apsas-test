@@ -27,9 +27,6 @@ export default defineConfig({
       auth: true,
       transformer: true,
       exportFromIndex: true,
-      validator: {
-        request: "zod",
-      },
     },
     {
       name: "@tanstack/react-query",

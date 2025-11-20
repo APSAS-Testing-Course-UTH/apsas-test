@@ -89,7 +89,7 @@ public class EvaluationService {
           .toList();
 
       // Calculate score and determine result
-      var score = calculateScore(testCaseResults);
+      var score = calculateScore(testCaseResults, assignment.getMaxScore());
       var result = determineResult(testCaseResults);
       var status =
           result == Result.FAILED ? Status.FAILED : Status.EVALUATED;
@@ -118,9 +118,10 @@ public class EvaluationService {
    * Calculate overall score based on test case results
    *
    * @param testCaseResults List of test case results
-   * @return Overall score
+   * @param maxScore Maximum score allowed for the assignment
+   * @return Overall score (capped at maxScore)
    */
-  private BigDecimal calculateScore(List<TestCaseResultResponse> testCaseResults) {
+  private BigDecimal calculateScore(List<TestCaseResultResponse> testCaseResults, BigDecimal maxScore) {
     if (testCaseResults.isEmpty()) {
       return BigDecimal.ZERO;
     }
@@ -140,7 +141,18 @@ public class EvaluationService {
       return BigDecimal.ZERO;
     }
 
-    return BigDecimal.valueOf((earnedWeight / totalWeight) * 100).setScale(2, RoundingMode.HALF_UP);
+    // Calculate percentage score (0-100)
+    var percentageScore = BigDecimal.valueOf((earnedWeight / totalWeight) * 100).setScale(2, RoundingMode.HALF_UP);
+    
+    // If maxScore is defined, scale the percentage to maxScore and cap it
+    if (maxScore != null && maxScore.compareTo(BigDecimal.ZERO) > 0) {
+      var scaledScore = percentageScore.multiply(maxScore).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+      // Ensure score doesn't exceed maxScore
+      return scaledScore.min(maxScore);
+    }
+    
+    // If no maxScore defined, return percentage score (0-100)
+    return percentageScore;
   }
 
   /**

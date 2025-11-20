@@ -12,12 +12,14 @@
  * - 100% Vietnamese UI
  */
 
-import { useEffect, useRef, useState, useMemo, useCallback } from 'react'
+import { useEffect, useRef, useState, useMemo } from 'react'
 import { Stack, Group, Paper, Text, Button, ActionIcon, Tooltip, Badge, Center, Modal, Textarea, ScrollArea } from '@mantine/core'
 import { IconSend, IconX, IconRefresh, IconAlertCircle } from '@tabler/icons-react'
 import { useCloseSupportSession } from '../api'
-import { useStompSession } from '../hooks/useStompSession'
+import { useWebSocket } from '../hooks/useWebSocket'
+import { useSupportSession } from '../hooks/useSupportSession'
 import { useAuthStore } from '@/features/auth/stores/useAuthStore'
+import { env } from '@/configs/env'
 import type { SupportSession, SupportMessage } from '../types'
 import styles from './SupportPage.module.css'
 
@@ -36,21 +38,32 @@ export function ChatWindow({ session, onRefresh }: ChatWindowProps) {
   const currentUser = useAuthStore((state) => state.user)
   const closeSessionMutation = useCloseSupportSession()
 
-  // Memoize callbacks to prevent infinite renders
-  const handleMessageReceived = useCallback((message: SupportMessage) => {
-    console.log('[ChatWindow] New message received:', message)
-  }, [])
-
-  const handleStompError = useCallback((error: Error) => {
-    console.error('[ChatWindow] STOMP error:', error)
-  }, [])
-
-  // Use WebSocket for real-time messaging
-  const stompSession = useStompSession({
-    sessionId: session.id,
-    onMessageReceived: handleMessageReceived,
-    onError: handleStompError,
+  // WebSocket connection with new hook
+  const wsUrl = env.VITE_WEBSOCKET_URL || 'http://localhost:8080/ws/support'
+  const { isConnected, subscribe, send, error: wsError } = useWebSocket({
+    url: wsUrl,
+    debug: true,
+    onConnect: () => console.log('[ChatWindow] WebSocket connected'),
+    onDisconnect: () => console.log('[ChatWindow] WebSocket disconnected'),
+    onError: (error) => console.error('[ChatWindow] WebSocket error:', error),
   })
+
+  // Session messaging with new hook
+  const { messages: wsMessages, sendMessage, isSending, error: sessionError } = useSupportSession({
+    sessionId: session.id,
+    isConnected,
+    subscribe,
+    send,
+  })
+
+  // Combine WebSocket and REST errors
+  const stompSession = {
+    isConnected,
+    isSending,
+    messages: wsMessages,
+    sendMessage,
+    error: wsError || sessionError,
+  }
 
   // Combine REST messages from session with WebSocket messages
   // REST messages are initial batch, WebSocket delivers new messages in real-time
@@ -139,7 +152,7 @@ export function ChatWindow({ session, onRefresh }: ChatWindowProps) {
     }
 
     try {
-      await stompSession.sendMessage(messageContent)
+      await sendMessage(messageContent)
       setMessageContent('')
     } catch (error) {
       console.error('[ChatWindow] Failed to send message:', error)
@@ -173,18 +186,10 @@ export function ChatWindow({ session, onRefresh }: ChatWindowProps) {
               <Badge color="green">Mở</Badge>
             )}
             {/* Connection Status - only show if session is not closed */}
-            {!session.isClosed && (
-              <>
-                {stompSession.isConnected ? (
-                  <Badge color="blue" variant="filled">
-                    🟢 Real-time (Trực tuyến)
-                  </Badge>
-                ) : (
-                  <Badge color="orange" variant="filled">
-                    📤 SẴN SÀNG GỬI (POLLING)
-                  </Badge>
-                )}
-              </>
+            {!session.isClosed && stompSession.isConnected && (
+              <Badge color="blue" variant="filled">
+                🟢 Real-time (Trực tuyến)
+              </Badge>
             )}
           </Group>
           <Group gap={8}>
@@ -203,7 +208,8 @@ export function ChatWindow({ session, onRefresh }: ChatWindowProps) {
           <ActionIcon variant="default" onClick={onRefresh} title="Làm mới">
             <IconRefresh size={18} />
           </ActionIcon>
-          {!session.isClosed && (
+          {/* Only show close button if session is open AND current user is the student who created it */}
+          {!session.isClosed && currentUser?.id === session.studentId && (
             <Tooltip label="Đóng yêu cầu">
               <ActionIcon
                 color="red"
@@ -219,7 +225,13 @@ export function ChatWindow({ session, onRefresh }: ChatWindowProps) {
       </Group>
 
       {/* Messages Container */}
-      <ScrollArea flex={1} mb="md">
+      <ScrollArea 
+        flex={1} 
+        mb="md" 
+        style={{ maxHeight: '500px' }}
+        type="auto"
+        offsetScrollbars
+      >
         <Stack gap="md" pr="md">
           {allMessages.length === 0 ? (
             <Center h={200}>
@@ -272,7 +284,7 @@ export function ChatWindow({ session, onRefresh }: ChatWindowProps) {
             onChange={(e) => setMessageContent(e.currentTarget.value)}
             minRows={1}
             maxRows={4}
-            disabled={session.isClosed || stompSession.isSending}
+            disabled={session.isClosed || isSending}
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault()
@@ -291,8 +303,8 @@ export function ChatWindow({ session, onRefresh }: ChatWindowProps) {
           />
           <Button
             onClick={handleSendMessage}
-            disabled={session.isClosed || !messageContent.trim() || stompSession.isSending}
-            loading={stompSession.isSending}
+            disabled={session.isClosed || !messageContent.trim() || isSending}
+            loading={isSending}
             title="Nhấn Enter hoặc click để gửi"
             size="md"
             h="auto"

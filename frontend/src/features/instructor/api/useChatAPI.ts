@@ -6,6 +6,7 @@
  */
 
 import { useQuery } from '@tanstack/react-query'
+import { instructorKeys } from './queryKeys'
 import type { ChatMessage, ChatSession } from '../components/InstructorChat'
 import { MOCK_DATA_REGISTRY } from '@/mocks/factory/mockDataRegistry'
 
@@ -14,7 +15,7 @@ import { MOCK_DATA_REGISTRY } from '@/mocks/factory/mockDataRegistry'
  */
 export function useChatSessions() {
   return useQuery({
-    queryKey: ['instructor', 'chat', 'sessions'],
+    queryKey: instructorKeys.chat.sessions(),
     queryFn: async (): Promise<ChatSession[]> => {
       // Get sessions from mock data registry
       const sessions = Array.isArray(MOCK_DATA_REGISTRY.supportSessions)
@@ -54,7 +55,7 @@ export function useChatSessions() {
  */
 export function useChatMessages(sessionId: string) {
   return useQuery({
-    queryKey: ['instructor', 'chat', 'messages', sessionId],
+    queryKey: instructorKeys.chat.messages(sessionId),
     queryFn: async (): Promise<ChatMessage[]> => {
       // Get session from mock data registry
       const session = MOCK_DATA_REGISTRY.supportSessions[sessionId]
@@ -64,7 +65,7 @@ export function useChatMessages(sessionId: string) {
       }
 
       // Transform support messages to chat messages
-      return (session.messages || []).map(msg => ({
+      return (session.messages || []).map((msg: any) => ({
         id: msg.id || crypto.randomUUID(),
         senderId: msg.senderId || '',
         senderName: msg.isInstructor ? 'Giảng viên' : 'Sinh viên',

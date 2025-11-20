@@ -1,33 +1,44 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { Card, Stack, Text, Badge, Group, Skeleton, Title, Grid, Box } from '@mantine/core'
-import { IconCalendar, IconAlertCircle, IconChevronLeft, IconChevronRight } from '@tabler/icons-react'
+import { Card, Stack, Text, Group, Skeleton, Title, Box } from '@mantine/core'
+import { IconCalendar, IconAlertCircle } from '@tabler/icons-react'
+import { Calendar } from '@mantine/dates'
+import clsx from 'clsx'
 import type { ContentServiceAssignmentResponse } from '@/api/types.gen'
+import type { CSSProperties } from 'react'
 import classes from './CalendarWidget.module.css'
 
 interface CalendarWidgetProps {
   assignments?: ContentServiceAssignmentResponse[]
   isLoading?: boolean
+  style?: CSSProperties
+  className?: string
 }
 
 /**
  * CalendarWidget - Lịch hiển thị hạn chót bài tập
  *
- * Hiển thị:
- * - Calendar view cho tháng hiện tại
- * - Ngày có deadline được highlight
- * - Danh sách bài tập cho ngày được chọn
+ * Redesigned UI với:
+ * - Mantine Calendar component với Vietnamese locale (via DatesProvider)
+ * - Dots indicators cho ngày có deadlines (thay vì background colors)
+ * - Clean, minimal modern design
+ * - Compatible với existing backend data structure
  *
  * Vietnamese UI: 100% ✓
+ * Localization: DatesProvider trong app.tsx với locale='vi'
  * Data source: Assignments từ props
+ * Design: Theo ảnh reference từ user
  */
 export function CalendarWidget({
   assignments = [],
   isLoading = false,
+  style,
+  className,
 }: CalendarWidgetProps) {
   const navigate = useNavigate()
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
-  const [currentMonth, setCurrentMonth] = useState<Date>(new Date())
+  const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  const [currentDate, setCurrentDate] = useState<Date>(new Date())
+  const todayStr = useMemo(() => new Date().toISOString().split('T')[0], [])
 
   // Tạo map của deadlines theo ngày (YYYY-MM-DD format)
   const deadlinesByDate = useMemo(() => {
@@ -48,87 +59,83 @@ export function CalendarWidget({
   }, [assignments])
 
   // Lấy danh sách bài tập cho ngày được chọn
-  const todayAssignments = useMemo(() => {
+  const selectedDateAssignments = useMemo(() => {
     if (!selectedDate) return []
-    const dateStr = selectedDate.toISOString().split('T')[0]
-    return deadlinesByDate.get(dateStr) || []
+    return deadlinesByDate.get(selectedDate) || []
   }, [selectedDate, deadlinesByDate])
 
-  // Helper functions
-  const getDaysInMonth = (date: Date) => {
-    return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate()
+  // Helper: Get number of deadlines for a date
+  const getDeadlineCount = (date: Date | string): number => {
+    const dateObj = typeof date === 'string' ? new Date(date) : date
+    const dateStr = dateObj.toISOString().split('T')[0]
+    return deadlinesByDate.get(dateStr)?.length || 0
   }
 
-  const getFirstDayOfMonth = (date: Date) => {
-    return new Date(date.getFullYear(), date.getMonth(), 1).getDay()
-  }
+  // Auto-select today when it has upcoming deadlines
+  useEffect(() => {
+    if (selectedDate) return
+    if (deadlinesByDate.has(todayStr)) {
+      setSelectedDate(todayStr)
+    }
+  }, [deadlinesByDate, selectedDate, todayStr])
 
-  const formatDate = (date: Date | null) => {
-    if (!date) return ''
-    return date.toLocaleDateString('vi-VN', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      weekday: 'long',
+  // Render day with dots indicators
+  const renderDay = (date: Date | string) => {
+    const dateObj = typeof date === 'string' ? new Date(date) : date
+    const day = dateObj.getDate()
+    const dateStr = dateObj.toISOString().split('T')[0]
+    const count = getDeadlineCount(dateObj)
+    const isSelected = selectedDate === dateStr
+    const isToday = dateStr === todayStr
+    const cellClassName = clsx(classes.dayCell, {
+      [classes.dayCellSelected]: isSelected,
+      [classes.dayCellToday]: isToday,
+      [classes.dayCellBusy]: count > 0,
     })
-  }
 
-  const hasDeadline = (day: number) => {
-    const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day)
-    const dateStr = date.toISOString().split('T')[0]
-    return deadlinesByDate.has(dateStr)
-  }
+    // No deadline - render plain day
+    if (count === 0) {
+      return (
+        <div className={cellClassName}>
+          {day}
+        </div>
+      )
+    }
 
-  const isDateSelected = (day: number) => {
-    if (!selectedDate) return false
+    // Has deadline - render with dots (max 3 visible)
+    const dotsCount = Math.min(count, 3)
+    const colors = ['red', 'orange', 'blue'] // Different colors for visual variety
+
     return (
-      day === selectedDate.getDate() &&
-      currentMonth.getMonth() === selectedDate.getMonth() &&
-      currentMonth.getFullYear() === selectedDate.getFullYear()
+      <div className={cellClassName}>
+        <div className={classes.dayNumber}>{day}</div>
+        <Group gap={2} justify="center" className={classes.dotsContainer}>
+          {Array.from({ length: dotsCount }).map((_, i) => (
+            <div
+              key={i}
+              className={classes.dot}
+              style={{
+                backgroundColor: `var(--mantine-color-${colors[i % colors.length]}-6)`,
+              }}
+            />
+          ))}
+        </Group>
+      </div>
     )
   }
-
-  const handleSelectDate = (day: number) => {
-    setSelectedDate(
-      new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day)
-    )
-  }
-
-  const handlePrevMonth = () => {
-    setCurrentMonth(
-      new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1)
-    )
-    setSelectedDate(null)
-  }
-
-  const handleNextMonth = () => {
-    setCurrentMonth(
-      new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1)
-    )
-    setSelectedDate(null)
-  }
-
-  // Computed values
-  const daysInMonth = getDaysInMonth(currentMonth)
-  const firstDay = getFirstDayOfMonth(currentMonth)
-  const monthName = currentMonth.toLocaleDateString('vi-VN', {
-    month: 'long',
-    year: 'numeric',
-  })
-  const dayNames = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
-  const days = Array.from({ length: daysInMonth }, (_, i) => i + 1)
 
   if (isLoading) {
     return (
       <Card
         withBorder
         shadow="sm"
-        padding="lg"
+        padding="md"
         radius="md"
-        className={classes.card}
+        className={className || classes.card}
+        style={style}
       >
-        <Card.Section inheritPadding py="md">
-          <Skeleton height={300} />
+        <Card.Section inheritPadding py="sm">
+          <Skeleton height={340} />
         </Card.Section>
       </Card>
     )
@@ -138,134 +145,54 @@ export function CalendarWidget({
     <Card
       withBorder
       shadow="sm"
-      padding="lg"
+      padding="md"
       radius="md"
-      className={classes.card}
+      className={className || classes.card}
+      style={style}
     >
-      <Card.Section inheritPadding py="md" withBorder>
+      {/* Header */}
+      <Card.Section inheritPadding py="sm" withBorder>
         <Group justify="space-between">
           <Group gap="xs">
-            <IconCalendar size={20} />
-            <Title order={3}>Lịch hạn chót</Title>
+            <IconCalendar size={18} />
+            <Title order={4} size="h4">Lịch theo tháng</Title>
           </Group>
-          <Badge variant="light" color="orange">
-            {deadlinesByDate.size} ngày
-          </Badge>
         </Group>
       </Card.Section>
 
-      <Card.Section inheritPadding py="md">
-        <Stack gap="lg">
-          {/* Calendar */}
-          <Box>
-            {/* Month header */}
-            <Group justify="space-between" mb="md">
-              <button
-                onClick={handlePrevMonth}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: '4px',
-                }}
-                title="Tháng trước"
-              >
-                <IconChevronLeft size={20} />
-              </button>
-              <Text fw={600} size="md">
-                {monthName}
-              </Text>
-              <button
-                onClick={handleNextMonth}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: '4px',
-                }}
-                title="Tháng sau"
-              >
-                <IconChevronRight size={20} />
-              </button>
-            </Group>
+      <Card.Section inheritPadding py="sm">
+        <Stack gap="md">
+          {/* Mantine Calendar với Vietnamese locale từ DatesProvider */}
+          <Calendar
+            date={currentDate.toISOString().split('T')[0]}
+            onDateChange={(dateStr) => setCurrentDate(new Date(dateStr))}
+            renderDay={renderDay}
+            size="sm"
+            className={classes.calendar}
+            getDayProps={(date) => {
+              const dateObj = typeof date === 'string' ? new Date(date) : date
+              const dateStr = dateObj.toISOString().split('T')[0]
+              const isSelected = selectedDate === dateStr
+              
+              return {
+                selected: isSelected,
+                onClick: () => setSelectedDate(dateStr),
+              }
+            }}
+          />
 
-            {/* Day names */}
-            <Grid gutter="xs" mb="xs">
-              {dayNames.map((day) => (
-                <Grid.Col key={day} span={12 / 7}>
-                  <Text ta="center" size="xs" fw={600} c="dimmed">
-                    {day}
-                  </Text>
-                </Grid.Col>
-              ))}
-            </Grid>
-
-            {/* Calendar days */}
-            <Grid gutter="xs">
-              {/* Empty cells for days before month starts */}
-              {Array.from({ length: firstDay }).map((_, i) => (
-                <Grid.Col key={`empty-${i}`} span={12 / 7}>
-                  <div style={{ height: '40px' }} />
-                </Grid.Col>
-              ))}
-
-              {/* Calendar day buttons */}
-              {days.map((day) => {
-                const isSelected = isDateSelected(day)
-                const hasDeadlineDay = hasDeadline(day)
-
-                return (
-                  <Grid.Col key={day} span={12 / 7}>
-                    <button
-                      onClick={() => handleSelectDate(day)}
-                      className={classes.dayButton}
-                      data-selected={isSelected}
-                      data-deadline={hasDeadlineDay}
-                      title={`${day} ${monthName}`}
-                    >
-                      {day}
-                    </button>
-                  </Grid.Col>
-                )
-              })}
-            </Grid>
-          </Box>
-
-          {/* Selected date info */}
-          {selectedDate && (
-            <Box>
-              <Text size="sm" c="dimmed" fw={500} mb="xs">
-                Ngày đã chọn
-              </Text>
-              <Text size="md" fw={600}>
-                {formatDate(selectedDate)}
-              </Text>
-            </Box>
-          )}
-
-          {/* Assignments for selected date */}
-          {selectedDate && todayAssignments.length > 0 ? (
+          {/* Selected date assignments list */}
+          {selectedDate && selectedDateAssignments.length > 0 ? (
             <Stack gap="xs">
               <Text size="sm" c="dimmed" fw={500}>
-                Bài tập hạn chót ({todayAssignments.length})
+                Bài tập hạn chót ({selectedDateAssignments.length})
               </Text>
-              {todayAssignments.map((assignment) => (
+              {selectedDateAssignments.map((assignment) => (
                 <Box
                   key={assignment.id}
                   p="xs"
                   onClick={() => assignment.id && navigate({ to: '/student/assignments/$id', params: { id: assignment.id } })}
-                  style={{
-                    backgroundColor: 'var(--mantine-color-gray-0)',
-                    borderRadius: 'var(--mantine-radius-md)',
-                    cursor: 'pointer',
-                    transition: 'background-color 0.2s ease',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--mantine-color-gray-1)'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--mantine-color-gray-0)'
-                  }}
+                  className={classes.assignmentItem}
                 >
                   <Group gap="xs">
                     <IconAlertCircle size={16} color="orange" />
@@ -290,13 +217,7 @@ export function CalendarWidget({
               ))}
             </Stack>
           ) : selectedDate ? (
-            <Box
-              p="xs"
-              style={{
-                backgroundColor: 'var(--mantine-color-green-0)',
-                borderRadius: 'var(--mantine-radius-md)',
-              }}
-            >
+            <Box className={classes.noAssignments}>
               <Group gap="xs">
                 <IconAlertCircle size={16} color="green" />
                 <Text size="sm" c="green">
@@ -305,15 +226,8 @@ export function CalendarWidget({
               </Group>
             </Box>
           ) : (
-            <Text size="sm" c="dimmed">
+            <Text size="sm" c="dimmed" ta="center">
               Chọn ngày để xem bài tập hạn chót
-            </Text>
-          )}
-
-          {/* Total deadlines info */}
-          {deadlinesByDate.size > 0 && (
-            <Text size="xs" c="dimmed" ta="center">
-              Có {deadlinesByDate.size} ngày có bài tập hạn chót
             </Text>
           )}
         </Stack>
@@ -321,5 +235,3 @@ export function CalendarWidget({
     </Card>
   )
 }
-
-export default CalendarWidget

@@ -4,7 +4,7 @@
  */
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import type { AxiosError } from 'axios'
+import type { ApiErrorResponse } from '@/configs/api-error-handler'
 import type {
   ContentServiceSkillResponse,
 } from '@/api/types.gen'
@@ -15,13 +15,17 @@ import {
   contentServiceGetSkillById,
 } from '@/api/sdk.gen'
 import { skillQueryKeys } from './useSkillsQuery'
-import { showErrorNotification, showSuccessNotification } from '../utils/errorHandler'
+import { 
+  handleApiError,
+  showErrorNotification, 
+  showSuccessNotification 
+} from '@/configs/api-error-handler'
 
 /**
  * Fetch skill by ID
  */
 export function useSkillDetailQuery(id: string | null) {
-  return useQuery<ContentServiceSkillResponse, AxiosError>({
+  return useQuery<ContentServiceSkillResponse, ApiErrorResponse>({
     queryKey: skillQueryKeys.detail(id || ''),
     queryFn: async () => {
       if (!id) throw new Error('Skill ID required')
@@ -41,7 +45,7 @@ export function useCreateSkillMutation() {
 
   return useMutation<
     ContentServiceSkillResponse,
-    AxiosError,
+    ApiErrorResponse,
     { name: string; description?: string }
   >({
     mutationFn: async (data: { name: string; description?: string }) => {
@@ -61,8 +65,9 @@ export function useCreateSkillMutation() {
       // Add the new skill to the cache
       queryClient.setQueryData(skillQueryKeys.detail(newSkill.id!), newSkill)
     },
-    onError: (error: AxiosError) => {
-      showErrorNotification('Lỗi tạo kỹ năng', undefined, error)
+    onError: (error: ApiErrorResponse) => {
+      const errorMessage = handleApiError(error)
+      showErrorNotification(errorMessage, 'Lỗi tạo kỹ năng')
     },
   })
 }
@@ -75,7 +80,7 @@ export function useUpdateSkillMutation() {
 
   return useMutation<
     ContentServiceSkillResponse,
-    AxiosError,
+    ApiErrorResponse,
     { id: string; data: { name: string; description?: string } }
   >({
     mutationFn: async ({ id, data }) => {
@@ -96,8 +101,9 @@ export function useUpdateSkillMutation() {
         queryKey: skillQueryKeys.lists(),
       })
     },
-    onError: (error: AxiosError) => {
-      showErrorNotification('Lỗi cập nhật kỹ năng', undefined, error)
+    onError: (error: ApiErrorResponse) => {
+      const errorMessage = handleApiError(error)
+      showErrorNotification(errorMessage, 'Lỗi cập nhật kỹ năng')
     },
   })
 }
@@ -108,7 +114,7 @@ export function useUpdateSkillMutation() {
 export function useDeleteSkillMutation() {
   const queryClient = useQueryClient()
 
-  return useMutation<void, AxiosError, { id: string; name: string }>({
+  return useMutation<void, ApiErrorResponse, { id: string; name: string }>({
     mutationFn: async ({ id }) => {
       await contentServiceDeleteSkill({ path: { id } })
     },
@@ -123,8 +129,9 @@ export function useDeleteSkillMutation() {
         queryKey: skillQueryKeys.lists(),
       })
     },
-    onError: (error: AxiosError) => {
-      showErrorNotification('Lỗi xóa kỹ năng', undefined, error)
+    onError: (error: ApiErrorResponse) => {
+      const errorMessage = handleApiError(error)
+      showErrorNotification(errorMessage, 'Lỗi xóa kỹ năng')
     },
   })
 }

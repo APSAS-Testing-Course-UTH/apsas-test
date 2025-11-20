@@ -505,4 +505,88 @@ describe('CodeDisplay', () => {
       expect(screen.queryByText(/Tải xuống/i)).not.toBeInTheDocument();
     });
   });
+
+  // ============================================
+  // BASE64 ENCODING DETECTION (6 tests)
+  // ============================================
+
+  describe('Base64 Encoding Detection', () => {
+    it('should display UTF-8 code correctly (old data format)', () => {
+      const utf8Code = 'function hello() {\n  console.log("Hello, World!");\n}';
+
+      const { container } = renderWithProvider(
+        <CodeDisplay code={utf8Code} language="javascript" />
+      );
+
+      // Should display the code as-is without decoding
+      const codeEl = container.querySelector('code');
+      expect(codeEl?.textContent).toContain('function hello');
+      expect(codeEl?.textContent).toContain('console.log');
+    });
+
+    it('should decode and display Base64 encoded code (new data format)', () => {
+      // Base64 encoded version of: console.log("Hello, World!");
+      const base64Code = 'Y29uc29sZS5sb2coIkhlbGxvLCBXb3JsZCEiKTs=';
+
+      const { container } = renderWithProvider(
+        <CodeDisplay code={base64Code} language="javascript" />
+      );
+
+      // Should decode and display the original code
+      const codeEl = container.querySelector('code');
+      expect(codeEl?.textContent).toBe('console.log("Hello, World!");');
+    });
+
+    it('should handle Python code in UTF-8', () => {
+      const pythonCode = 'def greet(name):\n    print(f"Xin chào, {name}!")\n\ngreet("Thế giới")';
+
+      const { container } = renderWithProvider(
+        <CodeDisplay code={pythonCode} language="python" />
+      );
+
+      const codeEl = container.querySelector('code');
+      expect(codeEl?.textContent).toContain('def greet');
+      expect(codeEl?.textContent).toContain('Xin chào');
+    });
+
+    it('should handle Python code in Base64', () => {
+      // Base64 encoded: print("Hello")
+      const base64Python = 'cHJpbnQoIkhlbGxvIik=';
+
+      const { container } = renderWithProvider(
+        <CodeDisplay code={base64Python} language="python" />
+      );
+
+      const codeEl = container.querySelector('code');
+      expect(codeEl?.textContent).toBe('print("Hello")');
+    });
+
+    it('should handle multiline Base64 code', () => {
+      // Base64 encoded version of a multiline Java class
+      const base64Java =
+        'cHVibGljIGNsYXNzIEhlbGxvIHsKICAgIHB1YmxpYyBzdGF0aWMgdm9pZCBtYWluKFN0cmluZ1tdIGFyZ3MpIHsKICAgICAgICBTeXN0ZW0ub3V0LnByaW50bG4oIkhlbGxvLCBXb3JsZCEiKTsKICAgIH0KfQ==';
+
+      const { container } = renderWithProvider(
+        <CodeDisplay code={base64Java} language="java" />
+      );
+
+      const codeEl = container.querySelector('code');
+      expect(codeEl?.textContent).toContain('public class Hello');
+      expect(codeEl?.textContent).toContain('System.out.println');
+    });
+
+    it('should fallback to raw code if Base64 decode fails', () => {
+      // Invalid Base64 string (contains characters not in Base64 alphabet)
+      const invalidBase64 = 'function test() { console.log("Not Base64!"); }';
+
+      const { container } = renderWithProvider(
+        <CodeDisplay code={invalidBase64} language="javascript" />
+      );
+
+      // Should display as-is without attempting to decode
+      const codeEl = container.querySelector('code');
+      expect(codeEl?.textContent).toContain('function test');
+      expect(codeEl?.textContent).toContain('Not Base64!');
+    });
+  });
 });

@@ -141,7 +141,7 @@ export function SubmissionEditor({
         </Tabs.List>
 
         <Tabs.Panel value="editor" pt="md">
-          {isLoading || isSubmitting ? (
+          {isLoading ? (
             <Center p="xl">
               <Loader />
             </Center>
@@ -149,6 +149,7 @@ export function SubmissionEditor({
             <CodeSubmissionForm
               assignmentId={assignmentId}
               runtimes={runtimes}
+              isLoading={isSubmitting}
               onSubmit={handleCodeSubmit}
               onError={onError}
             />
@@ -156,7 +157,7 @@ export function SubmissionEditor({
         </Tabs.Panel>
 
         <Tabs.Panel value="file" pt="md">
-          {isLoading || isSubmitting ? (
+          {isLoading ? (
             <Center p="xl">
               <Loader />
             </Center>

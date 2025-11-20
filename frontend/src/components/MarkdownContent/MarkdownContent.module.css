@@ -1,0 +1,298 @@
+/**
+ * MarkdownContent Component Styles
+ * Provides professional styling for rendered markdown content
+ * Vietnamese UI-focused with clear hierarchy and readability
+ */
+
+.markdownContent {
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--mantine-color-text);
+}
+
+/* Headings - Vietnamese typography optimization */
+.markdownContent h1 {
+  font-size: 2em;
+  font-weight: 700;
+  margin-top: 1.5em;
+  margin-bottom: 0.75em;
+  padding-bottom: 0.3em;
+  border-bottom: 2px solid var(--mantine-color-gray-3);
+  color: var(--mantine-color-dark-9);
+}
+
+.markdownContent h1:first-child {
+  margin-top: 0;
+}
+
+.markdownContent h2 {
+  font-size: 1.6em;
+  font-weight: 600;
+  margin-top: 1.3em;
+  margin-bottom: 0.65em;
+  padding-bottom: 0.25em;
+  border-bottom: 1px solid var(--mantine-color-gray-2);
+  color: var(--mantine-color-dark-8);
+}
+
+.markdownContent h3 {
+  font-size: 1.3em;
+  font-weight: 600;
+  margin-top: 1.2em;
+  margin-bottom: 0.6em;
+  color: var(--mantine-color-dark-7);
+}
+
+.markdownContent h4 {
+  font-size: 1.1em;
+  font-weight: 600;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+  color: var(--mantine-color-dark-6);
+}
+
+.markdownContent h5 {
+  font-size: 1em;
+  font-weight: 600;
+  margin-top: 0.9em;
+  margin-bottom: 0.45em;
+  color: var(--mantine-color-dark-6);
+}
+
+.markdownContent h6 {
+  font-size: 0.9em;
+  font-weight: 600;
+  margin-top: 0.8em;
+  margin-bottom: 0.4em;
+  color: var(--mantine-color-gray-7);
+}
+
+/* Paragraphs */
+.markdownContent p {
+  margin-top: 0;
+  margin-bottom: 1em;
+  text-align: justify;
+}
+
+/* Links */
+.markdownContent a {
+  color: var(--mantine-color-blue-6);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.markdownContent a:hover {
+  color: var(--mantine-color-blue-7);
+  text-decoration: underline;
+}
+
+/* Strong and emphasis */
+.markdownContent strong {
+  font-weight: 700;
+  color: var(--mantine-color-dark-9);
+}
+
+.markdownContent em {
+  font-style: italic;
+  color: var(--mantine-color-dark-7);
+}
+
+/* Code blocks */
+.markdownContent code {
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.9em;
+  padding: 0.2em 0.4em;
+  background-color: var(--mantine-color-gray-1);
+  border-radius: 4px;
+  color: var(--mantine-color-red-7);
+  border: 1px solid var(--mantine-color-gray-3);
+}
+
+.markdownContent pre {
+  background-color: var(--mantine-color-gray-0);
+  border: 1px solid var(--mantine-color-gray-3);
+  border-radius: 8px;
+  padding: 1em;
+  overflow-x: auto;
+  margin: 1.2em 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.markdownContent pre code {
+  background-color: transparent;
+  padding: 0;
+  border: none;
+  font-size: 0.95em;
+  color: var(--mantine-color-dark-8);
+  display: block;
+  line-height: 1.6;
+}
+
+/* Lists */
+.markdownContent ul,
+.markdownContent ol {
+  padding-left: 2em;
+  margin: 1em 0;
+}
+
+.markdownContent li {
+  margin: 0.4em 0;
+  line-height: 1.7;
+}
+
+.markdownContent ul ul,
+.markdownContent ol ol,
+.markdownContent ul ol,
+.markdownContent ol ul {
+  margin: 0.3em 0;
+}
+
+/* Blockquotes */
+.markdownContent blockquote {
+  border-left: 4px solid var(--mantine-color-blue-5);
+  padding: 0.8em 1.2em;
+  margin: 1.2em 0;
+  background-color: var(--mantine-color-blue-0);
+  border-radius: 4px;
+  color: var(--mantine-color-dark-7);
+  font-style: italic;
+}
+
+.markdownContent blockquote p {
+  margin: 0.5em 0;
+}
+
+.markdownContent blockquote p:first-child {
+  margin-top: 0;
+}
+
+.markdownContent blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+/* Horizontal rules */
+.markdownContent hr {
+  border: none;
+  border-top: 2px solid var(--mantine-color-gray-3);
+  margin: 2em 0;
+}
+
+/* Tables */
+.markdownContent table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.2em 0;
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.markdownContent thead {
+  background-color: var(--mantine-color-blue-1);
+}
+
+.markdownContent th {
+  padding: 0.8em 1em;
+  text-align: left;
+  font-weight: 600;
+  color: var(--mantine-color-dark-9);
+  border-bottom: 2px solid var(--mantine-color-gray-4);
+}
+
+.markdownContent td {
+  padding: 0.7em 1em;
+  border-bottom: 1px solid var(--mantine-color-gray-2);
+}
+
+.markdownContent tbody tr:hover {
+  background-color: var(--mantine-color-gray-0);
+  transition: background-color 0.2s ease;
+}
+
+.markdownContent tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Images */
+.markdownContent img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 1em 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Task lists (GitHub Flavored Markdown) */
+.markdownContent input[type='checkbox'] {
+  margin-right: 0.5em;
+  cursor: pointer;
+}
+
+/* Strikethrough */
+.markdownContent del {
+  color: var(--mantine-color-gray-6);
+  text-decoration: line-through;
+}
+
+/* Inline code in headings */
+.markdownContent h1 code,
+.markdownContent h2 code,
+.markdownContent h3 code,
+.markdownContent h4 code,
+.markdownContent h5 code,
+.markdownContent h6 code {
+  font-size: 0.85em;
+}
+
+/* Prevent excessive margins at start/end */
+.markdownContent > *:first-child {
+  margin-top: 0 !important;
+}
+
+.markdownContent > *:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* Spacing for consecutive elements */
+.markdownContent h1 + p,
+.markdownContent h2 + p,
+.markdownContent h3 + p,
+.markdownContent h4 + p,
+.markdownContent h5 + p,
+.markdownContent h6 + p {
+  margin-top: 0.5em;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .markdownContent {
+    font-size: 15px;
+  }
+
+  .markdownContent h1 {
+    font-size: 1.8em;
+  }
+
+  .markdownContent h2 {
+    font-size: 1.5em;
+  }
+
+  .markdownContent h3 {
+    font-size: 1.2em;
+  }
+
+  .markdownContent pre {
+    padding: 0.8em;
+    font-size: 0.9em;
+  }
+
+  .markdownContent table {
+    font-size: 0.9em;
+  }
+
+  .markdownContent th,
+  .markdownContent td {
+    padding: 0.6em 0.8em;
+  }
+}

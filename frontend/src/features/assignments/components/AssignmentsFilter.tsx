@@ -12,19 +12,18 @@
  * Vietnamese UI
  */
 
-import { useState } from 'react'
 import { TextInput, Select, Group, Stack, Button, Paper } from '@mantine/core'
 import { DatePickerInput } from '@mantine/dates'
-import { IconSearch, IconFilter, IconX } from '@tabler/icons-react'
+import { IconSearch, IconX } from '@tabler/icons-react'
 import '@mantine/dates/styles.css'
 
 export interface AssignmentFilters {
   search: string
   difficulty: string | null
-  startDateFrom: Date | null
-  startDateTo: Date | null
-  dueDateFrom: Date | null
-  dueDateTo: Date | null
+  startDateFrom: string | null  // Date string from DatePickerInput
+  startDateTo: string | null    // Date string from DatePickerInput
+  dueDateFrom: string | null    // Date string from DatePickerInput
+  dueDateTo: string | null      // Date string from DatePickerInput
   status: string | null
 }
 
@@ -109,7 +108,6 @@ export function AssignmentsFilter({ filters, onFiltersChange }: AssignmentsFilte
             value={filters.startDateFrom}
             onChange={(value) => onFiltersChange({ ...filters, startDateFrom: value })}
             clearable
-            valueFormat="DD/MM/YYYY"
             style={{ flex: '0 1 140px', minWidth: 120 }}
           />
 
@@ -119,8 +117,7 @@ export function AssignmentsFilter({ filters, onFiltersChange }: AssignmentsFilte
             value={filters.startDateTo}
             onChange={(value) => onFiltersChange({ ...filters, startDateTo: value })}
             clearable
-            valueFormat="DD/MM/YYYY"
-            minDate={filters.startDateFrom || undefined}
+            minDate={filters.startDateFrom ?? undefined}
             style={{ flex: '0 1 140px', minWidth: 120 }}
           />
 
@@ -130,7 +127,6 @@ export function AssignmentsFilter({ filters, onFiltersChange }: AssignmentsFilte
             value={filters.dueDateFrom}
             onChange={(value) => onFiltersChange({ ...filters, dueDateFrom: value })}
             clearable
-            valueFormat="DD/MM/YYYY"
             style={{ flex: '0 1 120px', minWidth: 100 }}
           />
 
@@ -140,8 +136,7 @@ export function AssignmentsFilter({ filters, onFiltersChange }: AssignmentsFilte
             value={filters.dueDateTo}
             onChange={(value) => onFiltersChange({ ...filters, dueDateTo: value })}
             clearable
-            valueFormat="DD/MM/YYYY"
-            minDate={filters.dueDateFrom || undefined}
+            minDate={filters.dueDateFrom ?? undefined}
             style={{ flex: '0 1 120px', minWidth: 100 }}
           />
 

@@ -48,7 +48,7 @@ export const StudentDashboard = () => {
   })
 
   // Calculate stats
-  const totalAssignments = assignments.length
+  const totalAssignments = Number(assignmentsResponse?.data?.totalElements || 0)
   const submittedCount = submissions.filter(s => s.status === 'EVALUATED').length
   const scores = submissions.map(s => s.score).filter(Boolean) as number[]
   const avgScore = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0
@@ -112,12 +112,12 @@ export const StudentDashboard = () => {
 
         {/* Student Info Card + Calendar */}
         <SimpleGrid cols={{ base: 1, md: 3 }}>
-          <div style={{ gridColumn: 'span 1' }}>
-            <StudentInfoCard />
-          </div>
-          <div style={{ gridColumn: 'span 2' }}>
-            <CalendarWidget assignments={assignments} isLoading={assignmentsLoading} />
-          </div>
+          <StudentInfoCard style={{ gridColumn: 'span 1', alignSelf: 'start' }} />
+          <CalendarWidget 
+            assignments={assignments} 
+            isLoading={assignmentsLoading}
+            style={{ gridColumn: 'span 2' }} 
+          />
         </SimpleGrid>
 
         {/* Stats Cards */}

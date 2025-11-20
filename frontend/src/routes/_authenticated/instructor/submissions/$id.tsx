@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { createFileRoute, redirect, useParams, useNavigate } from '@tanstack/react-router'
-import { Container, Stack, Title, Text, Breadcrumbs, Anchor, Button, Group } from '@mantine/core'
-import { IconArrowLeft, IconMessageCircle } from '@tabler/icons-react'
+import { createFileRoute, redirect, useParams } from '@tanstack/react-router'
+import { Container, Stack, Title, Text, Breadcrumbs, Anchor } from '@mantine/core'
+// Icons removed - not currently used in this page
 import { useAuthStore } from '@/features/auth/stores/useAuthStore'
 import { USER_ROLES } from '@/constants/roles'
 import { checkRoleAccess, logRoleAccessAttempt } from '@/features/auth/utils/roleGuards'
@@ -23,7 +23,7 @@ import { SubmissionDetail, ProvideFeedbackModal } from '@/features/submissions/c
  */
 const InstructorSubmissionDetailPage = () => {
   const { id } = useParams({ from: '/_authenticated/instructor/submissions/$id' })
-  const navigate = useNavigate()
+  // const navigate = useNavigate() // Not currently used
   const [feedbackModalOpen, setFeedbackModalOpen] = useState(false)
 
   return (

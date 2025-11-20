@@ -26,11 +26,11 @@ public class SkillService {
   private final SkillRepository skillRepository;
   private final SkillMapper skillMapper;
 
-  @Cacheable(
+  /*@Cacheable(
       value = CacheConfig.ALL_SKILLS_CACHE,
       unless = "#result.content.isEmpty()",
-      key = "pageable.pageNumber + '-' + pageable.pageSize + '-' + pageable.sort.toString()"
-  )
+      key = "#pageable.pageNumber + '-' + #pageable.pageSize + '-' + #pageable.sort.toString()"
+  )*/
   @Transactional(readOnly = true)
   public PageResponse<SkillResponse> getAllSkills(Pageable pageable) {
     Page<Skill> skillPage = skillRepository.findAll(pageable);

@@ -1,5 +1,5 @@
 import { createFileRoute, redirect, useNavigate, Outlet, useLocation } from '@tanstack/react-router'
-import { Container, Stack, Title, Text, Alert } from '@mantine/core'
+import { Container, Stack, Title, Text } from '@mantine/core'
 import { useAuthStore } from '@/features/auth/stores/useAuthStore'
 import { USER_ROLES } from '@/constants/roles'
 import { checkRoleAccess, logRoleAccessAttempt } from '@/features/auth/utils/roleGuards'

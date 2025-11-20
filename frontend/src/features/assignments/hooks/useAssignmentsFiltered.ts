@@ -9,12 +9,14 @@
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { contentServiceGetAllAssignments } from '@/api/sdk.gen'
+import type { ContentServicePageResponseAssignmentResponse } from '@/api/types.gen'
 
 export interface AssignmentFilters {
   difficultyLevel?: 'EASY' | 'MEDIUM' | 'HARD' | null
   status?: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED' | null
   dueDateFrom?: Date | null
   dueDateTo?: Date | null
+  search?: string | null
 }
 
 export interface UseAssignmentsFilteredOptions {
@@ -30,48 +32,62 @@ export interface UseAssignmentsFilteredOptions {
 const assignmentKeys = {
   all: ['assignments'],
   lists: () => [...assignmentKeys.all, 'list'],
-  list: (page: number, size: number) => [
-    ...assignmentKeys.lists(),
-    { page, size },
-  ],
-  filtered: (page: number, size: number, filters: AssignmentFilters) => [
-    ...assignmentKeys.lists(),
-    { page, size, filters },
-  ],
+  // Key for the "fetch all" query used for client-side filtering
+  allData: () => [...assignmentKeys.lists(), 'all-data'],
 }
 
 /**
  * Hook to fetch and filter assignments
+ * Implements "Solution A": Fetch All & Client-side Pagination
  */
 export function useAssignmentsFiltered({
   page,
   size,
   filters,
 }: UseAssignmentsFilteredOptions) {
-  // Fetch data from server with pagination
-  const queryResult = useQuery({
-    queryKey: assignmentKeys.list(page, size),
+  // 1. Fetch ALL data (up to 1000 items) to ensure filtering works correctly across all pages
+  const { data: allDataResponse, isLoading, error } = useQuery({
+    queryKey: assignmentKeys.allData(),
     queryFn: async () => {
       const response = await contentServiceGetAllAssignments({
         query: {
-          page: String(page),
-          size: String(size),
+          page: '0',
+          size: '1000', // Fetch a large number to simulate "all"
         },
       })
       return response.data
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000, // 5 minutes cache
     gcTime: 30 * 60 * 1000, // 30 minutes
   })
 
-  // Apply client-side filtering only on current page data
-  // Important: Do NOT filter across pages - filters are UI-only
-  const filteredData = useMemo(() => {
-    if (!queryResult.data?.content) {
-      return queryResult.data
+  // 2. Client-side Filtering & Pagination
+  const result = useMemo(() => {
+    if (!allDataResponse?.content) {
+      return {
+        content: [],
+        totalElements: 0n,
+        totalPages: 0,
+        pageNumber: page,
+        pageSize: size,
+        first: true,
+        last: true,
+        numberOfElements: 0,
+        empty: true
+      } as unknown as ContentServicePageResponseAssignmentResponse
     }
 
-    let filtered = [...queryResult.data.content]
+    let filtered = [...allDataResponse.content]
+
+    // Filter by search term (title or description)
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase()
+      filtered = filtered.filter(
+        (assignment) =>
+          (assignment.title?.toLowerCase().includes(searchLower)) ||
+          (assignment.description?.toLowerCase().includes(searchLower))
+      )
+    }
 
     // Filter by difficulty
     if (filters.difficultyLevel) {
@@ -104,17 +120,31 @@ export function useAssignmentsFiltered({
       })
     }
 
-    // Return filtered data for current page only
+    // Calculate pagination
+    const totalElements = filtered.length
+    const totalPages = Math.ceil(totalElements / size)
+    const startIndex = page * size
+    const endIndex = startIndex + size
+    const paginatedContent = filtered.slice(startIndex, endIndex)
+
+    // Construct response matching the API type
     return {
-      ...queryResult.data,
-      content: filtered,
-      // IMPORTANT: Keep original totalElements and totalPages
-      // Do NOT override - pagination is based on server total, not filtered count
-    }
-  }, [queryResult.data, filters])
+      content: paginatedContent,
+      totalElements: BigInt(totalElements),
+      totalPages: totalPages,
+      pageNumber: page,
+      pageSize: size,
+      first: page === 0,
+      last: page >= totalPages - 1,
+      numberOfElements: paginatedContent.length,
+      empty: paginatedContent.length === 0
+    } as unknown as ContentServicePageResponseAssignmentResponse
+
+  }, [allDataResponse, filters, page, size])
 
   return {
-    ...queryResult,
-    data: filteredData,
+    data: result,
+    isLoading,
+    error
   }
 }

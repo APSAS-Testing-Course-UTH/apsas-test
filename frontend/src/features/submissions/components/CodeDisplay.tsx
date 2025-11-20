@@ -159,6 +159,47 @@ const LANGUAGE_MAP: Record<string, string> = {
 };
 
 /**
+ * Detects if a string is Base64 encoded and decodes it
+ * Handles both UTF-8 (old data) and Base64 (new data) encoding
+ * @param input - The input string (possibly Base64 encoded)
+ * @returns Decoded string if Base64, original string otherwise
+ */
+function decodeCodeIfBase64(input: string): string {
+  if (!input || input.trim().length === 0) {
+    return input;
+  }
+
+  try {
+    // Check if string looks like Base64
+    // Base64 typically contains only A-Z, a-z, 0-9, +, /, = and no whitespace
+    const base64Regex = /^[A-Za-z0-9+/\s]*={0,2}$/;
+    
+    const trimmed = input.trim();
+    
+    if (!base64Regex.test(trimmed)) {
+      // Contains characters not in Base64 alphabet, likely UTF-8
+      return input;
+    }
+
+    // Try to decode as Base64
+    const decoded = atob(trimmed);
+    
+    // Verify decoded string is valid and looks like code
+    // If decode succeeds but produces garbage, it wasn't Base64
+    if (decoded.length > 0 && decoded.length < trimmed.length * 2) {
+      // Successfully decoded and size is reasonable
+      return decoded;
+    }
+    
+    // Decoded but looks suspicious, likely not Base64
+    return input;
+  } catch {
+    // atob() failed, not Base64 encoded
+    return input;
+  }
+}
+
+/**
  * Detect language from code content
  * Falls back to 'javascript' if no language provided
  */
@@ -206,16 +247,17 @@ function CodeDisplayComponent({
   const codeRef = useRef<HTMLElement>(null);
   const preRef = useRef<HTMLPreElement>(null);
 
-
+  // Decode Base64 if necessary (supports both UTF-8 and Base64 submissions)
+  const decodedCode = decodeCodeIfBase64(code);
 
   // Determine language to use
-  const displayLanguage = normalizeLanguage(language || detectLanguage(code));
+  const displayLanguage = normalizeLanguage(language || detectLanguage(decodedCode));
 
   // Apply Prism highlighting on mount and when code/language changes
   useEffect(() => {
-    if (codeRef.current && code) {
+    if (codeRef.current && decodedCode) {
       // Set the code content
-      codeRef.current.textContent = code;
+      codeRef.current.textContent = decodedCode;
 
       // Remove existing language classes
       codeRef.current.className = 'language-' + displayLanguage;
@@ -228,14 +270,14 @@ function CodeDisplayComponent({
         // Fallback: just show the code without highlighting
       }
     }
-  }, [code, displayLanguage]);
+  }, [decodedCode, displayLanguage]);
 
 
 
   // Handle download
   const handleDownload = useCallback(() => {
     try {
-      const blob = new Blob([code], { type: 'text/plain' });
+      const blob = new Blob([decodedCode], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -253,7 +295,7 @@ function CodeDisplayComponent({
     } catch (error) {
       console.error('Failed to download:', error);
     }
-  }, [code, displayLanguage, downloadFilename, onDownload]);
+  }, [decodedCode, displayLanguage, downloadFilename, onDownload]);
 
   // Loading state
   if (isLoading) {
@@ -267,7 +309,7 @@ function CodeDisplayComponent({
   }
 
   // Empty code
-  if (!code || code.trim().length === 0) {
+  if (!decodedCode || decodedCode.trim().length === 0) {
     return (
       <Card className={className}>
         <Text c="dimmed" size="sm">
@@ -278,7 +320,7 @@ function CodeDisplayComponent({
   }
 
   // Calculate line count for line numbers
-  const lineCount = code.split('\n').length;
+  const lineCount = decodedCode.split('\n').length;
 
   return (
     <Card className={`${styles.codeDisplay} ${className || ''}`}>
@@ -295,7 +337,7 @@ function CodeDisplayComponent({
 
         <Group gap="xs">
           {showCopyButton && (
-            <CopyButton value={code} timeout={2000}>
+            <CopyButton value={decodedCode} timeout={2000}>
               {({ copied, copy }) => (
                 <Tooltip
                   label={copied ? UI_LABELS.copied : UI_LABELS.copy}

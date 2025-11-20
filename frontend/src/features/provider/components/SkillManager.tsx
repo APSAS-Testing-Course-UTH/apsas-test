@@ -377,7 +377,7 @@ export function SkillManager({ onSelectSkill }: SkillManagerProps) {
                       </Text>
                     </Table.Td>
                     <Table.Td w="16%" style={{ textAlign: 'right' }}>
-                      <Group gap={0} justify="flex-end">
+                      <Group gap="sm" justify="flex-end">
                         <Tooltip label="Xem chi tiết">
                           <ActionIcon
                             variant="light"
@@ -478,5 +478,3 @@ export function SkillManager({ onSelectSkill }: SkillManagerProps) {
     </Stack>
   )
 }
-
-export default SkillManager

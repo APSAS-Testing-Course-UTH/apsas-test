@@ -4,7 +4,7 @@
  * Custom React hooks for form auto-save and submission management
  */
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 
 /**
  * Labels for auto-save UI
@@ -45,6 +45,14 @@ export function useFormAutoSave({
   const [lastSavedTime, setLastSavedTime] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isDraft, setIsDraft] = useState(false);
+  
+  // Use ref to store onError callback to avoid re-running useEffect on callback changes
+  const onErrorRef = useRef(onError);
+  
+  // Update ref when onError changes
+  useEffect(() => {
+    onErrorRef.current = onError;
+  }, [onError]);
 
   // Check if draft exists on mount
   const recoverDraft = useCallback(() => {
@@ -57,10 +65,10 @@ export function useFormAutoSave({
       }
     } catch (error) {
       console.error('Failed to recover draft:', error);
-      onError?.(error instanceof Error ? error : new Error('Draft recovery failed'));
+      onErrorRef.current?.(error instanceof Error ? error : new Error('Draft recovery failed'));
     }
     return null;
-  }, [draftKey, onError]);
+  }, [draftKey]);
 
   // Save draft with debouncing
   useEffect(() => {
@@ -82,14 +90,14 @@ export function useFormAutoSave({
         setLastSavedTime(timeStr);
       } catch (error) {
         console.error('Auto-save failed:', error);
-        onError?.(error instanceof Error ? error : new Error('Auto-save failed'));
+        onErrorRef.current?.(error instanceof Error ? error : new Error('Auto-save failed'));
       } finally {
         setIsSaving(false);
       }
     }, debounceMs);
 
     return () => clearTimeout(timer);
-  }, [code, runtimeId, draftKey, debounceMs, onError]);
+  }, [code, runtimeId, draftKey, debounceMs]);
 
   const clearDraft = useCallback(() => {
     try {
@@ -98,9 +106,9 @@ export function useFormAutoSave({
       setLastSavedTime(null);
     } catch (error) {
       console.error('Failed to clear draft:', error);
-      onError?.(error instanceof Error ? error : new Error('Clear draft failed'));
+      onErrorRef.current?.(error instanceof Error ? error : new Error('Clear draft failed'));
     }
-  }, [draftKey, onError]);
+  }, [draftKey]);
 
   const saveDraft = useCallback(() => {
     try {
@@ -116,9 +124,9 @@ export function useFormAutoSave({
       setLastSavedTime(timeStr);
     } catch (error) {
       console.error('Save draft failed:', error);
-      onError?.(error instanceof Error ? error : new Error('Save draft failed'));
+      onErrorRef.current?.(error instanceof Error ? error : new Error('Save draft failed'));
     }
-  }, [code, runtimeId, draftKey, onError]);
+  }, [code, runtimeId, draftKey]);
 
   return {
     lastSavedTime,

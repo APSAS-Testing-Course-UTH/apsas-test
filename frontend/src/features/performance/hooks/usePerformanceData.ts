@@ -16,8 +16,9 @@ import type {
 /**
  * Aggregate performance statistics from submissions
  */
-function aggregateStats(submissions: SubmissionServiceSubmissionResponse[]): PerformanceStats {
-  if (!submissions.length) {
+function aggregateStats(submissions: SubmissionServiceSubmissionResponse[], totalElements?: number): PerformanceStats {
+  const totalCount = totalElements ?? submissions.length
+  if (!submissions.length && totalCount === 0) {
     return {
       totalSubmissions: 0,
       passedSubmissions: 0,
@@ -30,12 +31,12 @@ function aggregateStats(submissions: SubmissionServiceSubmissionResponse[]): Per
   }
 
   const passedSubmissions = submissions.filter((s) => s.result === 'PASSED').length
-  const failedSubmissions = submissions.length - passedSubmissions
+  const failedSubmissions = totalCount - passedSubmissions // Approximate if not all fetched
 
   const totalScore = submissions.reduce((sum, s) => sum + (s.score || 0), 0)
-  const averageScore = Math.round(totalScore / submissions.length)
+  const averageScore = submissions.length > 0 ? Math.round(totalScore / submissions.length) : 0
 
-  const successRate = Math.round((passedSubmissions / submissions.length) * 100)
+  const successRate = submissions.length > 0 ? Math.round((passedSubmissions / submissions.length) * 100) : 0
 
   // Extract unique skills - count test cases as skills
   const skillsAttempted = new Set<string>()
@@ -55,7 +56,7 @@ function aggregateStats(submissions: SubmissionServiceSubmissionResponse[]): Per
   })
 
   return {
-    totalSubmissions: submissions.length,
+    totalSubmissions: totalCount,
     passedSubmissions,
     failedSubmissions,
     successRate,
@@ -136,9 +137,10 @@ export function usePerformanceData(studentId?: string) {
   })
 
   const submissions = (submissionsData?.data?.content as SubmissionServiceSubmissionResponse[]) || []
+  const totalElements = Number(submissionsData?.data?.totalElements || 0)
 
   // Memoize calculations to avoid recalculation on every render
-  const stats = useMemo(() => aggregateStats(submissions), [submissions])
+  const stats = useMemo(() => aggregateStats(submissions, totalElements), [submissions, totalElements])
   const trendData = useMemo(() => createTrendData(submissions), [submissions])
   const skillProgress = useMemo(() => calculateSkillProgress(submissions), [submissions])
 

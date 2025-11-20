@@ -1,5 +1,5 @@
 import { SimpleGrid, Skeleton, Center, Text, Group, Pagination, Stack, Badge, Button } from '@mantine/core'
-import type { AxiosError } from 'axios'
+import type { ApiErrorResponse } from '@/configs/api-error-handler'
 import type { ContentServiceTutorialResponse, ContentServiceSkillResponse } from '@/api/types.gen'
 import { ResourceCard } from './ResourceCard'
 import { 
@@ -11,7 +11,7 @@ import {
 interface ResourcesListProps {
   items?: ContentServiceTutorialResponse[] | ContentServiceSkillResponse[]
   isLoading: boolean
-  error?: AxiosError | Error | null
+  error?: ApiErrorResponse | Error | null
   totalPages?: number
   currentPage?: number
   onPageChange?: (page: number) => void
@@ -51,8 +51,8 @@ export function ResourcesList({
 
   // Error state
   if (error) {
-    const isNetwork = isNetworkError(error as AxiosError)
-    const isTimeout = isTimeoutError(error as AxiosError)
+    const isNetwork = isNetworkError(error as ApiErrorResponse)
+    const isTimeout = isTimeoutError(error as ApiErrorResponse)
     const errorMessage = getErrorMessage(error)
 
     return (

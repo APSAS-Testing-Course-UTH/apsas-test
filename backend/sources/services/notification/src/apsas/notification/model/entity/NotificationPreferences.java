@@ -30,7 +30,7 @@ public class NotificationPreferences {
   private Boolean emailEnabled = true;
 
   @Column(name = "push_enabled", nullable = false)
-  private Boolean pushEnabled = true;
+  private Boolean pushEnabled = false;
 
   // Email preferences by type
   @Column(name = "email_assignment_published", nullable = false)

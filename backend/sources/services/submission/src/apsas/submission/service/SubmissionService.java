@@ -68,7 +68,16 @@ public class SubmissionService {
       );
     }
 
-    Page<SubmissionResponse> responsePage = submissionPage.map(submissionMapper::toResponse);
+    Page<SubmissionResponse> responsePage = submissionPage.map(submission -> {
+      SubmissionResponse response = submissionMapper.toResponse(submission);
+
+      // Hide hidden test case details for students
+      if (!isInstructor) {
+        maskHiddenTestCaseResults(response);
+      }
+
+      return response;
+    });
     return PageResponse.of(responsePage);
   }
 
@@ -85,7 +94,14 @@ public class SubmissionService {
       throw new ForbiddenException("You are not authorized to view this submission");
     }
 
-    return submissionMapper.toResponse(submission);
+    SubmissionResponse response = submissionMapper.toResponse(submission);
+
+    // Hide hidden test case details for students
+    if (!isInstructor) {
+      maskHiddenTestCaseResults(response);
+    }
+
+    return response;
   }
 
   @Transactional
@@ -151,5 +167,16 @@ public class SubmissionService {
     Submission updatedSubmission = submissionRepository.save(submission);
 
     return submissionMapper.toResponse(updatedSubmission);
+  }
+
+  private void maskHiddenTestCaseResults(SubmissionResponse response) {
+    if (response.getTestCaseResults() != null) {
+      response.getTestCaseResults().forEach(testCaseResult -> {
+        if (Boolean.TRUE.equals(testCaseResult.getHidden())) {
+          testCaseResult.setInput("***");
+          testCaseResult.setOutput("***");
+        }
+      });
+    }
   }
 }

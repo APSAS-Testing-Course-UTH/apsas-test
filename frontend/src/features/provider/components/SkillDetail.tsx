@@ -199,5 +199,3 @@ export function SkillDetail({ skillId, onEdit }: SkillDetailProps) {
     </Container>
   )
 }
-
-export default SkillDetail

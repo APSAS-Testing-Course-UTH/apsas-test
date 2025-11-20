@@ -14,7 +14,7 @@ export { FormInput, FormSelect, FormTextarea } from './ui/Form';
 export type { FormInputProps, FormSelectProps, FormTextareaProps } from './types';
 
 export { Badge, StatusBadge } from './ui/Badge';
-export type { BadgeProps, StatusBadgeProps } from './types';
+export type { BadgeProps } from './types';
 
 export { Modal, ConfirmDialog } from './ui/Modal';
 export type { ModalProps, ConfirmDialogProps } from './types';

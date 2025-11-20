@@ -10,7 +10,7 @@
  */
 
 import { useCallback } from 'react'
-import type { AxiosError } from 'axios'
+import type { ApiErrorResponse } from '@/configs/api-error-handler'
 import {
   getErrorMessage,
   mapApiError,
@@ -46,7 +46,7 @@ export type UseErrorHandlerReturn = ReturnType<typeof useErrorHandler>
 
 export function useErrorHandler() {
   const handleError = useCallback(
-    (error: AxiosError | Error | unknown, title: string = 'Lỗi') => {
+    (error: ApiErrorResponse | Error | unknown, title: string = 'Lỗi') => {
       const category = getErrorCategory(error)
       const message = getErrorMessage(error)
 
@@ -68,11 +68,11 @@ export function useErrorHandler() {
     []
   )
 
-  const showError = useCallback((error: AxiosError | Error | unknown, title?: string) => {
+  const showError = useCallback((error: ApiErrorResponse | Error | unknown, title?: string) => {
     handleError(error, title || 'Lỗi')
   }, [handleError])
 
-  const getMappedError = useCallback((error: AxiosError | Error | unknown): StudentPortalError => {
+  const getMappedError = useCallback((error: ApiErrorResponse | Error | unknown): StudentPortalError => {
     return mapApiError(error)
   }, [])
 
@@ -104,7 +104,7 @@ export function useSubmissionErrorHandler() {
   const { handleError } = useErrorHandler()
 
   const handleSubmissionError = useCallback(
-    (error: AxiosError | Error | unknown) => {
+    (error: ApiErrorResponse | Error | unknown) => {
       const category = getErrorCategory(error)
 
       if (category === 'validation') {
@@ -121,14 +121,14 @@ export function useSubmissionErrorHandler() {
   )
 
   const handleCompilationError = useCallback(
-    (error: AxiosError | Error | unknown) => {
+    (error: ApiErrorResponse | Error | unknown) => {
       handleError(error, 'Lỗi biên dịch/chạy chương trình')
     },
     [handleError]
   )
 
   const handleTestcaseError = useCallback(
-    (error: AxiosError | Error | unknown) => {
+    (error: ApiErrorResponse | Error | unknown) => {
       handleError(error, 'Lỗi khi chạy test case')
     },
     [handleError]
@@ -164,7 +164,7 @@ export function useDownloadErrorHandler() {
   const { handleError } = useErrorHandler()
 
   const handleDownloadError = useCallback(
-    (error: AxiosError | Error | unknown, filename?: string) => {
+    (error: ApiErrorResponse | Error | unknown, filename?: string) => {
       const fileInfo = filename ? ` (${filename})` : ''
       handleError(error, `Lỗi tải tệp${fileInfo}`)
     },
@@ -172,7 +172,7 @@ export function useDownloadErrorHandler() {
   )
 
   const handleFileAccessError = useCallback(
-    (error: AxiosError | Error | unknown) => {
+    (error: ApiErrorResponse | Error | unknown) => {
       handleError(error, 'Lỗi truy cập tệp')
     },
     [handleError]
@@ -201,7 +201,7 @@ export function useDownloadErrorHandler() {
  */
 export function useNetworkErrorHandler() {
   const handleNetworkError = useCallback(
-    (error?: AxiosError | Error | unknown) => {
+    (error?: ApiErrorResponse | Error | unknown) => {
       showNetworkErrorNotification(error)
     },
     []
@@ -211,11 +211,11 @@ export function useNetworkErrorHandler() {
     showTimeoutNotification()
   }, [])
 
-  const isOffline = useCallback((error: AxiosError | Error | unknown): boolean => {
+  const isOffline = useCallback((error: ApiErrorResponse | Error | unknown): boolean => {
     return isNetworkError(error)
   }, [])
 
-  const isTimeout = useCallback((error: AxiosError | Error | unknown): boolean => {
+  const isTimeout = useCallback((error: ApiErrorResponse | Error | unknown): boolean => {
     return isTimeoutError(error)
   }, [])
 
@@ -250,7 +250,7 @@ export function useFormErrorHandler() {
   const { handleError } = useErrorHandler()
 
   const handleFormValidationError = useCallback(
-    (error: AxiosError | Error | unknown) => {
+    (error: ApiErrorResponse | Error | unknown) => {
       const validationErrors = extractValidationErrors(error)
 
       if (validationErrors.length > 0) {
@@ -265,7 +265,7 @@ export function useFormErrorHandler() {
   )
 
   const handleFormSubmitError = useCallback(
-    (error: AxiosError | Error | unknown) => {
+    (error: ApiErrorResponse | Error | unknown) => {
       const validationErrors = extractValidationErrors(error)
 
       if (validationErrors.length > 0) {

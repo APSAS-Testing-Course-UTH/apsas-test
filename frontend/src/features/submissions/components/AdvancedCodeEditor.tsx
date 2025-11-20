@@ -20,8 +20,8 @@ import {
   IconKeyboard,
   IconZoomIn,
   IconZoomOut,
-  IconChevronDown,
-  IconChevronUp,
+  // IconChevronDown,
+  // IconChevronUp,
 } from '@tabler/icons-react';
 import styles from './AdvancedCodeEditor.module.css';
 
@@ -108,27 +108,61 @@ export function AdvancedCodeEditor({
   minHeight = '500px',
 }: AdvancedCodeEditorProps) {
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+  const monacoRef = useRef<any>(null);
   const [currentTheme, setCurrentTheme] = useState<string>(theme);
   const [zoom, setZoom] = useState(100);
   const [validationErrors, setValidationErrors] = useState<CodeValidationError[]>([]);
-  const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
+  const [isShortcutsOpen, _setIsShortcutsOpen] = useState(false);
   const [lineCount, setLineCount] = useState(value.split('\n').length);
   const [selectedText, setSelectedText] = useState('');
 
-  const handleEditorMount = useCallback((editorInstance: editor.IStandaloneCodeEditor) => {
+  useEffect(() => {
+    setCurrentTheme(theme);
+  }, [theme]);
+
+  useEffect(() => {
+    if (editorRef.current) {
+      editorRef.current.updateOptions({ readOnly: isReadOnly });
+      
+      // CRITICAL FIX: Force update IME textarea readonly state
+      // Monaco Editor doesn't properly update the IME textarea when readonly changes
+      // This is a known issue: https://github.com/microsoft/monaco-editor/issues/2947
+      setTimeout(() => {
+        const imeTextarea = document.querySelector('.ime-text-area') as HTMLTextAreaElement;
+        if (imeTextarea) {
+          imeTextarea.readOnly = isReadOnly;
+        }
+      }, 50);
+    }
+  }, [isReadOnly]);
+
+  const handleEditorMount = useCallback((editorInstance: editor.IStandaloneCodeEditor, monacoInstance: any) => {
     editorRef.current = editorInstance;
+    monacoRef.current = monacoInstance;
 
     editorInstance.updateOptions({
       fontFamily: '"Fira Code", "Monaco", "Courier New", monospace',
       fontLigatures: true,
+      readOnly: isReadOnly, // Ensure readonly is set correctly on mount
     });
+
+    // CRITICAL FIX: Force update IME textarea readonly state on mount
+    // Monaco Editor has a bug where the IME textarea doesn't sync with editor options
+    // Reference: https://github.com/microsoft/monaco-editor/issues/2947
+    setTimeout(() => {
+      const imeTextarea = document.querySelector('.ime-text-area') as HTMLTextAreaElement;
+      if (imeTextarea) {
+        imeTextarea.readOnly = isReadOnly;
+      }
+    }, 100);
 
     editorInstance.onDidChangeCursorSelection(() => {
       const selection = editorInstance.getSelection();
       if (selection && !selection.isEmpty()) {
+        const currentValue = editorInstance.getValue();
         const startOffset = editorInstance.getModel()?.getOffsetAt(selection.getStartPosition()) || 0;
         const endOffset = editorInstance.getModel()?.getOffsetAt(selection.getEndPosition()) || 0;
-        const text = value.substring(startOffset, endOffset);
+        const text = currentValue.substring(startOffset, endOffset);
         setSelectedText(text);
       } else {
         setSelectedText('');
@@ -139,7 +173,7 @@ export function AdvancedCodeEditor({
       const newLineCount = editorInstance.getModel()?.getLineCount() || 1;
       setLineCount(newLineCount);
     });
-  }, [value]);
+  }, [isReadOnly]);
 
   const handleFormat = useCallback(() => {
     if (editorRef.current) {
@@ -190,8 +224,7 @@ export function AdvancedCodeEditor({
     const newZoom = Math.min(zoom + 10, 200);
     setZoom(newZoom);
     if (editorRef.current) {
-      // Monaco uses fontZoom action
-      (editorRef.current as any).setOption?.('fontSize', 14 + (newZoom - 100) / 10);
+      editorRef.current.updateOptions({ fontSize: 14 + (newZoom - 100) / 10 });
     }
     onZoomChange?.(newZoom);
   }, [zoom, onZoomChange]);
@@ -200,8 +233,7 @@ export function AdvancedCodeEditor({
     const newZoom = Math.max(zoom - 10, 50);
     setZoom(newZoom);
     if (editorRef.current) {
-      // Monaco uses fontZoom action
-      (editorRef.current as any).setOption?.('fontSize', 14 + (newZoom - 100) / 10);
+      editorRef.current.updateOptions({ fontSize: 14 + (newZoom - 100) / 10 });
     }
     onZoomChange?.(newZoom);
   }, [zoom, onZoomChange]);
@@ -256,7 +288,7 @@ export function AdvancedCodeEditor({
   }, [value, validateCode]);
 
   useEffect(() => {
-    if (editorRef.current && validationErrors.length > 0) {
+    if (editorRef.current && monacoRef.current && validationErrors.length > 0) {
       const markers = validationErrors.map((error) => ({
         startLineNumber: error.line,
         startColumn: error.column,
@@ -273,7 +305,7 @@ export function AdvancedCodeEditor({
 
       const model = editorRef.current.getModel();
       if (model) {
-        (window as any).monaco?.editor.setModelMarkers(model, 'validation', markers);
+        monacoRef.current.editor.setModelMarkers(model, 'validation', markers);
       }
     }
   }, [validationErrors]);
@@ -415,16 +447,16 @@ export function AdvancedCodeEditor({
             </Button>
           </Tooltip>
 
-          {showKeyboardShortcuts && (
+          {/* {showKeyboardShortcuts && (
             <Button
               variant="subtle"
               size="xs"
-              onClick={() => setIsShortcutsOpen(!isShortcutsOpen)}
+              onClick={() => _setIsShortcutsOpen(!isShortcutsOpen)}
               rightSection={isShortcutsOpen ? <IconChevronUp size={14} /> : <IconChevronDown size={14} />}
             >
               Phím tắt
             </Button>
-          )}
+          )} */}
         </Group>
       </div>
 

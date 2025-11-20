@@ -147,13 +147,3 @@ export const PLACEHOLDERS = {
   ENTER_MESSAGE: 'Nhập tin nhắn của bạn...',
   ENTER_CODE: 'Nhập mã...',
 } as const;
-
-export default {
-  STATUS_LABELS,
-  STATUS_COLORS,
-  BUTTON_LABELS,
-  FORM_LABELS,
-  ERROR_MESSAGES,
-  SUCCESS_MESSAGES,
-  PLACEHOLDERS,
-};

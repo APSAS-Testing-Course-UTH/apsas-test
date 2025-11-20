@@ -79,5 +79,3 @@ export function SkeletonLoader({
 
   return containerContent;
 }
-
-export default SkeletonLoader;

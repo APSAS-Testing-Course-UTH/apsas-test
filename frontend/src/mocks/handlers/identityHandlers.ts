@@ -487,10 +487,11 @@ const getCurrentUserHandler = http.get('**/api/v1/users/me',
 )
 
 /**
- * PUT /api/v1/users/me
+ * PATCH /api/v1/users/me
  * Update current user profile (Authenticated users only)
+ * ✅ MATCHES Backend OpenAPI spec (identity-service.json line 269)
  */
-const updateCurrentUserHandler = http.put('**/api/v1/users/me',
+const updateCurrentUserHandler = http.patch('**/api/v1/users/me',
   withAuth(async ({ request, user }: { request: Request, user: MockUser }) => {
     try {
       // Parse request body
@@ -603,7 +604,7 @@ export const changePasswordHandler = http.post('**/api/v1/users/me/change-passwo
  * GET /api/v1/users
  * Get all users with pagination (Admin only)
  */
-const getUsersHandler = http.post('**/api/v1/users',
+const getUsersHandler = http.get('**/api/v1/users',
   withAuth(({ request, user }: { request: Request, user: MockUser }) => {
     try {
       // Check if user is admin
@@ -704,17 +705,14 @@ const createUserHandler = http.post('**/api/v1/users',
 
 /**
  * GET /api/v1/users/{userId}
- * Get user by ID (Admin only)
+ * Get user by ID (Admin and Instructor can access)
+ * - Admin: Can access any user
+ * - Instructor: Can access student data for submissions
  */
 const getUserByIdHandler = http.get<{ userId: string }>(
-  '/api/v1/users/:userId',
+  '**/api/v1/users/:userId',
   withAuth(({ params, user: authUser }: { params: { userId: string }, user: MockUser }) => {
     try {
-      // Check if user is admin
-      if (authUser.role !== UserRole.ADMIN) {
-        return errorResponses.forbidden('Admin access required')
-      }
-
       const { userId } = params
 
       // Find user by ID
@@ -722,6 +720,19 @@ const getUserByIdHandler = http.get<{ userId: string }>(
 
       if (!user) {
         return errorResponses.notFound('User not found')
+      }
+
+      // Authorization check:
+      // - Admins can access any user
+      // - Instructors can access students (for viewing submission details)
+      // - Users can access their own data
+      const isAdmin = authUser.role === UserRole.ADMIN
+      const isInstructor = authUser.role === UserRole.INSTRUCTOR
+      const isStudent = user.role === UserRole.STUDENT
+      const isSelf = authUser.id === userId
+
+      if (!isAdmin && !isSelf && !(isInstructor && isStudent)) {
+        return errorResponses.forbidden('Access denied')
       }
 
       // Map role to API format and convert dates
@@ -744,7 +755,7 @@ const getUserByIdHandler = http.get<{ userId: string }>(
  * Delete user (Admin only)
  */
 const deleteUserHandler = http.delete<{ userId: string }>(
-  '/api/v1/users/:userId',
+  '**/api/v1/users/:userId',
   withAuth(({ params, user: authUser }: { params: { userId: string }, user: MockUser }) => {
     try {
       // Check if user is admin
@@ -775,11 +786,12 @@ const deleteUserHandler = http.delete<{ userId: string }>(
 )
 
 /**
- * PUT /api/v1/users/{userId}/activate
+ * POST /api/v1/users/{userId}/activate
  * Activate user (Admin only)
+ * ✅ MATCHES Backend OpenAPI spec (identity-service.json line 93)
  */
-const activateUserHandler = http.put<{ userId: string }>(
-  '/api/v1/users/:userId/activate',
+const activateUserHandler = http.post<{ userId: string }>(
+  '**/api/v1/users/:userId/activate',
   withAuth(({ params, user: authUser }: { params: { userId: string }, user: MockUser }) => {
     try {
       // Check if user is admin
@@ -813,11 +825,12 @@ const activateUserHandler = http.put<{ userId: string }>(
 )
 
 /**
- * PUT /api/v1/users/{userId}/deactivate
+ * POST /api/v1/users/{userId}/deactivate
  * Deactivate user (Admin only)
+ * ✅ MATCHES Backend OpenAPI spec (identity-service.json line 73)
  */
-const deactivateUserHandler = http.put<{ userId: string }>(
-  '/api/v1/users/:userId/deactivate',
+const deactivateUserHandler = http.post<{ userId: string }>(
+  '**/api/v1/users/:userId/deactivate',
   withAuth(({ params, user: authUser }: { params: { userId: string }, user: MockUser }) => {
     try {
       // Check if user is admin

@@ -9,7 +9,7 @@
  * - SupportMessage: Individual chat messages with metadata
  */
 
-import type { SupportServiceSupportSessionDto } from '@/api/types.gen'
+import type { SupportServiceSupportSessionResponse } from '@/api/types.gen'
 
 // Mock UUIDs for sessions
 const SESSION_ID_001 = '550e8400-e29b-41d4-a716-446655440001'
@@ -25,7 +25,7 @@ const USER_ID_INSTRUCTOR = 'instructor-001'
 /**
  * Mock Support Sessions with embedded messages
  */
-export const mockSupportSessions: Record<string, SupportServiceSupportSessionDto> = {
+export const mockSupportSessions: Record<string, SupportServiceSupportSessionResponse> = {
   [SESSION_ID_001]: {
     id: SESSION_ID_001,
     studentId: USER_ID_STUDENT,
@@ -37,7 +37,7 @@ export const mockSupportSessions: Record<string, SupportServiceSupportSessionDto
       {
         id: '550e8400-e29b-41d4-a716-446655440011',
         senderId: USER_ID_STUDENT,
-        content: 'I need help with the JavaScript assignment. I\'m stuck on the array methods.',
+        content: 'Em cần giúp đỡ về bài tập JavaScript. Em đang bị kẹt ở phần các phương thức mảng.',
         isInstructor: false,
         isRead: true,
         createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
@@ -45,7 +45,7 @@ export const mockSupportSessions: Record<string, SupportServiceSupportSessionDto
       {
         id: '550e8400-e29b-41d4-a716-446655440012',
         senderId: USER_ID_INSTRUCTOR,
-        content: 'Sure, I can help you with that. Which specific array method are you having trouble with?',
+        content: 'Được rồi, thầy có thể giúp em. Em đang gặp khó khăn với phương thức mảng cụ thể nào?',
         isInstructor: true,
         isRead: true,
         createdAt: new Date(Date.now() - 1.5 * 60 * 60 * 1000),
@@ -53,7 +53,7 @@ export const mockSupportSessions: Record<string, SupportServiceSupportSessionDto
       {
         id: '550e8400-e29b-41d4-a716-446655440013',
         senderId: USER_ID_STUDENT,
-        content: 'I\'m confused about map() and filter(). Can you explain the difference?',
+        content: 'Em đang bị nhầm lẫn giữa map() và filter(). Thầy có thể giải thích sự khác biệt được không ạ?',
         isInstructor: false,
         isRead: false,
         createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000),
@@ -71,7 +71,7 @@ export const mockSupportSessions: Record<string, SupportServiceSupportSessionDto
       {
         id: '550e8400-e29b-41d4-a716-446655440014',
         senderId: USER_ID_STUDENT,
-        content: 'Hello, I have a question about Python list comprehensions.',
+        content: 'Chào thầy, em có câu hỏi về list comprehensions trong Python ạ.',
         isInstructor: false,
         isRead: true,
         createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000),
@@ -79,7 +79,7 @@ export const mockSupportSessions: Record<string, SupportServiceSupportSessionDto
       {
         id: '550e8400-e29b-41d4-a716-446655440015',
         senderId: USER_ID_INSTRUCTOR,
-        content: 'Hi! List comprehensions are a concise way to create lists. What specifically would you like to know?',
+        content: 'Chào em! List comprehensions là cách ngắn gọn để tạo danh sách. Em muốn biết cụ thể về điều gì?',
         isInstructor: true,
         isRead: true,
         createdAt: new Date(Date.now() - 23.5 * 60 * 60 * 1000),
@@ -87,7 +87,7 @@ export const mockSupportSessions: Record<string, SupportServiceSupportSessionDto
       {
         id: '550e8400-e29b-41d4-a716-446655440016',
         senderId: USER_ID_STUDENT,
-        content: 'Thanks for the explanation! I think I understand now.',
+        content: 'Cảm ơn thầy đã giải thích! Em nghĩ em hiểu rồi ạ.',
         isInstructor: false,
         isRead: true,
         createdAt: new Date(Date.now() - 20 * 60 * 60 * 1000),
@@ -105,7 +105,7 @@ export const mockSupportSessions: Record<string, SupportServiceSupportSessionDto
       {
         id: '46630bc6-e29b-41d4-a716-446655440021',
         senderId: USER_ID_STUDENT,
-        content: 'Hi! I need help with my Python assignment. The sorting algorithm isn\'t working correctly.',
+        content: 'Chào thầy! Em cần giúp đỡ về bài tập Python. Thuật toán sắp xếp của em chạy không đúng.',
         isInstructor: false,
         isRead: true,
         createdAt: new Date(Date.now() - 30 * 60 * 1000),
@@ -113,7 +113,7 @@ export const mockSupportSessions: Record<string, SupportServiceSupportSessionDto
       {
         id: '46630bc6-e29b-41d4-a716-446655440022',
         senderId: USER_ID_INSTRUCTOR,
-        content: 'Hello! I\'d be happy to help. Can you describe what the issue is? What output are you getting?',
+        content: 'Chào em! Thầy rất sẵn lòng giúp. Em có thể mô tả vấn đề là gì không? Kết quả đầu ra em nhận được là gì?',
         isInstructor: true,
         isRead: true,
         createdAt: new Date(Date.now() - 25 * 60 * 1000),
@@ -121,7 +121,7 @@ export const mockSupportSessions: Record<string, SupportServiceSupportSessionDto
       {
         id: '46630bc6-e29b-41d4-a716-446655440023',
         senderId: USER_ID_STUDENT,
-        content: 'The array seems to sort partially but not completely. For example, [5, 2, 8, 1, 9] becomes [2, 5, 1, 8, 9].',
+        content: 'Mảng có vẻ chỉ được sắp xếp một phần chứ không hoàn toàn. Ví dụ, [5, 2, 8, 1, 9] lại thành [2, 5, 1, 8, 9].',
         isInstructor: false,
         isRead: true,
         createdAt: new Date(Date.now() - 20 * 60 * 1000),
@@ -129,7 +129,7 @@ export const mockSupportSessions: Record<string, SupportServiceSupportSessionDto
       {
         id: '46630bc6-e29b-41d4-a716-446655440024',
         senderId: USER_ID_INSTRUCTOR,
-        content: 'I see the issue. It looks like your comparison logic might be inverted. Are you using < or > in your comparison?',
+        content: 'Thầy thấy vấn đề rồi. Có vẻ như logic so sánh của em bị ngược. Em đang dùng < hay > trong phép so sánh vậy?',
         isInstructor: true,
         isRead: false,
         createdAt: new Date(Date.now() - 15 * 60 * 1000),
@@ -137,7 +137,7 @@ export const mockSupportSessions: Record<string, SupportServiceSupportSessionDto
       {
         id: '46630bc6-e29b-41d4-a716-446655440025',
         senderId: USER_ID_STUDENT,
-        content: 'I\'m using > for ascending order. Should I use < instead?',
+        content: 'Em đang dùng > cho thứ tự tăng dần. Em có nên dùng < thay thế không ạ?',
         isInstructor: false,
         isRead: false,
         createdAt: new Date(Date.now() - 10 * 60 * 1000),
@@ -145,7 +145,7 @@ export const mockSupportSessions: Record<string, SupportServiceSupportSessionDto
       {
         id: '46630bc6-e29b-41d4-a716-446655440026',
         senderId: USER_ID_INSTRUCTOR,
-        content: 'Yes, exactly! For ascending order, you need to use < so that smaller values move to the left. Try changing it and let me know if that fixes it.',
+        content: 'Đúng rồi! Để sắp xếp tăng dần, em cần dùng < để các giá trị nhỏ hơn chuyển về bên trái. Hãy thử thay đổi và cho thầy biết nếu nó sửa được lỗi nhé.',
         isInstructor: true,
         isRead: false,
         createdAt: new Date(Date.now() - 5 * 60 * 1000),
@@ -163,7 +163,7 @@ export const mockSupportSessions: Record<string, SupportServiceSupportSessionDto
       {
         id: '7a4f9e2b-e29b-41d4-a716-446655440031',
         senderId: USER_ID_STUDENT,
-        content: 'I\'m having trouble understanding recursion in JavaScript. Can someone help explain how the call stack works?',
+        content: 'Em đang gặp khó khăn trong việc hiểu đệ quy trong JavaScript. Có ai có thể giải thích giúp em cách call stack hoạt động không ạ?',
         isInstructor: false,
         isRead: false,
         createdAt: new Date(Date.now() - 10 * 60 * 1000),
@@ -181,7 +181,7 @@ export const mockSupportSessions: Record<string, SupportServiceSupportSessionDto
       {
         id: 'c5d4e3f2-e29b-41d4-a716-446655440041',
         senderId: USER_ID_STUDENT,
-        content: 'Can you explain the difference between let, const, and var in JavaScript?',
+        content: 'Thầy có thể giải thích sự khác biệt giữa let, const và var trong JavaScript được không ạ?',
         isInstructor: false,
         isRead: true,
         createdAt: new Date(Date.now() - 45 * 60 * 1000),
@@ -189,7 +189,7 @@ export const mockSupportSessions: Record<string, SupportServiceSupportSessionDto
       {
         id: 'c5d4e3f2-e29b-41d4-a716-446655440042',
         senderId: USER_ID_INSTRUCTOR,
-        content: 'Sure! var is function-scoped and can be re-declared. let is block-scoped and can be reassigned. const is block-scoped but cannot be reassigned.',
+        content: 'Được chứ! var có phạm vi function và có thể khai báo lại. let có phạm vi block và có thể gán lại. const có phạm vi block nhưng không thể gán lại.',
         isInstructor: true,
         isRead: true,
         createdAt: new Date(Date.now() - 40 * 60 * 1000),
@@ -197,7 +197,7 @@ export const mockSupportSessions: Record<string, SupportServiceSupportSessionDto
       {
         id: 'c5d4e3f2-e29b-41d4-a716-446655440043',
         senderId: USER_ID_STUDENT,
-        content: 'That makes sense! But what happens if I try to reassign a const object\'s property?',
+        content: 'Điều đó hợp lý ạ! Nhưng chuyện gì sẽ xảy ra nếu em cố gắng gán lại thuộc tính của một object được khai báo bằng const?',
         isInstructor: false,
         isRead: false,
         createdAt: new Date(Date.now() - 2 * 60 * 1000), // Recent - 2 mins ago
@@ -209,7 +209,7 @@ export const mockSupportSessions: Record<string, SupportServiceSupportSessionDto
 /**
  * Helper: Get all support sessions
  */
-export function getAllSupportSessions(): SupportServiceSupportSessionDto[] {
+export function getAllSupportSessions(): SupportServiceSupportSessionResponse[] {
   return Object.values(mockSupportSessions)
 }
 
@@ -218,14 +218,14 @@ export function getAllSupportSessions(): SupportServiceSupportSessionDto[] {
  */
 export function getSupportSessionById(
   id: string
-): SupportServiceSupportSessionDto | undefined {
+): SupportServiceSupportSessionResponse | undefined {
   return mockSupportSessions[id]
 }
 
 /**
  * Helper: Get open support sessions (not closed)
  */
-export function getOpenSupportSessions(): SupportServiceSupportSessionDto[] {
+export function getOpenSupportSessions(): SupportServiceSupportSessionResponse[] {
   return getAllSupportSessions().filter(session => !session.isClosed)
 }
 
@@ -234,7 +234,7 @@ export function getOpenSupportSessions(): SupportServiceSupportSessionDto[] {
  */
 export function getStudentSupportSessions(
   studentId: string
-): SupportServiceSupportSessionDto[] {
+): SupportServiceSupportSessionResponse[] {
   return getAllSupportSessions().filter(session => session.studentId === studentId)
 }
 
