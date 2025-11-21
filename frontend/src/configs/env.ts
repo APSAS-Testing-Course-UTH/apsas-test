@@ -28,6 +28,9 @@ const envSchema = z.object({
   // WebSocket Configuration (required when VITE_ENABLE_WEBSOCKET=true)
   VITE_WEBSOCKET_URL: z.string().url('WEBSOCKET_URL phải là URL hợp lệ').optional(),
 
+  // Admin Portal Configuration
+  VITE_ADMIN_PORTAL_URL: z.string().url('ADMIN_PORTAL_URL phải là URL hợp lệ').min(1, 'ADMIN_PORTAL_URL không được rỗng'),
+
   // Security
   VITE_CSP_ENABLED: z.string().transform(val => val === 'true'),
 

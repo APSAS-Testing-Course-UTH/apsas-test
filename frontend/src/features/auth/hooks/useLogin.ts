@@ -1,12 +1,13 @@
-import { useMutation } from '@tanstack/react-query'
-import { useNavigate } from '@tanstack/react-router'
+import { useMutation } from "@tanstack/react-query"
+import { useNavigate } from "@tanstack/react-router"
 
-import { authService } from '../api'
-import { useAuthStore } from '../stores/useAuthStore'
-import { mapApiError } from '@/configs/api-error-handler'
-import { showSuccessNotification, showErrorNotification } from '@/utils/notifications'
-import { ROLE_REDIRECTS } from '@/constants/roles'
-import type { UserRole } from '@/types/auth.types'
+import { authService } from "../api"
+import { useAuthStore } from "../stores/useAuthStore"
+import { mapApiError } from "@/configs/api-error-handler"
+import { showSuccessNotification, showErrorNotification } from "@/utils/notifications"
+import { ROLE_REDIRECTS, USER_ROLES } from "@/constants/roles"
+import { env } from "@/configs/env"
+import type { UserRole } from "@/types/auth.types"
 
 /**
  * Cấu hình options cho useLogin hook
@@ -19,10 +20,10 @@ interface UseLoginOptions {
 
 /**
  * Hook để handle login logic với role-based redirect
- * 
+ *
  * Xác thực người dùng qua email/password, lưu token và user data vào auth store
  * Tự động redirect dựa trên role của user hoặc redirectTo parameter
- * 
+ *
  * Role-based redirect mapping:
  * - STUDENT → /student/dashboard
  * - INSTRUCTOR → /instructor/dashboard
@@ -43,11 +44,11 @@ interface UseLoginOptions {
  *
  * @example
  * const { mutate: login, isPending, isError, error } = useLogin()
- * 
+ *
  * const handleLogin = (email: string, password: string) => {
  *   login({ email, password })
  * }
- * 
+ *
  * // Với redirectTo custom
  * const { mutate: login } = useLogin({ redirectTo: '/assignments' })
  */
@@ -62,7 +63,7 @@ export const useLogin = ({ redirectTo }: UseLoginOptions = {}) => {
     onSuccess: (data) => {
       // Validate response data
       if (!data.user) {
-        throw new Error('Invalid login response: missing user data')
+        throw new Error("Invalid login response: missing user data")
       }
 
       // Transform response to match AuthResponse type
@@ -70,28 +71,43 @@ export const useLogin = ({ redirectTo }: UseLoginOptions = {}) => {
         ...data,
         user: {
           ...data.user,
-          fullName: `${data.user.firstName || ''} ${data.user.lastName || ''}`.trim(),
-          displayName: data.user.firstName || data.user.email || 'Unknown User',
-        }
+          fullName: `${data.user.firstName || ""} ${data.user.lastName || ""}`.trim(),
+          displayName: data.user.firstName || data.user.email || "Unknown User",
+        },
       }
 
       // Lưu auth data vào store
       loginStore(authResponse)
 
       // Hiển thị success notification
-      showSuccessNotification('Chào mừng bạn quay trở lại!', 'Đăng nhập thành công')
+      showSuccessNotification("Chào mừng bạn quay trở lại!", "Đăng nhập thành công")
 
       // Xác định redirect URL dựa trên role
       // Priority: redirectTo (if valid) > role-based redirect > home
-      let finalRedirectUrl = '/'
-      
+      let finalRedirectUrl = "/"
+
       if (data.user.role) {
         const userRole = data.user.role as UserRole
-        finalRedirectUrl = ROLE_REDIRECTS[userRole] || '/'
+
+        // ✅ ADMIN ROLE: Redirect to Admin Portal with token
+        if (userRole === USER_ROLES.ADMIN) {
+          // Redirect with token in URL query parameter
+          // Admin portal will validate JWT token and create session
+          const adminPortalUrl = new URL(`${env.VITE_ADMIN_PORTAL_URL}/login-token`)
+          adminPortalUrl.searchParams.set("token", data.token || "")
+
+          // Perform immediate redirect
+          window.location.href = adminPortalUrl.toString()
+
+          // Note: Navigation stops here, browser will follow redirect
+          return
+        }
+
+        finalRedirectUrl = ROLE_REDIRECTS[userRole] || "/"
       }
 
       // Nếu có redirectTo query param, sử dụng nó
-      if (redirectTo && !redirectTo.includes('/login') && !redirectTo.includes('/register')) {
+      if (redirectTo && !redirectTo.includes("/login") && !redirectTo.includes("/register")) {
         finalRedirectUrl = redirectTo
       }
 
@@ -107,7 +123,7 @@ export const useLogin = ({ redirectTo }: UseLoginOptions = {}) => {
       // Map error và hiển thị notification
       const mappedError = mapApiError(error)
 
-      showErrorNotification(mappedError.message, 'Đăng nhập thất bại')
+      showErrorNotification(mappedError.message, "Đăng nhập thất bại")
     },
   })
 }

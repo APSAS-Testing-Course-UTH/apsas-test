@@ -65,6 +65,9 @@ public class SecurityConfig {
             .requestMatchers(PathPatternRequestMatcher.withDefaults()
                 .matcher(this.adminServer.path("/login")))
             .permitAll()
+            .requestMatchers(PathPatternRequestMatcher.withDefaults()
+                .matcher("/login-token"))
+            .permitAll()
             .dispatcherTypeMatchers(DispatcherType.ASYNC)
             .permitAll() // https://github.com/spring-projects/spring-security/issues/11027
             .anyRequest()
