@@ -1,38 +1,68 @@
 ---
-name: Bug report
-about: Create a report to help us improve
-title: ''
-labels: ''
-assignees: ''
+name: 🐞 Bug Report
+description: Báo cáo một lỗi phần mềm
+title: "[Bug] <title> "
+labels: [ "bug" ]
+assignees: [ ]
+body:
+  - type: input
+    id: summary
+    attributes:
+      label: Mô tả lỗi
+      description: Cung cấp bối cảnh về tình huống phát sinh lỗi.
+    validations:
+      required: true
 
+  - type: textarea
+    id: steps
+    attributes:
+      label: Các bước tái tạo
+      description: Liệt kê từng bước chính xác để người khác có thể lặp lại lỗi này.
+      placeholder: |
+        1. Nhập abc
+        2. Chạy xyz
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Kết quả mong đợi
+      description: Chức năng đáng lẽ phải hoạt động như thế nào ở bước cuối cùng?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Kết quả thực tế
+      description: Chức năng thực tế đang hoạt động ra sao (crash, bug, hiển thị sai...)?
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Môi trường Test
+      description: Ghi rõ thiết bị, hệ điều hành và trình duyệt hoặc phiên bản app đang test.
+      placeholder: VD. Windows 11, GitHub Actions,..
+    validations:
+      required: true
+
+  - type: upload
+    id: screenshots-or-video
+    attributes:
+      label: Ảnh chụp màn hình
+      description: Kéo thả hình ảnh hoặc dán link video quay màn hình thể hiện lỗi vào đây (rất quan trọng với lỗi UI).
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Log lỗi
+      description: Copy và paste crash log hoặc console log nếu có. Nội dung sẽ tự động được format thành dạng code.
+      render: shell
+    validations:
+      required: false
 ---
-
-**Describe the bug**
-A clear and concise description of what the bug is.
-
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
-
-**Expected behavior**
-A clear and concise description of what you expected to happen.
-
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
-
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
-
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
-
-**Additional context**
-Add any other context about the problem here.
