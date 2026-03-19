@@ -27,6 +27,8 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @RequiredArgsConstructor
 public class WebSocketAuthInterceptor implements ChannelInterceptor {
+  private static final String AUTHENTICATION_SESSION_KEY = "authentication";
+
   private final WebSocketAuthenticationService authenticationService;
 
   @Override
@@ -98,8 +100,8 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
 
     // Fallback: retrieve from session attributes
     var sessionAttributes = accessor.getSessionAttributes();
-    if (sessionAttributes != null && sessionAttributes.containsKey("authentication")) {
-      var auth = sessionAttributes.get("authentication");
+    if (sessionAttributes != null && sessionAttributes.containsKey(AUTHENTICATION_SESSION_KEY)) {
+      var auth = sessionAttributes.get(AUTHENTICATION_SESSION_KEY);
       if (auth instanceof HeaderAuthenticationToken token) {
         // Set user on accessor so Principal parameter works in @MessageMapping methods
         accessor.setUser(token);
@@ -126,7 +128,7 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
       StompHeaderAccessor accessor, HeaderAuthenticationToken authentication) {
     var sessionAttributes = accessor.getSessionAttributes();
     if (sessionAttributes != null) {
-      sessionAttributes.put("authentication", authentication);
+      sessionAttributes.put(AUTHENTICATION_SESSION_KEY, authentication);
     }
   }
 

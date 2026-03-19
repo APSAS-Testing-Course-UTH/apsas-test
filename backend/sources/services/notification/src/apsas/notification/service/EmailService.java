@@ -17,6 +17,8 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 @RequiredArgsConstructor
 @Slf4j
 public class EmailService {
+  private static final String KEY_FIRST_NAME = "firstName";
+
   private final JavaMailSender mailSender;
   private final SpringTemplateEngine templateEngine;
 
@@ -51,10 +53,10 @@ public class EmailService {
       mailSender.send(message);
     } catch (MessagingException e) {
       log.error("Failed to send email to {} with subject: {}", to, subject, e);
-      throw new RuntimeException("Failed to send email", e);
+      throw new EmailDeliveryException("Failed to send email", e);
     } catch (Exception e) {
       log.error("Unexpected error while sending email to {}", to, e);
-      throw new RuntimeException("Unexpected error while sending email", e);
+      throw new EmailDeliveryException("Unexpected error while sending email", e);
     }
   }
 
@@ -64,7 +66,7 @@ public class EmailService {
 
     Map<String, Object> variables =
         Map.of(
-            "firstName", firstName,
+        KEY_FIRST_NAME, firstName,
             "lastName", lastName,
             "verificationUrl", verificationUrl
         );
@@ -75,7 +77,7 @@ public class EmailService {
   public void sendPasswordResetEmail(String to, String firstName, String resetToken) {
     String resetUrl = resetPasswordUrlTemplate.replace("%token%", resetToken);
 
-    Map<String, Object> variables = Map.of("firstName", firstName, "resetUrl", resetUrl);
+    Map<String, Object> variables = Map.of(KEY_FIRST_NAME, firstName, "resetUrl", resetUrl);
 
     sendEmail(to, "Đặt Lại Mật Khẩu - APSAS", "email/password-reset-email", variables);
   }
@@ -90,7 +92,7 @@ public class EmailService {
   ) {
     Map<String, Object> variables =
         Map.of(
-            "firstName", firstName,
+        KEY_FIRST_NAME, firstName,
             "assignmentTitle", assignmentTitle,
             "description", description,
             "deadline", deadline,
@@ -105,6 +107,7 @@ public class EmailService {
     );
   }
 
+  @SuppressWarnings("java:S107")
   public void sendSubmissionEvaluatedEmail(
       String to,
       String firstName,
@@ -119,7 +122,7 @@ public class EmailService {
   ) {
     Map<String, Object> variables =
         Map.of(
-            "firstName", firstName,
+        KEY_FIRST_NAME, firstName,
             "assignmentTitle", assignmentTitle,
             "score", score,
             "passed", passed,
