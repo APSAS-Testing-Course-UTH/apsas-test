@@ -1,0 +1,66 @@
+name: 🐞 Bug Report
+description: Báo cáo một lỗi phần mềm
+title: "[Bug] <title> "
+labels: [ "bug" ]
+assignees: [ ]
+body:
+  - type: input
+    id: summary
+    attributes:
+      label: Mô tả lỗi
+      description: Cung cấp bối cảnh về tình huống phát sinh lỗi.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Các bước tái tạo
+      description: Liệt kê từng bước chính xác để người khác có thể lặp lại lỗi này.
+      placeholder: |
+        1. Nhập abc
+        2. Chạy xyz
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Kết quả mong đợi
+      description: Chức năng đáng lẽ phải hoạt động như thế nào ở bước cuối cùng?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Kết quả thực tế
+      description: Chức năng thực tế đang hoạt động ra sao (crash, bug, hiển thị sai...)?
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Môi trường Test
+      description: Ghi rõ thiết bị, hệ điều hành và trình duyệt hoặc phiên bản app đang test.
+      placeholder: VD. Windows 11, GitHub Actions,..
+    validations:
+      required: true
+
+  - type: upload
+    id: screenshots-or-video
+    attributes:
+      label: Ảnh chụp màn hình
+      description: Kéo thả hình ảnh hoặc dán link video quay màn hình thể hiện lỗi vào đây (rất quan trọng với lỗi UI).
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Log lỗi
+      description: Copy và paste crash log hoặc console log nếu có. Nội dung sẽ tự động được format thành dạng code.
+      render: shell
+    validations:
+      required: false
