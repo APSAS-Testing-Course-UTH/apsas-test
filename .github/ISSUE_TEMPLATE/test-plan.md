@@ -1,6 +1,6 @@
 ---
 name: 📋 Danh sách Thiết kế Test Case
-description: Tạo một danh sách nhiều test case cho một tính năng hoặc service cụ thể.
+about: Tạo một danh sách nhiều test case cho một tính năng hoặc service cụ thể.
 title: "[Test Plan] <Service>: <Tóm tắt chức năng>"
 labels: [ "test-plan" ]
 assignees: [ ]
