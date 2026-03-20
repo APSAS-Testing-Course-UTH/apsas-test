@@ -89,8 +89,8 @@
       <option name="INDENT_NAMESPACE_MEMBERS" value="0" />
       <option name="INDENT_C_STRUCT_MEMBERS" value="2" />
       <option name="INDENT_CLASS_MEMBERS" value="2" />
-      <option name="INDENT_VISIBILITY_KEYWORDS" value="1" />
       <option name="INDENT_INSIDE_CODE_BLOCK" value="2" />
+      <option name="INDENT_VISIBILITY_KEYWORDS" value="1" />
       <option name="KEEP_STRUCTURES_IN_ONE_LINE" value="true" />
       <option name="FUNCTION_PARAMETERS_WRAP" value="5" />
       <option name="FUNCTION_CALL_ARGUMENTS_WRAP" value="5" />
@@ -98,6 +98,21 @@
       <option name="TEMPLATE_CALL_ARGUMENTS_ALIGN_MULTILINE" value="true" />
       <option name="SPACE_BEFORE_SUPERCLASS_COLON" value="false" />
     </Objective-C>
+    <Objective-C-extensions>
+      <file>
+        <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Import" />
+        <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Macro" />
+        <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Typedef" />
+        <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Enum" />
+        <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Constant" />
+        <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Global" />
+        <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Struct" />
+        <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="FunctionPredecl" />
+        <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Function" />
+        <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="ClassPredef" />
+        <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Class" />
+      </file>
+    </Objective-C-extensions>
     <Objective-C-extensions>
       <file>
         <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Import" />

@@ -1,6 +1,7 @@
 plugins {
     java
     id("io.spring.dependency-management")
+    id("org.sonarqube")
 }
 
 java {
@@ -10,6 +11,7 @@ java {
         languageVersion = JavaLanguageVersion.of(21)
     }
 
+    @Suppress("UnstableApiUsage")
     sourceSets {
         main {
             java.setSrcDirs(listOf("src"))
@@ -36,4 +38,13 @@ dependencies {
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
     options.release = 21
+}
+
+sonar {
+    properties {
+        property("sonar.sources", "src")
+        if (projectDir.resolve("test").exists()) {
+            property("sonar.tests", "test")
+        }
+    }
 }
