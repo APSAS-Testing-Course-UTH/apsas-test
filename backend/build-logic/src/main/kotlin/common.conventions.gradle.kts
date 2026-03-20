@@ -1,6 +1,7 @@
 plugins {
     java
     id("io.spring.dependency-management")
+    id("org.sonarqube")
 }
 
 java {
