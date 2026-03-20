@@ -39,3 +39,10 @@ tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
     options.release = 21
 }
+
+sonar {
+    properties {
+        property("sonar.projectKey", findProperty("sonar.projectKey").toString())
+        property("sonar.organization", findProperty("sonar.organization").toString())
+    }
+}
