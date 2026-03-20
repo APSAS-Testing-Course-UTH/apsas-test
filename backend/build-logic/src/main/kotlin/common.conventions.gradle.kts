@@ -44,5 +44,7 @@ sonar {
     properties {
         property("sonar.projectKey", findProperty("sonar.projectKey").toString())
         property("sonar.organization", findProperty("sonar.organization").toString())
+        property("sonar.sources", "src")
+        property("sonar.tests", "test")
     }
 }
