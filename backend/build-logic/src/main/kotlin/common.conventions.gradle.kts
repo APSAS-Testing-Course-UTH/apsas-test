@@ -42,9 +42,9 @@ tasks.withType<JavaCompile> {
 
 sonar {
     properties {
-        property("sonar.projectKey", findProperty("sonar.projectKey").toString())
-        property("sonar.organization", findProperty("sonar.organization").toString())
         property("sonar.sources", "src")
-        property("sonar.tests", "test")
+        if (projectDir.resolve("test").exists()) {
+            property("sonar.tests", "test")
+        }
     }
 }
