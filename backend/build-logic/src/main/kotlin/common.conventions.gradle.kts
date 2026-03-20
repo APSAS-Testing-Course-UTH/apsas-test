@@ -11,6 +11,7 @@ java {
         languageVersion = JavaLanguageVersion.of(21)
     }
 
+    @Suppress("UnstableApiUsage")
     sourceSets {
         main {
             java.setSrcDirs(listOf("src"))
