@@ -61,15 +61,3 @@ jobs:
           args: >
             -Dsonar.qualitygate.wait=true
             -Dsonar.qualitygate.timeout=300
-
-  sonarqube-misconfigured:
-    name: SonarQube Variables Check
-    runs-on: ubuntu-latest
-    if: ${{ secrets.FRONTEND_SONAR_TOKEN == '' }}
-    steps:
-      - name: Missing SonarQube config
-        run: |
-          echo "Thiếu cấu hình SonarQube cho CI."
-          echo "Yêu cầu thiết lập:"
-          echo "- Secret: FRONTEND_SONAR_TOKEN"
-          exit 1
