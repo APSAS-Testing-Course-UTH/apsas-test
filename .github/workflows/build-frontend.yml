@@ -4,8 +4,21 @@ on:
   push:
     branches:
       - main
+      - releases/*
+    paths:
+      - frontend/**
+      - .github/workflows/build-frontend.yml
   pull_request:
-    types: [opened, synchronize, reopened]
+    branches:
+      - main
+      - releases/*
+    types:
+      - opened
+      - synchronize
+      - reopened
+    paths:
+      - frontend/**
+      - .github/workflows/build-frontend.yml
 
 concurrency:
   group: frontend-build-${{ github.ref }}
