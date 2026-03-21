@@ -1,0 +1,95 @@
+### Content Provider 1 - Minh Lê
+POST {{BASE_URL}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "contentprovider1@apsas",
+  "password": "SecurePassword123!"
+}
+
+> {%
+  client.test("Login successful", function () {
+    client.assert(response.status === 200);
+    client.assert(response.body.token !== undefined);
+  });
+  client.global.set("auth_token", response.body.token);
+  client.global.set("user_role", "CONTENT_PROVIDER");
+  client.global.set("user_name", "Minh Lê");
+%}
+
+### Content Provider 2 - Lan Đỗ
+POST {{BASE_URL}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "contentprovider2@apsas",
+  "password": "SecurePassword123!"
+}
+
+> {%
+  client.test("Login successful", function () {
+    client.assert(response.status === 200);
+    client.assert(response.body.token !== undefined);
+  });
+  client.global.set("auth_token", response.body.token);
+  client.global.set("user_role", "CONTENT_PROVIDER");
+  client.global.set("user_name", "Lan Đỗ");
+%}
+
+### Instructor 1 - Tuấn Nguyễn
+POST {{BASE_URL}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "instructor1@apsas",
+  "password": "SecurePassword123!"
+}
+
+> {%
+  client.test("Login successful", function () {
+    client.assert(response.status === 200);
+    client.assert(response.body.token !== undefined);
+  });
+  client.global.set("auth_token", response.body.token);
+  client.global.set("user_role", "INSTRUCTOR");
+  client.global.set("user_name", "Tuấn Nguyễn");
+%}
+
+### Instructor 2 - Hương Vũ
+POST {{BASE_URL}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "instructor2@apsas",
+  "password": "SecurePassword123!"
+}
+
+> {%
+  client.test("Login successful", function () {
+    client.assert(response.status === 200);
+    client.assert(response.body.token !== undefined);
+  });
+  client.global.set("auth_token", response.body.token);
+  client.global.set("user_role", "INSTRUCTOR");
+  client.global.set("user_name", "Hương Vũ");
+%}
+
+### Instructor 3 - Vinh Trần
+POST {{BASE_URL}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "instructor3@apsas",
+  "password": "SecurePassword123!"
+}
+
+> {%
+  client.test("Login successful", function () {
+    client.assert(response.status === 200);
+    client.assert(response.body.token !== undefined);
+  });
+  client.global.set("auth_token", response.body.token);
+  client.global.set("user_role", "INSTRUCTOR");
+  client.global.set("user_name", "Vinh Trần");
+%}
+

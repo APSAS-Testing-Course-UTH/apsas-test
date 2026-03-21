@@ -1,9 +1,12 @@
 package apsas.content.model.entity;
 
+import java.io.Serializable;
 import lombok.Data;
 
 @Data
-public class TestCase {
+public class TestCase implements Serializable {
+  private static final long serialVersionUID = 1L;
+
   private Integer order;
   private String description;
   private Boolean hidden;
