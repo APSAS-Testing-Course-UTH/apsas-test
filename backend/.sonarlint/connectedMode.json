@@ -1,0 +1,5 @@
+{
+    "sonarCloudOrganization": "apsas-test",
+    "projectKey": "apsas-backend",
+    "region": "EU"
+}

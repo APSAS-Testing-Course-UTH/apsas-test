@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+  private static final String USER_NOT_FOUND_MESSAGE = "User not found";
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final UserMapper userMapper;
@@ -39,7 +40,7 @@ public class UserService {
     User user =
         userRepository
             .findById(userId)
-            .orElseThrow(() -> new NotFoundException("User not found"));
+            .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_MESSAGE));
     return userMapper.toUserResponse(user);
   }
 
@@ -76,7 +77,7 @@ public class UserService {
     User user =
         userRepository
             .findById(userId)
-            .orElseThrow(() -> new NotFoundException("User not found"));
+            .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_MESSAGE));
 
     if (request.getFirstName() != null && !request.getFirstName().isEmpty()) {
       user.setFirstName(request.getFirstName());
@@ -96,7 +97,7 @@ public class UserService {
     User user =
         userRepository
             .findById(userId)
-            .orElseThrow(() -> new NotFoundException("User not found"));
+            .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_MESSAGE));
 
     if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPasswordHash())) {
       throw new UnauthorizedException("Current password is incorrect");
@@ -112,7 +113,7 @@ public class UserService {
     User user =
         userRepository
             .findById(userId)
-            .orElseThrow(() -> new NotFoundException("User not found"));
+            .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_MESSAGE));
 
     user.setIsActive(false);
     userRepository.save(user);
@@ -124,7 +125,7 @@ public class UserService {
     User user =
         userRepository
             .findById(userId)
-            .orElseThrow(() -> new NotFoundException("User not found"));
+            .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_MESSAGE));
 
     user.setIsActive(true);
     userRepository.save(user);
@@ -132,14 +133,13 @@ public class UserService {
 
   @Caching(
       evict = {
-          @CacheEvict(value = CacheConfig.USERS_CACHE, key = "#userId"),
-          @CacheEvict(value = CacheConfig.USERS_BY_ROLE_CACHE, allEntries = true)
-      }
-  )
+        @CacheEvict(value = CacheConfig.USERS_CACHE, key = "#userId"),
+        @CacheEvict(value = CacheConfig.USERS_BY_ROLE_CACHE, allEntries = true)
+      })
   @Transactional
   public void deleteUser(UUID userId) {
     if (!userRepository.existsById(userId)) {
-      throw new NotFoundException("User not found");
+      throw new NotFoundException(USER_NOT_FOUND_MESSAGE);
     }
     userRepository.deleteById(userId);
   }
