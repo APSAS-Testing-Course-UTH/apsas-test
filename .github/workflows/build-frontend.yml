@@ -1,0 +1,77 @@
+name: Build Frontend
+
+on:
+  push:
+    branches:
+      - main
+      - releases/*
+    paths:
+      - frontend/**
+      - .github/workflows/build-frontend.yml
+  pull_request:
+    branches:
+      - main
+      - releases/*
+    types:
+      - opened
+      - synchronize
+      - reopened
+    paths:
+      - frontend/**
+      - .github/workflows/build-frontend.yml
+
+concurrency:
+  group: frontend-build-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-sonarqube:
+    name: Build and SonarQube Analysis
+    runs-on: ubuntu-latest
+    if: ${{ secrets.FRONTEND_SONAR_TOKEN != '' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Cache SonarQube packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Type check
+        run: bun run type-check
+
+      - name: Lint
+        run: bun run lint
+
+      - name: Test with coverage
+        run: bun run test:coverage
+
+      - name: Build
+        run: bun run build
+
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v7
+        env:
+          SONAR_TOKEN: ${{ secrets.FRONTEND_SONAR_TOKEN }}
+        with:
+          projectBaseDir: frontend/
+          args: >
+            -Dsonar.qualitygate.wait=true
+            -Dsonar.qualitygate.timeout=300
