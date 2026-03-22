@@ -1,4 +1,4 @@
-package apsas.shared.exception;
+package apsas.shared.security;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;

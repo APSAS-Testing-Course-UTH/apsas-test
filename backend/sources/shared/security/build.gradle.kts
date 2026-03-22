@@ -3,8 +3,6 @@ plugins {
 }
 
 dependencies {
-    api(projects.sources.shared.exception)
-
     compileOnly("org.springframework.boot:spring-boot-starter-web")
     compileOnly("org.springframework.boot:spring-boot-starter-webflux")
 

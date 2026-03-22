@@ -1,6 +1,5 @@
 package apsas.shared.security;
 
-import apsas.shared.exception.UserPrincipalException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
