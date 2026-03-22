@@ -6,7 +6,7 @@ on:
       - releases/*
     paths:
       - backend/**
-      - .github/workflows/backend-build.yml
+      - .github/workflows/build-backend.yml
 
   pull_request:
     branches:
@@ -18,11 +18,11 @@ on:
       - reopened
     paths:
       - backend/**
-      - .github/workflows/backend-build.yml
+      - .github/workflows/build-backend.yml
 
 jobs:
-  build:
-    name: Build and analyze
+  build-backend:
+    name: Build and analyze backend
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -45,8 +45,8 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
+          key: ${{ runner.os }}-backend-sonar
+          restore-keys: ${{ runner.os }}-backend-sonar
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
