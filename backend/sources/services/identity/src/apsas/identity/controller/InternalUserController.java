@@ -5,7 +5,6 @@ import apsas.identity.service.UserService;
 import io.swagger.v3.oas.annotations.Hidden;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
