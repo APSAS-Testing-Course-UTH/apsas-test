@@ -20,17 +20,14 @@ on:
       - frontend/**
       - .github/workflows/build-frontend.yml
 
-concurrency:
-  group: frontend-build-${{ github.ref }}
-  cancel-in-progress: true
-
-permissions:
-  contents: read
-
 jobs:
   build-frontend:
     name: Build and analyze frontend
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend/
+
     steps:
       - name: Checkout
         uses: actions/checkout@v6
