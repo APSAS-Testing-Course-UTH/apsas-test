@@ -71,6 +71,7 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.FRONTEND_SONAR_TOKEN }}
         with:
+          projectBaseDir: frontend/
           args: >
             -Dsonar.qualitygate.wait=true
             -Dsonar.qualitygate.timeout=300
