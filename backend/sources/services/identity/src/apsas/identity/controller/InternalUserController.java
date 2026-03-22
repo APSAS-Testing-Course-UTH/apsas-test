@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Bộ điều khiển API nội bộ phục vụ giao tiếp giữa các dịch vụ trong hệ thống APSAS.
- * Không công khai qua API Gateway, chỉ truy cập trong service mesh.
+ * Bộ điều khiển API nội bộ phục vụ giao tiếp giữa các dịch vụ trong hệ thống APSAS. Không công khai
+ * qua API Gateway, chỉ truy cập trong service mesh.
  */
 @Hidden // Hide from public Swagger docs
 @RestController
@@ -29,35 +29,27 @@ public class InternalUserController {
   private final FeignUserMapper feignUserMapper;
 
   /**
-   * API nội bộ lấy thông tin người dùng theo ID.
-   * Được sử dụng bởi các dịch vụ như notification và các dịch vụ nội bộ khác.
+   * API nội bộ lấy thông tin người dùng theo ID. Được sử dụng bởi các dịch vụ như notification và
+   * các dịch vụ nội bộ khác.
    *
    * @param id ID người dùng
    * @return DTO thông tin người dùng
    */
   @GetMapping("/{id}")
-  public apsas.feign.dto.UserResponse getUserInternal(
-      @PathVariable
-      UUID id
-  ) {
+  public apsas.feign.dto.UserResponse getUserInternal(@PathVariable UUID id) {
     return feignUserMapper.toFeignDto(userService.getUserById(id));
   }
 
   /**
-   * API nội bộ lấy thông tin nhiều người dùng theo danh sách ID.
-   * Hữu ích cho các thao tác hàng loạt giữa các dịch vụ.
+   * API nội bộ lấy thông tin nhiều người dùng theo danh sách ID. Hữu ích cho các thao tác hàng loạt
+   * giữa các dịch vụ.
    *
    * @param ids Danh sách ID người dùng
    * @return Danh sách DTO thông tin người dùng
    */
   @PostMapping("/batch")
-  public List<apsas.feign.dto.UserResponse> getUsersBatchInternal(
-      @RequestBody
-      List<UUID> ids
-  ) {
-    return userService.findUsersByIds(ids).stream()
-        .map(feignUserMapper::toFeignDto)
-        .collect(Collectors.toList());
+  public List<apsas.feign.dto.UserResponse> getUsersBatchInternal(@RequestBody List<UUID> ids) {
+    return userService.findUsersByIds(ids).stream().map(feignUserMapper::toFeignDto).toList();
   }
 
   /**
@@ -67,12 +59,7 @@ public class InternalUserController {
    * @return Danh sách DTO thông tin người dùng
    */
   @GetMapping("/by-role")
-  public List<apsas.feign.dto.UserResponse> getUsersByRoleInternal(
-      @RequestParam
-      String role
-  ) {
-    return userService.getUsersByRole(role).stream()
-        .map(feignUserMapper::toFeignDto)
-        .collect(Collectors.toList());
+  public List<apsas.feign.dto.UserResponse> getUsersByRoleInternal(@RequestParam String role) {
+    return userService.getUsersByRole(role).stream().map(feignUserMapper::toFeignDto).toList();
   }
 }
