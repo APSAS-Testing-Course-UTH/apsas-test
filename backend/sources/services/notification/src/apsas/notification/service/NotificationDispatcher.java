@@ -68,6 +68,7 @@ public class NotificationDispatcher {
   }
 
   /** Send submission evaluated notification via email and push. */
+  @SuppressWarnings("java:S107")
   public void sendSubmissionEvaluatedNotification(
       UUID userId,
       String email,
