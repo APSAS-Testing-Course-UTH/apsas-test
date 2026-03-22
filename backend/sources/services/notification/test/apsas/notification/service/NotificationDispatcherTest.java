@@ -2,8 +2,9 @@ package apsas.notification.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -89,14 +90,20 @@ class NotificationDispatcherTest {
         "Good",
         "submission-id");
 
+    ArgumentCaptor<String> tokenCaptor = ArgumentCaptor.forClass(String.class);
+    ArgumentCaptor<String> titleCaptor = ArgumentCaptor.forClass(String.class);
+    ArgumentCaptor<Integer> scoreCaptor = ArgumentCaptor.forClass(Integer.class);
     ArgumentCaptor<String> statusCaptor = ArgumentCaptor.forClass(String.class);
     verify(pushNotificationService)
         .sendSubmissionEvaluatedNotification(
-            eq("token-1"), eq("Assignment A"), eq(80), statusCaptor.capture());
+            tokenCaptor.capture(), titleCaptor.capture(), scoreCaptor.capture(), statusCaptor.capture());
+    assertEquals("token-1", tokenCaptor.getValue());
+    assertEquals("Assignment A", titleCaptor.getValue());
+    assertEquals(80, scoreCaptor.getValue());
     assertEquals("\u0110\u1ea0T", statusCaptor.getValue());
     verify(emailService, never())
         .sendSubmissionEvaluatedEmail(
-            anyString(), anyString(), anyString(), eq(80), eq(true), eq(8), eq(10), anyString(),
+            anyString(), anyString(), anyString(), anyInt(), anyBoolean(), anyInt(), anyInt(), anyString(),
             anyString(), anyString());
   }
 
@@ -122,10 +129,16 @@ class NotificationDispatcherTest {
         "Retry",
         "submission-id");
 
+    ArgumentCaptor<String> tokenCaptor = ArgumentCaptor.forClass(String.class);
+    ArgumentCaptor<String> titleCaptor = ArgumentCaptor.forClass(String.class);
+    ArgumentCaptor<Integer> scoreCaptor = ArgumentCaptor.forClass(Integer.class);
     ArgumentCaptor<String> statusCaptor = ArgumentCaptor.forClass(String.class);
     verify(pushNotificationService)
         .sendSubmissionEvaluatedNotification(
-            eq("token-2"), eq("Assignment B"), eq(40), statusCaptor.capture());
+            tokenCaptor.capture(), titleCaptor.capture(), scoreCaptor.capture(), statusCaptor.capture());
+    assertEquals("token-2", tokenCaptor.getValue());
+    assertEquals("Assignment B", titleCaptor.getValue());
+    assertEquals(40, scoreCaptor.getValue());
     assertEquals("C\u1ea6N C\u1ea2I THI\u1ec6N", statusCaptor.getValue());
   }
 
@@ -136,12 +149,12 @@ class NotificationDispatcherTest {
     org.mockito.Mockito.doThrow(new RuntimeException("mail down"))
         .when(emailService)
         .sendSupportRequestEmail(
-            eq("instructor@example.com"),
-            eq("Instructor A"),
-            eq("Student A"),
-            eq("student@example.com"),
-            eq("Need help"),
-            eq("session-1"));
+            "instructor@example.com",
+            "Instructor A",
+            "Student A",
+            "student@example.com",
+            "Need help",
+            "session-1");
 
     assertDoesNotThrow(
         () ->

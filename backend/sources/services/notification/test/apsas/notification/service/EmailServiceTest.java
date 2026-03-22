@@ -115,16 +115,15 @@ class EmailServiceTest {
     MimeMessage mimeMessage = new MimeMessage((Session) null);
     when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
     when(templateEngine.process(anyString(), any())).thenThrow(new RuntimeException("boom"));
+    Map<String, Object> variables = Map.of("key", "value");
+
+    org.junit.jupiter.api.function.Executable action =
+      () -> service.sendEmail("to@example.com", "Subject", "email/template", variables);
 
     EmailDeliveryException exception =
         assertThrows(
             EmailDeliveryException.class,
-            () ->
-                service.sendEmail(
-                    "to@example.com",
-                    "Subject",
-                    "email/template",
-                    Map.of("key", "value")));
+        action);
 
     assertEquals("Unexpected error while sending email", exception.getMessage());
     assertNotNull(exception.getCause());
