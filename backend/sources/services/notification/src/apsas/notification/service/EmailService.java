@@ -67,9 +67,8 @@ public class EmailService {
     Map<String, Object> variables =
         Map.of(
         KEY_FIRST_NAME, firstName,
-            "lastName", lastName,
-            "verificationUrl", verificationUrl
-        );
+        "lastName", lastName,
+        "verificationUrl", verificationUrl);
 
     sendEmail(to, "Xác Thực Email - APSAS", "email/verification-email", variables);
   }
@@ -92,12 +91,11 @@ public class EmailService {
   ) {
     Map<String, Object> variables =
         Map.of(
-        KEY_FIRST_NAME, firstName,
+            KEY_FIRST_NAME, firstName,
             "assignmentTitle", assignmentTitle,
             "description", description,
             "deadline", deadline,
-            "assignmentUrl", assignmentUrl
-        );
+            "assignmentUrl", assignmentUrl);
 
     sendEmail(
         to,
@@ -122,7 +120,7 @@ public class EmailService {
   ) {
     Map<String, Object> variables =
         Map.of(
-        KEY_FIRST_NAME, firstName,
+            KEY_FIRST_NAME, firstName,
             "assignmentTitle", assignmentTitle,
             "score", score,
             "passed", passed,
@@ -130,8 +128,7 @@ public class EmailService {
             "totalTests", totalTests,
             "executionTime", executionTime,
             "feedback", feedback != null ? feedback : "",
-            "submissionUrl", submissionUrl
-        );
+            "submissionUrl", submissionUrl);
 
     sendEmail(
         to, "Bài Nộp Đã Được Chấm: " + assignmentTitle, "email/submission-evaluated", variables);
