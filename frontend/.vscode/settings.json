@@ -16,5 +16,10 @@
     "*": true,
     "plaintext": true,
     "markdown": true
-  }
+  },
+  "sonarlint.analysisExcludesStandalone": "src/api/**,src/routeTree.gen.ts,public/mockServiceWorker.js,dist/**,coverage/**",
+  "sonarlint.testFilePattern": "**/*.test.ts,**/*.test.tsx,**/*.test.js,**/*.test.jsx,**/*.spec.ts,**/*.spec.tsx,**/*.spec.js,**/*.spec.jsx,**/__tests__/**,src/test/**",
+  "sonarlint.disableTelemetry": true,
+  "sonarlint.output.showAnalyzerLogs": false,
+  "sonarlint.output.showVerboseLogs": false
 }
