@@ -83,6 +83,41 @@ class WebSocketAuthInterceptorTest {
     assertSame(authentication, SecurityContextHolder.getContext().getAuthentication());
   }
 
+  @Test
+  void preSend_leavesUserNullWhenSessionHasNoAuthenticationForNonConnect() {
+    WebSocketAuthenticationService authService = mock(WebSocketAuthenticationService.class);
+    WebSocketAuthInterceptor interceptor = new WebSocketAuthInterceptor(authService);
+
+    Message<byte[]> sendMessage = createStompMessage(StompCommand.SEND, null, null, Map.of());
+
+    Message<?> result = interceptor.preSend(sendMessage, mock(MessageChannel.class));
+
+    assertNotNull(result);
+    StompHeaderAccessor accessor = StompHeaderAccessor.wrap(result);
+    assertNull(accessor.getUser());
+    assertNull(SecurityContextHolder.getContext().getAuthentication());
+  }
+
+  @Test
+  void preSend_leavesUserNullWhenSessionAuthenticationHasUnexpectedType() {
+    WebSocketAuthenticationService authService = mock(WebSocketAuthenticationService.class);
+    WebSocketAuthInterceptor interceptor = new WebSocketAuthInterceptor(authService);
+
+    Message<byte[]> sendMessage =
+        createStompMessage(
+            StompCommand.SEND,
+            null,
+            null,
+            Map.of("authentication", "not-a-token"));
+
+    Message<?> result = interceptor.preSend(sendMessage, mock(MessageChannel.class));
+
+    assertNotNull(result);
+    StompHeaderAccessor accessor = StompHeaderAccessor.wrap(result);
+    assertNull(accessor.getUser());
+    assertNull(SecurityContextHolder.getContext().getAuthentication());
+  }
+
   private static HeaderAuthenticationToken createAuthenticationToken() {
     UserPrincipal principal =
         new UserPrincipal(
