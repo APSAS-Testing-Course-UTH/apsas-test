@@ -1,0 +1,123 @@
+name: CI
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - .allure/**
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - .allure/**
+
+permissions:
+  pull-requests: write
+  checks: write
+  contents: write
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          filter: backend/
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: jetbrains
+          java-version: "21"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+          add-job-summary-as-pr-comment: always
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+        working-directory: ./backend
+
+      - name: Test and dump results
+        run: npx allure run --dump="allure-results-backend" -- cd backend && ./gradlew test --no-configuration-cache
+
+      - name: Commit and push test history
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git add -f .allure/history.jsonl
+          git commit -m "chore: update test history"
+          git push
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: allure-results-backend
+          path: allure-results-backend.zip
+          compression-level: 0
+          retention-days: 1
+
+  report:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    needs: [ test-backend ]
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Download backend test results
+        uses: actions/download-artifact@v7
+        with:
+          name: allure-results-backend
+          path: ./
+
+      - name: Build report
+        run: npx allure generate --dump="allure-results-*.zip"
+
+      - name: Allure Report Official
+        uses: allure-framework/allure-action@v0
+        with:
+          report-directory: "./allure-report"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy-report:
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment:
+      name: test-report
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: [ test-backend ]
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Download backend test results
+        uses: actions/download-artifact@v7
+        with:
+          name: allure-results-backend
+          path: ./
+
+      - name: Build report
+        run: npx allure generate --dump="allure-results-*.zip"
+
+      - name: Allure Report Official
+        uses: allure-framework/allure-action@v0
+        with:
+          report-directory: "./allure-report"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ./allure-report
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

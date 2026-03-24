@@ -1,2 +1,6 @@
 /.idea
 allure-report/
+.allure/
+/bun.lock
+/node_modules
+/package.json
