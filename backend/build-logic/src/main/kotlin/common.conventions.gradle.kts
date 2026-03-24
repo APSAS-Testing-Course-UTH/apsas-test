@@ -2,6 +2,7 @@ plugins {
     java
     id("io.spring.dependency-management")
     id("org.sonarqube")
+    jacoco
 }
 
 java {
@@ -33,11 +34,8 @@ configurations {
 dependencies {
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-}
 
-tasks.withType<JavaCompile> {
-    options.encoding = "UTF-8"
-    options.release = 21
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 sonar {
@@ -45,6 +43,29 @@ sonar {
         property("sonar.sources", "src")
         if (projectDir.resolve("test").exists()) {
             property("sonar.tests", "test")
+        }
+    }
+}
+
+tasks {
+    withType<JavaCompile> {
+        options.encoding = "UTF-8"
+        options.release = 21
+    }
+
+    withType<Test> {
+        useJUnitPlatform()
+    }
+
+    test {
+        finalizedBy(tasks.jacocoTestReport)
+    }
+
+    jacocoTestReport {
+        dependsOn(tasks.test)
+        reports {
+            xml.required = true
+            html.required = true
         }
     }
 }

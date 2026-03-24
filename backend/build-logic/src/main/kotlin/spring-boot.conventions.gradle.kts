@@ -1,3 +1,5 @@
+import gradle.kotlin.dsl.accessors._d4863a4bc741fc1f4eb52a42d02bdb32.testImplementation
+
 plugins {
     id("spring-cloud.conventions")
     id("org.springframework.boot")
@@ -6,7 +8,10 @@ plugins {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+
     developmentOnly("org.springframework.boot:spring-boot-devtools")
+
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
 tasks {
