@@ -11,6 +11,10 @@ on:
       - opened
       - synchronize
       - reopened
+    paths-ignore:
+      - "docs/**"
+      - "**.md"
+      - ".allure/history.jsonl"
 
 jobs:
   lint-backend:

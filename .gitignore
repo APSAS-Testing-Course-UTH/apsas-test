@@ -4,3 +4,4 @@ allure-report/
 /bun.lock
 /node_modules
 /package.json
+*.zip
