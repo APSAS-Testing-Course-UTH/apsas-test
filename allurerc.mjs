@@ -1,7 +1,8 @@
-import {defineConfig} from "allure";
-
 // noinspection JSUnusedGlobalSymbols
-export default defineConfig({
+/**
+ * @type {import("allure").AllureConfig}
+ */
+export default {
     name: "APSAS - Allure Report",
     historyPath: "./.allure/history.jsonl",
     plugins: {
@@ -11,4 +12,4 @@ export default defineConfig({
             }
         }
     }
-});
+}
