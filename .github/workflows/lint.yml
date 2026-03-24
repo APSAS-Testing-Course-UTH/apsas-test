@@ -51,7 +51,7 @@ jobs:
       - name: Build and analyze
         env:
           SONAR_TOKEN: ${{ secrets.BACKEND_SONAR_TOKEN }}
-        run: ./gradlew build sonar
+        run: ./gradlew build sonar --no-configuration-cache
 
   lint-frontend:
     name: Analyze Frontend
