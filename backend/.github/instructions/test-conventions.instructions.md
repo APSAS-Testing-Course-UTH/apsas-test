@@ -46,7 +46,8 @@ Use these rules whenever creating or updating tests in this repository.
 - Prefer `@Description`, `@Epic`, `@Feature`, and `@Story` for behavior context.
 - Use `@Severity` for business impact signaling.
 - For integration tests, require `@Owner` to support team triage.
-- Use `@Issue` or `@TmsLink` when traceability exists.
+- Use `@Issue` for linkage to current work items in issue trackers.
+- Use `@TmsLink` for test case ID mapping in testing plans.
 - Use `@Step` on reusable helper methods that represent meaningful milestones.
 - Add attachments only when they help diagnose failures; include clear names and media types.
 - Never attach secrets or raw credentials.
@@ -63,3 +64,10 @@ Use these rules whenever creating or updating tests in this repository.
 - Structure follows Arrange-Act-Assert.
 - Test type is tagged (`unit` or `integration`).
 - Allure metadata is present and useful for report filtering and triage.
+
+## Skills to Use for Test Implementation
+
+- [allure-junit5](../../.agents/skills/allure-junit5/SKILL.md)
+- [instancio-junit](../../.agents/skills/instancio-junit/SKILL.md)
+- [java-junit](../../.agents/skills/java-junit/SKILL.md)
+- [spring-boot-test-patterns](../../.agents/skills/spring-boot-test-patterns/SKILL.md)
