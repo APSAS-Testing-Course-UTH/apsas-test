@@ -32,9 +32,15 @@ configurations {
     }
 }
 
+val libs: VersionCatalog = the<VersionCatalogsExtension>().named("libs")
+
 dependencies {
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
+
+    testImplementation(platform(libs.findLibrary("instancio-bom").get()))
+    testImplementation(libs.findLibrary("instancio-core").get())
+    testImplementation(libs.findLibrary("instancio-junit").get())
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }

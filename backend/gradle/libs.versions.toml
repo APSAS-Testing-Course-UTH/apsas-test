@@ -11,6 +11,7 @@ mapstruct = "1.6.3"
 firebase-admin = "9.8.0"
 sonarqube = "7.2.3.7755"
 allure-gradle = "3.0.2"
+instancio = "6.0.0-RC2"
 
 [libraries]
 springdoc-openapi-starter-webflux-ui = { module = "org.springdoc:springdoc-openapi-starter-webflux-ui", version.ref = "springdoc" }
@@ -24,6 +25,10 @@ mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.re
 mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "mapstruct" }
 
 firebase-admin = { module = "com.google.firebase:firebase-admin", version.ref = "firebase-admin" }
+
+instancio-bom = { module = "org.instancio:instancio-bom", version.ref = "instancio" }
+instancio-core = { module = "org.instancio:instancio-core" }
+instancio-junit = { module = "org.instancio:instancio-junit" }
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
