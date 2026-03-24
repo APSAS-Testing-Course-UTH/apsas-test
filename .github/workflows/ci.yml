@@ -36,12 +36,8 @@ jobs:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           add-job-summary-as-pr-comment: always
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x ./gradlew
-        working-directory: ./backend
-
       - name: Test and dump results
-        run: npx allure run --dump="allure-results-backend" -- cd backend && ./gradlew test --no-configuration-cache
+        run: npx allure run --dump="allure-results-backend" -- "cd backend && gradle test --no-configuration-cache"
 
       - name: Commit and push test history
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
