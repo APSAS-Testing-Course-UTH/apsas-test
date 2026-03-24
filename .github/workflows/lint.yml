@@ -1,28 +1,20 @@
-name: Backend Build
+name: Lint
 on:
   push:
     branches:
       - main
-      - releases/*
-    paths:
-      - backend/**
-      - .github/workflows/build-backend.yml
 
   pull_request:
     branches:
       - main
-      - releases/*
     types:
       - opened
       - synchronize
       - reopened
-    paths:
-      - backend/**
-      - .github/workflows/build-backend.yml
 
 jobs:
-  build-backend:
-    name: Build and analyze backend
+  lint-backend:
+    name: Analyze Backend
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -49,7 +41,7 @@ jobs:
           restore-keys: ${{ runner.os }}-backend-sonar
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
+        uses: gradle/actions/setup-gradle@v6
         with:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
@@ -60,3 +52,23 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.BACKEND_SONAR_TOKEN }}
         run: ./gradlew build sonar
+
+  lint-frontend:
+    name: Analyze Frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend/
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v7
+        env:
+          SONAR_TOKEN: ${{ secrets.FRONTEND_SONAR_TOKEN }}
+        with:
+          projectBaseDir: frontend/
