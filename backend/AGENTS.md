@@ -113,6 +113,11 @@ When adding tests, create the `test/` and `testResources/` directories in the ta
 
 ## Testing Instructions
 
+Copilot instruction files for test authoring:
+
+- `.github/instructions/test-conventions.instructions.md`: test-writing conventions for effective structure, naming, and
+  Allure reporting.
+
 Current baseline:
 
 - `./gradlew test` succeeds in the repo
