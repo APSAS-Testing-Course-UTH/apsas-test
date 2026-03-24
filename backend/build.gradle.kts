@@ -8,7 +8,7 @@ sonar {
         property("sonar.organization", findProperty("sonar.organization").toString())
         property(
             "sonar.coverage.jacoco.xmlReportPaths",
-            "**/build/reports/jacoco/test/jacocoTestReport.xml"
+            "**/build/reports/jacoco/test/jacocoTestReport.xml",
         )
     }
 }

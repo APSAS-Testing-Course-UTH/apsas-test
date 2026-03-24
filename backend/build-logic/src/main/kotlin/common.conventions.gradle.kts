@@ -2,6 +2,7 @@ plugins {
     java
     id("io.spring.dependency-management")
     id("org.sonarqube")
+    id("io.qameta.allure-adapter")
     jacoco
 }
 
@@ -66,6 +67,14 @@ tasks {
         reports {
             xml.required = true
             html.required = true
+        }
+    }
+}
+
+allure {
+    adapter {
+        frameworks {
+            junit5
         }
     }
 }

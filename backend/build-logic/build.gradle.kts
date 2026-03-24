@@ -18,6 +18,7 @@ dependencies {
     implementation(plugin(libs.plugins.spring.boot))
     implementation(plugin(libs.plugins.spring.dependency.management))
     implementation(plugin(libs.plugins.sonarqube))
+    implementation(plugin(libs.plugins.allure.adapter))
 }
 
 fun plugin(plugin: Provider<PluginDependency>): Provider<String> =

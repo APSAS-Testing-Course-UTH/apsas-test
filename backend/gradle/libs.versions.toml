@@ -10,6 +10,7 @@ hypersistence-utils-hibernate = "3.15.2"
 mapstruct = "1.6.3"
 firebase-admin = "9.8.0"
 sonarqube = "7.2.3.7755"
+allure-gradle = "3.0.2"
 
 [libraries]
 springdoc-openapi-starter-webflux-ui = { module = "org.springdoc:springdoc-openapi-starter-webflux-ui", version.ref = "springdoc" }
@@ -28,3 +29,4 @@ firebase-admin = { module = "com.google.firebase:firebase-admin", version.ref = 
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
 spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management" }
 sonarqube = { id = "org.sonarqube", version.ref = "sonarqube" }
+allure-adapter = { id = "io.qameta.allure-adapter", version.ref = "allure-gradle" }
