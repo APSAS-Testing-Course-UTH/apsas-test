@@ -3,6 +3,10 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - "docs/**"
+      - "**.md"
+      - ".allure/history.jsonl"
 
   pull_request:
     branches:
@@ -55,7 +59,7 @@ jobs:
       - name: Build and analyze
         env:
           SONAR_TOKEN: ${{ secrets.BACKEND_SONAR_TOKEN }}
-        run: ./gradlew build sonar --no-configuration-cache
+        run: ./gradlew build sonar
 
   lint-frontend:
     name: Analyze Frontend

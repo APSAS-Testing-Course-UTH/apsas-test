@@ -43,7 +43,7 @@ jobs:
           add-job-summary-as-pr-comment: always
 
       - name: Test and dump results
-        run: npx allure run --dump="allure-results-backend" -- "cd backend && gradle test --no-configuration-cache"
+        run: npx allure run --dump="allure-results-backend" -- "cd backend && gradle test"
 
       - name: Upload test results
         if: always()

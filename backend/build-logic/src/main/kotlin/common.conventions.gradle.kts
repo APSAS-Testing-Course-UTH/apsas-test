@@ -2,7 +2,6 @@ plugins {
     java
     id("io.spring.dependency-management")
     id("org.sonarqube")
-    id("io.qameta.allure-adapter")
     jacoco
 }
 
@@ -32,6 +31,11 @@ configurations {
     }
 }
 
+val aspectjAgent by configurations.creating {
+    isCanBeConsumed = true
+    isCanBeResolved = true
+}
+
 val libs: VersionCatalog = the<VersionCatalogsExtension>().named("libs")
 
 dependencies {
@@ -41,8 +45,11 @@ dependencies {
     testImplementation(platform(libs.findLibrary("instancio-bom").get()))
     testImplementation(libs.findLibrary("instancio-core").get())
     testImplementation(libs.findLibrary("instancio-junit").get())
+    testImplementation(platform(libs.findLibrary("allure-bom").get()))
+    testImplementation(libs.findLibrary("allure-junit5").get())
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    aspectjAgent(libs.findLibrary("aspectj-weaver").get())
 }
 
 sonar {
@@ -66,6 +73,10 @@ tasks {
 
     test {
         finalizedBy(tasks.jacocoTestReport)
+
+        jvmArgs.add("-javaagent:${aspectjAgent.singleFile}")
+
+        systemProperty("allure.results.directory", "build/allure-results")
     }
 
     jacocoTestReport {
@@ -73,14 +84,6 @@ tasks {
         reports {
             xml.required = true
             html.required = true
-        }
-    }
-}
-
-allure {
-    adapter {
-        frameworks {
-            junit5
         }
     }
 }
