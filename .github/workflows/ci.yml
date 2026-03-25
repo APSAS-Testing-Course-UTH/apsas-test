@@ -43,7 +43,11 @@ jobs:
           add-job-summary-as-pr-comment: always
 
       - name: Test and dump results
-        run: npx allure run --dump="allure-results-backend" -- "cd backend && gradle test"
+        run: gradle test
+        working-directory: backend/
+
+      - name: Zip test results
+        run: npx allure results pack --name allure-results-backend.zip
 
       - name: Upload test results
         if: always()
@@ -67,8 +71,11 @@ jobs:
           name: allure-results-backend
           path: ./
 
+      - name: Unpack backend test results
+        run: npx allure results unpack allure-results-backend.zip
+
       - name: Build report
-        run: npx allure generate --dump="allure-results-*.zip"
+        run: npx allure generate ./allure-results
 
       - name: Allure Report Official
         uses: allure-framework/allure-action@v0
@@ -92,8 +99,11 @@ jobs:
           name: allure-results-backend
           path: ./
 
+      - name: Unpack backend test results
+        run: npx allure results unpack allure-results-backend.zip
+
       - name: Build report
-        run: npx allure generate --dump="allure-results-*.zip"
+        run: npx allure generate ./allure-results
 
       - name: Commit and push test history
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
