@@ -2,12 +2,16 @@ package apsas.notification.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -39,13 +43,19 @@ class NotificationDispatcherTest {
   }
 
   @Test
-  void sendAssignmentPublishedNotification_sendsEmailAndPushWhenEnabled() {
+    void ntfDis001_sendVerificationEmail_bypassesPreferencesAndCallsEmailService() {
+        dispatcher.sendVerificationEmail("user@example.com", "Lan", "Nguyen", "verify-token");
+
+        verify(emailService).sendVerificationEmail("user@example.com", "Lan", "Nguyen", "verify-token");
+        verifyNoInteractions(preferencesService);
+    }
+
+    @Test
+    void ntfDis002_sendAssignmentPublishedNotification_sendsEmailWhenEnabled() {
     UUID userId = UUID.randomUUID();
     when(preferencesService.isNotificationEnabled(userId, "assignment_published", "email"))
         .thenReturn(true);
-    when(preferencesService.isNotificationEnabled(userId, "assignment_published", "push"))
-        .thenReturn(true);
-    when(deviceTokenService.getActiveTokenStringsByUserId(userId)).thenReturn(List.of("token-1"));
+        when(preferencesService.isNotificationEnabled(userId, "assignment_published", "push")).thenReturn(false);
 
     dispatcher.sendAssignmentPublishedNotification(
         userId,
@@ -63,13 +73,31 @@ class NotificationDispatcherTest {
             "2026-03-30",
             "https://host/assignment/A",
             "https://host/assignment/A");
-    verify(pushNotificationService)
-        .sendAssignmentPublishedNotification(
-            List.of("token-1"), "Assignment A", "https://host/assignment/A");
+    verify(pushNotificationService, never())
+        .sendAssignmentPublishedNotification(any(), anyString(), anyString());
   }
 
   @Test
-  void sendSubmissionEvaluatedNotification_usesPassedStatusForPush() {
+  void ntfDis003_sendAssignmentPublishedNotification_sendsPushWhenEnabledAndHasTokens() {
+    UUID userId = UUID.randomUUID();
+    when(preferencesService.isNotificationEnabled(userId, "assignment_published", "email")).thenReturn(false);
+    when(preferencesService.isNotificationEnabled(userId, "assignment_published", "push")).thenReturn(true);
+    when(deviceTokenService.getActiveTokenStringsByUserId(userId)).thenReturn(List.of("token-1"));
+
+    dispatcher.sendAssignmentPublishedNotification(
+        userId,
+        "user@example.com",
+        "Lan",
+        "Assignment A",
+        "2026-03-30",
+        "https://host/assignment/A");
+
+    verify(pushNotificationService)
+        .sendAssignmentPublishedNotification(List.of("token-1"), "Assignment A", "https://host/assignment/A");
+  }
+
+  @Test
+  void ntfDisExtra_sendSubmissionEvaluatedNotification_usesPassedStatusForPush() {
     UUID userId = UUID.randomUUID();
     when(preferencesService.isNotificationEnabled(userId, "submission_evaluated", "email"))
         .thenReturn(false);
@@ -108,7 +136,7 @@ class NotificationDispatcherTest {
   }
 
   @Test
-  void sendSubmissionEvaluatedNotification_usesNeedsImprovementStatusForPush() {
+    void ntfDisExtra_sendSubmissionEvaluatedNotification_usesNeedsImprovementStatusForPush() {
     UUID userId = UUID.randomUUID();
     when(preferencesService.isNotificationEnabled(userId, "submission_evaluated", "email"))
         .thenReturn(false);
@@ -143,7 +171,33 @@ class NotificationDispatcherTest {
   }
 
   @Test
-  void sendSupportRequestNotification_swallowsEmailExceptionAndContinuesPush() {
+  void ntfDis004_sendSubmissionEvaluatedNotification_doesNotSendPushWhenNoTokens() {
+    UUID userId = UUID.randomUUID();
+    when(preferencesService.isNotificationEnabled(userId, "submission_evaluated", "email"))
+        .thenReturn(false);
+    when(preferencesService.isNotificationEnabled(userId, "submission_evaluated", "push"))
+        .thenReturn(true);
+    when(deviceTokenService.getActiveTokenStringsByUserId(userId)).thenReturn(List.of());
+
+    dispatcher.sendSubmissionEvaluatedNotification(
+        userId,
+        "user@example.com",
+        "Lan",
+        "Assignment A",
+        80,
+        true,
+        8,
+        10,
+        "100ms",
+        "Good",
+        "submission-id");
+
+    verify(pushNotificationService, never())
+        .sendSubmissionEvaluatedNotification(anyString(), anyString(), anyInt(), anyString());
+  }
+
+  @Test
+    void ntfDisExtra_sendSupportRequestNotification_swallowsEmailExceptionAndContinuesPush() {
     UUID instructorId = UUID.randomUUID();
     when(deviceTokenService.getActiveTokenStringsByUserId(instructorId)).thenReturn(List.of("token-3"));
     org.mockito.Mockito.doThrow(new RuntimeException("mail down"))
@@ -169,5 +223,47 @@ class NotificationDispatcherTest {
     verify(pushNotificationService)
         .sendSupportRequestNotification(
             List.of("token-3"), "Student A", "Need help", "session-1");
+  }
+
+  @Test
+  void ntfDis005_sendSupportRequestNotification_sendsToAllInstructors() {
+    UUID instructorId1 = UUID.randomUUID();
+    UUID instructorId2 = UUID.randomUUID();
+
+    when(deviceTokenService.getActiveTokenStringsByUserId(instructorId1)).thenReturn(List.of("t1"));
+    when(deviceTokenService.getActiveTokenStringsByUserId(instructorId2)).thenReturn(List.of("t2"));
+
+    dispatcher.sendSupportRequestNotification(
+        Map.of(
+            "ins1@example.com", "Instructor 1",
+            "ins2@example.com", "Instructor 2"),
+        List.of(instructorId1, instructorId2),
+        "Student A",
+        "student@example.com",
+        "Need help",
+        "session-1");
+
+    verify(emailService, times(1))
+        .sendSupportRequestEmail(
+            eq("ins1@example.com"),
+            eq("Instructor 1"),
+            eq("Student A"),
+            eq("student@example.com"),
+            eq("Need help"),
+            eq("session-1"));
+    verify(emailService, times(1))
+        .sendSupportRequestEmail(
+            eq("ins2@example.com"),
+            eq("Instructor 2"),
+            eq("Student A"),
+            eq("student@example.com"),
+            eq("Need help"),
+            eq("session-1"));
+    verify(pushNotificationService, times(1))
+        .sendSupportRequestNotification(
+            List.of("t1"), "Student A", "Need help", "session-1");
+    verify(pushNotificationService, times(1))
+        .sendSupportRequestNotification(
+            List.of("t2"), "Student A", "Need help", "session-1");
   }
 }
