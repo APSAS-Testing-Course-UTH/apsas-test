@@ -162,12 +162,13 @@ class SubmissionServiceQueryTest {
   @DisplayName("Throws not found when submission id does not exist")
   void getSubmissionById_shouldThrowNotFoundException_whenSubmissionMissing() {
     UUID submissionId = UUID.randomUUID();
+    UUID requesterId = UUID.randomUUID();
 
     when(submissionRepository.findById(submissionId)).thenReturn(Optional.empty());
 
     NotFoundException ex = assertThrows(
         NotFoundException.class,
-        () -> submissionService.getSubmissionById(submissionId, UUID.randomUUID(), false)
+        () -> submissionService.getSubmissionById(submissionId, requesterId, false)
     );
 
     assertTrue(ex.getMessage().contains("Submission not found with id"));

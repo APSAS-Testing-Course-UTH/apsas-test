@@ -143,6 +143,7 @@ class SubmissionServiceEvaluationTest {
   @DisplayName("Throws not found when evaluated event references unknown submission")
   void handleSubmissionEvaluated_shouldThrowNotFoundException_whenSubmissionMissing() {
     UUID submissionId = UUID.randomUUID();
+    LocalDateTime evaluatedAt = LocalDateTime.now();
 
     when(submissionRepository.findById(submissionId)).thenReturn(Optional.empty());
 
@@ -154,7 +155,7 @@ class SubmissionServiceEvaluationTest {
             Result.FAILED,
             BigDecimal.ZERO,
             List.of(),
-            LocalDateTime.now()
+            evaluatedAt
         )
     );
   }
