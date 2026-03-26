@@ -144,6 +144,7 @@ class SubmissionServiceEvaluationTest {
   void handleSubmissionEvaluated_shouldThrowNotFoundException_whenSubmissionMissing() {
     UUID submissionId = UUID.randomUUID();
     LocalDateTime evaluatedAt = LocalDateTime.now();
+    List<TestCaseResultResponse> testCaseResults = List.of();
 
     when(submissionRepository.findById(submissionId)).thenReturn(Optional.empty());
 
@@ -154,7 +155,7 @@ class SubmissionServiceEvaluationTest {
             Status.FAILED,
             Result.FAILED,
             BigDecimal.ZERO,
-            List.of(),
+            testCaseResults,
             evaluatedAt
         )
     );
