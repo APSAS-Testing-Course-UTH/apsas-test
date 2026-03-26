@@ -168,7 +168,7 @@ class SupportServiceTest {
 
     SupportSessionResponse result = supportService.closeSession(sessionId, studentId);
 
-    assertFalse(Boolean.FALSE.equals(session.getIsClosed()));
+    assertEquals(Boolean.TRUE, session.getIsClosed());
     assertNotNull(session.getClosedAt());
     assertEquals(true, result.isClosed());
   }

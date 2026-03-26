@@ -55,7 +55,8 @@ class NotificationDispatcherTest {
     UUID userId = UUID.randomUUID();
     when(preferencesService.isNotificationEnabled(userId, "assignment_published", "email"))
         .thenReturn(true);
-        when(preferencesService.isNotificationEnabled(userId, "assignment_published", "push")).thenReturn(false);
+        when(preferencesService.isNotificationEnabled(userId, "assignment_published", "push"))
+                .thenReturn(false);
 
     dispatcher.sendAssignmentPublishedNotification(
         userId,
@@ -70,8 +71,8 @@ class NotificationDispatcherTest {
             "user@example.com",
             "Lan",
             "Assignment A",
+            "",
             "2026-03-30",
-            "https://host/assignment/A",
             "https://host/assignment/A");
     verify(pushNotificationService, never())
         .sendAssignmentPublishedNotification(any(), anyString(), anyString());
@@ -80,8 +81,10 @@ class NotificationDispatcherTest {
   @Test
   void ntfDis003_sendAssignmentPublishedNotification_sendsPushWhenEnabledAndHasTokens() {
     UUID userId = UUID.randomUUID();
-    when(preferencesService.isNotificationEnabled(userId, "assignment_published", "email")).thenReturn(false);
-    when(preferencesService.isNotificationEnabled(userId, "assignment_published", "push")).thenReturn(true);
+    when(preferencesService.isNotificationEnabled(userId, "assignment_published", "email"))
+        .thenReturn(false);
+    when(preferencesService.isNotificationEnabled(userId, "assignment_published", "push"))
+        .thenReturn(true);
     when(deviceTokenService.getActiveTokenStringsByUserId(userId)).thenReturn(List.of("token-1"));
 
     dispatcher.sendAssignmentPublishedNotification(
@@ -93,11 +96,12 @@ class NotificationDispatcherTest {
         "https://host/assignment/A");
 
     verify(pushNotificationService)
-        .sendAssignmentPublishedNotification(List.of("token-1"), "Assignment A", "https://host/assignment/A");
+                .sendAssignmentPublishedNotification(
+                        List.of("token-1"), "Assignment A", "https://host/assignment/A");
   }
 
   @Test
-  void ntfDisExtra_sendSubmissionEvaluatedNotification_usesPassedStatusForPush() {
+    void ntfDisExtra_sendSubmissionEvaluatedNotification_usesSubmissionUrlForPushData() {
     UUID userId = UUID.randomUUID();
     when(preferencesService.isNotificationEnabled(userId, "submission_evaluated", "email"))
         .thenReturn(false);
@@ -121,22 +125,30 @@ class NotificationDispatcherTest {
     ArgumentCaptor<String> tokenCaptor = ArgumentCaptor.forClass(String.class);
     ArgumentCaptor<String> titleCaptor = ArgumentCaptor.forClass(String.class);
     ArgumentCaptor<Integer> scoreCaptor = ArgumentCaptor.forClass(Integer.class);
-    ArgumentCaptor<String> statusCaptor = ArgumentCaptor.forClass(String.class);
+    ArgumentCaptor<String> submissionCaptor = ArgumentCaptor.forClass(String.class);
     verify(pushNotificationService)
         .sendSubmissionEvaluatedNotification(
-            tokenCaptor.capture(), titleCaptor.capture(), scoreCaptor.capture(), statusCaptor.capture());
+            tokenCaptor.capture(), titleCaptor.capture(), scoreCaptor.capture(), submissionCaptor.capture());
     assertEquals("token-1", tokenCaptor.getValue());
     assertEquals("Assignment A", titleCaptor.getValue());
     assertEquals(80, scoreCaptor.getValue());
-    assertEquals("\u0110\u1ea0T", statusCaptor.getValue());
+    assertEquals("submission-id", submissionCaptor.getValue());
     verify(emailService, never())
         .sendSubmissionEvaluatedEmail(
-            anyString(), anyString(), anyString(), anyInt(), anyBoolean(), anyInt(), anyInt(), anyString(),
-            anyString(), anyString());
+            anyString(),
+            anyString(),
+            anyString(),
+            anyInt(),
+            anyBoolean(),
+            anyInt(),
+            anyInt(),
+            anyString(),
+            anyString(),
+            anyString());
   }
 
   @Test
-    void ntfDisExtra_sendSubmissionEvaluatedNotification_usesNeedsImprovementStatusForPush() {
+  void ntfDisExtra_sendSubmissionEvaluatedNotification_usesSubmissionUrlForPushDataWhenFailed() {
     UUID userId = UUID.randomUUID();
     when(preferencesService.isNotificationEnabled(userId, "submission_evaluated", "email"))
         .thenReturn(false);
@@ -160,14 +172,14 @@ class NotificationDispatcherTest {
     ArgumentCaptor<String> tokenCaptor = ArgumentCaptor.forClass(String.class);
     ArgumentCaptor<String> titleCaptor = ArgumentCaptor.forClass(String.class);
     ArgumentCaptor<Integer> scoreCaptor = ArgumentCaptor.forClass(Integer.class);
-    ArgumentCaptor<String> statusCaptor = ArgumentCaptor.forClass(String.class);
+    ArgumentCaptor<String> submissionCaptor = ArgumentCaptor.forClass(String.class);
     verify(pushNotificationService)
         .sendSubmissionEvaluatedNotification(
-            tokenCaptor.capture(), titleCaptor.capture(), scoreCaptor.capture(), statusCaptor.capture());
+            tokenCaptor.capture(), titleCaptor.capture(), scoreCaptor.capture(), submissionCaptor.capture());
     assertEquals("token-2", tokenCaptor.getValue());
     assertEquals("Assignment B", titleCaptor.getValue());
     assertEquals(40, scoreCaptor.getValue());
-    assertEquals("C\u1ea6N C\u1ea2I THI\u1ec6N", statusCaptor.getValue());
+    assertEquals("submission-id", submissionCaptor.getValue());
   }
 
   @Test
@@ -199,7 +211,8 @@ class NotificationDispatcherTest {
   @Test
     void ntfDisExtra_sendSupportRequestNotification_swallowsEmailExceptionAndContinuesPush() {
     UUID instructorId = UUID.randomUUID();
-    when(deviceTokenService.getActiveTokenStringsByUserId(instructorId)).thenReturn(List.of("token-3"));
+        when(deviceTokenService.getActiveTokenStringsByUserId(instructorId))
+                .thenReturn(List.of("token-3"));
     org.mockito.Mockito.doThrow(new RuntimeException("mail down"))
         .when(emailService)
         .sendSupportRequestEmail(
@@ -221,8 +234,7 @@ class NotificationDispatcherTest {
                 "session-1"));
 
     verify(pushNotificationService)
-        .sendSupportRequestNotification(
-            List.of("token-3"), "Student A", "Need help", "session-1");
+                .sendSupportRequestNotification(List.of("token-3"), "Student A", "Need help", "session-1");
   }
 
   @Test
@@ -234,9 +246,7 @@ class NotificationDispatcherTest {
     when(deviceTokenService.getActiveTokenStringsByUserId(instructorId2)).thenReturn(List.of("t2"));
 
     dispatcher.sendSupportRequestNotification(
-        Map.of(
-            "ins1@example.com", "Instructor 1",
-            "ins2@example.com", "Instructor 2"),
+        Map.of("ins1@example.com", "Instructor 1", "ins2@example.com", "Instructor 2"),
         List.of(instructorId1, instructorId2),
         "Student A",
         "student@example.com",

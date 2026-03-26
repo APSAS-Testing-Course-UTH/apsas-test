@@ -115,7 +115,7 @@ class DeviceTokenServiceTest {
   }
 
   @Test
-  void ntfDev004_removeToken_handlesMissingTokenWithoutSave() {
+  void ntfDevExtra_removeToken_handlesMissingTokenWithoutSave() {
     service.removeToken("not-found");
     verify(deviceTokenRepository).deleteByToken("not-found");
     verify(deviceTokenRepository, never()).save(any(DeviceToken.class));
