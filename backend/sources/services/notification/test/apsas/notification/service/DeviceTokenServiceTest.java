@@ -16,6 +16,7 @@ import apsas.notification.repository.DeviceTokenRepository;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Owner;
@@ -83,6 +84,7 @@ class DeviceTokenServiceTest {
 
   @Test
   @Story("NTF-DEV-002")
+  @Description("Reactivates and updates an existing device token when the token already exists.")
   void ntfDev002_registerToken_updatesExistingTokenData() {
     UUID userId = UUID.randomUUID();
     RegisterDeviceRequest request = new RegisterDeviceRequest();

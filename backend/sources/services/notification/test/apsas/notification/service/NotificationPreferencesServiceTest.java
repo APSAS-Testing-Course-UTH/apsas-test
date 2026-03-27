@@ -14,6 +14,7 @@ import apsas.notification.model.entity.NotificationPreferences;
 import apsas.notification.repository.NotificationPreferencesRepository;
 import java.util.Optional;
 import java.util.UUID;
+import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Owner;
@@ -79,6 +80,7 @@ class NotificationPreferencesServiceTest {
 
   @Test
   @Story("NTF-PREF-003")
+  @Description("Updates stored notification preferences and returns the mapped response.")
   void ntfPref003_updatePreferences_updatesAndSaves() {
     UUID userId = UUID.randomUUID();
     NotificationPreferencesRequest request = new NotificationPreferencesRequest();

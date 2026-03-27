@@ -13,6 +13,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Owner;
@@ -88,6 +89,7 @@ class NotificationDispatcherTest {
 
   @Test
     @Story("NTF-DIS-003")
+    @Description("Sends push notification when push channel is enabled and at least one active token exists.")
   void ntfDis003_sendAssignmentPublishedNotification_sendsPushWhenEnabledAndHasTokens() {
     UUID userId = UUID.randomUUID();
     when(preferencesService.isNotificationEnabled(userId, "assignment_published", "email"))
@@ -251,6 +253,7 @@ class NotificationDispatcherTest {
 
   @Test
     @Story("NTF-DIS-005")
+    @Description("Dispatches support-request notifications to all instructors via email and push channels.")
   void ntfDis005_sendSupportRequestNotification_sendsToAllInstructors() {
     UUID instructorId1 = UUID.randomUUID();
     UUID instructorId2 = UUID.randomUUID();

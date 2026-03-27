@@ -23,6 +23,7 @@ import apsas.support.model.entity.SupportMessage;
 import apsas.support.model.entity.SupportSession;
 import apsas.support.repository.SupportMessageRepository;
 import apsas.support.repository.SupportSessionRepository;
+import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Owner;
@@ -93,6 +94,7 @@ class SupportServiceTest {
 
   @Test
   @Story("SUP-SVC-003")
+  @Description("Assigns the instructor to a session on the first instructor message and persists the message.")
   void supSvc003_sendMessage_assignsInstructorOnFirstInstructorMessage() {
     UUID studentId = UUID.randomUUID();
     UUID instructorId = UUID.randomUUID();
@@ -205,6 +207,7 @@ class SupportServiceTest {
 
   @Test
   @Story("SUP-SVC-007")
+  @Description("Marks messages from the opposite participant as read when loading session details.")
   void supSvc007_getSessionById_marksOppositeSideMessagesAsRead() {
     UUID studentId = UUID.randomUUID();
     UUID instructorId = UUID.randomUUID();
