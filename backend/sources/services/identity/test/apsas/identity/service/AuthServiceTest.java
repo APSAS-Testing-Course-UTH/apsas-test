@@ -375,12 +375,10 @@ class AuthServiceTest {
     when(request.getEmail()).thenReturn("missing@apsas.dev");
     when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.empty());
 
-    try {
-      authService.resendVerificationEmail(request);
-      org.junit.jupiter.api.Assertions.fail("Expected NotFoundException");
-    } catch (NotFoundException ignored) {
-      // expected
-    }
+    assertThrows(
+        NotFoundException.class,
+        () -> authService.resendVerificationEmail(request)
+    );
   }
 
   private User buildUser(String email, boolean isActive) {
