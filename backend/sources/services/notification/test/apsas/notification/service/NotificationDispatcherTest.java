@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -14,6 +13,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Owner;
+import io.qameta.allure.Story;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -21,6 +24,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+@Epic("R2 Backend")
+@Feature("Notification Dispatcher")
+@Owner("hoanglhh20026")
 class NotificationDispatcherTest {
   private EmailService emailService;
   private PushNotificationService pushNotificationService;
@@ -43,6 +49,7 @@ class NotificationDispatcherTest {
   }
 
   @Test
+    @Story("NTF-DIS-001")
     void ntfDis001_sendVerificationEmail_bypassesPreferencesAndCallsEmailService() {
         dispatcher.sendVerificationEmail("user@example.com", "Lan", "Nguyen", "verify-token");
 
@@ -51,6 +58,7 @@ class NotificationDispatcherTest {
     }
 
     @Test
+    @Story("NTF-DIS-002")
     void ntfDis002_sendAssignmentPublishedNotification_sendsEmailWhenEnabled() {
     UUID userId = UUID.randomUUID();
     when(preferencesService.isNotificationEnabled(userId, "assignment_published", "email"))
@@ -79,6 +87,7 @@ class NotificationDispatcherTest {
   }
 
   @Test
+    @Story("NTF-DIS-003")
   void ntfDis003_sendAssignmentPublishedNotification_sendsPushWhenEnabledAndHasTokens() {
     UUID userId = UUID.randomUUID();
     when(preferencesService.isNotificationEnabled(userId, "assignment_published", "email"))
@@ -101,6 +110,7 @@ class NotificationDispatcherTest {
   }
 
   @Test
+    @Story("NTF-DIS-EXTRA-001")
     void ntfDisExtra_sendSubmissionEvaluatedNotification_usesSubmissionUrlForPushData() {
     UUID userId = UUID.randomUUID();
     when(preferencesService.isNotificationEnabled(userId, "submission_evaluated", "email"))
@@ -148,6 +158,7 @@ class NotificationDispatcherTest {
   }
 
   @Test
+    @Story("NTF-DIS-EXTRA-002")
   void ntfDisExtra_sendSubmissionEvaluatedNotification_usesSubmissionUrlForPushDataWhenFailed() {
     UUID userId = UUID.randomUUID();
     when(preferencesService.isNotificationEnabled(userId, "submission_evaluated", "email"))
@@ -183,6 +194,7 @@ class NotificationDispatcherTest {
   }
 
   @Test
+    @Story("NTF-DIS-004")
   void ntfDis004_sendSubmissionEvaluatedNotification_doesNotSendPushWhenNoTokens() {
     UUID userId = UUID.randomUUID();
     when(preferencesService.isNotificationEnabled(userId, "submission_evaluated", "email"))
@@ -209,10 +221,10 @@ class NotificationDispatcherTest {
   }
 
   @Test
+    @Story("NTF-DIS-EXTRA-003")
     void ntfDisExtra_sendSupportRequestNotification_swallowsEmailExceptionAndContinuesPush() {
     UUID instructorId = UUID.randomUUID();
-        when(deviceTokenService.getActiveTokenStringsByUserId(instructorId))
-                .thenReturn(List.of("token-3"));
+        when(deviceTokenService.getActiveTokenStringsByUserId(instructorId)).thenReturn(List.of("token-3"));
     org.mockito.Mockito.doThrow(new RuntimeException("mail down"))
         .when(emailService)
         .sendSupportRequestEmail(
@@ -238,6 +250,7 @@ class NotificationDispatcherTest {
   }
 
   @Test
+    @Story("NTF-DIS-005")
   void ntfDis005_sendSupportRequestNotification_sendsToAllInstructors() {
     UUID instructorId1 = UUID.randomUUID();
     UUID instructorId2 = UUID.randomUUID();
@@ -255,20 +268,20 @@ class NotificationDispatcherTest {
 
     verify(emailService, times(1))
         .sendSupportRequestEmail(
-            eq("ins1@example.com"),
-            eq("Instructor 1"),
-            eq("Student A"),
-            eq("student@example.com"),
-            eq("Need help"),
-            eq("session-1"));
+            "ins1@example.com",
+            "Instructor 1",
+            "Student A",
+            "student@example.com",
+            "Need help",
+            "session-1");
     verify(emailService, times(1))
         .sendSupportRequestEmail(
-            eq("ins2@example.com"),
-            eq("Instructor 2"),
-            eq("Student A"),
-            eq("student@example.com"),
-            eq("Need help"),
-            eq("session-1"));
+            "ins2@example.com",
+            "Instructor 2",
+            "Student A",
+            "student@example.com",
+            "Need help",
+            "session-1");
     verify(pushNotificationService, times(1))
         .sendSupportRequestNotification(
             List.of("t1"), "Student A", "Need help", "session-1");

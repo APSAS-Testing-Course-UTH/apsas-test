@@ -14,6 +14,10 @@ import apsas.notification.model.entity.NotificationPreferences;
 import apsas.notification.repository.NotificationPreferencesRepository;
 import java.util.Optional;
 import java.util.UUID;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Owner;
+import io.qameta.allure.Story;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,6 +25,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
+@Epic("R2 Backend")
+@Feature("Notification Preferences")
+@Owner("hoanglhh20026")
 class NotificationPreferencesServiceTest {
   @Mock private NotificationPreferencesRepository preferencesRepository;
   @Mock private NotificationPreferencesMapper preferencesMapper;
@@ -33,6 +40,7 @@ class NotificationPreferencesServiceTest {
   }
 
   @Test
+  @Story("NTF-PREF-001")
   void ntfPref001_getPreferences_returnsMappedResponseForExistingUser() {
     UUID userId = UUID.randomUUID();
     NotificationPreferences preferences = new NotificationPreferences();
@@ -50,6 +58,7 @@ class NotificationPreferencesServiceTest {
   }
 
   @Test
+  @Story("NTF-PREF-002")
   void ntfPref002_getPreferences_createsDefaultPreferencesWhenMissing() {
     UUID userId = UUID.randomUUID();
     NotificationPreferences created = new NotificationPreferences();
@@ -69,6 +78,7 @@ class NotificationPreferencesServiceTest {
   }
 
   @Test
+  @Story("NTF-PREF-003")
   void ntfPref003_updatePreferences_updatesAndSaves() {
     UUID userId = UUID.randomUUID();
     NotificationPreferencesRequest request = new NotificationPreferencesRequest();
@@ -96,6 +106,7 @@ class NotificationPreferencesServiceTest {
   }
 
   @Test
+  @Story("NTF-PREF-EXTRA-001")
   void ntfPrefExtra_isNotificationEnabled_defaultsTrueWhenNoPreferences() {
     UUID userId = UUID.randomUUID();
     when(preferencesRepository.findByUserId(userId)).thenReturn(Optional.empty());
@@ -104,6 +115,7 @@ class NotificationPreferencesServiceTest {
   }
 
   @Test
+  @Story("NTF-PREF-004")
   void ntfPref004_isNotificationEnabled_returnsFalseWhenGlobalChannelDisabled() {
     UUID userId = UUID.randomUUID();
     NotificationPreferences preferences = new NotificationPreferences();
@@ -117,6 +129,7 @@ class NotificationPreferencesServiceTest {
   }
 
   @Test
+  @Story("NTF-PREF-005")
   void ntfPref005_isNotificationEnabled_respectsTypeSpecificFlags() {
     UUID userId = UUID.randomUUID();
     NotificationPreferences preferences = new NotificationPreferences();

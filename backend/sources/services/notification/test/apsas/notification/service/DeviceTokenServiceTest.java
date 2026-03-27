@@ -16,6 +16,10 @@ import apsas.notification.repository.DeviceTokenRepository;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Owner;
+import io.qameta.allure.Story;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,6 +27,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
+@Epic("R2 Backend")
+@Feature("Device Token Management")
+@Owner("hoanglhh20026")
 class DeviceTokenServiceTest {
   @Mock private DeviceTokenRepository deviceTokenRepository;
   @Mock private DeviceTokenMapper deviceTokenMapper;
@@ -35,6 +42,7 @@ class DeviceTokenServiceTest {
   }
 
   @Test
+  @Story("NTF-DEV-001")
   void ntfDev001_registerToken_createsNewTokenAsActive() {
     UUID userId = UUID.randomUUID();
     RegisterDeviceRequest request = new RegisterDeviceRequest();
@@ -74,6 +82,7 @@ class DeviceTokenServiceTest {
   }
 
   @Test
+  @Story("NTF-DEV-002")
   void ntfDev002_registerToken_updatesExistingTokenData() {
     UUID userId = UUID.randomUUID();
     RegisterDeviceRequest request = new RegisterDeviceRequest();
@@ -109,12 +118,14 @@ class DeviceTokenServiceTest {
   }
 
   @Test
+  @Story("NTF-DEV-004")
   void ntfDev004_removeToken_deletesExistingToken() {
     service.removeToken("token-1");
     verify(deviceTokenRepository).deleteByToken("token-1");
   }
 
   @Test
+  @Story("NTF-DEV-EXTRA-001")
   void ntfDevExtra_removeToken_handlesMissingTokenWithoutSave() {
     service.removeToken("not-found");
     verify(deviceTokenRepository).deleteByToken("not-found");
@@ -122,6 +133,7 @@ class DeviceTokenServiceTest {
   }
 
   @Test
+  @Story("NTF-DEV-003")
   void ntfDev003_getActiveTokenStringsByUserId_returnsOnlyActiveTokens() {
     UUID userId = UUID.randomUUID();
     DeviceToken active = new DeviceToken();
@@ -137,6 +149,7 @@ class DeviceTokenServiceTest {
   }
 
   @Test
+  @Story("NTF-DEV-EXTRA-002")
   void ntfDevExtra_getUserDevices_mapsEntitiesToResponses() {
     UUID userId = UUID.randomUUID();
     DeviceToken t1 = new DeviceToken();

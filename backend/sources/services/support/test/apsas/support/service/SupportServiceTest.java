@@ -1,7 +1,6 @@
 package apsas.support.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -24,6 +23,10 @@ import apsas.support.model.entity.SupportMessage;
 import apsas.support.model.entity.SupportSession;
 import apsas.support.repository.SupportMessageRepository;
 import apsas.support.repository.SupportSessionRepository;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Owner;
+import io.qameta.allure.Story;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -36,6 +39,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 
 @ExtendWith(MockitoExtension.class)
+@Epic("R2 Backend")
+@Feature("Support Session Workflow")
+@Owner("hoanglhh20026")
 class SupportServiceTest {
   @Mock private SupportSessionRepository sessionRepository;
   @Mock private SupportMessageRepository messageRepository;
@@ -51,6 +57,7 @@ class SupportServiceTest {
   }
 
   @Test
+  @Story("SUP-SVC-001")
   void supSvc001_createSession_createsOpenSessionWithInitialMessage() {
     UUID studentId = UUID.randomUUID();
     SupportSession saved = new SupportSession();
@@ -73,6 +80,7 @@ class SupportServiceTest {
   }
 
   @Test
+  @Story("SUP-SVC-002")
   void supSvc002_createSessionFailsWhenRoleIsNotStudent_wsPath() {
     UUID studentId = UUID.randomUUID();
 
@@ -84,6 +92,7 @@ class SupportServiceTest {
   }
 
   @Test
+  @Story("SUP-SVC-003")
   void supSvc003_sendMessage_assignsInstructorOnFirstInstructorMessage() {
     UUID studentId = UUID.randomUUID();
     UUID instructorId = UUID.randomUUID();
@@ -121,6 +130,7 @@ class SupportServiceTest {
   }
 
   @Test
+  @Story("SUP-SVC-004")
   void supSvc004_sendMessage_throwsWhenSessionClosed() {
     UUID studentId = UUID.randomUUID();
     UUID sessionId = UUID.randomUUID();
@@ -142,14 +152,17 @@ class SupportServiceTest {
 
     when(sessionRepository.findById(sessionId)).thenReturn(Optional.of(session));
 
+    SendMessageRequest request = new SendMessageRequest("msg");
+
     assertThrows(
         BadRequestException.class,
-        () -> supportService.sendMessage(student, sessionId, new SendMessageRequest("msg")));
+        () -> supportService.sendMessage(student, sessionId, request));
 
     verify(messageRepository, never()).save(any());
   }
 
   @Test
+  @Story("SUP-SVC-005")
   void supSvc005_closeSession_succeedsForOwnerStudent() {
     UUID studentId = UUID.randomUUID();
     UUID sessionId = UUID.randomUUID();
@@ -174,6 +187,7 @@ class SupportServiceTest {
   }
 
   @Test
+  @Story("SUP-SVC-006")
   void supSvc006_closeSession_throwsForNonOwner() {
     UUID studentId = UUID.randomUUID();
     UUID otherUser = UUID.randomUUID();
@@ -190,6 +204,7 @@ class SupportServiceTest {
   }
 
   @Test
+  @Story("SUP-SVC-007")
   void supSvc007_getSessionById_marksOppositeSideMessagesAsRead() {
     UUID studentId = UUID.randomUUID();
     UUID instructorId = UUID.randomUUID();
@@ -234,6 +249,7 @@ class SupportServiceTest {
   }
 
   @Test
+  @Story("SUP-SVC-EXTRA-001")
   void supSvcExtra_getSessionById_studentWithoutOwnership_throwsForbidden() {
     UUID ownerId = UUID.randomUUID();
     UUID otherStudentId = UUID.randomUUID();
@@ -259,6 +275,7 @@ class SupportServiceTest {
   }
 
   @Test
+  @Story("SUP-SVC-EXTRA-002")
   void supSvcExtra_getSessionById_notFound_throwsNotFound() {
     UUID sessionId = UUID.randomUUID();
     UserPrincipal principal =
@@ -277,6 +294,7 @@ class SupportServiceTest {
   }
 
   @Test
+  @Story("SUP-SVC-008")
   void supSvc008_getSessions_studentOnlySeesOwnSessions() {
     UUID studentId = UUID.randomUUID();
     UserPrincipal student =
