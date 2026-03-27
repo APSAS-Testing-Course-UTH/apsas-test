@@ -9,6 +9,12 @@ import apsas.content.repository.TutorialRepository;
 import apsas.shared.exception.NotFoundException;
 import apsas.shared.exception.UnauthorizedException;
 import apsas.shared.models.pagination.PageResponse;
+import io.qameta.allure.Description;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Severity;
+import io.qameta.allure.SeverityLevel;
+import io.qameta.allure.Story;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -32,7 +38,14 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("TutorialService")
+@Epic("Content Service")
+@Feature("Tutorial Management")
 class TutorialServiceTest {
+
+  private static final String JAVA_BASICS_TITLE = "Java Basics";
+  private static final String JAVA_BASICS_CONTENT = "Learn Java fundamentals";
+  private static final String JAVA_ADVANCED_TITLE = "Java Advanced";
+  private static final String JAVA_ADVANCED_CONTENT = "Learn advanced Java";
 
   @Mock
   private TutorialRepository tutorialRepository;
@@ -57,32 +70,35 @@ class TutorialServiceTest {
 
     tutorial = new Tutorial();
     tutorial.setId(tutorialId);
-    tutorial.setTitle("Java Basics");
-    tutorial.setContent("Learn Java fundamentals");
+    tutorial.setTitle(JAVA_BASICS_TITLE);
+    tutorial.setContent(JAVA_BASICS_CONTENT);
     tutorial.setCreatorId(creatorId);
     tutorial.setCreatedAt(LocalDateTime.now());
     tutorial.setUpdatedAt(LocalDateTime.now());
 
     tutorialResponse = new TutorialResponse();
     tutorialResponse.setId(tutorialId);
-    tutorialResponse.setTitle("Java Basics");
-    tutorialResponse.setContent("Learn Java fundamentals");
+    tutorialResponse.setTitle(JAVA_BASICS_TITLE);
+    tutorialResponse.setContent(JAVA_BASICS_CONTENT);
 
     createRequest = new CreateTutorialRequest();
-    createRequest.setTitle("Java Basics");
-    createRequest.setContent("Learn Java fundamentals");
+    createRequest.setTitle(JAVA_BASICS_TITLE);
+    createRequest.setContent(JAVA_BASICS_CONTENT);
 
     updateRequest = new UpdateTutorialRequest();
-    updateRequest.setTitle("Java Advanced");
-    updateRequest.setContent("Learn advanced Java");
+    updateRequest.setTitle(JAVA_ADVANCED_TITLE);
+    updateRequest.setContent(JAVA_ADVANCED_CONTENT);
   }
 
   @Nested
   @DisplayName("getAllTutorials")
+  @Story("Retrieve paginated list of tutorials")
   class GetAllTutorialsTests {
 
     @Test
     @DisplayName("shouldReturnPageOfTutorials_whenCalled")
+    @Severity(SeverityLevel.NORMAL)
+    @Description("Retrieve all tutorials with pagination")
     void shouldReturnPageOfTutorials() {
       // Arrange
       Pageable pageable = PageRequest.of(0, 10);
@@ -146,10 +162,13 @@ class TutorialServiceTest {
 
   @Nested
   @DisplayName("getTutorialById")
+  @Story("Retrieve specific tutorial by ID")
   class GetTutorialByIdTests {
 
     @Test
     @DisplayName("shouldReturnTutorialResponse_whenTutorialExists")
+    @Severity(SeverityLevel.NORMAL)
+    @Description("Retrieve an existing tutorial by ID")
     void shouldReturnTutorialResponse() {
       // Arrange
       when(tutorialRepository.findById(tutorialId)).thenReturn(Optional.of(tutorial));
@@ -161,7 +180,7 @@ class TutorialServiceTest {
       // Assert
       assertThat(result).isNotNull();
       assertThat(result.getId()).isEqualTo(tutorialId);
-      assertThat(result.getTitle()).isEqualTo("Java Basics");
+      assertThat(result.getTitle()).isEqualTo(JAVA_BASICS_TITLE);
       verify(tutorialRepository, times(1)).findById(tutorialId);
     }
 
@@ -196,16 +215,19 @@ class TutorialServiceTest {
 
   @Nested
   @DisplayName("createTutorial")
+  @Story("Create new tutorials by creators")
   class CreateTutorialTests {
 
     @Test
     @DisplayName("shouldCreateTutorial_whenRequestIsValid")
+    @Severity(SeverityLevel.CRITICAL)
+    @Description("Create a new tutorial with valid request")
     void shouldCreateTutorial() {
       // Arrange
       Tutorial createdTutorial = new Tutorial();
       createdTutorial.setId(UUID.randomUUID());
-      createdTutorial.setTitle("Java Basics");
-      createdTutorial.setContent("Learn Java fundamentals");
+      createdTutorial.setTitle(JAVA_BASICS_TITLE);
+      createdTutorial.setContent(JAVA_BASICS_CONTENT);
       createdTutorial.setCreatorId(creatorId);
 
       when(tutorialMapper.toEntity(createRequest, creatorId)).thenReturn(tutorial);
@@ -217,7 +239,7 @@ class TutorialServiceTest {
 
       // Assert
       assertThat(result).isNotNull();
-      assertThat(result.getTitle()).isEqualTo("Java Basics");
+      assertThat(result.getTitle()).isEqualTo(JAVA_BASICS_TITLE);
       verify(tutorialRepository, times(1)).save(any());
       verify(tutorialMapper, times(1)).toEntity(createRequest, creatorId);
     }
@@ -256,24 +278,56 @@ class TutorialServiceTest {
       verify(tutorialRepository).save(captor.capture());
       assertThat(captor.getValue()).isEqualTo(tutorial);
     }
+
+    @Test
+    @DisplayName("shouldHandleNullContent_whenCreating")
+    @Severity(SeverityLevel.NORMAL)
+    @Description("Null content in create request should be handled")
+    void shouldHandleNullContent_whenCreating() {
+      // Arrange
+      CreateTutorialRequest nullContentRequest = new CreateTutorialRequest();
+      nullContentRequest.setTitle(JAVA_BASICS_TITLE);
+      nullContentRequest.setContent(null);
+
+      Tutorial tutorialWithNull = new Tutorial();
+      tutorialWithNull.setTitle(JAVA_BASICS_TITLE);
+      tutorialWithNull.setContent(null);
+
+      when(tutorialMapper.toEntity(nullContentRequest, creatorId))
+          .thenReturn(tutorialWithNull);
+      when(tutorialRepository.save(tutorialWithNull))
+          .thenReturn(tutorialWithNull);
+      when(tutorialMapper.toResponse(tutorialWithNull))
+          .thenReturn(tutorialResponse);
+
+      // Act
+      TutorialResponse result = tutorialService.createTutorial(nullContentRequest, creatorId);
+
+      // Assert
+      assertThat(result).isNotNull();
+      verify(tutorialRepository, times(1)).save(any());
+    }
   }
 
   @Nested
   @DisplayName("updateTutorial")
+  @Story("Update tutorials with authorization")
   class UpdateTutorialTests {
 
     @Test
     @DisplayName("shouldUpdateTutorial_whenUserIsCreator")
+    @Severity(SeverityLevel.CRITICAL)
+    @Description("Update a tutorial when user is the creator")
     void shouldUpdateTutorial() {
       // Arrange
       Tutorial updatedTutorial = new Tutorial();
       updatedTutorial.setId(tutorialId);
-      updatedTutorial.setTitle("Java Advanced");
+      updatedTutorial.setTitle(JAVA_ADVANCED_TITLE);
       updatedTutorial.setCreatorId(creatorId);
 
       TutorialResponse updatedResponse = new TutorialResponse();
       updatedResponse.setId(tutorialId);
-      updatedResponse.setTitle("Java Advanced");
+      updatedResponse.setTitle(JAVA_ADVANCED_TITLE);
 
       when(tutorialRepository.findById(tutorialId)).thenReturn(Optional.of(tutorial));
       doNothing().when(tutorialMapper).updateEntity(tutorial, updateRequest);
@@ -285,7 +339,7 @@ class TutorialServiceTest {
 
       // Assert
       assertThat(result).isNotNull();
-      assertThat(result.getTitle()).isEqualTo("Java Advanced");
+      assertThat(result.getTitle()).isEqualTo(JAVA_ADVANCED_TITLE);
       verify(tutorialRepository, times(1)).save(any());
     }
 
@@ -351,10 +405,13 @@ class TutorialServiceTest {
 
   @Nested
   @DisplayName("deleteTutorial")
+  @Story("Delete tutorials with ownership verification")
   class DeleteTutorialTests {
 
     @Test
     @DisplayName("shouldDeleteTutorial_whenUserIsCreator")
+    @Severity(SeverityLevel.CRITICAL)
+    @Description("Delete a tutorial when user is the creator")
     void shouldDeleteTutorial() {
       // Arrange
       when(tutorialRepository.findById(tutorialId)).thenReturn(Optional.of(tutorial));

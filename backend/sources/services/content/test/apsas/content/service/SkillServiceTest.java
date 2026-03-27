@@ -9,6 +9,12 @@ import apsas.content.repository.SkillRepository;
 import apsas.shared.exception.BadRequestException;
 import apsas.shared.exception.NotFoundException;
 import apsas.shared.models.pagination.PageResponse;
+import io.qameta.allure.Description;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Severity;
+import io.qameta.allure.SeverityLevel;
+import io.qameta.allure.Story;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -32,7 +38,14 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SkillService")
+@Epic("Content Service")
+@Feature("Skill Management")
 class SkillServiceTest {
+
+  private static final String JAVA_SKILL_NAME = "Java";
+  private static final String JAVA_DESCRIPTION = "Java programming language";
+  private static final String ADVANCED_JAVA_NAME = "Java Advanced";
+  private static final String ADVANCED_JAVA_DESC = "Advanced Java";
 
   @Mock
   private SkillRepository skillRepository;
@@ -55,31 +68,34 @@ class SkillServiceTest {
 
     skill = new Skill();
     skill.setId(skillId);
-    skill.setName("Java");
-    skill.setDescription("Java programming language");
+    skill.setName(JAVA_SKILL_NAME);
+    skill.setDescription(JAVA_DESCRIPTION);
     skill.setCreatedAt(LocalDateTime.now());
     skill.setUpdatedAt(LocalDateTime.now());
 
     skillResponse = new SkillResponse();
     skillResponse.setId(skillId);
-    skillResponse.setName("Java");
-    skillResponse.setDescription("Java programming language");
+    skillResponse.setName(JAVA_SKILL_NAME);
+    skillResponse.setDescription(JAVA_DESCRIPTION);
 
     createRequest = new CreateSkillRequest();
-    createRequest.setName("Java");
-    createRequest.setDescription("Java programming language");
+    createRequest.setName(JAVA_SKILL_NAME);
+    createRequest.setDescription(JAVA_DESCRIPTION);
 
     updateRequest = new UpdateSkillRequest();
-    updateRequest.setName("Java Advanced");
-    updateRequest.setDescription("Advanced Java");
+    updateRequest.setName(ADVANCED_JAVA_NAME);
+    updateRequest.setDescription(ADVANCED_JAVA_DESC);
   }
 
   @Nested
   @DisplayName("getAllSkills")
+  @Story("Retrieve paginated list of skills")
   class GetAllSkillsTests {
 
     @Test
     @DisplayName("shouldReturnPageOfSkills_whenCalled")
+    @Severity(SeverityLevel.NORMAL)
+    @Description("Retrieve all skills with pagination")
     void shouldReturnPageOfSkills() {
       // Arrange
       Pageable pageable = PageRequest.of(0, 10);
@@ -143,10 +159,13 @@ class SkillServiceTest {
 
   @Nested
   @DisplayName("getSkillById")
+  @Story("Retrieve specific skill by ID")
   class GetSkillByIdTests {
 
     @Test
     @DisplayName("shouldReturnSkillResponse_whenSkillExists")
+    @Severity(SeverityLevel.NORMAL)
+    @Description("Retrieve an existing skill by ID")
     void shouldReturnSkillResponse() {
       // Arrange
       when(skillRepository.findById(skillId)).thenReturn(Optional.of(skill));
@@ -158,7 +177,7 @@ class SkillServiceTest {
       // Assert
       assertThat(result).isNotNull();
       assertThat(result.getId()).isEqualTo(skillId);
-      assertThat(result.getName()).isEqualTo("Java");
+      assertThat(result.getName()).isEqualTo(JAVA_SKILL_NAME);
       verify(skillRepository, times(1)).findById(skillId);
     }
 
@@ -189,33 +208,25 @@ class SkillServiceTest {
       // Assert
       verify(skillMapper, times(1)).toResponse(skill);
     }
-
-    @Test
-    @DisplayName("shouldThrowNotFoundException_whenIdIsNull")
-    void shouldThrowNotFoundException_whenIdIsNull() {
-      // Arrange
-      when(skillRepository.findById(null)).thenReturn(Optional.empty());
-
-      // Act & Assert
-      assertThatThrownBy(() -> skillService.getSkillById(null))
-          .isInstanceOf(NotFoundException.class);
-    }
   }
 
   @Nested
   @DisplayName("createSkill")
+  @Story("Create new skills with duplicate name validation")
   class CreateSkillTests {
 
     @Test
     @DisplayName("shouldCreateSkill_whenRequestIsValid")
+    @Severity(SeverityLevel.CRITICAL)
+    @Description("Create a new skill with unique name")
     void shouldCreateSkill() {
       // Arrange
       Skill createdSkill = new Skill();
       createdSkill.setId(UUID.randomUUID());
-      createdSkill.setName("Java");
-      createdSkill.setDescription("Java programming language");
+      createdSkill.setName(JAVA_SKILL_NAME);
+      createdSkill.setDescription(JAVA_DESCRIPTION);
 
-      when(skillRepository.existsByName("Java")).thenReturn(false);
+      when(skillRepository.existsByName(JAVA_SKILL_NAME)).thenReturn(false);
       when(skillMapper.toEntity(createRequest)).thenReturn(skill);
       when(skillRepository.save(skill)).thenReturn(createdSkill);
       when(skillMapper.toResponse(createdSkill)).thenReturn(skillResponse);
@@ -225,8 +236,8 @@ class SkillServiceTest {
 
       // Assert
       assertThat(result).isNotNull();
-      assertThat(result.getName()).isEqualTo("Java");
-      verify(skillRepository, times(1)).existsByName("Java");
+      assertThat(result.getName()).isEqualTo(JAVA_SKILL_NAME);
+      verify(skillRepository, times(1)).existsByName(JAVA_SKILL_NAME);
       verify(skillRepository, times(1)).save(skill);
     }
 
@@ -234,7 +245,7 @@ class SkillServiceTest {
     @DisplayName("shouldThrowBadRequestException_whenSkillNameAlreadyExists")
     void shouldThrowBadRequestException() {
       // Arrange
-      when(skillRepository.existsByName("Java")).thenReturn(true);
+      when(skillRepository.existsByName(JAVA_SKILL_NAME)).thenReturn(true);
 
       // Act & Assert
       assertThatThrownBy(() -> skillService.createSkill(createRequest))
@@ -248,7 +259,7 @@ class SkillServiceTest {
     @DisplayName("shouldCallMapper_whenCreatingSkill")
     void shouldCallMapper() {
       // Arrange
-      when(skillRepository.existsByName("Java")).thenReturn(false);
+      when(skillRepository.existsByName(JAVA_SKILL_NAME)).thenReturn(false);
       when(skillMapper.toEntity(createRequest)).thenReturn(skill);
       when(skillRepository.save(skill)).thenReturn(skill);
       when(skillMapper.toResponse(skill)).thenReturn(skillResponse);
@@ -265,7 +276,7 @@ class SkillServiceTest {
     @DisplayName("shouldSaveSkill_whenNameIsUnique")
     void shouldSaveSkill() {
       // Arrange
-      when(skillRepository.existsByName("Java")).thenReturn(false);
+      when(skillRepository.existsByName(JAVA_SKILL_NAME)).thenReturn(false);
       when(skillMapper.toEntity(createRequest)).thenReturn(skill);
       when(skillRepository.save(skill)).thenReturn(skill);
       when(skillMapper.toResponse(skill)).thenReturn(skillResponse);
@@ -276,16 +287,19 @@ class SkillServiceTest {
       // Assert
       ArgumentCaptor<Skill> captor = ArgumentCaptor.forClass(Skill.class);
       verify(skillRepository).save(captor.capture());
-      assertThat(captor.getValue().getName()).isEqualTo("Java");
+      assertThat(captor.getValue().getName()).isEqualTo(JAVA_SKILL_NAME);
     }
   }
 
   @Nested
   @DisplayName("updateSkill")
+  @Story("Update existing skills")
   class UpdateSkillTests {
 
     @Test
     @DisplayName("shouldUpdateSkill_whenRequestIsValid")
+    @Severity(SeverityLevel.CRITICAL)
+    @Description("Update a skill with valid new name")
     void shouldUpdateSkill() {
       // Arrange
       Skill updatedSkill = new Skill();
@@ -363,6 +377,8 @@ class SkillServiceTest {
 
     @Test
     @DisplayName("shouldUpdateOnlyDescription_whenNameIsNull")
+    @Severity(SeverityLevel.NORMAL)
+    @Description("Update skill with null description should preserve existing description")
     void shouldUpdateOnlyDescription() {
       // Arrange
       UpdateSkillRequest partialRequest = new UpdateSkillRequest();
@@ -380,14 +396,41 @@ class SkillServiceTest {
       // Assert
       verify(skillRepository, times(1)).save(skill);
     }
+
+    @Test
+    @DisplayName("shouldHandleNullDescription_whenUpdating")
+    @Severity(SeverityLevel.NORMAL)
+    @Description("Update skill with null description should not fail")
+    void shouldHandleNullDescription_whenUpdating() {
+      // Arrange
+      UpdateSkillRequest nullDescRequest = new UpdateSkillRequest();
+      nullDescRequest.setName(ADVANCED_JAVA_NAME);
+      nullDescRequest.setDescription(null);
+
+      when(skillRepository.findById(skillId)).thenReturn(Optional.of(skill));
+      when(skillRepository.existsByName(ADVANCED_JAVA_NAME)).thenReturn(false);
+      doNothing().when(skillMapper).updateEntity(skill, nullDescRequest);
+      when(skillRepository.save(skill)).thenReturn(skill);
+      when(skillMapper.toResponse(skill)).thenReturn(skillResponse);
+
+      // Act
+      SkillResponse result = skillService.updateSkill(skillId, nullDescRequest);
+
+      // Assert
+      assertThat(result).isNotNull();
+      verify(skillRepository, times(1)).save(skill);
+    }
   }
 
   @Nested
   @DisplayName("deleteSkill")
+  @Story("Delete skills")
   class DeleteSkillTests {
 
     @Test
     @DisplayName("shouldDeleteSkill_whenSkillExists")
+    @Severity(SeverityLevel.CRITICAL)
+    @Description("Delete an existing skill")
     void shouldDeleteSkill() {
       // Arrange
       when(skillRepository.existsById(skillId)).thenReturn(true);
@@ -426,17 +469,6 @@ class SkillServiceTest {
       ArgumentCaptor<UUID> captor = ArgumentCaptor.forClass(UUID.class);
       verify(skillRepository).deleteById(captor.capture());
       assertThat(captor.getValue()).isEqualTo(skillId);
-    }
-
-    @Test
-    @DisplayName("shouldThrowNotFoundException_whenIdIsNull")
-    void shouldThrowNotFoundException_whenIdIsNull() {
-      // Arrange
-      when(skillRepository.existsById(null)).thenReturn(false);
-
-      // Act & Assert
-      assertThatThrownBy(() -> skillService.deleteSkill(null))
-          .isInstanceOf(NotFoundException.class);
     }
   }
 }

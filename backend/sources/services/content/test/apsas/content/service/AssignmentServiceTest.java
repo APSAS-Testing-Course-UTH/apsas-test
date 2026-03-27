@@ -23,6 +23,12 @@ import apsas.shared.messaging.event.AssignmentScheduleUpdatedEvent;
 import apsas.shared.messaging.event.EventPublisher;
 import apsas.shared.models.pagination.PageResponse;
 import apsas.shared.security.UserPrincipal;
+import io.qameta.allure.Description;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Severity;
+import io.qameta.allure.SeverityLevel;
+import io.qameta.allure.Story;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -50,7 +56,17 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("AssignmentService")
+@Epic("Content Service")
+@Feature("Assignment Management")
 class AssignmentServiceTest {
+
+  private static final BigDecimal DEFAULT_MAX_SCORE = new BigDecimal("100.00");
+  private static final int DAYS_UNTIL_DUE = 7;
+  private static final int DEFAULT_PAGE_SIZE = 10;
+  private static final int DEFAULT_PAGE_NUMBER = 0;
+  private static final String INVALID_DATE_MESSAGE = "Due date must be after start date";
+  private static final String NOT_DRAFT_MESSAGE = "Only draft assignments can be published";
+  private static final String ALREADY_ARCHIVED_MESSAGE = "already archived";
 
   @Mock
   private AssignmentRepository assignmentRepository;
@@ -87,7 +103,7 @@ class AssignmentServiceTest {
     tutorialId = UUID.randomUUID();
 
     LocalDateTime now = LocalDateTime.now();
-    LocalDateTime future = now.plusDays(7);
+    LocalDateTime future = now.plusDays(DAYS_UNTIL_DUE);
 
     assignment = new Assignment();
     assignment.setId(assignmentId);
@@ -97,7 +113,7 @@ class AssignmentServiceTest {
     assignment.setCreatorId(creatorId);
     assignment.setStartDate(now);
     assignment.setDueDate(future);
-    assignment.setMaxScore(new BigDecimal("100.00"));
+    assignment.setMaxScore(DEFAULT_MAX_SCORE);
     assignment.setStatus(AssignmentStatus.DRAFT);
     assignment.setLanguages(new String[]{"Java", "Python"});
     assignment.setTestCases(new java.util.ArrayList<>());
@@ -115,7 +131,7 @@ class AssignmentServiceTest {
     createRequest.setDifficultyLevel(DifficultyLevel.MEDIUM);
     createRequest.setStartDate(now);
     createRequest.setDueDate(future);
-    createRequest.setMaxScore(new BigDecimal("100.00"));
+    createRequest.setMaxScore(DEFAULT_MAX_SCORE);
     createRequest.setLanguages(new String[]{"Java"});
     createRequest.setTestCases(new java.util.ArrayList<>());
 
@@ -126,13 +142,16 @@ class AssignmentServiceTest {
 
   @Nested
   @DisplayName("getAllAssignments")
+  @Story("Retrieve assignments with role-based filtering")
   class GetAllAssignmentsTests {
 
     @Test
     @DisplayName("shouldReturnPublishedAssignments_whenNoPrincipalProvided")
+    @Severity(SeverityLevel.CRITICAL)
+    @Description("Public users should see only published assignments")
     void shouldReturnPublishedAssignments() {
       // Arrange
-      Pageable pageable = PageRequest.of(0, 10);
+      Pageable pageable = PageRequest.of(DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE);
       Page<Assignment> assignmentPage = new PageImpl<>(List.of(assignment), pageable, 1);
 
       when(assignmentRepository.findByStatus(AssignmentStatus.PUBLISHED, pageable))
@@ -149,15 +168,16 @@ class AssignmentServiceTest {
 
     @Test
     @DisplayName("shouldReturnContentProviderAssignments_whenPrincipalIsContentProvider")
+    @Severity(SeverityLevel.CRITICAL)
+    @Description("Content providers see only their own assignments")
     void shouldReturnContentProviderAssignments() {
       // Arrange
-      Pageable pageable = PageRequest.of(0, 10);
+      Pageable pageable = PageRequest.of(DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE);
       UserPrincipal principal = new UserPrincipal(
           creatorId, "email@test.com", "First", "Last", "CONTENT_PROVIDER", true
       );
 
       Page<Assignment> assignmentPage = new PageImpl<>(List.of(assignment), pageable, 1);
-      Page<AssignmentResponse> responsePage = new PageImpl<>(List.of(assignmentResponse), pageable, 1);
 
       when(assignmentRepository.findByCreatorId(creatorId, pageable))
           .thenReturn(assignmentPage);
@@ -167,14 +187,17 @@ class AssignmentServiceTest {
       PageResponse<AssignmentResponse> result = assignmentService.getAllAssignments(pageable, principal);
 
       // Assert
+      assertThat(result.content()).hasSize(1);
       verify(assignmentRepository).findByCreatorId(creatorId, pageable);
     }
 
     @Test
     @DisplayName("shouldMaskHiddenTestCases_whenUserIsStudent")
+    @Severity(SeverityLevel.CRITICAL)
+    @Description("Student users cannot see hidden test case values")
     void shouldMaskHiddenTestCases() {
       // Arrange
-      Pageable pageable = PageRequest.of(0, 10);
+      Pageable pageable = PageRequest.of(DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE);
       UserPrincipal studentPrincipal = new UserPrincipal(
           UUID.randomUUID(), "student@test.com", "First", "Last", "STUDENT", true
       );
@@ -196,15 +219,17 @@ class AssignmentServiceTest {
       PageResponse<AssignmentResponse> result = assignmentService.getAllAssignments(pageable, studentPrincipal);
 
       // Assert
-      assertThat(result.content().get(0).getTestCases().get(0).getInput()).isEqualTo("***");
-      assertThat(result.content().get(0).getTestCases().get(0).getOutput()).isEqualTo("***");
+      assertThat(result.content().getFirst().getTestCases().getFirst().getInput()).isEqualTo("***");
+      assertThat(result.content().getFirst().getTestCases().getFirst().getOutput()).isEqualTo("***");
     }
 
     @Test
     @DisplayName("shouldNotMaskHiddenTestCases_whenUserIsInstructor")
+    @Severity(SeverityLevel.CRITICAL)
+    @Description("Instructor users see all test case values including hidden")
     void shouldNotMaskTestCases_forInstructor() {
       // Arrange
-      Pageable pageable = PageRequest.of(0, 10);
+      Pageable pageable = PageRequest.of(DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE);
       UserPrincipal instructorPrincipal = new UserPrincipal(
           UUID.randomUUID(), "instructor@test.com", "First", "Last", "INSTRUCTOR", true
       );
@@ -226,17 +251,20 @@ class AssignmentServiceTest {
       PageResponse<AssignmentResponse> result = assignmentService.getAllAssignments(pageable, instructorPrincipal);
 
       // Assert
-      assertThat(result.content().get(0).getTestCases().get(0).getInput())
+      assertThat(result.content().getFirst().getTestCases().getFirst().getInput())
           .isNotEqualTo("***");
     }
   }
 
   @Nested
   @DisplayName("getAssignmentById")
+  @Story("Retrieve single assignment with authorization checks")
   class GetAssignmentByIdTests {
 
     @Test
     @DisplayName("shouldReturnAssignment_whenAssignmentExists")
+    @Severity(SeverityLevel.NORMAL)
+    @Description("Retrieve an existing assignment by ID")
     void shouldReturnAssignment() {
       // Arrange
       when(assignmentRepository.findById(assignmentId)).thenReturn(Optional.of(assignment));
@@ -366,13 +394,13 @@ class AssignmentServiceTest {
     void shouldThrowBadRequestException_invalidDates() {
       // Arrange
       LocalDateTime now = LocalDateTime.now();
-      createRequest.setStartDate(now.plusDays(7));
+      createRequest.setStartDate(now.plusDays(DAYS_UNTIL_DUE));
       createRequest.setDueDate(now);
 
       // Act & Assert
       assertThatThrownBy(() -> assignmentService.createAssignment(createRequest, creatorId))
           .isInstanceOf(BadRequestException.class)
-          .hasMessageContaining("Due date must be after start date");
+          .hasMessageContaining(INVALID_DATE_MESSAGE);
     }
 
     @Test
@@ -527,7 +555,7 @@ class AssignmentServiceTest {
     void shouldUpdateSchedule() {
       // Arrange
       LocalDateTime newStart = LocalDateTime.now().plusDays(1);
-      LocalDateTime newDue = LocalDateTime.now().plusDays(8);
+      LocalDateTime newDue = LocalDateTime.now().plusDays(DAYS_UNTIL_DUE);
 
       UpdateAssignmentScheduleRequest request = new UpdateAssignmentScheduleRequest();
       request.setStartDate(newStart);
@@ -553,7 +581,7 @@ class AssignmentServiceTest {
     void shouldPublishEvent() {
       // Arrange
       LocalDateTime newStart = LocalDateTime.now().plusDays(1);
-      LocalDateTime newDue = LocalDateTime.now().plusDays(8);
+      LocalDateTime newDue = LocalDateTime.now().plusDays(DAYS_UNTIL_DUE);
 
       UpdateAssignmentScheduleRequest request = new UpdateAssignmentScheduleRequest();
       request.setStartDate(newStart);
@@ -582,7 +610,7 @@ class AssignmentServiceTest {
       // Arrange
       LocalDateTime now = LocalDateTime.now();
       UpdateAssignmentScheduleRequest request = new UpdateAssignmentScheduleRequest();
-      request.setStartDate(now.plusDays(7));
+      request.setStartDate(now.plusDays(DAYS_UNTIL_DUE));
       request.setDueDate(now);
 
       when(assignmentRepository.findById(assignmentId)).thenReturn(Optional.of(assignment));
@@ -673,7 +701,7 @@ class AssignmentServiceTest {
       // Act & Assert
       assertThatThrownBy(() -> assignmentService.publishAssignment(assignmentId, creatorId))
           .isInstanceOf(BadRequestException.class)
-          .hasMessageContaining("Only draft assignments can be published");
+          .hasMessageContaining(NOT_DRAFT_MESSAGE);
 
       verify(eventPublisher, never()).publish(any(), any());
     }
@@ -747,7 +775,7 @@ class AssignmentServiceTest {
       // Act & Assert
       assertThatThrownBy(() -> assignmentService.archiveAssignment(assignmentId, creatorId))
           .isInstanceOf(BadRequestException.class)
-          .hasMessageContaining("already archived");
+          .hasMessageContaining(ALREADY_ARCHIVED_MESSAGE);
 
       verify(assignmentRepository, never()).save(any());
     }
