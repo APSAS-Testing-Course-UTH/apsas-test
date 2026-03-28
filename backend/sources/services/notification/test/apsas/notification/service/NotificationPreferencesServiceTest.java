@@ -12,26 +12,31 @@ import apsas.notification.model.dto.NotificationPreferencesRequest;
 import apsas.notification.model.dto.NotificationPreferencesResponse;
 import apsas.notification.model.entity.NotificationPreferences;
 import apsas.notification.repository.NotificationPreferencesRepository;
-import java.util.Optional;
-import java.util.UUID;
-import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
-import io.qameta.allure.Owner;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
+import io.qameta.allure.TmsLink;
+import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@Epic("R2 Backend")
-@Feature("Notification Preferences")
-@Owner("hoanglhh20026")
+@Epic("Notification Service")
+@Feature("Notification Preferences Service")
+@Issue("13")
 class NotificationPreferencesServiceTest {
-  @Mock private NotificationPreferencesRepository preferencesRepository;
-  @Mock private NotificationPreferencesMapper preferencesMapper;
+  @Mock
+  private NotificationPreferencesRepository preferencesRepository;
+
+  @Mock
+  private NotificationPreferencesMapper preferencesMapper;
 
   private NotificationPreferencesService service;
 
@@ -41,8 +46,11 @@ class NotificationPreferencesServiceTest {
   }
 
   @Test
-  @Story("NTF-PREF-001")
-  void ntfPref001_getPreferences_returnsMappedResponseForExistingUser() {
+  @Tag("unit")
+  @Story("Get user preferences")
+  @TmsLink("NTF-PREF-001")
+  @DisplayName("Should return mapped preferences when user preferences exist")
+  void getPreferences_shouldReturnMappedPreferences_whenUserPreferencesExist() {
     UUID userId = UUID.randomUUID();
     NotificationPreferences preferences = new NotificationPreferences();
     preferences.setUserId(userId);
@@ -59,8 +67,11 @@ class NotificationPreferencesServiceTest {
   }
 
   @Test
-  @Story("NTF-PREF-002")
-  void ntfPref002_getPreferences_createsDefaultPreferencesWhenMissing() {
+  @Tag("unit")
+  @Story("Create default preferences")
+  @TmsLink("NTF-PREF-002")
+  @DisplayName("Should create default preferences when user preferences are missing")
+  void getPreferences_shouldCreateDefaultPreferences_whenUserPreferencesMissing() {
     UUID userId = UUID.randomUUID();
     NotificationPreferences created = new NotificationPreferences();
     created.setUserId(userId);
@@ -79,9 +90,11 @@ class NotificationPreferencesServiceTest {
   }
 
   @Test
-  @Story("NTF-PREF-003")
-  @Description("Updates stored notification preferences and returns the mapped response.")
-  void ntfPref003_updatePreferences_updatesAndSaves() {
+  @Tag("unit")
+  @Story("Update preferences")
+  @TmsLink("NTF-PREF-003")
+  @DisplayName("Should update and persist preferences when update request is valid")
+  void updatePreferences_shouldPersistUpdatedPreferences_whenRequestIsValid() {
     UUID userId = UUID.randomUUID();
     NotificationPreferencesRequest request = new NotificationPreferencesRequest();
     request.setEmailEnabled(false);
@@ -108,8 +121,11 @@ class NotificationPreferencesServiceTest {
   }
 
   @Test
-  @Story("NTF-PREF-EXTRA-001")
-  void ntfPrefExtra_isNotificationEnabled_defaultsTrueWhenNoPreferences() {
+  @Tag("unit")
+  @Story("Resolve notification toggle defaults")
+  @TmsLink("NTF-PREF-EXTRA-001")
+  @DisplayName("Should return true by default when preferences are missing")
+  void isNotificationEnabled_shouldReturnTrueByDefault_whenPreferencesMissing() {
     UUID userId = UUID.randomUUID();
     when(preferencesRepository.findByUserId(userId)).thenReturn(Optional.empty());
 
@@ -117,8 +133,11 @@ class NotificationPreferencesServiceTest {
   }
 
   @Test
-  @Story("NTF-PREF-004")
-  void ntfPref004_isNotificationEnabled_returnsFalseWhenGlobalChannelDisabled() {
+  @Tag("unit")
+  @Story("Evaluate global channel flags")
+  @TmsLink("NTF-PREF-004")
+  @DisplayName("Should return false when global channel is disabled")
+  void isNotificationEnabled_shouldReturnFalse_whenGlobalChannelDisabled() {
     UUID userId = UUID.randomUUID();
     NotificationPreferences preferences = new NotificationPreferences();
     preferences.setUserId(userId);
@@ -131,8 +150,11 @@ class NotificationPreferencesServiceTest {
   }
 
   @Test
-  @Story("NTF-PREF-005")
-  void ntfPref005_isNotificationEnabled_respectsTypeSpecificFlags() {
+  @Tag("unit")
+  @Story("Evaluate type-specific notification flags")
+  @TmsLink("NTF-PREF-005")
+  @DisplayName("Should follow type-specific preferences for each notification type")
+  void isNotificationEnabled_shouldFollowTypeSpecificFlags_whenTypeConfigurationsExist() {
     UUID userId = UUID.randomUUID();
     NotificationPreferences preferences = new NotificationPreferences();
     preferences.setUserId(userId);

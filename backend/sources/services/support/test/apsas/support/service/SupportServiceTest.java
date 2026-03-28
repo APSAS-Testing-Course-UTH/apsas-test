@@ -3,6 +3,7 @@ package apsas.support.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -23,15 +24,17 @@ import apsas.support.model.entity.SupportMessage;
 import apsas.support.model.entity.SupportSession;
 import apsas.support.repository.SupportMessageRepository;
 import apsas.support.repository.SupportSessionRepository;
-import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
-import io.qameta.allure.Owner;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
+import io.qameta.allure.TmsLink;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -40,14 +43,21 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 
 @ExtendWith(MockitoExtension.class)
-@Epic("R2 Backend")
+@Epic("Support Service")
 @Feature("Support Session Workflow")
-@Owner("hoanglhh20026")
+@Issue("13")
 class SupportServiceTest {
-  @Mock private SupportSessionRepository sessionRepository;
-  @Mock private SupportMessageRepository messageRepository;
-  @Mock private SupportSessionMapper sessionMapper;
-  @Mock private EventPublisher eventPublisher;
+  @Mock
+  private SupportSessionRepository sessionRepository;
+
+  @Mock
+  private SupportMessageRepository messageRepository;
+
+  @Mock
+  private SupportSessionMapper sessionMapper;
+
+  @Mock
+  private EventPublisher eventPublisher;
 
   private SupportService supportService;
 
@@ -58,8 +68,11 @@ class SupportServiceTest {
   }
 
   @Test
-  @Story("SUP-SVC-001")
-  void supSvc001_createSession_createsOpenSessionWithInitialMessage() {
+  @Tag("unit")
+  @Story("Create support session")
+  @TmsLink("SUP-SVC-001")
+  @DisplayName("Should create an open session with initial message for student")
+  void createSession_shouldCreateOpenSessionWithInitialMessage_whenStudentDataIsValid() {
     UUID studentId = UUID.randomUUID();
     SupportSession saved = new SupportSession();
     saved.setId(UUID.randomUUID());
@@ -81,8 +94,11 @@ class SupportServiceTest {
   }
 
   @Test
-  @Story("SUP-SVC-002")
-  void supSvc002_createSessionFailsWhenRoleIsNotStudent_wsPath() {
+  @Tag("unit")
+  @Story("Create support session with role validation")
+  @TmsLink("SUP-SVC-002")
+  @DisplayName("Should throw forbidden when role is not student in websocket session creation")
+  void createSessionWs_shouldThrowForbidden_whenRoleIsNotStudent() {
     UUID studentId = UUID.randomUUID();
 
     assertThrows(
@@ -93,9 +109,11 @@ class SupportServiceTest {
   }
 
   @Test
-  @Story("SUP-SVC-003")
-  @Description("Assigns the instructor to a session on the first instructor message and persists the message.")
-  void supSvc003_sendMessage_assignsInstructorOnFirstInstructorMessage() {
+  @Tag("unit")
+  @Story("Send support message")
+  @TmsLink("SUP-SVC-003")
+  @DisplayName("Should assign instructor on first instructor message")
+  void sendMessage_shouldAssignInstructor_whenFirstInstructorMessageIsSent() {
     UUID studentId = UUID.randomUUID();
     UUID instructorId = UUID.randomUUID();
     UUID sessionId = UUID.randomUUID();
@@ -132,8 +150,11 @@ class SupportServiceTest {
   }
 
   @Test
-  @Story("SUP-SVC-004")
-  void supSvc004_sendMessage_throwsWhenSessionClosed() {
+  @Tag("unit")
+  @Story("Validate closed support session")
+  @TmsLink("SUP-SVC-004")
+  @DisplayName("Should throw bad request when sending message to closed session")
+  void sendMessage_shouldThrowBadRequest_whenSessionIsClosed() {
     UUID studentId = UUID.randomUUID();
     UUID sessionId = UUID.randomUUID();
 
@@ -156,16 +177,17 @@ class SupportServiceTest {
 
     SendMessageRequest request = new SendMessageRequest("msg");
 
-    assertThrows(
-        BadRequestException.class,
-        () -> supportService.sendMessage(student, sessionId, request));
+    assertThrows(BadRequestException.class, () -> supportService.sendMessage(student, sessionId, request));
 
     verify(messageRepository, never()).save(any());
   }
 
   @Test
-  @Story("SUP-SVC-005")
-  void supSvc005_closeSession_succeedsForOwnerStudent() {
+  @Tag("unit")
+  @Story("Close support session")
+  @TmsLink("SUP-SVC-005")
+  @DisplayName("Should close session when owner student requests closure")
+  void closeSession_shouldCloseSession_whenRequesterIsOwnerStudent() {
     UUID studentId = UUID.randomUUID();
     UUID sessionId = UUID.randomUUID();
 
@@ -185,12 +207,15 @@ class SupportServiceTest {
 
     assertEquals(Boolean.TRUE, session.getIsClosed());
     assertNotNull(session.getClosedAt());
-    assertEquals(true, result.isClosed());
+    assertTrue(result.isClosed());
   }
 
   @Test
-  @Story("SUP-SVC-006")
-  void supSvc006_closeSession_throwsForNonOwner() {
+  @Tag("unit")
+  @Story("Authorize close support session")
+  @TmsLink("SUP-SVC-006")
+  @DisplayName("Should throw forbidden when non-owner attempts to close session")
+  void closeSession_shouldThrowForbidden_whenRequesterIsNotSessionOwner() {
     UUID studentId = UUID.randomUUID();
     UUID otherUser = UUID.randomUUID();
     UUID sessionId = UUID.randomUUID();
@@ -206,9 +231,11 @@ class SupportServiceTest {
   }
 
   @Test
-  @Story("SUP-SVC-007")
-  @Description("Marks messages from the opposite participant as read when loading session details.")
-  void supSvc007_getSessionById_marksOppositeSideMessagesAsRead() {
+  @Tag("unit")
+  @Story("Mark messages as read")
+  @TmsLink("SUP-SVC-007")
+  @DisplayName("Should mark opposite participant messages as read when loading session details")
+  void getSessionById_shouldMarkOppositeMessagesAsRead_whenSessionIsLoaded() {
     UUID studentId = UUID.randomUUID();
     UUID instructorId = UUID.randomUUID();
     UUID sessionId = UUID.randomUUID();
@@ -248,12 +275,15 @@ class SupportServiceTest {
     ArgumentCaptor<SupportMessage> captor = ArgumentCaptor.forClass(SupportMessage.class);
     verify(messageRepository).save(captor.capture());
     assertEquals(instructorId, captor.getValue().getSenderId());
-    assertEquals(true, captor.getValue().getIsRead());
+    assertEquals(Boolean.TRUE, captor.getValue().getIsRead());
   }
 
   @Test
-  @Story("SUP-SVC-EXTRA-001")
-  void supSvcExtra_getSessionById_studentWithoutOwnership_throwsForbidden() {
+  @Tag("unit")
+  @Story("Authorize session detail access")
+  @TmsLink("SUP-SVC-EXTRA-001")
+  @DisplayName("Should throw forbidden when student requests another student's session")
+  void getSessionById_shouldThrowForbidden_whenStudentDoesNotOwnSession() {
     UUID ownerId = UUID.randomUUID();
     UUID otherStudentId = UUID.randomUUID();
     UUID sessionId = UUID.randomUUID();
@@ -278,8 +308,11 @@ class SupportServiceTest {
   }
 
   @Test
-  @Story("SUP-SVC-EXTRA-002")
-  void supSvcExtra_getSessionById_notFound_throwsNotFound() {
+  @Tag("unit")
+  @Story("Handle missing support session")
+  @TmsLink("SUP-SVC-EXTRA-002")
+  @DisplayName("Should throw not found when session does not exist")
+  void getSessionById_shouldThrowNotFound_whenSessionDoesNotExist() {
     UUID sessionId = UUID.randomUUID();
     UserPrincipal principal =
         UserPrincipal.builder()
@@ -297,8 +330,11 @@ class SupportServiceTest {
   }
 
   @Test
-  @Story("SUP-SVC-008")
-  void supSvc008_getSessions_studentOnlySeesOwnSessions() {
+  @Tag("unit")
+  @Story("List sessions for student")
+  @TmsLink("SUP-SVC-008")
+  @DisplayName("Should return only student sessions when principal role is student")
+  void getSessions_shouldQueryStudentSessionsOnly_whenPrincipalIsStudent() {
     UUID studentId = UUID.randomUUID();
     UserPrincipal student =
         UserPrincipal.builder()

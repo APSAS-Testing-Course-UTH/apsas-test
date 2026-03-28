@@ -13,27 +13,32 @@ import apsas.notification.model.dto.DeviceTokenResponse;
 import apsas.notification.model.dto.RegisterDeviceRequest;
 import apsas.notification.model.entity.DeviceToken;
 import apsas.notification.repository.DeviceTokenRepository;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
+import io.qameta.allure.TmsLink;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import io.qameta.allure.Description;
-import io.qameta.allure.Epic;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Owner;
-import io.qameta.allure.Story;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@Epic("R2 Backend")
-@Feature("Device Token Management")
-@Owner("hoanglhh20026")
+@Epic("Notification Service")
+@Feature("Device Token Service")
+@Issue("13")
 class DeviceTokenServiceTest {
-  @Mock private DeviceTokenRepository deviceTokenRepository;
-  @Mock private DeviceTokenMapper deviceTokenMapper;
+  @Mock
+  private DeviceTokenRepository deviceTokenRepository;
+
+  @Mock
+  private DeviceTokenMapper deviceTokenMapper;
 
   private DeviceTokenService service;
 
@@ -43,8 +48,11 @@ class DeviceTokenServiceTest {
   }
 
   @Test
-  @Story("NTF-DEV-001")
-  void ntfDev001_registerToken_createsNewTokenAsActive() {
+  @Tag("unit")
+  @Story("Register a new device token")
+  @TmsLink("NTF-DEV-001")
+  @DisplayName("Should create an active token when token does not exist")
+  void registerToken_shouldCreateActiveToken_whenTokenDoesNotExist() {
     UUID userId = UUID.randomUUID();
     RegisterDeviceRequest request = new RegisterDeviceRequest();
     request.setToken("token-new");
@@ -83,9 +91,11 @@ class DeviceTokenServiceTest {
   }
 
   @Test
-  @Story("NTF-DEV-002")
-  @Description("Reactivates and updates an existing device token when the token already exists.")
-  void ntfDev002_registerToken_updatesExistingTokenData() {
+  @Tag("unit")
+  @Story("Update an existing device token")
+  @TmsLink("NTF-DEV-002")
+  @DisplayName("Should update existing token data when token already exists")
+  void registerToken_shouldUpdateExistingToken_whenTokenAlreadyExists() {
     UUID userId = UUID.randomUUID();
     RegisterDeviceRequest request = new RegisterDeviceRequest();
     request.setToken("token-existing");
@@ -120,23 +130,11 @@ class DeviceTokenServiceTest {
   }
 
   @Test
-  @Story("NTF-DEV-004")
-  void ntfDev004_removeToken_deletesExistingToken() {
-    service.removeToken("token-1");
-    verify(deviceTokenRepository).deleteByToken("token-1");
-  }
-
-  @Test
-  @Story("NTF-DEV-EXTRA-001")
-  void ntfDevExtra_removeToken_handlesMissingTokenWithoutSave() {
-    service.removeToken("not-found");
-    verify(deviceTokenRepository).deleteByToken("not-found");
-    verify(deviceTokenRepository, never()).save(any(DeviceToken.class));
-  }
-
-  @Test
-  @Story("NTF-DEV-003")
-  void ntfDev003_getActiveTokenStringsByUserId_returnsOnlyActiveTokens() {
+  @Tag("unit")
+  @Story("Fetch active tokens by user")
+  @TmsLink("NTF-DEV-003")
+  @DisplayName("Should return only active token strings for the user")
+  void getActiveTokenStringsByUserId_shouldReturnOnlyActiveTokens_whenRepositoryReturnsMixedState() {
     UUID userId = UUID.randomUUID();
     DeviceToken active = new DeviceToken();
     active.setToken("active-token");
@@ -147,24 +145,50 @@ class DeviceTokenServiceTest {
     List<String> result = service.getActiveTokenStringsByUserId(userId);
 
     assertEquals(1, result.size());
-    assertEquals("active-token", result.get(0));
+    assertEquals("active-token", result.getFirst());
   }
 
   @Test
-  @Story("NTF-DEV-EXTRA-002")
-  void ntfDevExtra_getUserDevices_mapsEntitiesToResponses() {
-    UUID userId = UUID.randomUUID();
-    DeviceToken t1 = new DeviceToken();
-    t1.setToken("token-1");
-    DeviceTokenResponse r1 = new DeviceTokenResponse();
-    r1.setToken("token-1");
+  @Tag("unit")
+  @Story("Remove a device token")
+  @TmsLink("NTF-DEV-004")
+  @DisplayName("Should delete token when removal is requested")
+  void removeToken_shouldDeleteToken_whenTokenIsProvided() {
+    service.removeToken("token-1");
 
-    when(deviceTokenRepository.findByUserId(userId)).thenReturn(List.of(t1));
-    when(deviceTokenMapper.toResponse(t1)).thenReturn(r1);
+    verify(deviceTokenRepository).deleteByToken("token-1");
+  }
+
+  @Test
+  @Tag("unit")
+  @Story("Handle remove token for missing token")
+  @TmsLink("NTF-DEV-EXTRA-001")
+  @DisplayName("Should not perform save when deleting a non-existent token")
+  void removeToken_shouldNotSaveEntity_whenTokenDoesNotExist() {
+    service.removeToken("not-found");
+
+    verify(deviceTokenRepository).deleteByToken("not-found");
+    verify(deviceTokenRepository, never()).save(any(DeviceToken.class));
+  }
+
+  @Test
+  @Tag("unit")
+  @Story("Map user devices to response")
+  @TmsLink("NTF-DEV-EXTRA-002")
+  @DisplayName("Should map user device entities to response DTOs")
+  void getUserDevices_shouldMapEntitiesToResponses_whenDevicesExist() {
+    UUID userId = UUID.randomUUID();
+    DeviceToken token = new DeviceToken();
+    token.setToken("token-1");
+    DeviceTokenResponse response = new DeviceTokenResponse();
+    response.setToken("token-1");
+
+    when(deviceTokenRepository.findByUserId(userId)).thenReturn(List.of(token));
+    when(deviceTokenMapper.toResponse(token)).thenReturn(response);
 
     List<DeviceTokenResponse> result = service.getUserDevices(userId);
 
     assertEquals(1, result.size());
-    assertEquals("token-1", result.get(0).getToken());
+    assertEquals("token-1", result.getFirst().getToken());
   }
 }
