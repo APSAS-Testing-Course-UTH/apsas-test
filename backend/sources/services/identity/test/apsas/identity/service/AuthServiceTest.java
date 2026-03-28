@@ -90,9 +90,9 @@ class AuthServiceTest {
 
   @Test
   @TmsLink("IDT-AUTH-001")
-  @DisplayName("Dang ky thanh cong khi email moi")
+  @DisplayName("Register succeeds when email is new")
   @Description("register tra ve auth response, tao token verify va phat su kien user registered")
-  @Story("Dang ky tai khoan")
+  @Story("Account registration")
   @Severity(SeverityLevel.CRITICAL)
   void register_shouldReturnAuthResponse_whenEmailIsNew() {
     RegisterRequest request =
@@ -135,8 +135,8 @@ class AuthServiceTest {
 
   @Test
   @TmsLink("IDT-AUTH-002")
-  @DisplayName("Dang ky that bai khi email da ton tai")
-  @Story("Dang ky tai khoan")
+  @DisplayName("Register fails when email already exists")
+  @Story("Account registration")
   void register_shouldThrowBadRequest_whenEmailAlreadyExists() {
     RegisterRequest request =
         Instancio.of(RegisterRequest.class)
@@ -151,8 +151,8 @@ class AuthServiceTest {
 
   @Test
   @TmsLink("IDT-AUTH-003")
-  @DisplayName("Dang nhap thanh cong voi thong tin hop le")
-  @Story("Dang nhap")
+  @DisplayName("Login succeeds with valid credentials")
+  @Story("Login")
   void login_shouldReturnAuthResponse_whenCredentialsAreValid() {
     LoginRequest request = new LoginRequest("user@apsas.dev", "Password@123");
     User user = buildUser("user@apsas.dev", true);
@@ -171,8 +171,8 @@ class AuthServiceTest {
 
   @Test
   @TmsLink("IDT-AUTH-004")
-  @DisplayName("Dang nhap that bai khi sai mat khau")
-  @Story("Dang nhap")
+  @DisplayName("Login fails when password is incorrect")
+  @Story("Login")
   void login_shouldThrowUnauthorized_whenPasswordIsWrong() {
     LoginRequest request = new LoginRequest("user@apsas.dev", "wrong-pass");
     User user = buildUser("user@apsas.dev", true);
@@ -185,8 +185,8 @@ class AuthServiceTest {
 
   @Test
   @TmsLink("IDT-AUTH-005")
-  @DisplayName("Dang nhap that bai khi tai khoan bi vo hieu hoa")
-  @Story("Dang nhap")
+  @DisplayName("Login fails when account is inactive")
+  @Story("Login")
   void login_shouldThrowUnauthorized_whenAccountIsInactive() {
     LoginRequest request = new LoginRequest("user@apsas.dev", "Password@123");
     User user = buildUser("user@apsas.dev", false);
@@ -199,8 +199,8 @@ class AuthServiceTest {
 
   @Test
   @TmsLink("IDT-AUTH-006")
-  @DisplayName("Xac thuc email thanh cong khi token hop le")
-  @Story("Xac thuc email")
+  @DisplayName("Email verification succeeds with valid token")
+  @Story("Email verification")
   void verifyEmail_shouldMarkUserVerified_whenTokenIsValid() {
     User user = buildUser("verify@apsas.dev", true);
     user.setIsEmailVerified(false);
@@ -221,8 +221,8 @@ class AuthServiceTest {
 
   @Test
   @TmsLink("IDT-AUTH-007")
-  @DisplayName("Xac thuc email that bai khi token khong ton tai")
-  @Story("Xac thuc email")
+  @DisplayName("Email verification fails when token is missing")
+  @Story("Email verification")
   void verifyEmail_shouldThrowBadRequest_whenTokenNotFound() {
     when(emailVerificationTokenRepository.findByToken("missing-token")).thenReturn(Optional.empty());
 
@@ -231,8 +231,8 @@ class AuthServiceTest {
 
   @Test
   @TmsLink("IDT-AUTH-008")
-  @DisplayName("Xac thuc email that bai khi token het han")
-  @Story("Xac thuc email")
+  @DisplayName("Email verification fails when token is expired")
+  @Story("Email verification")
   void verifyEmail_shouldThrowBadRequest_whenTokenExpired() {
     EmailVerificationToken token = new EmailVerificationToken();
     token.setUser(buildUser("verify@apsas.dev", true));
@@ -246,8 +246,8 @@ class AuthServiceTest {
 
   @Test
   @TmsLink("IDT-AUTH-009")
-  @DisplayName("Gui lai email verify thanh cong va xoa token cu")
-  @Story("Xac thuc email")
+  @DisplayName("Resend verification email succeeds and replaces old token")
+  @Story("Email verification")
   void resendVerificationEmail_shouldReplaceOldToken_whenUserNotVerified() {
     User user = buildUser("resend@apsas.dev", true);
     user.setIsEmailVerified(false);
@@ -272,8 +272,8 @@ class AuthServiceTest {
 
   @Test
   @TmsLink("IDT-AUTH-010")
-  @DisplayName("Gui lai email verify that bai khi email da duoc xac thuc")
-  @Story("Xac thuc email")
+  @DisplayName("Resend verification email fails when email is already verified")
+  @Story("Email verification")
   void resendVerificationEmail_shouldThrowBadRequest_whenAlreadyVerified() {
     User user = buildUser("verified@apsas.dev", true);
     EmailRequest request = new EmailRequest(user.getEmail());
@@ -289,8 +289,8 @@ class AuthServiceTest {
 
   @Test
   @TmsLink("IDT-AUTH-011")
-  @DisplayName("Yeu cau reset password thanh cong")
-  @Story("Khoi phuc mat khau")
+  @DisplayName("Request password reset succeeds")
+  @Story("Password recovery")
   void requestPasswordReset_shouldPublishEvent_whenUserExists() {
     User user = buildUser("reset@apsas.dev", true);
     PasswordResetToken oldToken = new PasswordResetToken();
@@ -313,8 +313,8 @@ class AuthServiceTest {
 
   @Test
   @TmsLink("IDT-AUTH-012")
-  @DisplayName("Reset password thanh cong voi token hop le")
-  @Story("Khoi phuc mat khau")
+  @DisplayName("Reset password succeeds with valid token")
+  @Story("Password recovery")
   void resetPassword_shouldUpdatePasswordAndDeleteToken_whenTokenIsValid() {
     User user = buildUser("reset@apsas.dev", true);
     PasswordResetToken token = new PasswordResetToken();
@@ -334,8 +334,8 @@ class AuthServiceTest {
 
   @Test
   @TmsLink("IDT-AUTH-013")
-  @DisplayName("Reset password that bai khi token khong ton tai")
-  @Story("Khoi phuc mat khau")
+  @DisplayName("Reset password fails when token is missing")
+  @Story("Password recovery")
   void resetPassword_shouldThrowBadRequest_whenTokenNotFound() {
     ResetPasswordRequest request = new ResetPasswordRequest("missing-reset-token", "Password@123");
     when(passwordResetTokenRepository.findByToken("missing-reset-token")).thenReturn(Optional.empty());
@@ -348,8 +348,8 @@ class AuthServiceTest {
 
   @Test
   @TmsLink("IDT-AUTH-014")
-  @DisplayName("Reset password that bai khi token het han")
-  @Story("Khoi phuc mat khau")
+  @DisplayName("Reset password fails when token is expired")
+  @Story("Password recovery")
   void resetPassword_shouldThrowBadRequest_whenTokenExpired() {
     ResetPasswordRequest request = new ResetPasswordRequest("expired-reset-token", "Password@123");
     PasswordResetToken token = new PasswordResetToken();
@@ -368,8 +368,8 @@ class AuthServiceTest {
 
   @Test
   @TmsLink("IDT-AUTH-015")
-  @DisplayName("Gui lai email verify that bai khi khong tim thay user")
-  @Story("Xac thuc email")
+  @DisplayName("Resend verification email fails when user is not found")
+  @Story("Email verification")
   void resendVerificationEmail_shouldThrowNotFound_whenUserMissing() {
     EmailRequest request = org.mockito.Mockito.mock(EmailRequest.class);
     when(request.getEmail()).thenReturn("missing@apsas.dev");
@@ -394,5 +394,4 @@ class AuthServiceTest {
         .create();
   }
 }
-
 

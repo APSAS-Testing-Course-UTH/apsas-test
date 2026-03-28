@@ -42,8 +42,8 @@ class CustomUserDetailsServiceTest {
 
   @Test
   @TmsLink("IDT-CUDS-001")
-  @DisplayName("Load user details thanh cong bang email")
-  @Story("Xac thuc nguoi dung")
+  @DisplayName("Load user details succeeds by email")
+  @Story("User authentication")
   void loadUserByUsername_shouldReturnUserPrincipal_whenEmailExists() {
     User user = buildUser("student@apsas.dev");
 
@@ -58,8 +58,8 @@ class CustomUserDetailsServiceTest {
 
   @Test
   @TmsLink("IDT-CUDS-002")
-  @DisplayName("Load user details thanh cong bang UUID")
-  @Story("Xac thuc nguoi dung")
+  @DisplayName("Load user details succeeds by UUID")
+  @Story("User authentication")
   void loadUserByUsername_shouldReturnUserPrincipal_whenUuidExists() {
     User user = buildUser("uuid@apsas.dev");
 
@@ -74,8 +74,8 @@ class CustomUserDetailsServiceTest {
 
   @Test
   @TmsLink("IDT-CUDS-003")
-  @DisplayName("Load user details that bai khi email khong ton tai")
-  @Story("Xac thuc nguoi dung")
+  @DisplayName("Load user details fails when email does not exist")
+  @Story("User authentication")
   void loadUserByUsername_shouldThrowUsernameNotFound_whenEmailMissing() {
     when(userRepository.findByEmail("missing@apsas.dev")).thenReturn(Optional.empty());
 
@@ -87,8 +87,8 @@ class CustomUserDetailsServiceTest {
 
   @Test
   @TmsLink("IDT-CUDS-004")
-  @DisplayName("Load user details that bai khi UUID khong ton tai")
-  @Story("Xac thuc nguoi dung")
+  @DisplayName("Load user details fails when UUID does not exist")
+  @Story("User authentication")
   void loadUserByUsername_shouldThrowUsernameNotFound_whenUuidMissing() {
     UUID missingId = UUID.randomUUID();
     String missingUserId = missingId.toString();
@@ -102,8 +102,8 @@ class CustomUserDetailsServiceTest {
 
   @Test
   @TmsLink("IDT-CUDS-005")
-  @DisplayName("Load user details that bai khi input sai dinh dang")
-  @Story("Xac thuc nguoi dung")
+  @DisplayName("Load user details fails when identifier is invalid")
+  @Story("User authentication")
   void loadUserByUsername_shouldThrowUsernameNotFound_whenIdentifierIsInvalid() {
     assertThrows(
         UsernameNotFoundException.class,
@@ -123,5 +123,4 @@ class CustomUserDetailsServiceTest {
         .create();
   }
 }
-
 

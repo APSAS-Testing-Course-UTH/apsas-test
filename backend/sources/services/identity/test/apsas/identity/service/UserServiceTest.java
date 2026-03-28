@@ -62,8 +62,8 @@ class UserServiceTest {
 
   @Test
   @TmsLink("IDT-USER-001")
-  @DisplayName("Lay user theo id thanh cong")
-  @Story("Quan ly thong tin user")
+  @DisplayName("Get user by id succeeds")
+  @Story("User information management")
   void getUserById_shouldReturnUserResponse_whenUserExists() {
     UUID userId = UUID.randomUUID();
     User user = buildUser("existing@apsas.dev");
@@ -79,8 +79,8 @@ class UserServiceTest {
 
   @Test
   @TmsLink("IDT-USER-002")
-  @DisplayName("Lay user theo id that bai khi user khong ton tai")
-  @Story("Quan ly thong tin user")
+  @DisplayName("Get user by id fails when user does not exist")
+  @Story("User information management")
   void getUserById_shouldThrowNotFound_whenUserMissing() {
     UUID userId = UUID.randomUUID();
     when(userRepository.findById(userId)).thenReturn(Optional.empty());
@@ -90,8 +90,8 @@ class UserServiceTest {
 
   @Test
   @TmsLink("IDT-USER-003")
-  @DisplayName("Lay danh sach user theo phan trang")
-  @Story("Quan ly thong tin user")
+  @DisplayName("Get paginated users list")
+  @Story("User information management")
   void getAllUsers_shouldMapPageContent() {
     User user = buildUser("user1@apsas.dev");
     UserResponse response = Instancio.create(UserResponse.class);
@@ -109,8 +109,8 @@ class UserServiceTest {
 
   @Test
   @TmsLink("IDT-USER-004")
-  @DisplayName("Lay danh sach user theo role va phan trang")
-  @Story("Quan ly thong tin user")
+  @DisplayName("Get paginated users by role")
+  @Story("User information management")
   void getUsersByRole_shouldReturnMappedPage_whenRoleProvided() {
     User user = buildUser("role@apsas.dev");
     UserResponse response = Instancio.create(UserResponse.class);
@@ -130,9 +130,9 @@ class UserServiceTest {
 
   @Test
   @TmsLink("IDT-USER-005")
-  @DisplayName("Tao user thanh cong khi email chua duoc dang ky")
+  @DisplayName("Create user succeeds when email is not registered")
   @Description("createUser luu user moi va tra ve user response")
-  @Story("Quan ly thong tin user")
+  @Story("User information management")
   void createUser_shouldSaveAndReturnResponse_whenEmailIsUnique() {
     CreateUserRequest request =
         Instancio.of(CreateUserRequest.class)
@@ -155,8 +155,8 @@ class UserServiceTest {
 
   @Test
   @TmsLink("IDT-USER-006")
-  @DisplayName("Tao user that bai khi email da ton tai")
-  @Story("Quan ly thong tin user")
+  @DisplayName("Create user fails when email already exists")
+  @Story("User information management")
   void createUser_shouldThrowBadRequest_whenEmailExists() {
     CreateUserRequest request =
         Instancio.of(CreateUserRequest.class)
@@ -171,8 +171,8 @@ class UserServiceTest {
 
   @Test
   @TmsLink("IDT-USER-007")
-  @DisplayName("Cap nhat profile chi thay doi truong hop le")
-  @Story("Quan ly thong tin user")
+  @DisplayName("Update profile changes only valid fields")
+  @Story("User information management")
   void updateProfile_shouldUpdateOnlyValidFields_whenRequestContainsBlankValue() {
     UUID userId = UUID.randomUUID();
     User user = buildUser("profile@apsas.dev");
@@ -197,8 +197,8 @@ class UserServiceTest {
 
   @Test
   @TmsLink("IDT-USER-008")
-  @DisplayName("Cap nhat profile that bai khi user khong ton tai")
-  @Story("Quan ly thong tin user")
+  @DisplayName("Update profile fails when user does not exist")
+  @Story("User information management")
   void updateProfile_shouldThrowNotFound_whenUserMissing() {
     UUID userId = UUID.randomUUID();
     UpdateProfileRequest request = new UpdateProfileRequest("A", "B");
@@ -209,8 +209,8 @@ class UserServiceTest {
 
   @Test
   @TmsLink("IDT-USER-017")
-  @DisplayName("Cap nhat profile chi cap nhat lastName khi firstName rong")
-  @Story("Quan ly thong tin user")
+  @DisplayName("Update profile changes only lastName when firstName is empty")
+  @Story("User information management")
   void updateProfile_shouldUpdateLastNameOnly_whenFirstNameIsBlank() {
     UUID userId = UUID.randomUUID();
     User user = buildUser("profile2@apsas.dev");
@@ -235,8 +235,8 @@ class UserServiceTest {
 
   @Test
   @TmsLink("IDT-USER-009")
-  @DisplayName("Doi mat khau thanh cong khi mat khau hien tai dung")
-  @Story("Bao mat tai khoan")
+  @DisplayName("Change password succeeds when current password is correct")
+  @Story("Account security")
   void changePassword_shouldEncodeAndSave_whenCurrentPasswordMatches() {
     UUID userId = UUID.randomUUID();
     User user = buildUser("password@apsas.dev");
@@ -257,8 +257,8 @@ class UserServiceTest {
 
   @Test
   @TmsLink("IDT-USER-010")
-  @DisplayName("Doi mat khau that bai khi sai mat khau hien tai")
-  @Story("Bao mat tai khoan")
+  @DisplayName("Change password fails when current password is incorrect")
+  @Story("Account security")
   void changePassword_shouldThrowUnauthorized_whenCurrentPasswordIsIncorrect() {
     UUID userId = UUID.randomUUID();
     User user = buildUser("password@apsas.dev");
@@ -277,8 +277,8 @@ class UserServiceTest {
 
   @Test
   @TmsLink("IDT-USER-011")
-  @DisplayName("Deactivate user se danh dau isActive bang false")
-  @Story("Quan ly trang thai user")
+  @DisplayName("Deactivate user sets isActive to false")
+  @Story("User status management")
   void deactivateUser_shouldSetInactiveAndSave() {
     UUID userId = UUID.randomUUID();
     User user = buildUser("inactive@apsas.dev");
@@ -294,8 +294,8 @@ class UserServiceTest {
 
   @Test
   @TmsLink("IDT-USER-012")
-  @DisplayName("Activate user se danh dau isActive bang true")
-  @Story("Quan ly trang thai user")
+  @DisplayName("Activate user sets isActive to true")
+  @Story("User status management")
   void activateUser_shouldSetActiveAndSave() {
     UUID userId = UUID.randomUUID();
     User user = buildUser("active@apsas.dev");
@@ -311,8 +311,8 @@ class UserServiceTest {
 
   @Test
   @TmsLink("IDT-USER-013")
-  @DisplayName("Xoa user that bai khi id khong ton tai")
-  @Story("Quan ly thong tin user")
+  @DisplayName("Delete user fails when id does not exist")
+  @Story("User information management")
   void deleteUser_shouldThrowNotFound_whenIdDoesNotExist() {
     UUID userId = UUID.randomUUID();
     when(userRepository.existsById(userId)).thenReturn(false);
@@ -322,8 +322,8 @@ class UserServiceTest {
 
   @Test
   @TmsLink("IDT-USER-014")
-  @DisplayName("Xoa user thanh cong khi id ton tai")
-  @Story("Quan ly thong tin user")
+  @DisplayName("Delete user succeeds when id exists")
+  @Story("User information management")
   void deleteUser_shouldDeleteById_whenUserExists() {
     UUID userId = UUID.randomUUID();
     when(userRepository.existsById(userId)).thenReturn(true);
@@ -335,8 +335,8 @@ class UserServiceTest {
 
   @Test
   @TmsLink("IDT-USER-015")
-  @DisplayName("Tim users theo ids se map thanh user response")
-  @Story("Noi bo cho feign client")
+  @DisplayName("Find users by ids maps to user responses")
+  @Story("Internal for feign client")
   void findUsersByIds_shouldMapAllUsers() {
     User user1 = buildUser("user1@apsas.dev");
     User user2 = buildUser("user2@apsas.dev");
@@ -357,8 +357,8 @@ class UserServiceTest {
 
   @Test
   @TmsLink("IDT-USER-016")
-  @DisplayName("Lay users theo role string hop le")
-  @Story("Noi bo cho feign client")
+  @DisplayName("Get users by valid role string")
+  @Story("Internal for feign client")
   void getUsersByRole_shouldConvertStringRoleAndMapResponses() {
     User user = buildUser("student@apsas.dev");
     user.setRole(UserRole.STUDENT);
@@ -386,4 +386,3 @@ class UserServiceTest {
         .create();
   }
 }
-
