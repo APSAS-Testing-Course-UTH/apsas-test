@@ -102,7 +102,7 @@ class TutorialServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-028")
-    @DisplayName("shouldReturnPageOfTutorials_whenCalled")
+    @DisplayName("Returns page of tutorials when called")
     @Severity(SeverityLevel.NORMAL)
     @Description("Retrieve all tutorials with pagination")
     void shouldReturnPageOfTutorials_whenCalled() {
@@ -125,7 +125,7 @@ class TutorialServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-028")
-    @DisplayName("shouldReturnEmptyPage_whenNoTutorialsExist")
+    @DisplayName("Returns empty page when no tutorials exist")
     void shouldReturnEmptyPage_whenNoTutorialsExist() {
       // Arrange
       Pageable pageable = PageRequest.of(0, 10);
@@ -144,7 +144,7 @@ class TutorialServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-028")
-    @DisplayName("shouldHandleMultiplePages_whenPaginationApplied")
+    @DisplayName("Handles multiple pages when pagination applied")
     void shouldHandleMultiplePages_whenPaginationApplied() {
       // Arrange
       Pageable pageable = PageRequest.of(1, 5);
@@ -178,7 +178,7 @@ class TutorialServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-029")
-    @DisplayName("shouldReturnTutorialResponse_whenTutorialExists")
+    @DisplayName("Returns tutorial response when tutorial exists")
     @Severity(SeverityLevel.NORMAL)
     @Description("Retrieve an existing tutorial by ID")
     void shouldReturnTutorialResponse_whenTutorialExists() {
@@ -199,7 +199,7 @@ class TutorialServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-030")
-    @DisplayName("shouldThrowNotFoundException_whenTutorialDoesNotExist")
+    @DisplayName("Throws not found exception when tutorial does not exist")
     void shouldThrowNotFoundException_whenTutorialDoesNotExist() {
       // Arrange
       when(tutorialRepository.findById(tutorialId)).thenReturn(Optional.empty());
@@ -215,7 +215,7 @@ class TutorialServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-029")
-    @DisplayName("shouldCallMapperToResponse_whenTutorialFound")
+    @DisplayName("Calls mapper to response when tutorial found")
     void shouldCallMapperToResponse_whenTutorialFound() {
       // Arrange
       when(tutorialRepository.findById(tutorialId)).thenReturn(Optional.of(tutorial));
@@ -237,7 +237,7 @@ class TutorialServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-031")
-    @DisplayName("shouldCreateTutorial_whenRequestIsValid")
+    @DisplayName("Creates tutorial when request is valid")
     @Severity(SeverityLevel.CRITICAL)
     @Description("Create a new tutorial with valid request")
     void shouldCreateTutorial_whenRequestIsValid() {
@@ -265,7 +265,7 @@ class TutorialServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-031")
-    @DisplayName("shouldMapperReceiveCreatorId_whenCreatingTutorial")
+    @DisplayName("Mappers receive creator ID when creating tutorial")
     void shouldMapperReceiveCreatorId_whenCreatingTutorial() {
       // Arrange
       when(tutorialMapper.toEntity(createRequest, creatorId)).thenReturn(tutorial);
@@ -285,7 +285,7 @@ class TutorialServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-031")
-    @DisplayName("shouldSaveTutorialToRepository_whenRequestIsValid")
+    @DisplayName("Saves tutorial to repository when request is valid")
     void shouldSaveTutorialToRepository_whenRequestIsValid() {
       // Arrange
       when(tutorialMapper.toEntity(createRequest, creatorId)).thenReturn(tutorial);
@@ -304,7 +304,7 @@ class TutorialServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-032")
-    @DisplayName("shouldHandleNullContent_whenCreating")
+    @DisplayName("Handles null content when creating")
     @Severity(SeverityLevel.NORMAL)
     @Description("Null content in create request should be handled")
     void shouldHandleNullContent_whenCreating() {
@@ -341,7 +341,7 @@ class TutorialServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-033")
-    @DisplayName("shouldUpdateTutorial_whenUserIsCreator")
+    @DisplayName("Updates tutorial when user is creator")
     @Severity(SeverityLevel.CRITICAL)
     @Description("Update a tutorial when user is the creator")
     void shouldUpdateTutorial_whenUserIsCreator() {
@@ -372,7 +372,7 @@ class TutorialServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-034")
-    @DisplayName("shouldThrowUnauthorizedException_whenUserIsNotCreator")
+    @DisplayName("Throws unauthorized exception when user is not creator")
     void shouldThrowUnauthorizedException_whenUserIsNotCreator() {
       // Arrange
       UUID differentUserId = UUID.randomUUID();
@@ -389,7 +389,7 @@ class TutorialServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-035")
-    @DisplayName("shouldThrowNotFoundException_whenTutorialDoesNotExist")
+    @DisplayName("Throws not found exception when tutorial does not exist")
     void shouldThrowNotFoundException_whenTutorialDoesNotExist() {
       // Arrange
       when(tutorialRepository.findById(tutorialId)).thenReturn(Optional.empty());
@@ -405,7 +405,7 @@ class TutorialServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-033")
-    @DisplayName("shouldCallMapper_whenUpdatingTutorial")
+    @DisplayName("Calls mapper when updating tutorial")
     void shouldCallMapper_whenUpdatingTutorial() {
       // Arrange
       when(tutorialRepository.findById(tutorialId)).thenReturn(Optional.of(tutorial));
@@ -423,7 +423,7 @@ class TutorialServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-034")
-    @DisplayName("shouldVerifyCreatorIdMatch_beforeUpdating")
+    @DisplayName("Verifies creator ID match before updating")
     void shouldVerifyCreatorIdMatch_whenUpdatingWithMismatchedCreatorId() {
       // Arrange
       UUID wrongCreatorId = UUID.randomUUID();
@@ -445,7 +445,7 @@ class TutorialServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-036")
-    @DisplayName("shouldDeleteTutorial_whenUserIsCreator")
+    @DisplayName("Deletes tutorial when user is creator")
     @Severity(SeverityLevel.CRITICAL)
     @Description("Delete a tutorial when user is the creator")
     void shouldDeleteTutorial_whenUserIsCreator() {
@@ -462,7 +462,7 @@ class TutorialServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-037")
-    @DisplayName("shouldThrowUnauthorizedException_whenUserIsNotCreator")
+    @DisplayName("Throws unauthorized exception when user is not creator")
     void shouldThrowUnauthorizedException_whenUserIsNotCreator() {
       // Arrange
       UUID differentUserId = UUID.randomUUID();
@@ -479,7 +479,7 @@ class TutorialServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-038")
-    @DisplayName("shouldThrowNotFoundException_whenTutorialDoesNotExist")
+    @DisplayName("Throws not found exception when tutorial does not exist")
     void shouldThrowNotFoundException_whenTutorialDoesNotExist() {
       // Arrange
       when(tutorialRepository.findById(tutorialId)).thenReturn(Optional.empty());
@@ -495,7 +495,7 @@ class TutorialServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-036")
-    @DisplayName("shouldCallRepositoryDelete_withCorrectId")
+    @DisplayName("Calls repository delete with correct ID")
     void shouldCallRepositoryDelete_whenDeletingWithCorrectId() {
       // Arrange
       when(tutorialRepository.findById(tutorialId)).thenReturn(Optional.of(tutorial));
@@ -512,7 +512,7 @@ class TutorialServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-037")
-    @DisplayName("shouldVerifyCreatorIdMatch_beforeDeleting")
+    @DisplayName("Verifies creator ID match before deleting")
     void shouldVerifyCreatorIdMatch_whenDeletingWithMismatchedCreatorId() {
       // Arrange
       UUID wrongCreatorId = UUID.randomUUID();

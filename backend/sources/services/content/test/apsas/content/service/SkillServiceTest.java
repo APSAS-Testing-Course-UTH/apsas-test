@@ -99,7 +99,7 @@ class SkillServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-018")
-    @DisplayName("shouldReturnPageOfSkills_whenCalled")
+    @DisplayName("Returns page of skills when called")
     @Severity(SeverityLevel.NORMAL)
     @Description("Retrieve all skills with pagination")
     void shouldReturnPageOfSkills_whenCalled() {
@@ -122,7 +122,7 @@ class SkillServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-018")
-    @DisplayName("shouldReturnEmptyPage_whenNoSkillsExist")
+    @DisplayName("Returns empty page when no skills exist")
     void shouldReturnEmptyPage_whenNoSkillsExist() {
       // Arrange
       Pageable pageable = PageRequest.of(0, 10);
@@ -141,7 +141,7 @@ class SkillServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-018")
-    @DisplayName("shouldReturnMultiplePages_whenPaginationParametersApplied")
+    @DisplayName("Returns multiple pages when pagination parameters applied")
     void shouldReturnMultiplePages_whenPaginationParametersApplied() {
       // Arrange
       Pageable pageable = PageRequest.of(1, 5);
@@ -175,7 +175,7 @@ class SkillServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-019")
-    @DisplayName("shouldReturnSkillResponse_whenSkillExists")
+    @DisplayName("Returns skill response when skill exists")
     @Severity(SeverityLevel.NORMAL)
     @Description("Retrieve an existing skill by ID")
     void shouldReturnSkillResponse_whenSkillExists() {
@@ -196,7 +196,7 @@ class SkillServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-020")
-    @DisplayName("shouldThrowNotFoundException_whenSkillDoesNotExist")
+    @DisplayName("Throws not found exception when skill does not exist")
     void shouldThrowNotFoundException_whenSkillDoesNotExist() {
       // Arrange
       when(skillRepository.findById(skillId)).thenReturn(Optional.empty());
@@ -212,7 +212,7 @@ class SkillServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-019")
-    @DisplayName("shouldCallMapperToResponse_whenSkillFound")
+    @DisplayName("Calls mapper to response when skill found")
     void shouldCallMapperToResponse_whenSkillFound() {
       // Arrange
       when(skillRepository.findById(skillId)).thenReturn(Optional.of(skill));
@@ -234,7 +234,7 @@ class SkillServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-021")
-    @DisplayName("shouldCreateSkill_whenRequestIsValid")
+    @DisplayName("Creates skill when request is valid")
     @Severity(SeverityLevel.CRITICAL)
     @Description("Create a new skill with unique name")
     void shouldCreateSkill_whenRequestIsValid() {
@@ -262,7 +262,7 @@ class SkillServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-022")
-    @DisplayName("shouldThrowBadRequestException_whenSkillNameAlreadyExists")
+    @DisplayName("Throws bad request exception when skill name already exists")
     void shouldThrowBadRequestException_whenSkillNameAlreadyExists() {
       // Arrange
       when(skillRepository.existsByName(JAVA_SKILL_NAME)).thenReturn(true);
@@ -278,7 +278,7 @@ class SkillServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-021")
-    @DisplayName("shouldCallMapper_whenCreatingSkill")
+    @DisplayName("Calls mapper when creating skill")
     void shouldCallMapper_whenCreatingSkill() {
       // Arrange
       when(skillRepository.existsByName(JAVA_SKILL_NAME)).thenReturn(false);
@@ -297,7 +297,7 @@ class SkillServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-021")
-    @DisplayName("shouldSaveSkill_whenNameIsUnique")
+    @DisplayName("Saves skill when name is unique")
     void shouldSaveSkill_whenNameIsUnique() {
       // Arrange
       when(skillRepository.existsByName(JAVA_SKILL_NAME)).thenReturn(false);
@@ -323,7 +323,7 @@ class SkillServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-023")
-    @DisplayName("shouldUpdateSkill_whenRequestIsValid")
+    @DisplayName("Updates skill when request is valid")
     @Severity(SeverityLevel.CRITICAL)
     @Description("Update a skill with valid new name")
     void shouldUpdateSkill_whenRequestIsValid() {
@@ -356,7 +356,7 @@ class SkillServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-024")
-    @DisplayName("shouldThrowNotFoundException_whenSkillDoesNotExist")
+    @DisplayName("Throws not found exception when skill does not exist")
     void shouldThrowNotFoundException_whenSkillDoesNotExist() {
       // Arrange
       when(skillRepository.findById(skillId)).thenReturn(Optional.empty());
@@ -371,7 +371,7 @@ class SkillServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-025")
-    @DisplayName("shouldThrowBadRequestException_whenNewNameAlreadyExists")
+    @DisplayName("Throws bad request exception when new name already exists")
     void shouldThrowBadRequestException_whenNewNameAlreadyExists() {
       // Arrange
       when(skillRepository.findById(skillId)).thenReturn(Optional.of(skill));
@@ -388,7 +388,7 @@ class SkillServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-023")
-    @DisplayName("shouldNotCheckDuplicate_whenNameIsNotChanged")
+    @DisplayName("Does not check duplicate when name is not changed")
     void shouldNotCheckDuplicate_whenNameIsNotChanged() {
       // Arrange
       UpdateSkillRequest sameNameRequest = new UpdateSkillRequest();
@@ -410,7 +410,7 @@ class SkillServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-023")
-    @DisplayName("shouldUpdateOnlyDescription_whenNameIsNull")
+    @DisplayName("Updates only description when name is null")
     @Severity(SeverityLevel.NORMAL)
     @Description("Update skill with null description should preserve existing description")
     void shouldUpdateOnlyDescription_whenNameIsNull() {
@@ -434,7 +434,7 @@ class SkillServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-023")
-    @DisplayName("shouldHandleNullDescription_whenUpdating")
+    @DisplayName("Handles null description when updating")
     @Severity(SeverityLevel.NORMAL)
     @Description("Update skill with null description should not fail")
     void shouldHandleNullDescription_whenUpdating() {
@@ -466,7 +466,7 @@ class SkillServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-026")
-    @DisplayName("shouldDeleteSkill_whenSkillExists")
+    @DisplayName("Deletes skill when skill exists")
     @Severity(SeverityLevel.CRITICAL)
     @Description("Delete an existing skill")
     void shouldDeleteSkill_whenSkillExists() {
@@ -483,7 +483,7 @@ class SkillServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-027")
-    @DisplayName("shouldThrowNotFoundException_whenSkillDoesNotExist")
+    @DisplayName("Throws not found exception when skill does not exist")
     void shouldThrowNotFoundException_whenSkillDoesNotExist() {
       // Arrange
       when(skillRepository.existsById(skillId)).thenReturn(false);
@@ -499,7 +499,7 @@ class SkillServiceTest {
     @Test
     @Tag("unit")
     @TmsLink("CNT-SVC-026")
-    @DisplayName("shouldCallRepositoryDelete_whenSkillExists")
+    @DisplayName("Calls repository delete when skill exists")
     void shouldCallRepositoryDelete_whenSkillExists() {
       // Arrange
       when(skillRepository.existsById(skillId)).thenReturn(true);
