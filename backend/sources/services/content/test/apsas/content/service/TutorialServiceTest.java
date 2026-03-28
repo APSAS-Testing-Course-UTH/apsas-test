@@ -12,15 +12,18 @@ import apsas.shared.models.pagination.PageResponse;
 import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Severity;
 import io.qameta.allure.SeverityLevel;
 import io.qameta.allure.Story;
+import io.qameta.allure.TmsLink;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -40,6 +43,7 @@ import static org.mockito.Mockito.*;
 @DisplayName("TutorialService")
 @Epic("Content Service")
 @Feature("Tutorial Management")
+@Issue("19")
 class TutorialServiceTest {
 
   private static final String JAVA_BASICS_TITLE = "Java Basics";
@@ -96,10 +100,12 @@ class TutorialServiceTest {
   class GetAllTutorialsTests {
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-028")
     @DisplayName("shouldReturnPageOfTutorials_whenCalled")
     @Severity(SeverityLevel.NORMAL)
     @Description("Retrieve all tutorials with pagination")
-    void shouldReturnPageOfTutorials() {
+    void shouldReturnPageOfTutorials_whenCalled() {
       // Arrange
       Pageable pageable = PageRequest.of(0, 10);
       Page<Tutorial> tutorialPage = new PageImpl<>(java.util.List.of(tutorial), pageable, 1);
@@ -117,8 +123,10 @@ class TutorialServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-028")
     @DisplayName("shouldReturnEmptyPage_whenNoTutorialsExist")
-    void shouldReturnEmptyPage() {
+    void shouldReturnEmptyPage_whenNoTutorialsExist() {
       // Arrange
       Pageable pageable = PageRequest.of(0, 10);
       Page<Tutorial> emptyPage = new PageImpl<>(java.util.List.of(), pageable, 0);
@@ -134,8 +142,10 @@ class TutorialServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-028")
     @DisplayName("shouldHandleMultiplePages_whenPaginationApplied")
-    void shouldHandleMultiplePages() {
+    void shouldHandleMultiplePages_whenPaginationApplied() {
       // Arrange
       Pageable pageable = PageRequest.of(1, 5);
       Tutorial tutorial2 = new Tutorial();
@@ -166,10 +176,12 @@ class TutorialServiceTest {
   class GetTutorialByIdTests {
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-029")
     @DisplayName("shouldReturnTutorialResponse_whenTutorialExists")
     @Severity(SeverityLevel.NORMAL)
     @Description("Retrieve an existing tutorial by ID")
-    void shouldReturnTutorialResponse() {
+    void shouldReturnTutorialResponse_whenTutorialExists() {
       // Arrange
       when(tutorialRepository.findById(tutorialId)).thenReturn(Optional.of(tutorial));
       when(tutorialMapper.toResponse(tutorial)).thenReturn(tutorialResponse);
@@ -185,8 +197,10 @@ class TutorialServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-030")
     @DisplayName("shouldThrowNotFoundException_whenTutorialDoesNotExist")
-    void shouldThrowNotFoundException() {
+    void shouldThrowNotFoundException_whenTutorialDoesNotExist() {
       // Arrange
       when(tutorialRepository.findById(tutorialId)).thenReturn(Optional.empty());
 
@@ -199,8 +213,10 @@ class TutorialServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-029")
     @DisplayName("shouldCallMapperToResponse_whenTutorialFound")
-    void shouldCallMapperToResponse() {
+    void shouldCallMapperToResponse_whenTutorialFound() {
       // Arrange
       when(tutorialRepository.findById(tutorialId)).thenReturn(Optional.of(tutorial));
       when(tutorialMapper.toResponse(tutorial)).thenReturn(tutorialResponse);
@@ -219,10 +235,12 @@ class TutorialServiceTest {
   class CreateTutorialTests {
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-031")
     @DisplayName("shouldCreateTutorial_whenRequestIsValid")
     @Severity(SeverityLevel.CRITICAL)
     @Description("Create a new tutorial with valid request")
-    void shouldCreateTutorial() {
+    void shouldCreateTutorial_whenRequestIsValid() {
       // Arrange
       Tutorial createdTutorial = new Tutorial();
       createdTutorial.setId(UUID.randomUUID());
@@ -245,8 +263,10 @@ class TutorialServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-031")
     @DisplayName("shouldMapperReceiveCreatorId_whenCreatingTutorial")
-    void shouldMapperReceiveCreatorId() {
+    void shouldMapperReceiveCreatorId_whenCreatingTutorial() {
       // Arrange
       when(tutorialMapper.toEntity(createRequest, creatorId)).thenReturn(tutorial);
       when(tutorialRepository.save(tutorial)).thenReturn(tutorial);
@@ -263,8 +283,10 @@ class TutorialServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-031")
     @DisplayName("shouldSaveTutorialToRepository_whenRequestIsValid")
-    void shouldSaveTutorialToRepository() {
+    void shouldSaveTutorialToRepository_whenRequestIsValid() {
       // Arrange
       when(tutorialMapper.toEntity(createRequest, creatorId)).thenReturn(tutorial);
       when(tutorialRepository.save(tutorial)).thenReturn(tutorial);
@@ -280,6 +302,8 @@ class TutorialServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-032")
     @DisplayName("shouldHandleNullContent_whenCreating")
     @Severity(SeverityLevel.NORMAL)
     @Description("Null content in create request should be handled")
@@ -315,10 +339,12 @@ class TutorialServiceTest {
   class UpdateTutorialTests {
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-033")
     @DisplayName("shouldUpdateTutorial_whenUserIsCreator")
     @Severity(SeverityLevel.CRITICAL)
     @Description("Update a tutorial when user is the creator")
-    void shouldUpdateTutorial() {
+    void shouldUpdateTutorial_whenUserIsCreator() {
       // Arrange
       Tutorial updatedTutorial = new Tutorial();
       updatedTutorial.setId(tutorialId);
@@ -344,8 +370,10 @@ class TutorialServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-034")
     @DisplayName("shouldThrowUnauthorizedException_whenUserIsNotCreator")
-    void shouldThrowUnauthorizedException() {
+    void shouldThrowUnauthorizedException_whenUserIsNotCreator() {
       // Arrange
       UUID differentUserId = UUID.randomUUID();
       when(tutorialRepository.findById(tutorialId)).thenReturn(Optional.of(tutorial));
@@ -359,8 +387,10 @@ class TutorialServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-035")
     @DisplayName("shouldThrowNotFoundException_whenTutorialDoesNotExist")
-    void shouldThrowNotFoundException() {
+    void shouldThrowNotFoundException_whenTutorialDoesNotExist() {
       // Arrange
       when(tutorialRepository.findById(tutorialId)).thenReturn(Optional.empty());
 
@@ -373,8 +403,10 @@ class TutorialServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-033")
     @DisplayName("shouldCallMapper_whenUpdatingTutorial")
-    void shouldCallMapper() {
+    void shouldCallMapper_whenUpdatingTutorial() {
       // Arrange
       when(tutorialRepository.findById(tutorialId)).thenReturn(Optional.of(tutorial));
       doNothing().when(tutorialMapper).updateEntity(tutorial, updateRequest);
@@ -389,8 +421,10 @@ class TutorialServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-034")
     @DisplayName("shouldVerifyCreatorIdMatch_beforeUpdating")
-    void shouldVerifyCreatorIdMatch() {
+    void shouldVerifyCreatorIdMatch_whenUpdatingWithMismatchedCreatorId() {
       // Arrange
       UUID wrongCreatorId = UUID.randomUUID();
       when(tutorialRepository.findById(tutorialId)).thenReturn(Optional.of(tutorial));
@@ -409,10 +443,12 @@ class TutorialServiceTest {
   class DeleteTutorialTests {
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-036")
     @DisplayName("shouldDeleteTutorial_whenUserIsCreator")
     @Severity(SeverityLevel.CRITICAL)
     @Description("Delete a tutorial when user is the creator")
-    void shouldDeleteTutorial() {
+    void shouldDeleteTutorial_whenUserIsCreator() {
       // Arrange
       when(tutorialRepository.findById(tutorialId)).thenReturn(Optional.of(tutorial));
 
@@ -424,8 +460,10 @@ class TutorialServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-037")
     @DisplayName("shouldThrowUnauthorizedException_whenUserIsNotCreator")
-    void shouldThrowUnauthorizedException() {
+    void shouldThrowUnauthorizedException_whenUserIsNotCreator() {
       // Arrange
       UUID differentUserId = UUID.randomUUID();
       when(tutorialRepository.findById(tutorialId)).thenReturn(Optional.of(tutorial));
@@ -439,8 +477,10 @@ class TutorialServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-038")
     @DisplayName("shouldThrowNotFoundException_whenTutorialDoesNotExist")
-    void shouldThrowNotFoundException() {
+    void shouldThrowNotFoundException_whenTutorialDoesNotExist() {
       // Arrange
       when(tutorialRepository.findById(tutorialId)).thenReturn(Optional.empty());
 
@@ -453,8 +493,10 @@ class TutorialServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-036")
     @DisplayName("shouldCallRepositoryDelete_withCorrectId")
-    void shouldCallRepositoryDelete() {
+    void shouldCallRepositoryDelete_whenDeletingWithCorrectId() {
       // Arrange
       when(tutorialRepository.findById(tutorialId)).thenReturn(Optional.of(tutorial));
 
@@ -468,8 +510,10 @@ class TutorialServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-037")
     @DisplayName("shouldVerifyCreatorIdMatch_beforeDeleting")
-    void shouldVerifyCreatorIdMatch() {
+    void shouldVerifyCreatorIdMatch_whenDeletingWithMismatchedCreatorId() {
       // Arrange
       UUID wrongCreatorId = UUID.randomUUID();
       when(tutorialRepository.findById(tutorialId)).thenReturn(Optional.of(tutorial));

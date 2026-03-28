@@ -26,9 +26,11 @@ import apsas.shared.security.UserPrincipal;
 import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Severity;
 import io.qameta.allure.SeverityLevel;
 import io.qameta.allure.Story;
+import io.qameta.allure.TmsLink;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -39,6 +41,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -58,6 +61,7 @@ import static org.mockito.Mockito.*;
 @DisplayName("AssignmentService")
 @Epic("Content Service")
 @Feature("Assignment Management")
+@Issue("19")
 class AssignmentServiceTest {
 
   private static final BigDecimal DEFAULT_MAX_SCORE = new BigDecimal("100.00");
@@ -146,10 +150,12 @@ class AssignmentServiceTest {
   class GetAllAssignmentsTests {
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-001")
     @DisplayName("shouldReturnPublishedAssignments_whenNoPrincipalProvided")
     @Severity(SeverityLevel.CRITICAL)
     @Description("Public users should see only published assignments")
-    void shouldReturnPublishedAssignments() {
+    void shouldReturnPublishedAssignments_whenNoPrincipalProvided() {
       // Arrange
       Pageable pageable = PageRequest.of(DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE);
       Page<Assignment> assignmentPage = new PageImpl<>(List.of(assignment), pageable, 1);
@@ -167,10 +173,12 @@ class AssignmentServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-002")
     @DisplayName("shouldReturnContentProviderAssignments_whenPrincipalIsContentProvider")
     @Severity(SeverityLevel.CRITICAL)
     @Description("Content providers see only their own assignments")
-    void shouldReturnContentProviderAssignments() {
+    void shouldReturnContentProviderAssignments_whenPrincipalIsContentProvider() {
       // Arrange
       Pageable pageable = PageRequest.of(DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE);
       UserPrincipal principal = new UserPrincipal(
@@ -192,10 +200,12 @@ class AssignmentServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-003")
     @DisplayName("shouldMaskHiddenTestCases_whenUserIsStudent")
     @Severity(SeverityLevel.CRITICAL)
     @Description("Student users cannot see hidden test case values")
-    void shouldMaskHiddenTestCases() {
+    void shouldMaskHiddenTestCases_whenUserIsStudent() {
       // Arrange
       Pageable pageable = PageRequest.of(DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE);
       UserPrincipal studentPrincipal = new UserPrincipal(
@@ -224,10 +234,12 @@ class AssignmentServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-004")
     @DisplayName("shouldNotMaskHiddenTestCases_whenUserIsInstructor")
     @Severity(SeverityLevel.CRITICAL)
     @Description("Instructor users see all test case values including hidden")
-    void shouldNotMaskTestCases_forInstructor() {
+    void shouldNotMaskHiddenTestCases_whenUserIsInstructor() {
       // Arrange
       Pageable pageable = PageRequest.of(DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE);
       UserPrincipal instructorPrincipal = new UserPrincipal(
@@ -262,10 +274,12 @@ class AssignmentServiceTest {
   class GetAssignmentByIdTests {
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-001")
     @DisplayName("shouldReturnAssignment_whenAssignmentExists")
     @Severity(SeverityLevel.NORMAL)
     @Description("Retrieve an existing assignment by ID")
-    void shouldReturnAssignment() {
+    void shouldReturnAssignment_whenAssignmentExists() {
       // Arrange
       when(assignmentRepository.findById(assignmentId)).thenReturn(Optional.of(assignment));
       when(assignmentMapper.toResponse(assignment)).thenReturn(assignmentResponse);
@@ -279,8 +293,10 @@ class AssignmentServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-005")
     @DisplayName("shouldThrowNotFoundException_whenAssignmentDoesNotExist")
-    void shouldThrowNotFoundException() {
+    void shouldThrowNotFoundException_whenAssignmentDoesNotExist() {
       // Arrange
       when(assignmentRepository.findById(assignmentId)).thenReturn(Optional.empty());
 
@@ -290,8 +306,10 @@ class AssignmentServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-002")
     @DisplayName("shouldAllowContentProviderToViewOwnAssignments")
-    void shouldAllowContentProviderToViewOwnAssignments() {
+    void shouldAllowContentProviderToViewOwnAssignments_whenCreatorMatches() {
       // Arrange
       UserPrincipal principal = new UserPrincipal(
           creatorId, "email@test.com", "First", "Last", "CONTENT_PROVIDER", true
@@ -308,8 +326,10 @@ class AssignmentServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-006")
     @DisplayName("shouldThrowUnauthorizedException_whenContentProviderViewsOtherAssignment")
-    void shouldThrowUnauthorizedException_notOwnAssignment() {
+    void shouldThrowUnauthorizedException_whenContentProviderViewsOtherAssignment() {
       // Arrange
       UUID otherCreatorId = UUID.randomUUID();
       UserPrincipal principal = new UserPrincipal(
@@ -324,8 +344,10 @@ class AssignmentServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-003")
     @DisplayName("shouldAllowStudentToViewPublishedAssignments")
-    void shouldAllowStudentToViewPublishedAssignments() {
+    void shouldAllowStudentToViewPublishedAssignments_whenStatusIsPublished() {
       // Arrange
       UserPrincipal studentPrincipal = new UserPrincipal(
           UUID.randomUUID(), "student@test.com", "First", "Last", "STUDENT", true
@@ -346,8 +368,10 @@ class AssignmentServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-005")
     @DisplayName("shouldThrowNotFoundException_whenStudentViewsDraftAssignment")
-    void shouldThrowNotFoundException_studentViewsDraft() {
+    void shouldThrowNotFoundException_whenStudentViewsDraftAssignment() {
       // Arrange
       UserPrincipal studentPrincipal = new UserPrincipal(
           UUID.randomUUID(), "student@test.com", "First", "Last", "STUDENT", true
@@ -368,8 +392,10 @@ class AssignmentServiceTest {
   class CreateAssignmentTests {
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-007")
     @DisplayName("shouldCreateAssignment_whenRequestIsValid")
-    void shouldCreateAssignment() {
+    void shouldCreateAssignment_whenRequestIsValid() {
       // Arrange
       Skill skill = new Skill();
       skill.setId(skillId);
@@ -390,8 +416,10 @@ class AssignmentServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-008")
     @DisplayName("shouldThrowBadRequestException_whenDueDateBeforeStartDate")
-    void shouldThrowBadRequestException_invalidDates() {
+    void shouldThrowBadRequestException_whenDueDateBeforeStartDate() {
       // Arrange
       LocalDateTime now = LocalDateTime.now();
       createRequest.setStartDate(now.plusDays(DAYS_UNTIL_DUE));
@@ -404,8 +432,10 @@ class AssignmentServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-008")
     @DisplayName("shouldThrowBadRequestException_whenSkillIdsAreInvalid")
-    void shouldThrowBadRequestException_invalidSkillIds() {
+    void shouldThrowBadRequestException_whenSkillIdsAreInvalid() {
       // Arrange
       createRequest.setSkillIds(Set.of(skillId));
 
@@ -419,8 +449,10 @@ class AssignmentServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-008")
     @DisplayName("shouldThrowBadRequestException_whenTutorialIdsAreInvalid")
-    void shouldThrowBadRequestException_invalidTutorialIds() {
+    void shouldThrowBadRequestException_whenTutorialIdsAreInvalid() {
       // Arrange
       createRequest.setTutorialIds(Set.of(tutorialId));
 
@@ -434,8 +466,10 @@ class AssignmentServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-007")
     @DisplayName("shouldSetSkillsAndTutorials_whenBothProvided")
-    void shouldSetSkillsAndTutorials() {
+    void shouldSetSkillsAndTutorials_whenBothProvided() {
       // Arrange
       Skill skill = new Skill();
       skill.setId(skillId);
@@ -467,8 +501,10 @@ class AssignmentServiceTest {
   class UpdateAssignmentTests {
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-009")
     @DisplayName("shouldUpdateAssignment_whenUserIsCreator")
-    void shouldUpdateAssignment() {
+    void shouldUpdateAssignment_whenUserIsCreator() {
       // Arrange
       when(assignmentRepository.findById(assignmentId)).thenReturn(Optional.of(assignment));
       doNothing().when(assignmentMapper).updateEntity(assignment, updateRequest);
@@ -484,8 +520,10 @@ class AssignmentServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-010")
     @DisplayName("shouldThrowUnauthorizedException_whenUserIsNotCreator")
-    void shouldThrowUnauthorizedException() {
+    void shouldThrowUnauthorizedException_whenUserIsNotCreator() {
       // Arrange
       UUID differentUserId = UUID.randomUUID();
       when(assignmentRepository.findById(assignmentId)).thenReturn(Optional.of(assignment));
@@ -498,8 +536,10 @@ class AssignmentServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-005")
     @DisplayName("shouldThrowNotFoundException_whenAssignmentDoesNotExist")
-    void shouldThrowNotFoundException() {
+    void shouldThrowNotFoundException_whenAssignmentDoesNotExist() {
       // Arrange
       when(assignmentRepository.findById(assignmentId)).thenReturn(Optional.empty());
 
@@ -509,8 +549,10 @@ class AssignmentServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-009")
     @DisplayName("shouldValidateDates_whenDateUpdated")
-    void shouldValidateDates() {
+    void shouldValidateDates_whenDateUpdated() {
       // Arrange
       UpdateAssignmentRequest invalidDateRequest = new UpdateAssignmentRequest();
       invalidDateRequest.setStartDate(LocalDateTime.now().plusDays(7));
@@ -524,8 +566,10 @@ class AssignmentServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-009")
     @DisplayName("shouldUpdateSkillsIfProvided")
-    void shouldUpdateSkills() {
+    void shouldUpdateSkills_whenSkillIdsProvided() {
       // Arrange
       Skill newSkill = new Skill();
       newSkill.setId(UUID.randomUUID());
@@ -551,8 +595,10 @@ class AssignmentServiceTest {
   class UpdateAssignmentScheduleTests {
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-017")
     @DisplayName("shouldUpdateSchedule_whenDatesAreValid")
-    void shouldUpdateSchedule() {
+    void shouldUpdateSchedule_whenDatesAreValid() {
       // Arrange
       LocalDateTime newStart = LocalDateTime.now().plusDays(1);
       LocalDateTime newDue = LocalDateTime.now().plusDays(DAYS_UNTIL_DUE);
@@ -577,8 +623,10 @@ class AssignmentServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-017")
     @DisplayName("shouldPublishEvent_afterScheduleUpdate")
-    void shouldPublishEvent() {
+    void shouldPublishEvent_whenScheduleUpdated() {
       // Arrange
       LocalDateTime newStart = LocalDateTime.now().plusDays(1);
       LocalDateTime newDue = LocalDateTime.now().plusDays(DAYS_UNTIL_DUE);
@@ -605,8 +653,10 @@ class AssignmentServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-008")
     @DisplayName("shouldThrowBadRequestException_whenDueDateBeforeStartDate")
-    void shouldThrowBadRequestException() {
+    void shouldThrowBadRequestException_whenDueDateBeforeStartDate() {
       // Arrange
       LocalDateTime now = LocalDateTime.now();
       UpdateAssignmentScheduleRequest request = new UpdateAssignmentScheduleRequest();
@@ -628,8 +678,10 @@ class AssignmentServiceTest {
   class DeleteAssignmentTests {
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-011")
     @DisplayName("shouldDeleteAssignment_whenUserIsCreator")
-    void shouldDeleteAssignment() {
+    void shouldDeleteAssignment_whenUserIsCreator() {
       // Arrange
       when(assignmentRepository.findById(assignmentId)).thenReturn(Optional.of(assignment));
 
@@ -641,8 +693,10 @@ class AssignmentServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-012")
     @DisplayName("shouldThrowUnauthorizedException_whenUserIsNotCreator")
-    void shouldThrowUnauthorizedException() {
+    void shouldThrowUnauthorizedException_whenUserIsNotCreator() {
       // Arrange
       UUID differentUserId = UUID.randomUUID();
       when(assignmentRepository.findById(assignmentId)).thenReturn(Optional.of(assignment));
@@ -655,8 +709,10 @@ class AssignmentServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-005")
     @DisplayName("shouldThrowNotFoundException_whenAssignmentDoesNotExist")
-    void shouldThrowNotFoundException() {
+    void shouldThrowNotFoundException_whenAssignmentDoesNotExist() {
       // Arrange
       when(assignmentRepository.findById(assignmentId)).thenReturn(Optional.empty());
 
@@ -673,8 +729,10 @@ class AssignmentServiceTest {
   class PublishAssignmentTests {
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-013")
     @DisplayName("shouldPublishAssignment_whenStatusIsDraft")
-    void shouldPublishAssignment() {
+    void shouldPublishAssignment_whenStatusIsDraft() {
       // Arrange
       when(assignmentRepository.findById(assignmentId)).thenReturn(Optional.of(assignment));
       when(assignmentRepository.save(assignment)).thenReturn(assignment);
@@ -692,8 +750,10 @@ class AssignmentServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-014")
     @DisplayName("shouldThrowBadRequestException_whenAssignmentIsNotDraft")
-    void shouldThrowBadRequestException() {
+    void shouldThrowBadRequestException_whenAssignmentIsNotDraft() {
       // Arrange
       assignment.setStatus(AssignmentStatus.PUBLISHED);
       when(assignmentRepository.findById(assignmentId)).thenReturn(Optional.of(assignment));
@@ -707,8 +767,10 @@ class AssignmentServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-010")
     @DisplayName("shouldThrowUnauthorizedException_whenUserIsNotCreator")
-    void shouldThrowUnauthorizedException() {
+    void shouldThrowUnauthorizedException_whenUserIsNotCreator() {
       // Arrange
       UUID differentUserId = UUID.randomUUID();
       when(assignmentRepository.findById(assignmentId)).thenReturn(Optional.of(assignment));
@@ -721,8 +783,10 @@ class AssignmentServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-013")
     @DisplayName("shouldPublishEvent_withCorrectData")
-    void shouldPublishEvent() {
+    void shouldPublishEvent_whenDataIsCorrect() {
       // Arrange
       when(assignmentRepository.findById(assignmentId)).thenReturn(Optional.of(assignment));
       when(assignmentRepository.save(assignment)).thenReturn(assignment);
@@ -748,8 +812,10 @@ class AssignmentServiceTest {
   class ArchiveAssignmentTests {
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-015")
     @DisplayName("shouldArchiveAssignment_whenStatusIsNotArchived")
-    void shouldArchiveAssignment() {
+    void shouldArchiveAssignment_whenStatusIsNotArchived() {
       // Arrange
       when(assignmentRepository.findById(assignmentId)).thenReturn(Optional.of(assignment));
       when(assignmentRepository.save(assignment)).thenReturn(assignment);
@@ -766,8 +832,10 @@ class AssignmentServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-016")
     @DisplayName("shouldThrowBadRequestException_whenAlreadyArchived")
-    void shouldThrowBadRequestException() {
+    void shouldThrowBadRequestException_whenAlreadyArchived() {
       // Arrange
       assignment.setStatus(AssignmentStatus.ARCHIVED);
       when(assignmentRepository.findById(assignmentId)).thenReturn(Optional.of(assignment));
@@ -781,8 +849,10 @@ class AssignmentServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-012")
     @DisplayName("shouldThrowUnauthorizedException_whenUserIsNotCreator")
-    void shouldThrowUnauthorizedException() {
+    void shouldThrowUnauthorizedException_whenUserIsNotCreator() {
       // Arrange
       UUID differentUserId = UUID.randomUUID();
       when(assignmentRepository.findById(assignmentId)).thenReturn(Optional.of(assignment));
@@ -795,8 +865,10 @@ class AssignmentServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-005")
     @DisplayName("shouldThrowNotFoundException_whenAssignmentDoesNotExist")
-    void shouldThrowNotFoundException() {
+    void shouldThrowNotFoundException_whenAssignmentDoesNotExist() {
       // Arrange
       when(assignmentRepository.findById(assignmentId)).thenReturn(Optional.empty());
 

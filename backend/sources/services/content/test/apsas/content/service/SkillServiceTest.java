@@ -12,15 +12,18 @@ import apsas.shared.models.pagination.PageResponse;
 import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Severity;
 import io.qameta.allure.SeverityLevel;
 import io.qameta.allure.Story;
+import io.qameta.allure.TmsLink;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -40,6 +43,7 @@ import static org.mockito.Mockito.*;
 @DisplayName("SkillService")
 @Epic("Content Service")
 @Feature("Skill Management")
+@Issue("19")
 class SkillServiceTest {
 
   private static final String JAVA_SKILL_NAME = "Java";
@@ -93,10 +97,12 @@ class SkillServiceTest {
   class GetAllSkillsTests {
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-018")
     @DisplayName("shouldReturnPageOfSkills_whenCalled")
     @Severity(SeverityLevel.NORMAL)
     @Description("Retrieve all skills with pagination")
-    void shouldReturnPageOfSkills() {
+    void shouldReturnPageOfSkills_whenCalled() {
       // Arrange
       Pageable pageable = PageRequest.of(0, 10);
       Page<Skill> skillPage = new PageImpl<>(java.util.List.of(skill), pageable, 1);
@@ -114,8 +120,10 @@ class SkillServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-018")
     @DisplayName("shouldReturnEmptyPage_whenNoSkillsExist")
-    void shouldReturnEmptyPage() {
+    void shouldReturnEmptyPage_whenNoSkillsExist() {
       // Arrange
       Pageable pageable = PageRequest.of(0, 10);
       Page<Skill> emptyPage = new PageImpl<>(java.util.List.of(), pageable, 0);
@@ -131,8 +139,10 @@ class SkillServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-018")
     @DisplayName("shouldReturnMultiplePages_whenPaginationParametersApplied")
-    void shouldReturnMultiplePages() {
+    void shouldReturnMultiplePages_whenPaginationParametersApplied() {
       // Arrange
       Pageable pageable = PageRequest.of(1, 5);
       Skill skill2 = new Skill();
@@ -163,10 +173,12 @@ class SkillServiceTest {
   class GetSkillByIdTests {
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-019")
     @DisplayName("shouldReturnSkillResponse_whenSkillExists")
     @Severity(SeverityLevel.NORMAL)
     @Description("Retrieve an existing skill by ID")
-    void shouldReturnSkillResponse() {
+    void shouldReturnSkillResponse_whenSkillExists() {
       // Arrange
       when(skillRepository.findById(skillId)).thenReturn(Optional.of(skill));
       when(skillMapper.toResponse(skill)).thenReturn(skillResponse);
@@ -182,8 +194,10 @@ class SkillServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-020")
     @DisplayName("shouldThrowNotFoundException_whenSkillDoesNotExist")
-    void shouldThrowNotFoundException() {
+    void shouldThrowNotFoundException_whenSkillDoesNotExist() {
       // Arrange
       when(skillRepository.findById(skillId)).thenReturn(Optional.empty());
 
@@ -196,8 +210,10 @@ class SkillServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-019")
     @DisplayName("shouldCallMapperToResponse_whenSkillFound")
-    void shouldCallMapperToResponse() {
+    void shouldCallMapperToResponse_whenSkillFound() {
       // Arrange
       when(skillRepository.findById(skillId)).thenReturn(Optional.of(skill));
       when(skillMapper.toResponse(skill)).thenReturn(skillResponse);
@@ -216,10 +232,12 @@ class SkillServiceTest {
   class CreateSkillTests {
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-021")
     @DisplayName("shouldCreateSkill_whenRequestIsValid")
     @Severity(SeverityLevel.CRITICAL)
     @Description("Create a new skill with unique name")
-    void shouldCreateSkill() {
+    void shouldCreateSkill_whenRequestIsValid() {
       // Arrange
       Skill createdSkill = new Skill();
       createdSkill.setId(UUID.randomUUID());
@@ -242,8 +260,10 @@ class SkillServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-022")
     @DisplayName("shouldThrowBadRequestException_whenSkillNameAlreadyExists")
-    void shouldThrowBadRequestException() {
+    void shouldThrowBadRequestException_whenSkillNameAlreadyExists() {
       // Arrange
       when(skillRepository.existsByName(JAVA_SKILL_NAME)).thenReturn(true);
 
@@ -256,8 +276,10 @@ class SkillServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-021")
     @DisplayName("shouldCallMapper_whenCreatingSkill")
-    void shouldCallMapper() {
+    void shouldCallMapper_whenCreatingSkill() {
       // Arrange
       when(skillRepository.existsByName(JAVA_SKILL_NAME)).thenReturn(false);
       when(skillMapper.toEntity(createRequest)).thenReturn(skill);
@@ -273,8 +295,10 @@ class SkillServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-021")
     @DisplayName("shouldSaveSkill_whenNameIsUnique")
-    void shouldSaveSkill() {
+    void shouldSaveSkill_whenNameIsUnique() {
       // Arrange
       when(skillRepository.existsByName(JAVA_SKILL_NAME)).thenReturn(false);
       when(skillMapper.toEntity(createRequest)).thenReturn(skill);
@@ -297,10 +321,12 @@ class SkillServiceTest {
   class UpdateSkillTests {
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-023")
     @DisplayName("shouldUpdateSkill_whenRequestIsValid")
     @Severity(SeverityLevel.CRITICAL)
     @Description("Update a skill with valid new name")
-    void shouldUpdateSkill() {
+    void shouldUpdateSkill_whenRequestIsValid() {
       // Arrange
       Skill updatedSkill = new Skill();
       updatedSkill.setId(skillId);
@@ -328,8 +354,10 @@ class SkillServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-024")
     @DisplayName("shouldThrowNotFoundException_whenSkillDoesNotExist")
-    void shouldThrowNotFoundException() {
+    void shouldThrowNotFoundException_whenSkillDoesNotExist() {
       // Arrange
       when(skillRepository.findById(skillId)).thenReturn(Optional.empty());
 
@@ -341,8 +369,10 @@ class SkillServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-025")
     @DisplayName("shouldThrowBadRequestException_whenNewNameAlreadyExists")
-    void shouldThrowBadRequestException() {
+    void shouldThrowBadRequestException_whenNewNameAlreadyExists() {
       // Arrange
       when(skillRepository.findById(skillId)).thenReturn(Optional.of(skill));
       when(skillRepository.existsByName("Java Advanced")).thenReturn(true);
@@ -356,8 +386,10 @@ class SkillServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-023")
     @DisplayName("shouldNotCheckDuplicate_whenNameIsNotChanged")
-    void shouldNotCheckDuplicate_whenNameNotChanged() {
+    void shouldNotCheckDuplicate_whenNameIsNotChanged() {
       // Arrange
       UpdateSkillRequest sameNameRequest = new UpdateSkillRequest();
       sameNameRequest.setName("Java"); // same as original
@@ -376,10 +408,12 @@ class SkillServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-023")
     @DisplayName("shouldUpdateOnlyDescription_whenNameIsNull")
     @Severity(SeverityLevel.NORMAL)
     @Description("Update skill with null description should preserve existing description")
-    void shouldUpdateOnlyDescription() {
+    void shouldUpdateOnlyDescription_whenNameIsNull() {
       // Arrange
       UpdateSkillRequest partialRequest = new UpdateSkillRequest();
       partialRequest.setName(null);
@@ -398,6 +432,8 @@ class SkillServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-023")
     @DisplayName("shouldHandleNullDescription_whenUpdating")
     @Severity(SeverityLevel.NORMAL)
     @Description("Update skill with null description should not fail")
@@ -428,10 +464,12 @@ class SkillServiceTest {
   class DeleteSkillTests {
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-026")
     @DisplayName("shouldDeleteSkill_whenSkillExists")
     @Severity(SeverityLevel.CRITICAL)
     @Description("Delete an existing skill")
-    void shouldDeleteSkill() {
+    void shouldDeleteSkill_whenSkillExists() {
       // Arrange
       when(skillRepository.existsById(skillId)).thenReturn(true);
 
@@ -443,8 +481,10 @@ class SkillServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-027")
     @DisplayName("shouldThrowNotFoundException_whenSkillDoesNotExist")
-    void shouldThrowNotFoundException() {
+    void shouldThrowNotFoundException_whenSkillDoesNotExist() {
       // Arrange
       when(skillRepository.existsById(skillId)).thenReturn(false);
 
@@ -457,8 +497,10 @@ class SkillServiceTest {
     }
 
     @Test
+    @Tag("unit")
+    @TmsLink("CNT-SVC-026")
     @DisplayName("shouldCallRepositoryDelete_whenSkillExists")
-    void shouldCallRepositoryDelete() {
+    void shouldCallRepositoryDelete_whenSkillExists() {
       // Arrange
       when(skillRepository.existsById(skillId)).thenReturn(true);
 
