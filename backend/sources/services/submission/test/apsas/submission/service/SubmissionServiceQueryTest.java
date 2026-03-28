@@ -17,9 +17,11 @@ import apsas.submission.model.entity.SubmissionStatus;
 import apsas.submission.repository.SubmissionRepository;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Severity;
 import io.qameta.allure.SeverityLevel;
 import io.qameta.allure.Story;
+import io.qameta.allure.TmsLink;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -46,6 +48,7 @@ import org.springframework.data.domain.Pageable;
 @ExtendWith(MockitoExtension.class)
 @Epic("Submission Service")
 @Feature("Service Layer - Query")
+@Issue("12")
 class SubmissionServiceQueryTest {
 
   private static final String SECRET_INPUT = "secret-input";
@@ -65,6 +68,7 @@ class SubmissionServiceQueryTest {
   @Tag("unit")
   @Story("List submissions for student")
   @Severity(SeverityLevel.CRITICAL)
+  @TmsLink("SUB-SVC-001")
   @DisplayName("Masks hidden test case input and output for student list view")
   void getAllSubmissions_shouldMaskHiddenTestCases_whenRequesterIsStudent() {
     UUID studentId = UUID.randomUUID();
@@ -114,6 +118,7 @@ class SubmissionServiceQueryTest {
   @Tag("unit")
   @Story("List submissions for instructor")
   @Severity(SeverityLevel.NORMAL)
+  @TmsLink("SUB-SVC-002")
   @DisplayName("Uses instructor filters and keeps hidden test case details unchanged")
   void getAllSubmissions_shouldUseInstructorFilters_whenRequesterIsInstructor() {
     UUID studentId = UUID.randomUUID();
@@ -159,6 +164,7 @@ class SubmissionServiceQueryTest {
   @Tag("unit")
   @Story("Get submission by id")
   @Severity(SeverityLevel.NORMAL)
+  @TmsLink("SUB-SVC-003")
   @DisplayName("Throws not found when submission id does not exist")
   void getSubmissionById_shouldThrowNotFoundException_whenSubmissionMissing() {
     UUID submissionId = UUID.randomUUID();
@@ -179,6 +185,7 @@ class SubmissionServiceQueryTest {
   @Tag("unit")
   @Story("Get submission by id")
   @Severity(SeverityLevel.CRITICAL)
+  @TmsLink("SUB-SVC-004")
   @DisplayName("Throws forbidden when student tries to access another student submission")
   void getSubmissionById_shouldThrowForbiddenException_whenStudentAccessesOthersSubmission() {
     UUID submissionId = UUID.randomUUID();
@@ -204,6 +211,7 @@ class SubmissionServiceQueryTest {
   @Tag("unit")
   @Story("Get submission by id")
   @Severity(SeverityLevel.CRITICAL)
+  @TmsLink("SUB-SVC-005")
   @DisplayName("Masks hidden test case details when student reads own submission")
   void getSubmissionById_shouldMaskHiddenTestCases_whenStudentReadsOwnSubmission() {
     UUID submissionId = UUID.randomUUID();
@@ -244,6 +252,7 @@ class SubmissionServiceQueryTest {
   @Tag("unit")
   @Story("Get submission by id")
   @Severity(SeverityLevel.NORMAL)
+  @TmsLink("SUB-SVC-006")
   @DisplayName("Returns unmasked submission when requester is instructor")
   void getSubmissionById_shouldReturnUnmaskedResult_whenRequesterIsInstructor() {
     UUID submissionId = UUID.randomUUID();
@@ -281,6 +290,7 @@ class SubmissionServiceQueryTest {
   @Tag("unit")
   @Story("Get submission by id")
   @Severity(SeverityLevel.NORMAL)
+  @TmsLink("SUB-SVC-007")
   @DisplayName("Returns response safely when student submission has null test case results")
   void getSubmissionById_shouldReturnResponse_whenTestCaseResultsIsNull() {
     UUID submissionId = UUID.randomUUID();

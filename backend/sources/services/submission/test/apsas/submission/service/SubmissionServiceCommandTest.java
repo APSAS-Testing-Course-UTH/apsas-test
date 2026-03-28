@@ -18,9 +18,11 @@ import apsas.submission.model.entity.Submission;
 import apsas.submission.repository.SubmissionRepository;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Severity;
 import io.qameta.allure.SeverityLevel;
 import io.qameta.allure.Story;
+import io.qameta.allure.TmsLink;
 import java.util.Optional;
 import java.util.UUID;
 import org.instancio.Instancio;
@@ -41,6 +43,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 @Epic("Submission Service")
 @Feature("Service Layer - Command")
+@Issue("12")
 class SubmissionServiceCommandTest {
 
   private static final String CODE_BASE64 = "Y29kZQ==";
@@ -62,6 +65,7 @@ class SubmissionServiceCommandTest {
   @Tag("unit")
   @Story("Create submission")
   @Severity(SeverityLevel.CRITICAL)
+  @TmsLink("SUB-SVC-008")
   @DisplayName("Saves submission and publishes submission created event")
   void createSubmission_shouldSaveAndPublishEvent_whenRequestIsValid() {
     UUID submissionId = UUID.randomUUID();
@@ -109,6 +113,7 @@ class SubmissionServiceCommandTest {
   @Tag("unit")
   @Story("Provide feedback")
   @Severity(SeverityLevel.NORMAL)
+  @TmsLink("SUB-SVC-012")
   @DisplayName("Updates feedback and returns mapped response when submission exists")
   void provideFeedback_shouldUpdateFeedbackAndReturnResponse_whenSubmissionExists() {
     UUID submissionId = UUID.randomUUID();
@@ -142,6 +147,7 @@ class SubmissionServiceCommandTest {
   @Tag("unit")
   @Story("Provide feedback")
   @Severity(SeverityLevel.NORMAL)
+  @TmsLink("SUB-SVC-013")
   @DisplayName("Throws not found when providing feedback to unknown submission")
   void provideFeedback_shouldThrowNotFoundException_whenSubmissionMissing() {
     UUID submissionId = UUID.randomUUID();

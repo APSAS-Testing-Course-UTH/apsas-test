@@ -19,9 +19,11 @@ import apsas.submission.model.entity.SubmissionStatus;
 import apsas.submission.repository.SubmissionRepository;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Severity;
 import io.qameta.allure.SeverityLevel;
 import io.qameta.allure.Story;
+import io.qameta.allure.TmsLink;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -45,6 +47,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 @Epic("Submission Service")
 @Feature("Service Layer - Evaluation Update")
+@Issue("12")
 class SubmissionServiceEvaluationTest {
 
   @Mock
@@ -61,6 +64,7 @@ class SubmissionServiceEvaluationTest {
   @Tag("unit")
   @Story("Handle evaluated submission event")
   @Severity(SeverityLevel.CRITICAL)
+  @TmsLink("SUB-SVC-009")
   @DisplayName("Updates submission with mapped status result and test case data when evaluation event is valid")
   void handleSubmissionEvaluated_shouldUpdateSubmission_whenEvaluationDataIsProvided() {
     UUID submissionId = UUID.randomUUID();
@@ -104,6 +108,7 @@ class SubmissionServiceEvaluationTest {
   @Tag("unit")
   @Story("Handle evaluated submission event")
   @Severity(SeverityLevel.NORMAL)
+  @TmsLink("SUB-SVC-010")
   @DisplayName("Sets evaluatedAt to current time when event does not provide evaluated timestamp")
   void handleSubmissionEvaluated_shouldSetCurrentTime_whenEvaluatedAtIsNull() {
     UUID submissionId = UUID.randomUUID();
@@ -140,6 +145,7 @@ class SubmissionServiceEvaluationTest {
   @Tag("unit")
   @Story("Handle evaluated submission event")
   @Severity(SeverityLevel.NORMAL)
+  @TmsLink("SUB-SVC-011")
   @DisplayName("Throws not found when evaluated event references unknown submission")
   void handleSubmissionEvaluated_shouldThrowNotFoundException_whenSubmissionMissing() {
     UUID submissionId = UUID.randomUUID();
