@@ -47,8 +47,9 @@ public class NotificationDispatcher {
   ) {
     if (preferencesService.isNotificationEnabled(userId, "assignment_published", "email")) {
       try {
+        String description = "";
         emailService.sendAssignmentPublishedEmail(
-            email, firstName, assignmentTitle, deadline, assignmentUrl, assignmentUrl);
+            email, firstName, assignmentTitle, description, deadline, assignmentUrl);
       } catch (Exception e) {
         log.error("Failed to send assignment published email to: {}", email, e);
       }
@@ -105,12 +106,11 @@ public class NotificationDispatcher {
       try {
         List<String> tokens = deviceTokenService.getActiveTokenStringsByUserId(userId);
         if (!tokens.isEmpty()) {
-          String status = Boolean.TRUE.equals(passed) ? "ĐẠT" : "CẦN CẢI THIỆN";
           pushNotificationService.sendSubmissionEvaluatedNotification(
               tokens.getFirst(),
               assignmentTitle,
               score,
-              status
+              submissionUrl
           );
         }
       } catch (Exception e) {
