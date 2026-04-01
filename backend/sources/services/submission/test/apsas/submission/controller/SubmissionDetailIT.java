@@ -7,7 +7,6 @@ import static apsas.submission.controller.SubmissionControllerTestSupport.USER_I
 import static apsas.submission.controller.SubmissionControllerTestSupport.encodedUserInfo;
 import static apsas.submission.controller.SubmissionControllerTestSupport.instructorPrincipal;
 import static apsas.submission.controller.SubmissionControllerTestSupport.studentPrincipal;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -33,7 +32,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 /**
@@ -61,7 +60,7 @@ class SubmissionDetailIT {
   @Autowired
   private MockMvc mockMvc;
 
-  @MockBean
+  @MockitoBean
   private SubmissionService submissionService;
 
   /**
@@ -86,7 +85,7 @@ class SubmissionDetailIT {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value(submissionId.toString()));
 
-    verify(submissionService).getSubmissionById(eq(submissionId), eq(INSTRUCTOR_ID), eq(true));
+    verify(submissionService).getSubmissionById(submissionId, INSTRUCTOR_ID, true);
   }
 
   /**
@@ -111,7 +110,7 @@ class SubmissionDetailIT {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value(submissionId.toString()));
 
-    verify(submissionService).getSubmissionById(eq(submissionId), eq(STUDENT_ID), eq(false));
+    verify(submissionService).getSubmissionById(submissionId, STUDENT_ID, false);
   }
 
   /**

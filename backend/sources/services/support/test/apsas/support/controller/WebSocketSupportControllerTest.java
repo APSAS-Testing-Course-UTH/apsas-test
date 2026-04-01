@@ -2,7 +2,6 @@ package apsas.support.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -61,11 +60,11 @@ class WebSocketSupportControllerTest {
 
     SupportSessionResponse response = sessionResponse(UUID.randomUUID(), List.of());
     when(supportService.createSessionWs(
-        eq(principal.userId()),
-        eq(principal.email()),
-        eq(principal.firstName() + " " + principal.lastName()),
-        eq("need help"),
-        eq(principal.role())
+      principal.userId(),
+      principal.email(),
+      principal.firstName() + " " + principal.lastName(),
+      "need help",
+      principal.role()
     )).thenReturn(response);
 
     WebSocketMessage<SupportSessionResponse> actual = webSocketSupportController.createSession(
