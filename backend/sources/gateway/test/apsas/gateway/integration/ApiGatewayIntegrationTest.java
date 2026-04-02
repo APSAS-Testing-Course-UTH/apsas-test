@@ -72,176 +72,6 @@ class ApiGatewayIntegrationTest {
     }
   }
 
-  @BeforeEach
-  void resetCounter() {
-    FORWARDED_REQUESTS.set(0);
-  }
-
-  @DisplayName("Applies BVA for route and security boundaries in API Gateway")
-  @Description(
-      "Verifies Min-/Min/Min+ boundary cases for permitAll paths, exact docs path, and protected routes."
-  )
-  @Story("Boundary path matching between permitAll and authenticated routes")
-  @Severity(SeverityLevel.CRITICAL)
-  @Owner("backend-team")
-  @Issue("9")
-  @TmsLink("GW-BVA-001")
-  @ParameterizedTest(name = "[{index}] GET {0} -> {1}")
-  @MethodSource("routeBoundaryCases")
-  void gateway_shouldApplyExpectedBoundaryBehavior_whenRequestPathVaries(
-      String path,
-      int expectedStatus,
-      boolean shouldForward,
-      String expectedForwardedPath
-  ) {
-    Allure.parameter("Path", path);
-    Allure.parameter("Expected Status", expectedStatus);
-    Allure.parameter("Should Forward", shouldForward);
-    Allure.parameter("Expected Forwarded Path", expectedForwardedPath);
-
-    int forwardedBefore = FORWARDED_REQUESTS.get();
-
-    var response = webTestClient.get()
-        .uri(path)
-        .exchange()
-        .expectStatus()
-        .isEqualTo(expectedStatus);
-
-    if (shouldForward) {
-      assertNotNull(expectedForwardedPath);
-      response.expectBody(String.class)
-          .value(body -> assertTrue(body.contains("path=" + expectedForwardedPath)));
-      assertEquals(forwardedBefore + 1, FORWARDED_REQUESTS.get());
-      return;
-    }
-
-    assertEquals(forwardedBefore, FORWARDED_REQUESTS.get());
-  }
-
-  @Test
-  @DisplayName("Rejects invalid bearer token on protected route")
-  @Description(
-      "Checks token-state boundary when Authorization header is present but token is invalid."
-  )
-  @Story("JWT boundary on protected endpoint")
-  @Severity(SeverityLevel.CRITICAL)
-  @Owner("backend-team")
-  @Issue("9")
-  @TmsLink("GW-BVA-010")
-  void gateway_shouldRejectInvalidBearerToken_whenAccessingProtectedRoute() {
-    int forwardedBefore = FORWARDED_REQUESTS.get();
-
-    webTestClient.get()
-        .uri("/api/v1/runtimes")
-        .header("Authorization", "Bearer invalid-token")
-        .exchange()
-        .expectStatus()
-        .isUnauthorized();
-
-    assertEquals(forwardedBefore, FORWARDED_REQUESTS.get());
-  }
-
-  @Test
-  @DisplayName("Returns 429 when rate-limit exceeds Max+ boundary")
-  @Description(
-      "Applies BVA for rate limit: the 21st request in the same one-second window is blocked."
-  )
-  @Story("Rate limiting boundary")
-  @Severity(SeverityLevel.CRITICAL)
-  @Owner("backend-team")
-  @Issue("9")
-  @TmsLink("GW-BVA-011")
-  void gateway_shouldReturnTooManyRequests_whenRateLimitExceeded() {
-    Allure.parameter("Max", 20);
-    Allure.parameter("Max+", 21);
-
-    IntStream.range(0, 20).parallel().forEach(
-        ignored -> webTestClient.get()
-            .uri("/api/auth/rate-limit")
-            .exchange()
-            .expectStatus()
-            .isOk());
-
-    webTestClient.get()
-        .uri("/api/auth/rate-limit")
-        .exchange()
-        .expectStatus()
-        .isEqualTo(429);
-  }
-
-  @Test
-  @DisplayName("Returns gateway timeout when downstream exceeds response timeout")
-  @Description(
-      "Applies timeout boundary check: downstream delay beyond configured threshold results in 504."
-  )
-  @Story("Gateway timeout boundary")
-  @Severity(SeverityLevel.CRITICAL)
-  @Owner("backend-team")
-  @Issue("9")
-  @TmsLink("GW-BVA-012")
-  void gateway_shouldReturnGatewayTimeout_whenDownstreamExceedsResponseTimeout() {
-    Allure.parameter("Max", "2s");
-    Allure.parameter("Max+", "3s");
-
-    webTestClient.get()
-        .uri("/api/auth/slow")
-        .exchange()
-        .expectStatus()
-        .isEqualTo(504);
-  }
-
-  @Test
-  @DisplayName("Rejects request body larger than payload size boundary")
-  @Description(
-      "Applies payload-size boundary with RequestSize filter where 1KB is the configured threshold."
-  )
-  @Story("Payload size boundary")
-  @Severity(SeverityLevel.CRITICAL)
-  @Owner("backend-team")
-  @Issue("9")
-  @TmsLink("GW-BVA-013")
-  void gateway_shouldRejectPayloadTooLarge_whenRequestBodyExceedsLimit() {
-    Allure.parameter("Max", "1KB");
-    Allure.parameter("Max+", "1.5KB");
-
-
-    String underLimitPayload = "a".repeat(900);
-    String overLimitPayload = "a".repeat(1400);
-
-    webTestClient.post()
-        .uri("/api/auth/upload")
-        .bodyValue(underLimitPayload)
-        .exchange()
-        .expectStatus()
-        .isOk();
-
-    webTestClient.post()
-        .uri("/api/auth/upload")
-        .bodyValue(overLimitPayload)
-        .exchange()
-        .expectStatus()
-        .isEqualTo(413);
-  }
-
-  @Test
-  @DisplayName("Rejects oversized request header at Max+ boundary")
-  @Description("Applies request-header boundary check where header size above limit is rejected.")
-  @Story("Header size boundary")
-  @Severity(SeverityLevel.CRITICAL)
-  @Owner("backend-team")
-  @Issue("9")
-  @TmsLink("GW-BVA-014")
-  void gateway_shouldRejectRequest_whenHeaderExceedsMaxSize() {
-    String oversizedHeader = "x".repeat(11000);
-
-    webTestClient.get()
-        .uri("/api/auth/login")
-        .header("X-Large", oversizedHeader)
-        .exchange()
-        .expectStatus()
-        .isEqualTo(431);
-  }
-
   private static Stream<Arguments> routeBoundaryCases() {
     return Stream.of(
         Arguments.of("/api/auth/login", 200, true, "/api/auth/login"),
@@ -307,5 +137,169 @@ class ApiGatewayIntegrationTest {
     try (OutputStream output = exchange.getResponseBody()) {
       output.write(body);
     }
+  }
+
+  @BeforeEach
+  void resetCounter() {
+    FORWARDED_REQUESTS.set(0);
+  }
+
+  @DisplayName("Applies BVA for route and security boundaries in API Gateway")
+  @Description(
+      "Verifies Min-/Min/Min+ boundary cases for permitAll paths, exact docs path, and protected routes."
+  )
+  @Story("Boundary path matching between permitAll and authenticated routes")
+  @Severity(SeverityLevel.CRITICAL)
+  @Owner("backend-team")
+  @TmsLink("GW-BVA-001")
+  @ParameterizedTest(name = "[{index}] GET {0} -> {1}")
+  @MethodSource("routeBoundaryCases")
+  void gateway_shouldApplyExpectedBoundaryBehavior_whenRequestPathVaries(
+      String path,
+      int expectedStatus,
+      boolean shouldForward,
+      String expectedForwardedPath
+  ) {
+    Allure.parameter("Path", path);
+    Allure.parameter("Expected Status", expectedStatus);
+    Allure.parameter("Should Forward", shouldForward);
+    Allure.parameter("Expected Forwarded Path", expectedForwardedPath);
+
+    int forwardedBefore = FORWARDED_REQUESTS.get();
+
+    var response = webTestClient.get()
+        .uri(path)
+        .exchange()
+        .expectStatus()
+        .isEqualTo(expectedStatus);
+
+    if (shouldForward) {
+      assertNotNull(expectedForwardedPath);
+      response.expectBody(String.class)
+          .value(body -> assertTrue(body.contains("path=" + expectedForwardedPath)));
+      assertEquals(forwardedBefore + 1, FORWARDED_REQUESTS.get());
+      return;
+    }
+
+    assertEquals(forwardedBefore, FORWARDED_REQUESTS.get());
+  }
+
+  @Test
+  @DisplayName("Rejects invalid bearer token on protected route")
+  @Description(
+      "Checks token-state boundary when Authorization header is present but token is invalid."
+  )
+  @Story("JWT boundary on protected endpoint")
+  @Severity(SeverityLevel.CRITICAL)
+  @Owner("backend-team")
+  @TmsLink("GW-BVA-010")
+  void gateway_shouldRejectInvalidBearerToken_whenAccessingProtectedRoute() {
+    int forwardedBefore = FORWARDED_REQUESTS.get();
+
+    webTestClient.get()
+        .uri("/api/v1/runtimes")
+        .header("Authorization", "Bearer invalid-token")
+        .exchange()
+        .expectStatus()
+        .isUnauthorized();
+
+    assertEquals(forwardedBefore, FORWARDED_REQUESTS.get());
+  }
+
+  @Test
+  @DisplayName("Returns 429 when rate-limit exceeds Max+ boundary")
+  @Description(
+      "Applies BVA for rate limit: the 21st request in the same one-second window is blocked."
+  )
+  @Story("Rate limiting boundary")
+  @Severity(SeverityLevel.CRITICAL)
+  @Owner("backend-team")
+  @TmsLink("GW-BVA-011")
+  void gateway_shouldReturnTooManyRequests_whenRateLimitExceeded() {
+    Allure.parameter("Max", 20);
+    Allure.parameter("Max+", 21);
+
+    IntStream.range(0, 20).parallel().forEach(
+        ignored -> webTestClient.get()
+            .uri("/api/auth/rate-limit")
+            .exchange()
+            .expectStatus()
+            .isOk());
+
+    webTestClient.get()
+        .uri("/api/auth/rate-limit")
+        .exchange()
+        .expectStatus()
+        .isEqualTo(429);
+  }
+
+  @Test
+  @DisplayName("Returns gateway timeout when downstream exceeds response timeout")
+  @Description(
+      "Applies timeout boundary check: downstream delay beyond configured threshold results in 504."
+  )
+  @Story("Gateway timeout boundary")
+  @Severity(SeverityLevel.CRITICAL)
+  @Owner("backend-team")
+  @TmsLink("GW-BVA-012")
+  void gateway_shouldReturnGatewayTimeout_whenDownstreamExceedsResponseTimeout() {
+    Allure.parameter("Max", "2s");
+    Allure.parameter("Max+", "3s");
+
+    webTestClient.get()
+        .uri("/api/auth/slow")
+        .exchange()
+        .expectStatus()
+        .isEqualTo(504);
+  }
+
+  @Test
+  @DisplayName("Rejects request body larger than payload size boundary")
+  @Description(
+      "Applies payload-size boundary with RequestSize filter where 1KB is the configured threshold."
+  )
+  @Story("Payload size boundary")
+  @Severity(SeverityLevel.CRITICAL)
+  @Owner("backend-team")
+  @TmsLink("GW-BVA-013")
+  void gateway_shouldRejectPayloadTooLarge_whenRequestBodyExceedsLimit() {
+    Allure.parameter("Max", "1KB");
+    Allure.parameter("Max+", "1.5KB");
+
+
+    String underLimitPayload = "a".repeat(900);
+    String overLimitPayload = "a".repeat(1400);
+
+    webTestClient.post()
+        .uri("/api/auth/upload")
+        .bodyValue(underLimitPayload)
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    webTestClient.post()
+        .uri("/api/auth/upload")
+        .bodyValue(overLimitPayload)
+        .exchange()
+        .expectStatus()
+        .isEqualTo(413);
+  }
+
+  @Test
+  @DisplayName("Rejects oversized request header at Max+ boundary")
+  @Description("Applies request-header boundary check where header size above limit is rejected.")
+  @Story("Header size boundary")
+  @Severity(SeverityLevel.CRITICAL)
+  @Owner("backend-team")
+  @TmsLink("GW-BVA-014")
+  void gateway_shouldRejectRequest_whenHeaderExceedsMaxSize() {
+    String oversizedHeader = "x".repeat(11000);
+
+    webTestClient.get()
+        .uri("/api/auth/login")
+        .header("X-Large", oversizedHeader)
+        .exchange()
+        .expectStatus()
+        .isEqualTo(431);
   }
 }

@@ -40,6 +40,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @Tag("integration")
 @Epic("Evaluation Service")
 @Feature("Controller Layer")
+@Issue("21")
 class EvaluationControllerIntegrationTest {
 
   @Autowired
@@ -53,7 +54,6 @@ class EvaluationControllerIntegrationTest {
   @Description("Verifies the runtimes endpoint returns the service response with HTTP 200.")
   @Story("Fetch supported runtimes")
   @Severity(SeverityLevel.NORMAL)
-  @Issue("9")
   @TmsLink("EVL-CTL-001")
   void getSupportedRuntimes_shouldReturnOkWithRuntimes_whenEndpointIsCalled() throws Exception {
     var runtimes = List.of(
