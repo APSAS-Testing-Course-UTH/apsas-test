@@ -8,7 +8,6 @@ import static apsas.notification.controller.NotificationControllerTestSupport.de
 import static apsas.notification.controller.NotificationControllerTestSupport.encodedUserInfo;
 import static apsas.notification.controller.NotificationControllerTestSupport.instructorPrincipal;
 import static apsas.notification.controller.NotificationControllerTestSupport.studentPrincipal;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -83,7 +82,7 @@ class DeviceTokenRetrievalIT {
   @Severity(SeverityLevel.NORMAL)
   @TmsLink("NTF-BVA-GET-001")
   void getUserDevicesShouldReturnEmptyArrayWhenNoDeviceExists() throws Exception {
-    when(deviceTokenService.getUserDevices(eq(STUDENT_ID))).thenReturn(List.of());
+    when(deviceTokenService.getUserDevices(STUDENT_ID)).thenReturn(List.of());
 
     mockMvc.perform(get(DEVICES_API)
             .header(USER_INFO_HEADER, encodedUserInfo(studentPrincipal())))
@@ -105,7 +104,7 @@ class DeviceTokenRetrievalIT {
     DeviceTokenResponse first = deviceTokenResponse(UUID.randomUUID(), "token-1", "ANDROID");
     DeviceTokenResponse second = deviceTokenResponse(UUID.randomUUID(), "token-2", "IOS");
 
-    when(deviceTokenService.getUserDevices(eq(STUDENT_ID))).thenReturn(List.of(first, second));
+    when(deviceTokenService.getUserDevices(STUDENT_ID)).thenReturn(List.of(first, second));
 
     mockMvc.perform(get(DEVICES_API)
             .header(USER_INFO_HEADER, encodedUserInfo(studentPrincipal())))
@@ -125,7 +124,7 @@ class DeviceTokenRetrievalIT {
   @Severity(SeverityLevel.CRITICAL)
   @TmsLink("NTF-BVA-GET-003")
   void getUserDevicesShouldUseCallerIdentityFromHeader() throws Exception {
-    when(deviceTokenService.getUserDevices(eq(INSTRUCTOR_ID))).thenReturn(List.of());
+    when(deviceTokenService.getUserDevices(INSTRUCTOR_ID)).thenReturn(List.of());
 
     mockMvc.perform(get(DEVICES_API)
             .header(USER_INFO_HEADER, encodedUserInfo(instructorPrincipal())))

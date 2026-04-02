@@ -8,7 +8,6 @@ import static apsas.notification.controller.NotificationControllerTestSupport.US
 import static apsas.notification.controller.NotificationControllerTestSupport.defaultPreferencesResponse;
 import static apsas.notification.controller.NotificationControllerTestSupport.encodedUserInfo;
 import static apsas.notification.controller.NotificationControllerTestSupport.studentPrincipal;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -82,7 +81,7 @@ class NotificationPreferencesGetIT {
   @TmsLink("NTF-BVA-PREF-GET-001")
   void getPreferencesShouldReturnDefaultPreferencesWhenProfileIsDefault() throws Exception {
     NotificationPreferencesResponse stub = defaultPreferencesResponse(STUDENT_ID);
-    when(preferencesService.getPreferences(eq(STUDENT_ID))).thenReturn(stub);
+    when(preferencesService.getPreferences(STUDENT_ID)).thenReturn(stub);
 
     mockMvc.perform(get(PREFERENCES_API)
             .header(USER_INFO_HEADER, encodedUserInfo(studentPrincipal())))
@@ -106,7 +105,7 @@ class NotificationPreferencesGetIT {
     stub.setEmailEnabled(false);
     stub.setPushEnabled(true);
 
-    when(preferencesService.getPreferences(eq(STUDENT_ID))).thenReturn(stub);
+    when(preferencesService.getPreferences(STUDENT_ID)).thenReturn(stub);
 
     mockMvc.perform(get(PREFERENCES_API)
             .header(USER_INFO_HEADER, encodedUserInfo(studentPrincipal())))

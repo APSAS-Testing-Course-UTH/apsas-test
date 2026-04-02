@@ -1,6 +1,5 @@
 package apsas.notification.controller;
 
-import static apsas.notification.controller.NotificationControllerTestSupport.DEVICES_API;
 import static apsas.notification.controller.NotificationControllerTestSupport.DEVICES_TOKEN_API_TEMPLATE;
 import static apsas.notification.controller.NotificationControllerTestSupport.USER_INFO_HEADER;
 import static apsas.notification.controller.NotificationControllerTestSupport.encodedUserInfo;
