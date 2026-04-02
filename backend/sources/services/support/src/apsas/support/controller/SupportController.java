@@ -141,7 +141,6 @@ public class SupportController {
       summary = "Gửi tin nhắn trong phiên hỗ trợ",
       description = "Gửi tin nhắn trong một phiên hỗ trợ"
   )
-  @ResponseStatus(HttpStatus.CREATED)
   public ResponseEntity<SupportSessionResponse> sendMessage(
       @PathVariable
       UUID sessionId,

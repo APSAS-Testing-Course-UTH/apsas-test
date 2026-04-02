@@ -22,6 +22,7 @@ import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Owner;
 import io.qameta.allure.Story;
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -392,6 +393,9 @@ class SupportControllerIntegrationTest {
     session.setStudentId(studentId);
     session.setInstructorId(instructorId);
     session.setIsClosed(isClosed);
+    if (isClosed) {
+      session.setClosedAt(LocalDateTime.now());
+    }
     return sessionRepository.saveAndFlush(session);
   }
 
