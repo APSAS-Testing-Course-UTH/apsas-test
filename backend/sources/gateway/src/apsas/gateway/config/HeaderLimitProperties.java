@@ -10,6 +10,6 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "apsas.gateway.header-limit")
 public class HeaderLimitProperties {
-  private int maxSizeBytes = 8192;
-  private String pathPrefix = "/api/";
+  private int maxSizeBytes;
+  private String pathPrefix;
 }

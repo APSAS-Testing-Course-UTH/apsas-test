@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "apsas.gateway.rate-limit")
 public class RateLimitProperties {
-  private int maxRequests = 20;
-  private int windowSeconds = 1;
-  private String pathPrefix = "/api/";
+  private int maxRequests;
+  private int windowSeconds;
+  private String pathPrefix;
 }
