@@ -7,8 +7,8 @@ import java.util.UUID;
 /**
  * Tiện ích dùng chung cho integration test của SubmissionController.
  *
- * <p>Giúp giảm lặp code và đảm bảo test data nhất quán theo nguyên tắc FIRST (Independent,
- * Repeatable).</p>
+ * Giúp giảm lặp code và đảm bảo test data nhất quán theo nguyên tắc FIRST (Independent,
+ * Repeatable).
  */
 final class SubmissionControllerTestSupport {
   static final String SUBMISSIONS_API = "/api/v1/submissions";

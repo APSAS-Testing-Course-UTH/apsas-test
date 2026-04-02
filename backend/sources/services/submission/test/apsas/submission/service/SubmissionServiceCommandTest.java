@@ -38,7 +38,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 /**
  * Unit test cho nhóm command/write behavior của SubmissionService.
  *
- * <p>Nhóm này cover các hành vi mutate state: create submission và provide feedback.</p>
+ * Nhóm này cover các hành vi mutate state: create submission và provide feedback.
  */
 @ExtendWith(MockitoExtension.class)
 @Epic("Submission Service")

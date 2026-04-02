@@ -53,7 +53,7 @@ import org.springframework.test.web.servlet.MockMvc;
 /**
  * Integration test cho nhóm validation + authorization của các endpoint ghi dữ liệu Submission.
  *
- * <p>Mỗi test chỉ xác minh 1 hành vi để đảm bảo test rõ ràng, dễ bảo trì và fail đúng nguyên nhân.</p>
+ * Mỗi test chỉ xác minh 1 hành vi để đảm bảo test rõ ràng, dễ bảo trì và fail đúng nguyên nhân.
  */
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.MOCK,

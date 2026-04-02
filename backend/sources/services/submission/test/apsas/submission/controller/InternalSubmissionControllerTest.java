@@ -26,7 +26,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 /**
  * Unit test cho InternalSubmissionController.
  *
- * <p>Đảm bảo API nội bộ ủy quyền đúng sang service và mapper.</p>
+ * Đảm bảo API nội bộ ủy quyền đúng sang service và mapper.
  */
 @ExtendWith(MockitoExtension.class)
 @Tag("unit")
