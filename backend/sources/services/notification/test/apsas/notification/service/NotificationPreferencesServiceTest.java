@@ -32,6 +32,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @Feature("Notification Preferences Service")
 @Issue("13")
 class NotificationPreferencesServiceTest {
+  private static final String ASSIGNMENT_PUBLISHED = "assignment_published";
+  private static final String SUBMISSION_EVALUATED = "submission_evaluated";
+  private static final String EMAIL_CHANNEL = "email";
+  private static final String PUSH_CHANNEL = "push";
+
   @Mock
   private NotificationPreferencesRepository preferencesRepository;
 
@@ -50,7 +55,7 @@ class NotificationPreferencesServiceTest {
   @Story("Get user preferences")
   @TmsLink("NTF-PREF-001")
   @DisplayName("Should return mapped preferences when user preferences exist")
-  void getPreferences_shouldReturnMappedPreferences_whenUserPreferencesExist() {
+  void getPreferencesShouldReturnMappedPreferencesWhenUserPreferencesExist() {
     UUID userId = UUID.randomUUID();
     NotificationPreferences preferences = new NotificationPreferences();
     preferences.setUserId(userId);
@@ -71,7 +76,7 @@ class NotificationPreferencesServiceTest {
   @Story("Create default preferences")
   @TmsLink("NTF-PREF-002")
   @DisplayName("Should create default preferences when user preferences are missing")
-  void getPreferences_shouldCreateDefaultPreferences_whenUserPreferencesMissing() {
+  void getPreferencesShouldCreateDefaultPreferencesWhenUserPreferencesMissing() {
     UUID userId = UUID.randomUUID();
     NotificationPreferences created = new NotificationPreferences();
     created.setUserId(userId);
@@ -94,7 +99,7 @@ class NotificationPreferencesServiceTest {
   @Story("Update preferences")
   @TmsLink("NTF-PREF-003")
   @DisplayName("Should update and persist preferences when update request is valid")
-  void updatePreferences_shouldPersistUpdatedPreferences_whenRequestIsValid() {
+  void updatePreferencesShouldPersistUpdatedPreferencesWhenRequestIsValid() {
     UUID userId = UUID.randomUUID();
     NotificationPreferencesRequest request = new NotificationPreferencesRequest();
     request.setEmailEnabled(false);
@@ -125,11 +130,11 @@ class NotificationPreferencesServiceTest {
   @Story("Resolve notification toggle defaults")
   @TmsLink("NTF-PREF-EXTRA-001")
   @DisplayName("Should return true by default when preferences are missing")
-  void isNotificationEnabled_shouldReturnTrueByDefault_whenPreferencesMissing() {
+  void isNotificationEnabledShouldReturnTrueByDefaultWhenPreferencesMissing() {
     UUID userId = UUID.randomUUID();
     when(preferencesRepository.findByUserId(userId)).thenReturn(Optional.empty());
 
-    assertTrue(service.isNotificationEnabled(userId, "assignment_published", "email"));
+    assertTrue(service.isNotificationEnabled(userId, ASSIGNMENT_PUBLISHED, EMAIL_CHANNEL));
   }
 
   @Test
@@ -137,7 +142,7 @@ class NotificationPreferencesServiceTest {
   @Story("Evaluate global channel flags")
   @TmsLink("NTF-PREF-004")
   @DisplayName("Should return false when global channel is disabled")
-  void isNotificationEnabled_shouldReturnFalse_whenGlobalChannelDisabled() {
+  void isNotificationEnabledShouldReturnFalseWhenGlobalChannelDisabled() {
     UUID userId = UUID.randomUUID();
     NotificationPreferences preferences = new NotificationPreferences();
     preferences.setUserId(userId);
@@ -146,7 +151,7 @@ class NotificationPreferencesServiceTest {
 
     when(preferencesRepository.findByUserId(userId)).thenReturn(Optional.of(preferences));
 
-    assertFalse(service.isNotificationEnabled(userId, "assignment_published", "email"));
+    assertFalse(service.isNotificationEnabled(userId, ASSIGNMENT_PUBLISHED, EMAIL_CHANNEL));
   }
 
   @Test
@@ -154,7 +159,7 @@ class NotificationPreferencesServiceTest {
   @Story("Evaluate type-specific notification flags")
   @TmsLink("NTF-PREF-005")
   @DisplayName("Should follow type-specific preferences for each notification type")
-  void isNotificationEnabled_shouldFollowTypeSpecificFlags_whenTypeConfigurationsExist() {
+  void isNotificationEnabledShouldFollowTypeSpecificFlagsWhenTypeConfigurationsExist() {
     UUID userId = UUID.randomUUID();
     NotificationPreferences preferences = new NotificationPreferences();
     preferences.setUserId(userId);
@@ -165,8 +170,42 @@ class NotificationPreferencesServiceTest {
 
     when(preferencesRepository.findByUserId(userId)).thenReturn(Optional.of(preferences));
 
-    assertFalse(service.isNotificationEnabled(userId, "assignment_published", "email"));
-    assertFalse(service.isNotificationEnabled(userId, "submission_evaluated", "push"));
-    assertTrue(service.isNotificationEnabled(userId, "unknown", "email"));
+    assertFalse(service.isNotificationEnabled(userId, ASSIGNMENT_PUBLISHED, EMAIL_CHANNEL));
+    assertFalse(service.isNotificationEnabled(userId, SUBMISSION_EVALUATED, PUSH_CHANNEL));
+    assertTrue(service.isNotificationEnabled(userId, "unknown", EMAIL_CHANNEL));
+  }
+
+  @Test
+  @Tag("unit")
+  @Story("Evaluate global channel flags")
+  @TmsLink("NTF-PREF-006")
+  @DisplayName("Should return false when global push channel is disabled")
+  void isNotificationEnabledShouldReturnFalseWhenGlobalPushDisabled() {
+    UUID userId = UUID.randomUUID();
+    NotificationPreferences preferences = new NotificationPreferences();
+    preferences.setUserId(userId);
+    preferences.setEmailEnabled(true);
+    preferences.setPushEnabled(false);
+
+    when(preferencesRepository.findByUserId(userId)).thenReturn(Optional.of(preferences));
+
+    assertFalse(service.isNotificationEnabled(userId, ASSIGNMENT_PUBLISHED, PUSH_CHANNEL));
+  }
+
+  @Test
+  @Tag("unit")
+  @Story("Evaluate unknown channel behavior")
+  @TmsLink("NTF-PREF-007")
+  @DisplayName("Should return true for unknown channel by default")
+  void isNotificationEnabledShouldReturnTrueWhenChannelIsUnknown() {
+    UUID userId = UUID.randomUUID();
+    NotificationPreferences preferences = new NotificationPreferences();
+    preferences.setUserId(userId);
+    preferences.setEmailEnabled(false);
+    preferences.setPushEnabled(false);
+
+    when(preferencesRepository.findByUserId(userId)).thenReturn(Optional.of(preferences));
+
+    assertTrue(service.isNotificationEnabled(userId, ASSIGNMENT_PUBLISHED, "sms"));
   }
 }
