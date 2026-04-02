@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    config:
+      enabled: false
+
+    gateway:
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: false
+
+eureka:
+  client:
+    enabled: false

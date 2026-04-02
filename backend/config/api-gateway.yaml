@@ -16,11 +16,22 @@ spring:
         ttl: 15s
 
     gateway:
+
+
       server:
         webflux:
           discovery:
             locator:
               enabled: true
+
+          httpclient:
+            connect-timeout: 10000
+            response-timeout: 30s
+
+          default-filters:
+            - name: RequestSize
+              args:
+                maxSize: 10MB
 
           globalcors:
             cors-configurations:
@@ -79,6 +90,17 @@ spring:
 
 server:
   port: 8080
+  max-http-request-header-size: 8KB
+
+apsas:
+  gateway:
+    rate-limit:
+      max-requests: 20
+      window-seconds: 1
+      path-prefix: /api/
+    header-limit:
+      max-size-bytes: 8192
+      path-prefix: /api/
 
 springdoc:
   swagger-ui:
