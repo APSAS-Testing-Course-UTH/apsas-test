@@ -41,7 +41,7 @@ apsas:
   gateway:
     rate-limit:
       max-requests: 20
-      window-seconds: 1
+      window-seconds: 30
       path-prefix: /api/
     header-limit:
       max-size-bytes: 8192

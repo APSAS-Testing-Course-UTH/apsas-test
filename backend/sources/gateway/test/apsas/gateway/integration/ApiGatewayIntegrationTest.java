@@ -209,7 +209,7 @@ class ApiGatewayIntegrationTest {
   @Test
   @DisplayName("Returns 429 when rate-limit exceeds Max+ boundary")
   @Description(
-      "Applies BVA for rate limit: the 21st request in the same one-second window is blocked."
+      "Applies BVA for rate limit: the 21st request in the same rate-limit window is blocked."
   )
   @Story("Rate limiting boundary")
   @Severity(SeverityLevel.CRITICAL)
