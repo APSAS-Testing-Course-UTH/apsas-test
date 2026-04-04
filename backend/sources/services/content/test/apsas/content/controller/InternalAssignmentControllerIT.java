@@ -40,7 +40,7 @@ class InternalAssignmentControllerIT extends BaseContentControllerIT {
   class ValidCases {
 
     @Test
-    @TmsLink("IDT-RESTIT-INTERNAL-001")
+    @TmsLink("CONT-INT-001")
     @DisplayName("Get internal assignment by id returns assignment")
     @Description("Equivalence test: fetch internal assignment by valid existing UUID; expect HTTP 200 and assignment fields in response.")
     @Story("Get internal assignment by id")
@@ -55,7 +55,7 @@ class InternalAssignmentControllerIT extends BaseContentControllerIT {
     }
 
     @Test
-    @TmsLink("IDT-RESTIT-INTERNAL-002")
+    @TmsLink("CONT-INT-002")
     @DisplayName("Get internal assignments by batch returns list")
     @Description("Equivalence test: batch endpoint receives one valid existing assignment id; expect HTTP 200 with corresponding assignment array.")
     @Story("Get internal assignments by batch")
@@ -73,7 +73,7 @@ class InternalAssignmentControllerIT extends BaseContentControllerIT {
     }
 
     @Test
-    @TmsLink("IDT-RESTIT-INTERNAL-003")
+    @TmsLink("CONT-INT-003")
     @DisplayName("Get internal assignments by empty batch returns empty list")
     @Description("Edge case: batch endpoint receives empty id list; expect HTTP 200 and empty response array.")
     @Story("Get internal assignments by batch")
@@ -91,7 +91,7 @@ class InternalAssignmentControllerIT extends BaseContentControllerIT {
   class InvalidCases {
 
     @Test
-    @TmsLink("IDT-RESTIT-INTERNAL-004")
+    @TmsLink("CONT-INT-004")
     @DisplayName("Get internal assignment by id fails when id format is invalid")
     @Description("Negative validation case: internal assignment id path variable is not a UUID; expect HTTP 400 bad request.")
     @Story("Get internal assignment by id")
@@ -101,7 +101,7 @@ class InternalAssignmentControllerIT extends BaseContentControllerIT {
     }
 
     @Test
-    @TmsLink("IDT-RESTIT-INTERNAL-005")
+    @TmsLink("CONT-INT-005")
     @DisplayName("Get internal assignments by batch fails when one id is unknown")
     @Description("Edge lookup case: batch endpoint contains unknown assignment UUID; expect HTTP 404 not found.")
     @Story("Get internal assignments by batch")

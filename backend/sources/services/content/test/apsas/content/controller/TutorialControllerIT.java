@@ -42,7 +42,7 @@ class TutorialControllerIT extends BaseContentControllerIT {
   class ValidCases {
 
     @Test
-    @TmsLink("IDT-RESTIT-TUTORIAL-001")
+    @TmsLink("CONT-TUT-001")
     @DisplayName("Create tutorial with title length at max boundary (255)")
     @Description("BVA: create tutorial with title length exactly 255 and valid content/tags; expect HTTP 201 with tutorial metadata in response.")
     @Story("Create tutorial")
@@ -63,7 +63,7 @@ class TutorialControllerIT extends BaseContentControllerIT {
     }
 
     @Test
-    @TmsLink("IDT-RESTIT-TUTORIAL-002")
+    @TmsLink("CONT-TUT-002")
     @DisplayName("List tutorials with size at max boundary (100)")
     @Description("BVA: list tutorials using size at upper boundary 100 and valid page index; expect HTTP 200 and one seeded tutorial returned.")
     @Story("List tutorials")
@@ -83,7 +83,7 @@ class TutorialControllerIT extends BaseContentControllerIT {
   class InvalidCases {
 
     @Test
-    @TmsLink("IDT-RESTIT-TUTORIAL-003")
+    @TmsLink("CONT-TUT-003")
     @DisplayName("Create tutorial fails when title length exceeds max boundary (256)")
     @Description("BVA negative case: create tutorial with title length 256 (max+1) and valid content; expect HTTP 400 with title max-length error.")
     @Story("Create tutorial")
@@ -102,7 +102,7 @@ class TutorialControllerIT extends BaseContentControllerIT {
     }
 
     @Test
-    @TmsLink("IDT-RESTIT-TUTORIAL-004")
+    @TmsLink("CONT-TUT-004")
     @DisplayName("Create tutorial fails when content is blank")
     @Description("Equivalence negative case: create tutorial with blank content and valid title; expect HTTP 400 with content-required validation message.")
     @Story("Create tutorial")
@@ -121,7 +121,7 @@ class TutorialControllerIT extends BaseContentControllerIT {
     }
 
     @Test
-    @TmsLink("IDT-RESTIT-TUTORIAL-005")
+    @TmsLink("CONT-TUT-005")
     @DisplayName("Update tutorial denied when requester is not owner")
     @Description("Authorization edge case: non-owner content provider attempts to update tutorial; expect HTTP 401 and unauthorized detail message.")
     @Story("Update tutorial")
@@ -147,7 +147,7 @@ class TutorialControllerIT extends BaseContentControllerIT {
   class EdgeCases {
 
     @Test
-    @TmsLink("IDT-RESTIT-TUTORIAL-006")
+    @TmsLink("CONT-TUT-006")
     @DisplayName("Get tutorial by id returns not found for unknown id")
     @Description("Edge lookup case: request tutorial by random UUID not present in storage; expect HTTP 404 and problem detail payload.")
     @Story("Get tutorial by id")
@@ -159,7 +159,7 @@ class TutorialControllerIT extends BaseContentControllerIT {
     }
 
     @Test
-    @TmsLink("IDT-RESTIT-TUTORIAL-007")
+    @TmsLink("CONT-TUT-007")
     @DisplayName("Delete tutorial denied when requester is not owner")
     @Description("Authorization edge case: non-owner content provider attempts to delete tutorial; expect HTTP 401 with unauthorized detail message.")
     @Story("Delete tutorial")

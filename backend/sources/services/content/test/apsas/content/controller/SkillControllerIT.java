@@ -44,7 +44,7 @@ class SkillControllerIT extends BaseContentControllerIT {
   class ValidCases {
 
     @Test
-    @TmsLink("IDT-RESTIT-SKILL-001")
+    @TmsLink("CONT-SKL-001")
     @DisplayName("Create skill with name length at max boundary (255)")
     @Description("BVA: create skill with name length exactly 255 characters and valid description; expect HTTP 201 and response returns the same name.")
     @Story("Create skill")
@@ -64,7 +64,7 @@ class SkillControllerIT extends BaseContentControllerIT {
     }
 
     @Test
-    @TmsLink("IDT-RESTIT-SKILL-002")
+    @TmsLink("CONT-SKL-002")
     @DisplayName("List skills with page below minimum uses clamped boundary")
     @Description("Edge pagination case: list endpoint called with page=-1 and size above nominal value; expect HTTP 200 and returned content is still accessible.")
     @Story("List skills")
@@ -84,7 +84,7 @@ class SkillControllerIT extends BaseContentControllerIT {
   class InvalidCases {
 
     @Test
-    @TmsLink("IDT-RESTIT-SKILL-003")
+    @TmsLink("CONT-SKL-003")
     @DisplayName("Create skill fails when name is blank")
     @Description("Equivalence negative case: create skill with blank name and valid description; expect HTTP 400 with required-name validation error.")
     @Story("Create skill")
@@ -103,7 +103,7 @@ class SkillControllerIT extends BaseContentControllerIT {
     }
 
     @Test
-    @TmsLink("IDT-RESTIT-SKILL-004")
+    @TmsLink("CONT-SKL-004")
     @DisplayName("Create skill fails when name length exceeds max boundary (256)")
     @Description("BVA negative case: name length at 256 characters (max+1) during create request; expect HTTP 400 and max-length validation message.")
     @Story("Create skill")
@@ -123,7 +123,7 @@ class SkillControllerIT extends BaseContentControllerIT {
     }
 
     @Test
-    @TmsLink("IDT-RESTIT-SKILL-005")
+    @TmsLink("CONT-SKL-005")
     @DisplayName("Update skill fails when name length exceeds max boundary (256)")
     @Description("BVA negative case: update request sets skill name to 256 characters while target skill exists; expect HTTP 400 and max-length validation error.")
     @Story("Update skill")
@@ -142,7 +142,7 @@ class SkillControllerIT extends BaseContentControllerIT {
     }
 
     @Test
-    @TmsLink("IDT-RESTIT-SKILL-006")
+    @TmsLink("CONT-SKL-006")
     @DisplayName("Create skill denied when role is not content provider")
     @Description("Authorization equivalence: student role attempts skill creation with valid payload; expect HTTP 403 forbidden.")
     @Story("Create skill")
@@ -164,7 +164,7 @@ class SkillControllerIT extends BaseContentControllerIT {
   class EdgeCases {
 
     @Test
-    @TmsLink("IDT-RESTIT-SKILL-007")
+    @TmsLink("CONT-SKL-007")
     @DisplayName("Get skill by id returns not found for non-existing id")
     @Description("Edge lookup case: query skill by random UUID that does not exist; expect HTTP 404 and problem detail in response body.")
     @Story("Get skill by id")
@@ -176,7 +176,7 @@ class SkillControllerIT extends BaseContentControllerIT {
     }
 
     @Test
-    @TmsLink("IDT-RESTIT-SKILL-008")
+    @TmsLink("CONT-SKL-008")
     @DisplayName("Delete skill returns not found for non-existing id")
     @Description("Edge deletion case: delete operation against unknown skill UUID; expect HTTP 404 with detail field present.")
     @Story("Delete skill")

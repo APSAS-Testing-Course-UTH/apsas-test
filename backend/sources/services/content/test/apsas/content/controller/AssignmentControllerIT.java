@@ -46,7 +46,7 @@ class AssignmentControllerIT extends BaseContentControllerIT {
   class ValidCases {
 
     @Test
-    @TmsLink("IDT-RESTIT-ASSIGNMENT-001")
+    @TmsLink("CONT-ASS-001")
     @DisplayName("Create assignment succeeds when maxScore equals min boundary (0.0)")
     @Description("BVA: create assignment with maxScore at minimum boundary value 0.0, valid payload, and content provider role; expect HTTP 201 and persisted maxScore equals 0.0.")
     @Story("Create assignment")
@@ -62,7 +62,7 @@ class AssignmentControllerIT extends BaseContentControllerIT {
     }
 
     @Test
-    @TmsLink("IDT-RESTIT-ASSIGNMENT-002")
+    @TmsLink("CONT-ASS-002")
     @DisplayName("Create assignment succeeds when maxScore equals max boundary (999.99)")
     @Description("BVA: create assignment with maxScore at maximum allowed boundary 999.99 using valid inputs; expect HTTP 201 and response maxScore equals 999.99.")
     @Story("Create assignment")
@@ -78,7 +78,7 @@ class AssignmentControllerIT extends BaseContentControllerIT {
     }
 
     @Test
-    @TmsLink("IDT-RESTIT-ASSIGNMENT-003")
+    @TmsLink("CONT-ASS-003")
     @DisplayName("Update schedule succeeds when dates are valid")
     @Description("Equivalence test: update schedule with dueDate after startDate on existing assignment using instructor role; expect HTTP 200 and both schedule fields present.")
     @Story("Update assignment schedule")
@@ -100,7 +100,7 @@ class AssignmentControllerIT extends BaseContentControllerIT {
     }
 
     @Test
-    @TmsLink("IDT-RESTIT-ASSIGNMENT-004")
+    @TmsLink("CONT-ASS-004")
     @DisplayName("Student sees hidden test case values masked")
     @Description("Edge case: student reads published assignment containing hidden test cases; expect HTTP 200 and hidden input/output values masked as ***.")
     @Story("Get assignment by id")
@@ -120,7 +120,7 @@ class AssignmentControllerIT extends BaseContentControllerIT {
   class InvalidCases {
 
     @Test
-    @TmsLink("IDT-RESTIT-ASSIGNMENT-005")
+    @TmsLink("CONT-ASS-005")
     @DisplayName("Create assignment fails when maxScore is below min boundary (-0.01)")
     @Description("BVA negative case: maxScore below minimum boundary at -0.01 while other fields are valid; expect HTTP 400 with maxScore validation message.")
     @Story("Create assignment")
@@ -136,7 +136,7 @@ class AssignmentControllerIT extends BaseContentControllerIT {
     }
 
     @Test
-    @TmsLink("IDT-RESTIT-ASSIGNMENT-006")
+    @TmsLink("CONT-ASS-006")
     @DisplayName("Create assignment fails when maxScore is above max boundary (1000.00)")
     @Description("BVA negative case: maxScore above maximum boundary at 1000.00 with otherwise valid payload; expect HTTP 400 and maxScore upper-bound error.")
     @Story("Create assignment")
@@ -152,7 +152,7 @@ class AssignmentControllerIT extends BaseContentControllerIT {
     }
 
     @Test
-    @TmsLink("IDT-RESTIT-ASSIGNMENT-007")
+    @TmsLink("CONT-ASS-007")
     @DisplayName("Create assignment fails when title length exceeds max boundary (256)")
     @Description("BVA negative case: title length is 256 characters (max+1) with valid remaining fields; expect HTTP 400 and title length validation error.")
     @Story("Create assignment")
@@ -168,7 +168,7 @@ class AssignmentControllerIT extends BaseContentControllerIT {
     }
 
     @Test
-    @TmsLink("IDT-RESTIT-ASSIGNMENT-008")
+    @TmsLink("CONT-ASS-008")
     @DisplayName("Create assignment fails when languages list is empty")
     @Description("BVA negative case: languages collection violates minimum size by being empty; expect HTTP 400 and languages-required validation message.")
     @Story("Create assignment")
@@ -184,7 +184,7 @@ class AssignmentControllerIT extends BaseContentControllerIT {
     }
 
     @Test
-    @TmsLink("IDT-RESTIT-ASSIGNMENT-009")
+    @TmsLink("CONT-ASS-009")
     @DisplayName("Create assignment fails when test cases list is empty")
     @Description("BVA negative case: testCases collection violates minimum size by being empty while other fields are valid; expect HTTP 400 and testCases-required error.")
     @Story("Create assignment")
@@ -200,7 +200,7 @@ class AssignmentControllerIT extends BaseContentControllerIT {
     }
 
     @Test
-    @TmsLink("IDT-RESTIT-ASSIGNMENT-010")
+    @TmsLink("CONT-ASS-010")
     @DisplayName("Create assignment denied when role is not content provider")
     @Description("Authorization equivalence: student role attempts to create assignment with valid payload; expect HTTP 403 forbidden.")
     @Story("Create assignment")
@@ -215,7 +215,7 @@ class AssignmentControllerIT extends BaseContentControllerIT {
     }
 
     @Test
-    @TmsLink("IDT-RESTIT-ASSIGNMENT-011")
+    @TmsLink("CONT-ASS-011")
     @DisplayName("Update schedule fails when dueDate is before startDate")
     @Description("Edge validation: update schedule where dueDate is earlier than startDate; expect HTTP 400 with business validation detail message.")
     @Story("Update assignment schedule")
@@ -236,7 +236,7 @@ class AssignmentControllerIT extends BaseContentControllerIT {
     }
 
     @Test
-    @TmsLink("IDT-RESTIT-ASSIGNMENT-012")
+    @TmsLink("CONT-ASS-012")
     @DisplayName("Update schedule denied when role is not instructor")
     @Description("Authorization equivalence: student role calls schedule update endpoint with valid dates; expect HTTP 403 forbidden.")
     @Story("Update assignment schedule")
@@ -260,7 +260,7 @@ class AssignmentControllerIT extends BaseContentControllerIT {
   class EdgeCases {
 
     @Test
-    @TmsLink("IDT-RESTIT-ASSIGNMENT-013")
+    @TmsLink("CONT-ASS-013")
     @DisplayName("Student receives not found for draft assignment")
     @Description("Edge access case: student requests assignment in DRAFT status; expect HTTP 404 because draft resources are not visible to students.")
     @Story("Get assignment by id")
@@ -274,7 +274,7 @@ class AssignmentControllerIT extends BaseContentControllerIT {
     }
 
     @Test
-    @TmsLink("IDT-RESTIT-ASSIGNMENT-014")
+    @TmsLink("CONT-ASS-014")
     @DisplayName("Publish assignment succeeds for creator on draft assignment")
     @Description("State transition test: assignment creator publishes a draft assignment; expect HTTP 200 and assignment status changes to PUBLISHED.")
     @Story("Publish assignment")
@@ -289,7 +289,7 @@ class AssignmentControllerIT extends BaseContentControllerIT {
     }
 
     @Test
-    @TmsLink("IDT-RESTIT-ASSIGNMENT-015")
+    @TmsLink("CONT-ASS-015")
     @DisplayName("Archive assignment fails when assignment already archived")
     @Description("Edge state case: archive endpoint called on already archived assignment by creator; expect HTTP 400 and already-archived detail message.")
     @Story("Archive assignment")
