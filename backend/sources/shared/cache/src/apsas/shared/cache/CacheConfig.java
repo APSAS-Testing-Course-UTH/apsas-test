@@ -6,7 +6,10 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
@@ -25,6 +28,12 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 @EnableCaching
 public class CacheConfig {
+
+  private static final String APSAS_PREFIX = "apsas:";
+  private static final String IDENTITY_PREFIX = "apsas:identity:";
+  private static final String CONTENT_PREFIX = "apsas:content:";
+  private static final String SUBMISSION_PREFIX = "apsas:submission:";
+  private static final String EVALUATION_PREFIX = "apsas:evaluation:";
 
   /**
    * Cache name for user entities. TTL: 30 minutes (users don't change frequently)
@@ -70,6 +79,12 @@ public class CacheConfig {
    * Configures RedisCacheManager with specific TTL and serialization settings.
    */
   @Bean
+  @ConditionalOnProperty(
+      prefix = "spring.cache",
+      name = "type",
+      havingValue = "redis",
+      matchIfMissing = true
+  )
   public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
     var objectMapper = new ObjectMapper();
     objectMapper.registerModule(new JavaTimeModule());
@@ -87,7 +102,7 @@ public class CacheConfig {
             .fromSerializer(new StringRedisSerializer()))
         .serializeValuesWith(RedisSerializationContext.SerializationPair
             .fromSerializer(jacksonSerializer))
-        .prefixCacheNameWith("apsas:");
+        .prefixCacheNameWith(APSAS_PREFIX);
 
     // Per-cache configurations with specific TTLs
     Map<String, RedisCacheConfiguration> cacheConfigs = new HashMap<>();
@@ -96,52 +111,52 @@ public class CacheConfig {
     cacheConfigs.put(
         USERS_CACHE, defaultConfig
             .entryTtl(Duration.ofMinutes(30))
-            .prefixCacheNameWith("apsas:identity:")
+            .prefixCacheNameWith(IDENTITY_PREFIX)
     );
 
     cacheConfigs.put(
         USERS_BY_ROLE_CACHE, defaultConfig
             .entryTtl(Duration.ofMinutes(15))
-            .prefixCacheNameWith("apsas:identity:")
+            .prefixCacheNameWith(IDENTITY_PREFIX)
     );
 
     // Content Service caches
     cacheConfigs.put(
         ASSIGNMENTS_CACHE, defaultConfig
             .entryTtl(Duration.ofMinutes(20))
-            .prefixCacheNameWith("apsas:content:")
+            .prefixCacheNameWith(CONTENT_PREFIX)
     );
 
     cacheConfigs.put(
         SKILLS_CACHE, defaultConfig
             .entryTtl(Duration.ofHours(1))
-            .prefixCacheNameWith("apsas:content:")
+            .prefixCacheNameWith(CONTENT_PREFIX)
     );
 
     cacheConfigs.put(
         ALL_SKILLS_CACHE, defaultConfig
             .entryTtl(Duration.ofHours(1))
-            .prefixCacheNameWith("apsas:content:")
+            .prefixCacheNameWith(CONTENT_PREFIX)
     );
 
     cacheConfigs.put(
         TUTORIALS_CACHE, defaultConfig
             .entryTtl(Duration.ofHours(1))
-            .prefixCacheNameWith("apsas:content:")
+            .prefixCacheNameWith(CONTENT_PREFIX)
     );
 
     // Submission Service caches
     cacheConfigs.put(
         SUBMISSIONS_CACHE, defaultConfig
             .entryTtl(Duration.ofMinutes(10))
-            .prefixCacheNameWith("apsas:submission:")
+            .prefixCacheNameWith(SUBMISSION_PREFIX)
     );
 
     // Evaluation Service caches
     cacheConfigs.put(
         RUNTIMES_CACHE, defaultConfig
             .entryTtl(Duration.ofHours(1))
-            .prefixCacheNameWith("apsas:evaluation:")
+            .prefixCacheNameWith(EVALUATION_PREFIX)
     );
 
     return RedisCacheManager.builder(connectionFactory)
@@ -149,5 +164,23 @@ public class CacheConfig {
         .withInitialCacheConfigurations(cacheConfigs)
         .transactionAware()
         .build();
+  }
+
+  /**
+   * Lightweight in-memory cache for integration tests or environments without Redis.
+   */
+  @Bean
+  @ConditionalOnProperty(prefix = "spring.cache", name = "type", havingValue = "simple")
+  public CacheManager inMemoryCacheManager() {
+    return new ConcurrentMapCacheManager(
+        USERS_CACHE,
+        USERS_BY_ROLE_CACHE,
+        ASSIGNMENTS_CACHE,
+        SKILLS_CACHE,
+        ALL_SKILLS_CACHE,
+        SUBMISSIONS_CACHE,
+        TUTORIALS_CACHE,
+        RUNTIMES_CACHE
+    );
   }
 }
