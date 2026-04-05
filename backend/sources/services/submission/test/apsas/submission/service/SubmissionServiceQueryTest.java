@@ -42,8 +42,8 @@ import org.springframework.data.domain.Pageable;
 /**
  * Unit test cho nhóm use case đọc dữ liệu của SubmissionService.
  *
- * Nhóm này tập trung vào query behavior: list submissions và get by id,
- * bao gồm authorization logic + masking dữ liệu hidden test case cho student.
+ * <p>Nhóm này tập trung vào query behavior: list submissions và get by id,
+ * bao gồm authorization logic + masking dữ liệu hidden test case cho student.</p>
  */
 @ExtendWith(MockitoExtension.class)
 @Epic("Submission Service")
