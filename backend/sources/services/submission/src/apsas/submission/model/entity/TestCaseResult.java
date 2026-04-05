@@ -1,15 +1,9 @@
 package apsas.submission.model.entity;
 
-import java.io.Serial;
-import java.io.Serializable;
 import lombok.Data;
 
 @Data
-public class TestCaseResult implements Serializable {
-
-  @Serial
-  private static final long serialVersionUID = 1L;
-
+public class TestCaseResult {
   private Integer order;
   private String description;
   private Boolean hidden;

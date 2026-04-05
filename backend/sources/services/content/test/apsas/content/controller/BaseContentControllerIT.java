@@ -22,6 +22,11 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
@@ -38,6 +43,16 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Epic("Content Service")
 @Owner("qa-team")
 abstract class BaseContentControllerIT {
+
+  @TestConfiguration
+  static class TestCacheConfig {
+
+    @Bean
+    @Primary
+    public CacheManager cacheManager() {
+      return new ConcurrentMapCacheManager();
+    }
+  }
 
   @Autowired
   protected ObjectMapper objectMapper;

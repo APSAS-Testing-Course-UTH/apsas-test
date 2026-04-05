@@ -1,7 +1,4 @@
 spring:
-  config:
-    import: "optional:file:./"
-
   cloud:
     config:
       enabled: false
@@ -36,9 +33,6 @@ spring:
     redis:
       repositories:
         enabled: false
-
-  cache:
-    type: simple
 
   main:
     allow-bean-definition-overriding: true
