@@ -23,6 +23,7 @@ import apsas.identity.service.UserService;
 import apsas.shared.messaging.event.EventPublisher;
 import apsas.shared.models.pagination.PageResponse;
 import apsas.shared.security.HeaderAuthenticationFilter;
+import apsas.shared.security.SharedSecurityConfig;
 import apsas.shared.security.UserPrincipal;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.qameta.allure.Description;
@@ -38,6 +39,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
 import org.instancio.Instancio;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -49,6 +51,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.cache.CacheManager;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -60,6 +63,7 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 @WebMvcTest(controllers = UserController.class)
 @AutoConfigureMockMvc(addFilters = false)
+@Import(SharedSecurityConfig.class)
 @Tag("integration")
 @Tag("identity")
 @Epic("Identity Service")
@@ -464,6 +468,11 @@ class UserControllerIT {
 
   private static String repeat(String token, int count) {
     return token.repeat(Math.max(count, 0));
+  }
+
+  @AfterEach
+  void clearSecurityContext() {
+    SecurityContextHolder.clearContext();
   }
 
   private RequestPostProcessor authenticated(Authentication authentication) {
