@@ -15,4 +15,6 @@ dependencies {
     implementation("org.springframework.security:spring-security-messaging")
     implementation("org.springframework.security:spring-security-oauth2-jose")
     implementation("org.postgresql:postgresql")
+
+    testRuntimeOnly("com.h2database:h2")
 }
