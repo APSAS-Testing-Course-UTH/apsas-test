@@ -6,9 +6,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -19,7 +19,6 @@ import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import io.qameta.allure.TmsLink;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -31,6 +30,29 @@ import org.mockito.ArgumentCaptor;
 @Feature("Notification Dispatcher")
 @Issue("13")
 class NotificationDispatcherTest {
+  private static final String USER_EMAIL = "user@example.com";
+  private static final String FIRST_NAME = "Lan";
+  private static final String LAST_NAME = "Nguyen";
+  private static final String VERIFY_TOKEN = "verify-token";
+  private static final String RESET_TOKEN = "reset-token";
+  private static final String ASSIGNMENT_PUBLISHED = "assignment_published";
+  private static final String SUBMISSION_EVALUATED = "submission_evaluated";
+  private static final String EMAIL_CHANNEL = "email";
+  private static final String PUSH_CHANNEL = "push";
+  private static final String ASSIGNMENT_A = "Assignment A";
+  private static final String ASSIGNMENT_B = "Assignment B";
+  private static final String ASSIGNMENT_DEADLINE = "2026-03-30";
+  private static final String ASSIGNMENT_URL = "https://host/assignment/A";
+  private static final String SUBMISSION_ID = "submission-id";
+  private static final String EXECUTION_TIME_100_MS = "100ms";
+  private static final String EXECUTION_TIME_120_MS = "120ms";
+  private static final String FEEDBACK_GOOD = "Good";
+  private static final String FEEDBACK_RETRY = "Retry";
+  private static final String TOKEN_1 = "token-1";
+  private static final String TOKEN_2 = "token-2";
+  private static final String PUSH_DOWN = "push down";
+  private static final String MAIL_DOWN = "mail down";
+
   private EmailService emailService;
   private PushNotificationService pushNotificationService;
   private NotificationPreferencesService preferencesService;
@@ -56,11 +78,53 @@ class NotificationDispatcherTest {
   @Story("Send verification email")
   @TmsLink("NTF-DIS-001")
   @DisplayName("Should bypass preferences when sending verification email")
-  void sendVerificationEmail_shouldBypassPreferences_whenVerificationNotificationIsTriggered() {
-    dispatcher.sendVerificationEmail("user@example.com", "Lan", "Nguyen", "verify-token");
+  void sendVerificationEmailShouldBypassPreferencesWhenVerificationNotificationIsTriggered() {
+    dispatcher.sendVerificationEmail(USER_EMAIL, FIRST_NAME, LAST_NAME, VERIFY_TOKEN);
 
-    verify(emailService).sendVerificationEmail("user@example.com", "Lan", "Nguyen", "verify-token");
+    verify(emailService).sendVerificationEmail(USER_EMAIL, FIRST_NAME, LAST_NAME, VERIFY_TOKEN);
     verifyNoInteractions(preferencesService);
+  }
+
+  @Test
+  @Tag("unit")
+  @Story("Send verification email")
+  @TmsLink("NTF-DIS-010")
+  @DisplayName("Should swallow exception when verification email service fails")
+  void sendVerificationEmailShouldSwallowExceptionWhenEmailServiceThrows() {
+    doThrow(new RuntimeException(MAIL_DOWN))
+        .when(emailService)
+        .sendVerificationEmail(USER_EMAIL, FIRST_NAME, LAST_NAME, VERIFY_TOKEN);
+
+    assertDoesNotThrow(() -> dispatcher.sendVerificationEmail(USER_EMAIL, FIRST_NAME, LAST_NAME, VERIFY_TOKEN));
+
+    verify(emailService).sendVerificationEmail(USER_EMAIL, FIRST_NAME, LAST_NAME, VERIFY_TOKEN);
+  }
+
+  @Test
+  @Tag("unit")
+  @Story("Send password reset email")
+  @TmsLink("NTF-DIS-006")
+  @DisplayName("Should bypass preferences when sending password reset email")
+  void sendPasswordResetEmailShouldBypassPreferencesWhenPasswordResetIsTriggered() {
+    dispatcher.sendPasswordResetEmail(USER_EMAIL, FIRST_NAME, RESET_TOKEN);
+
+    verify(emailService).sendPasswordResetEmail(USER_EMAIL, FIRST_NAME, RESET_TOKEN);
+    verifyNoInteractions(preferencesService);
+  }
+
+  @Test
+  @Tag("unit")
+  @Story("Send password reset email")
+  @TmsLink("NTF-DIS-007")
+  @DisplayName("Should swallow exception when password reset email sending fails")
+  void sendPasswordResetEmailShouldSwallowExceptionWhenEmailServiceThrows() {
+    doThrow(new RuntimeException(MAIL_DOWN))
+        .when(emailService)
+        .sendPasswordResetEmail(USER_EMAIL, FIRST_NAME, RESET_TOKEN);
+
+    assertDoesNotThrow(() -> dispatcher.sendPasswordResetEmail(USER_EMAIL, FIRST_NAME, RESET_TOKEN));
+
+    verify(emailService).sendPasswordResetEmail(USER_EMAIL, FIRST_NAME, RESET_TOKEN);
   }
 
   @Test
@@ -68,29 +132,29 @@ class NotificationDispatcherTest {
   @Story("Send assignment published email notification")
   @TmsLink("NTF-DIS-002")
   @DisplayName("Should send assignment email when email channel is enabled")
-  void sendAssignmentPublishedNotification_shouldSendEmail_whenEmailChannelIsEnabled() {
+  void sendAssignmentPublishedNotificationShouldSendEmailWhenEmailChannelIsEnabled() {
     UUID userId = UUID.randomUUID();
-    when(preferencesService.isNotificationEnabled(userId, "assignment_published", "email"))
+    when(preferencesService.isNotificationEnabled(userId, ASSIGNMENT_PUBLISHED, EMAIL_CHANNEL))
         .thenReturn(true);
-    when(preferencesService.isNotificationEnabled(userId, "assignment_published", "push"))
+    when(preferencesService.isNotificationEnabled(userId, ASSIGNMENT_PUBLISHED, PUSH_CHANNEL))
         .thenReturn(false);
 
     dispatcher.sendAssignmentPublishedNotification(
         userId,
-        "user@example.com",
-        "Lan",
-        "Assignment A",
-        "2026-03-30",
-        "https://host/assignment/A");
+        USER_EMAIL,
+        FIRST_NAME,
+        ASSIGNMENT_A,
+        ASSIGNMENT_DEADLINE,
+        ASSIGNMENT_URL);
 
     verify(emailService)
         .sendAssignmentPublishedEmail(
-            "user@example.com",
-            "Lan",
-            "Assignment A",
+            USER_EMAIL,
+            FIRST_NAME,
+            ASSIGNMENT_A,
             "",
-            "2026-03-30",
-            "https://host/assignment/A");
+            ASSIGNMENT_DEADLINE,
+            ASSIGNMENT_URL);
     verify(pushNotificationService, never())
         .sendAssignmentPublishedNotification(any(), anyString(), anyString());
   }
@@ -100,24 +164,24 @@ class NotificationDispatcherTest {
   @Story("Send assignment published push notification")
   @TmsLink("NTF-DIS-003")
   @DisplayName("Should send assignment push when push channel is enabled and tokens exist")
-  void sendAssignmentPublishedNotification_shouldSendPush_whenPushChannelEnabledAndTokensExist() {
+  void sendAssignmentPublishedNotificationShouldSendPushWhenPushChannelEnabledAndTokensExist() {
     UUID userId = UUID.randomUUID();
-    when(preferencesService.isNotificationEnabled(userId, "assignment_published", "email"))
+    when(preferencesService.isNotificationEnabled(userId, ASSIGNMENT_PUBLISHED, EMAIL_CHANNEL))
         .thenReturn(false);
-    when(preferencesService.isNotificationEnabled(userId, "assignment_published", "push"))
+    when(preferencesService.isNotificationEnabled(userId, ASSIGNMENT_PUBLISHED, PUSH_CHANNEL))
         .thenReturn(true);
-    when(deviceTokenService.getActiveTokenStringsByUserId(userId)).thenReturn(List.of("token-1"));
+    when(deviceTokenService.getActiveTokenStringsByUserId(userId)).thenReturn(List.of(TOKEN_1));
 
     dispatcher.sendAssignmentPublishedNotification(
         userId,
-        "user@example.com",
-        "Lan",
-        "Assignment A",
-        "2026-03-30",
-        "https://host/assignment/A");
+        USER_EMAIL,
+        FIRST_NAME,
+        ASSIGNMENT_A,
+        ASSIGNMENT_DEADLINE,
+        ASSIGNMENT_URL);
 
     verify(pushNotificationService)
-        .sendAssignmentPublishedNotification(List.of("token-1"), "Assignment A", "https://host/assignment/A");
+        .sendAssignmentPublishedNotification(List.of(TOKEN_1), ASSIGNMENT_A, ASSIGNMENT_URL);
   }
 
   @Test
@@ -125,26 +189,26 @@ class NotificationDispatcherTest {
   @Story("Send submission evaluated push notification")
   @TmsLink("NTF-DIS-EXTRA-001")
   @DisplayName("Should pass submission identifier to push payload when submission is passed")
-  void sendSubmissionEvaluatedNotification_shouldUseSubmissionId_whenPushEnabledAndSubmissionPassed() {
+  void sendSubmissionEvaluatedNotificationShouldUseSubmissionIdWhenPushEnabledAndSubmissionPassed() {
     UUID userId = UUID.randomUUID();
-    when(preferencesService.isNotificationEnabled(userId, "submission_evaluated", "email"))
+    when(preferencesService.isNotificationEnabled(userId, SUBMISSION_EVALUATED, EMAIL_CHANNEL))
         .thenReturn(false);
-    when(preferencesService.isNotificationEnabled(userId, "submission_evaluated", "push"))
+    when(preferencesService.isNotificationEnabled(userId, SUBMISSION_EVALUATED, PUSH_CHANNEL))
         .thenReturn(true);
-    when(deviceTokenService.getActiveTokenStringsByUserId(userId)).thenReturn(List.of("token-1"));
+    when(deviceTokenService.getActiveTokenStringsByUserId(userId)).thenReturn(List.of(TOKEN_1));
 
     dispatcher.sendSubmissionEvaluatedNotification(
         userId,
-        "user@example.com",
-        "Lan",
-        "Assignment A",
+        USER_EMAIL,
+        FIRST_NAME,
+        ASSIGNMENT_A,
         80,
         true,
         8,
         10,
-        "100ms",
-        "Good",
-        "submission-id");
+        EXECUTION_TIME_100_MS,
+        FEEDBACK_GOOD,
+        SUBMISSION_ID);
 
     ArgumentCaptor<String> tokenCaptor = ArgumentCaptor.forClass(String.class);
     ArgumentCaptor<String> titleCaptor = ArgumentCaptor.forClass(String.class);
@@ -156,10 +220,11 @@ class NotificationDispatcherTest {
             titleCaptor.capture(),
             scoreCaptor.capture(),
             submissionCaptor.capture());
-    assertEquals("token-1", tokenCaptor.getValue());
-    assertEquals("Assignment A", titleCaptor.getValue());
+
+    assertEquals(TOKEN_1, tokenCaptor.getValue());
+    assertEquals(ASSIGNMENT_A, titleCaptor.getValue());
     assertEquals(80, scoreCaptor.getValue());
-    assertEquals("submission-id", submissionCaptor.getValue());
+    assertEquals(SUBMISSION_ID, submissionCaptor.getValue());
     verify(emailService, never())
         .sendSubmissionEvaluatedEmail(
             anyString(),
@@ -179,26 +244,26 @@ class NotificationDispatcherTest {
   @Story("Send submission evaluated push notification")
   @TmsLink("NTF-DIS-EXTRA-002")
   @DisplayName("Should pass submission identifier to push payload when submission is not passed")
-  void sendSubmissionEvaluatedNotification_shouldUseSubmissionId_whenPushEnabledAndSubmissionNotPassed() {
+  void sendSubmissionEvaluatedNotificationShouldUseSubmissionIdWhenPushEnabledAndSubmissionNotPassed() {
     UUID userId = UUID.randomUUID();
-    when(preferencesService.isNotificationEnabled(userId, "submission_evaluated", "email"))
+    when(preferencesService.isNotificationEnabled(userId, SUBMISSION_EVALUATED, EMAIL_CHANNEL))
         .thenReturn(false);
-    when(preferencesService.isNotificationEnabled(userId, "submission_evaluated", "push"))
+    when(preferencesService.isNotificationEnabled(userId, SUBMISSION_EVALUATED, PUSH_CHANNEL))
         .thenReturn(true);
-    when(deviceTokenService.getActiveTokenStringsByUserId(userId)).thenReturn(List.of("token-2"));
+    when(deviceTokenService.getActiveTokenStringsByUserId(userId)).thenReturn(List.of(TOKEN_2));
 
     dispatcher.sendSubmissionEvaluatedNotification(
         userId,
-        "user@example.com",
-        "Lan",
-        "Assignment B",
+        USER_EMAIL,
+        FIRST_NAME,
+        ASSIGNMENT_B,
         40,
         false,
         4,
         10,
-        "120ms",
-        "Retry",
-        "submission-id");
+        EXECUTION_TIME_120_MS,
+        FEEDBACK_RETRY,
+        SUBMISSION_ID);
 
     ArgumentCaptor<String> tokenCaptor = ArgumentCaptor.forClass(String.class);
     ArgumentCaptor<String> titleCaptor = ArgumentCaptor.forClass(String.class);
@@ -210,10 +275,11 @@ class NotificationDispatcherTest {
             titleCaptor.capture(),
             scoreCaptor.capture(),
             submissionCaptor.capture());
-    assertEquals("token-2", tokenCaptor.getValue());
-    assertEquals("Assignment B", titleCaptor.getValue());
+
+    assertEquals(TOKEN_2, tokenCaptor.getValue());
+    assertEquals(ASSIGNMENT_B, titleCaptor.getValue());
     assertEquals(40, scoreCaptor.getValue());
-    assertEquals("submission-id", submissionCaptor.getValue());
+    assertEquals(SUBMISSION_ID, submissionCaptor.getValue());
   }
 
   @Test
@@ -221,26 +287,26 @@ class NotificationDispatcherTest {
   @Story("Skip submission evaluated push notification")
   @TmsLink("NTF-DIS-004")
   @DisplayName("Should not send submission evaluated push when no active tokens exist")
-  void sendSubmissionEvaluatedNotification_shouldNotSendPush_whenNoActiveTokensExist() {
+  void sendSubmissionEvaluatedNotificationShouldNotSendPushWhenNoActiveTokensExist() {
     UUID userId = UUID.randomUUID();
-    when(preferencesService.isNotificationEnabled(userId, "submission_evaluated", "email"))
+    when(preferencesService.isNotificationEnabled(userId, SUBMISSION_EVALUATED, EMAIL_CHANNEL))
         .thenReturn(false);
-    when(preferencesService.isNotificationEnabled(userId, "submission_evaluated", "push"))
+    when(preferencesService.isNotificationEnabled(userId, SUBMISSION_EVALUATED, PUSH_CHANNEL))
         .thenReturn(true);
     when(deviceTokenService.getActiveTokenStringsByUserId(userId)).thenReturn(List.of());
 
     dispatcher.sendSubmissionEvaluatedNotification(
         userId,
-        "user@example.com",
-        "Lan",
-        "Assignment A",
+        USER_EMAIL,
+        FIRST_NAME,
+        ASSIGNMENT_A,
         80,
         true,
         8,
         10,
-        "100ms",
-        "Good",
-        "submission-id");
+        EXECUTION_TIME_100_MS,
+        FEEDBACK_GOOD,
+        SUBMISSION_ID);
 
     verify(pushNotificationService, never())
         .sendSubmissionEvaluatedNotification(anyString(), anyString(), anyInt(), anyString());
@@ -248,75 +314,108 @@ class NotificationDispatcherTest {
 
   @Test
   @Tag("unit")
-  @Story("Send support request notifications")
-  @TmsLink("NTF-DIS-EXTRA-003")
-  @DisplayName("Should continue with push notification when support email sending fails")
-  void sendSupportRequestNotification_shouldContinuePush_whenEmailFails() {
-    UUID instructorId = UUID.randomUUID();
-    when(deviceTokenService.getActiveTokenStringsByUserId(instructorId)).thenReturn(List.of("token-3"));
-    org.mockito.Mockito.doThrow(new RuntimeException("mail down"))
-        .when(emailService)
-        .sendSupportRequestEmail(
-            "instructor@example.com",
-            "Instructor A",
-            "Student A",
-            "student@example.com",
-            "Need help",
-            "session-1");
+  @Story("Send submission evaluated email notification")
+  @TmsLink("NTF-DIS-008")
+  @DisplayName("Should send submission evaluated email when email channel is enabled")
+  void sendSubmissionEvaluatedNotificationShouldSendEmailWhenEmailEnabled() {
+    UUID userId = UUID.randomUUID();
+    when(preferencesService.isNotificationEnabled(userId, SUBMISSION_EVALUATED, EMAIL_CHANNEL))
+        .thenReturn(true);
+    when(preferencesService.isNotificationEnabled(userId, SUBMISSION_EVALUATED, PUSH_CHANNEL))
+        .thenReturn(false);
 
-    assertDoesNotThrow(
-        () ->
-            dispatcher.sendSupportRequestNotification(
-                Map.of("instructor@example.com", "Instructor A"),
-                List.of(instructorId),
-                "Student A",
-                "student@example.com",
-                "Need help",
-                "session-1"));
+    dispatcher.sendSubmissionEvaluatedNotification(
+        userId,
+        USER_EMAIL,
+        FIRST_NAME,
+        ASSIGNMENT_A,
+        80,
+        true,
+        8,
+        10,
+        EXECUTION_TIME_100_MS,
+        FEEDBACK_GOOD,
+        SUBMISSION_ID);
 
-    verify(pushNotificationService)
-        .sendSupportRequestNotification(List.of("token-3"), "Student A", "Need help", "session-1");
+    verify(emailService)
+        .sendSubmissionEvaluatedEmail(
+            USER_EMAIL,
+            FIRST_NAME,
+            ASSIGNMENT_A,
+            80,
+            true,
+            8,
+            10,
+            EXECUTION_TIME_100_MS,
+            FEEDBACK_GOOD,
+            SUBMISSION_ID);
+    verify(pushNotificationService, never())
+        .sendSubmissionEvaluatedNotification(anyString(), anyString(), anyInt(), anyString());
   }
 
   @Test
   @Tag("unit")
-  @Story("Send support request notifications")
-  @TmsLink("NTF-DIS-005")
-  @DisplayName("Should send support request notifications to all instructors")
-  void sendSupportRequestNotification_shouldNotifyAllInstructors_whenInstructorListsProvided() {
-    UUID instructorId1 = UUID.randomUUID();
-    UUID instructorId2 = UUID.randomUUID();
+  @Story("Send submission evaluated push notification")
+  @TmsLink("NTF-DIS-011")
+  @DisplayName("Should swallow push exception when submission evaluated push dispatch fails")
+  void sendSubmissionEvaluatedNotificationShouldSwallowPushExceptionWhenPushFails() {
+    UUID userId = UUID.randomUUID();
+    when(preferencesService.isNotificationEnabled(userId, SUBMISSION_EVALUATED, EMAIL_CHANNEL))
+        .thenReturn(false);
+    when(preferencesService.isNotificationEnabled(userId, SUBMISSION_EVALUATED, PUSH_CHANNEL))
+        .thenReturn(true);
+    when(deviceTokenService.getActiveTokenStringsByUserId(userId)).thenReturn(List.of(TOKEN_1));
+    doThrow(new RuntimeException(PUSH_DOWN))
+        .when(pushNotificationService)
+        .sendSubmissionEvaluatedNotification(TOKEN_1, ASSIGNMENT_A, 80, SUBMISSION_ID);
 
-    when(deviceTokenService.getActiveTokenStringsByUserId(instructorId1)).thenReturn(List.of("t1"));
-    when(deviceTokenService.getActiveTokenStringsByUserId(instructorId2)).thenReturn(List.of("t2"));
+    assertDoesNotThrow(
+        () ->
+            dispatcher.sendSubmissionEvaluatedNotification(
+                userId,
+                USER_EMAIL,
+                FIRST_NAME,
+                ASSIGNMENT_A,
+                80,
+                true,
+                8,
+                10,
+                EXECUTION_TIME_100_MS,
+                FEEDBACK_GOOD,
+                SUBMISSION_ID));
 
-    dispatcher.sendSupportRequestNotification(
-        Map.of("ins1@example.com", "Instructor 1", "ins2@example.com", "Instructor 2"),
-        List.of(instructorId1, instructorId2),
-        "Student A",
-        "student@example.com",
-        "Need help",
-        "session-1");
-
-    verify(emailService, times(1))
-        .sendSupportRequestEmail(
-            "ins1@example.com",
-            "Instructor 1",
-            "Student A",
-            "student@example.com",
-            "Need help",
-            "session-1");
-    verify(emailService, times(1))
-        .sendSupportRequestEmail(
-            "ins2@example.com",
-            "Instructor 2",
-            "Student A",
-            "student@example.com",
-            "Need help",
-            "session-1");
-    verify(pushNotificationService, times(1))
-        .sendSupportRequestNotification(List.of("t1"), "Student A", "Need help", "session-1");
-    verify(pushNotificationService, times(1))
-        .sendSupportRequestNotification(List.of("t2"), "Student A", "Need help", "session-1");
+    verify(pushNotificationService)
+        .sendSubmissionEvaluatedNotification(TOKEN_1, ASSIGNMENT_A, 80, SUBMISSION_ID);
   }
+
+  @Test
+  @Tag("unit")
+  @Story("Send assignment published push notification")
+  @TmsLink("NTF-DIS-009")
+  @DisplayName("Should swallow push exception when assignment push dispatch fails")
+  void sendAssignmentPublishedNotificationShouldSwallowPushExceptionWhenPushFails() {
+    UUID userId = UUID.randomUUID();
+    when(preferencesService.isNotificationEnabled(userId, ASSIGNMENT_PUBLISHED, EMAIL_CHANNEL))
+        .thenReturn(false);
+    when(preferencesService.isNotificationEnabled(userId, ASSIGNMENT_PUBLISHED, PUSH_CHANNEL))
+        .thenReturn(true);
+    when(deviceTokenService.getActiveTokenStringsByUserId(userId)).thenReturn(List.of(TOKEN_1));
+    doThrow(new RuntimeException(PUSH_DOWN))
+        .when(pushNotificationService)
+        .sendAssignmentPublishedNotification(List.of(TOKEN_1), ASSIGNMENT_A, ASSIGNMENT_URL);
+
+    assertDoesNotThrow(
+        () ->
+            dispatcher.sendAssignmentPublishedNotification(
+                userId,
+                USER_EMAIL,
+                FIRST_NAME,
+                ASSIGNMENT_A,
+                ASSIGNMENT_DEADLINE,
+                ASSIGNMENT_URL));
+
+    verify(pushNotificationService)
+        .sendAssignmentPublishedNotification(List.of(TOKEN_1), ASSIGNMENT_A, ASSIGNMENT_URL);
+  }
+
 }
