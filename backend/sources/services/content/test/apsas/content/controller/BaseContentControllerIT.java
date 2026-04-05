@@ -12,6 +12,7 @@ import apsas.content.repository.TutorialRepository;
 import apsas.shared.messaging.event.EventPublisher;
 import apsas.shared.security.UserPrincipal;
 import apsas.shared.security.UserPrincipals;
+import apsas.shared.cache.CacheConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Owner;
@@ -47,7 +48,16 @@ abstract class BaseContentControllerIT {
   CacheManager cacheManager;
 
   static CacheManager cacheManager() {
-    return new ConcurrentMapCacheManager();
+    return new ConcurrentMapCacheManager(
+        CacheConfig.USERS_CACHE,
+        CacheConfig.USERS_BY_ROLE_CACHE,
+        CacheConfig.ASSIGNMENTS_CACHE,
+        CacheConfig.SKILLS_CACHE,
+        CacheConfig.ALL_SKILLS_CACHE,
+        CacheConfig.SUBMISSIONS_CACHE,
+        CacheConfig.TUTORIALS_CACHE,
+        CacheConfig.RUNTIMES_CACHE
+    );
   }
 
   @Autowired
