@@ -1,0 +1,48 @@
+spring:
+  cloud:
+    gateway:
+      server:
+        webflux:
+          httpclient:
+            connect-timeout: 10000
+            response-timeout: 2s
+
+          default-filters:
+            - name: RequestSize
+              args:
+                maxSize: 1KB
+
+          routes:
+            - id: auth-route
+              uri: ${test.downstream.base-url}
+              predicates:
+                - Path=/api/auth/**
+
+            - id: evaluation-docs-route
+              uri: ${test.downstream.base-url}
+              predicates:
+                - Path=/api-docs/evaluation-service
+              filters:
+                - RewritePath=/api-docs/.*, /api-docs
+
+            - id: evaluation-runtimes-route
+              uri: ${test.downstream.base-url}
+              predicates:
+                - Path=/api/v1/runtimes/**
+
+
+jwt:
+  secret: 01234567890123456789012345678901
+
+server:
+  max-http-request-header-size: 10KB
+
+apsas:
+  gateway:
+    rate-limit:
+      max-requests: 20
+      window-seconds: 30
+      path-prefix: /api/
+    header-limit:
+      max-size-bytes: 8192
+      path-prefix: /api/
