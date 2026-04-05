@@ -2,6 +2,7 @@ package apsas.gateway.filter;
 
 import apsas.gateway.config.RateLimitProperties;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -17,6 +18,10 @@ public class InMemoryRateLimitFilter implements GlobalFilter, Ordered {
 
   private final RateLimitProperties rateLimitProperties;
   private final ConcurrentHashMap<String, FixedWindowCounter> counters = new ConcurrentHashMap<>();
+  private final AtomicLong lastEvictionMillis = new AtomicLong(System.currentTimeMillis());
+
+  private static final long EVICTION_INTERVAL_MULTIPLIER = 10;
+  private static final long STALE_WINDOW_MULTIPLIER = 2;
 
   @Override
   public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -50,6 +55,8 @@ public class InMemoryRateLimitFilter implements GlobalFilter, Ordered {
       }
     }
 
+    evictStaleEntries(now);
+
     if (limited) {
       exchange.getResponse().setStatusCode(HttpStatus.TOO_MANY_REQUESTS);
       return exchange.getResponse().setComplete();
@@ -61,6 +68,19 @@ public class InMemoryRateLimitFilter implements GlobalFilter, Ordered {
   @Override
   public int getOrder() {
     return -200;
+  }
+
+  private void evictStaleEntries(long now) {
+    var windowMs = rateLimitProperties.getWindowSeconds() * 1000L;
+    var evictionIntervalMs = windowMs * EVICTION_INTERVAL_MULTIPLIER;
+    var last = lastEvictionMillis.get();
+    if (now - last >= evictionIntervalMs && lastEvictionMillis.compareAndSet(last, now)) {
+      counters.entrySet().removeIf(entry -> {
+        synchronized (entry.getValue()) {
+          return now - entry.getValue().windowStartMillis >= windowMs * STALE_WINDOW_MULTIPLIER;
+        }
+      });
+    }
   }
 
   private static final class FixedWindowCounter {

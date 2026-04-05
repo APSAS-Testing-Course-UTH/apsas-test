@@ -293,7 +293,7 @@ class ApiGatewayIntegrationTest {
   @Owner("backend-team")
   @TmsLink("GW-BVA-014")
   void gateway_shouldRejectRequest_whenHeaderExceedsMaxSize() {
-    String oversizedHeader = "x".repeat(11000);
+    String oversizedHeader = "x".repeat(9000);
 
     webTestClient.get()
         .uri("/api/auth/login")

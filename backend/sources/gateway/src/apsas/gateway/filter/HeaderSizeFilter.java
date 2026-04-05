@@ -24,6 +24,8 @@ public class HeaderSizeFilter implements GlobalFilter, Ordered {
       return chain.filter(exchange);
     }
 
+    // Sums header name and value byte lengths. Per-header wire overhead (": ", CRLF) is not
+    // included, so this is a conservative lower bound of the actual on-wire header size.
     int headerSizeBytes = exchange.getRequest().getHeaders().entrySet().stream()
         .mapToInt(entry -> {
           int keySize = entry.getKey().getBytes(StandardCharsets.UTF_8).length;
