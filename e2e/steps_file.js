@@ -8,8 +8,8 @@ module.exports = function () {
     login(email, password) {
       this.amOnPage("/login")
       this.fillField("Email", email)
-      this.fillField("Password", password)
-      this.click("Login")
+      this.fillField("Mật khẩu", password)
+      this.click("Đăng nhập")
     },
   })
 }

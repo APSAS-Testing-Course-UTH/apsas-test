@@ -93,10 +93,8 @@ The frontend uses MSW for API mocking in development. Available test accounts:
 
 ## CI Integration
 
-Set the `CI` environment variable to run tests in headless mode:
+Set the `CI` environment variable to run tests in headless mode (GitHub Actions sets this automatically):
 
 ```bash
 CI=true npm test
 ```
-
-The `test:ci` script automatically passes `CI=true` when launched from GitHub Actions.
