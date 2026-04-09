@@ -1,0 +1,21 @@
+{
+  "name": "apsas-e2e",
+  "version": "1.0.0",
+  "private": true,
+  "description": "End-to-end tests for APSAS using CodeceptJS + Playwright",
+  "type": "commonjs",
+  "scripts": {
+    "postinstall": "playwright install chromium",
+    "test": "codeceptjs run --steps",
+    "test:ui": "codeceptjs run --steps --reporter mochawesome",
+    "test:parallel": "codeceptjs run-workers 2",
+    "dev:server": "cd ../frontend && bun run dev",
+    "test:ci": "start-server-and-test dev:server http://localhost:5173 test"
+  },
+  "dependencies": {
+    "@codeceptjs/configure": "^1.0.6",
+    "codeceptjs": "^3.7.8",
+    "playwright": "^1.49.0",
+    "start-server-and-test": "^3.0.0"
+  }
+}
