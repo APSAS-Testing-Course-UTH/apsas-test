@@ -4,7 +4,7 @@ This directory contains the APSAS end-to-end test project built with CodeceptJS 
 
 ## Scope
 
-- Work only inside `/home/runner/work/apsas-test/apsas-test/e2e` for E2E changes.
+- Work only inside the `e2e/` directory for E2E changes.
 - Prefer minimal, focused test updates.
 - Do not modify backend services for E2E-only requests.
 
@@ -12,11 +12,11 @@ This directory contains the APSAS end-to-end test project built with CodeceptJS 
 
 - Node.js 18+.
 - Frontend app available at `http://localhost:5173`.
-- Frontend dev server command is `bun run dev` (from `/home/runner/work/apsas-test/apsas-test/frontend`).
+- Frontend dev server command is `bun run dev` (from `frontend/`).
 
 ## Common Commands
 
-Run from `/home/runner/work/apsas-test/apsas-test/e2e`:
+Run from the `e2e/` directory:
 
 ```bash
 npm install
