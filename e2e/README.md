@@ -32,7 +32,7 @@ This uses `start-server-and-test` to:
 
 ```bash
 # Start the frontend first (in a separate terminal):
-cd ../frontend && npm run dev
+cd ../frontend && bun run dev
 
 # Then run e2e tests:
 cd e2e && npm test
@@ -50,6 +50,24 @@ APP_URL=http://localhost:4173 npm test
 npm run test:parallel
 ```
 
+## Allure Report
+
+Generate and view Allure reports from CodeceptJS results:
+
+```bash
+# Run tests and generate report
+npm run test:allure
+
+# Open generated report
+npm run allure:open
+```
+
+You can also serve directly from raw results:
+
+```bash
+npm run allure:serve
+```
+
 ## Project Structure
 
 ```
@@ -59,6 +77,8 @@ e2e/
 │   └── register.test.js
 ├── steps_file.js      # Custom step definitions (shared helpers)
 ├── codecept.conf.js   # CodeceptJS configuration
+├── allure-results/    # Raw Allure results (git-ignored)
+├── allure-report/     # Generated Allure report (git-ignored)
 ├── output/            # Screenshots, test artifacts (git-ignored)
 └── package.json
 ```

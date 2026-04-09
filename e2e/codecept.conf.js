@@ -32,6 +32,11 @@ exports.config = {
     screenshotOnFail: {
       enabled: true,
     },
+    allure: {
+      enabled: true,
+      require: "allure-codeceptjs",
+      outputDir: "allure-results",
+    },
   },
   name: "apsas-e2e",
 }

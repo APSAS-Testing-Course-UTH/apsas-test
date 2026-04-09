@@ -9,11 +9,17 @@
     "test": "codeceptjs run --steps",
     "test:ui": "codeceptjs run --steps --reporter mochawesome",
     "test:parallel": "codeceptjs run-workers 2",
+    "test:allure": "npm run test && npm run allure:generate",
     "dev:server": "cd ../frontend && bun run dev",
-    "test:ci": "start-server-and-test dev:server http://localhost:5173 test"
+    "test:ci": "start-server-and-test dev:server http://localhost:5173 test",
+    "allure:generate": "allure generate ./allure-results --clean -o ./allure-report",
+    "allure:open": "allure open ./allure-report",
+    "allure:serve": "allure serve ./allure-results"
   },
   "dependencies": {
     "@codeceptjs/configure": "^1.0.6",
+    "allure-codeceptjs": "^3.7.1",
+    "allure-commandline": "^2.38.1",
     "codeceptjs": "^3.7.8",
     "playwright": "^1.49.0",
     "start-server-and-test": "^3.0.0"
