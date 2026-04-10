@@ -29,7 +29,11 @@
     "allure-commandline": "^2.38.1",
     "codeceptjs": "^3.7.8",
     "playwright": "^1.49.0",
-    "start-server-and-test": "^3.0.0",
     "wait-on": "^9.0.4"
+  },
+  "devDependencies": {
+    "@types/node": "^24.9.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
   }
 }

@@ -2,7 +2,7 @@
 
 End-to-end tests for APSAS using [CodeceptJS](https://codecept.io/) + [Playwright](https://playwright.dev/).
 
-> E2E uses the real backend stack (not MSW mock mode).
+> E2E uses the real backend stack (not MSW mock mode). Smoke/mock-only test scenarios are removed.
 
 ## Prerequisites
 
@@ -68,12 +68,12 @@ bun run allure:serve
 
 ```
 e2e/
-├── tests/             # Test files (*.test.js)
-│   ├── login.test.js
-│   └── register.test.js
-├── steps_file.js      # Custom step definitions (shared helpers)
+├── tests/             # Test files (*.test.ts)
+│   └── login.test.ts
+├── steps_file.ts      # Custom step definitions (shared helpers)
 ├── codecept.conf.js   # CodeceptJS configuration
 ├── docker-compose.e2e.yaml # Full E2E runtime stack
+├── tsconfig.json      # TypeScript configuration
 ├── allure-results/    # Raw Allure results (git-ignored)
 ├── allure-report/     # Generated Allure report (git-ignored)
 ├── output/            # Screenshots, test artifacts (git-ignored)
@@ -84,7 +84,7 @@ e2e/
 
 Tests follow the [BDD-style Gherkin syntax](https://codecept.io/basics/#writing-tests):
 
-```js
+```ts
 Feature("My Feature");
 
 Scenario("does something", ({ I }) => {
@@ -100,7 +100,7 @@ See [CodeceptJS Playwright helper docs](https://codecept.io/helpers/Playwright/)
 ## Test Accounts
 
 Use accounts available in your backend seed data/environment.
-Current smoke tests expect the default seeded student account:
+Current regression tests expect the default seeded student account:
 
 ### 👥 Người Dùng (Identity Service)
 

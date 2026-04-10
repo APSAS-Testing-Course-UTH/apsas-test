@@ -10,8 +10,11 @@ const BASE_URL = process.env.APP_URL || "http://localhost:5173"
 
 /** @type {CodeceptJS.MainConfig} */
 exports.config = {
-  tests: "./tests/**/*.test.js",
+  tests: "./tests/**/*.test.ts",
   output: "./output",
+  require: [
+    "ts-node/register/transpile-only",
+  ],
   helpers: {
     Playwright: {
       url: BASE_URL,
@@ -22,7 +25,7 @@ exports.config = {
     },
   },
   include: {
-    I: "./steps_file.js",
+    I: "./steps_file.ts",
   },
   plugins: {
     pauseOnFail: {},

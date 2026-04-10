@@ -67,8 +67,8 @@ bun run test:ci
 
 ### Test Locations and Naming
 
-- Test files: `tests/**/*.test.js`
-- Shared helper steps: `steps_file.js`
+- Test files: `tests/**/*.test.ts`
+- Shared helper steps: `steps_file.ts`
 - Main config: `codecept.conf.js`
 
 ### Runtime Expectations
@@ -88,14 +88,14 @@ bun run test:ci
 
 ## CodeceptJS + Allure Authoring Guidelines
 
-Use these conventions when writing or updating `tests/*.test.js`.
+Use these conventions when writing or updating `tests/*.test.ts`.
 
 ### Scenario Design Rules
 
 - One business behavior per `Scenario`.
 - Prefer user-facing selectors (label, visible text, role) before CSS fallbacks.
 - Avoid fixed sleeps; wait on meaningful UI states.
-- Reuse shared actions in `steps_file.js` for repeated flows.
+- Reuse shared actions in `steps_file.ts` for repeated flows.
 - Keep data deterministic and independent between scenarios.
 
 ### Required Allure Metadata for Scenarios
@@ -109,7 +109,7 @@ Each scenario should set:
 - `allure.severity("critical" | "normal" | "minor")`
 - `allure.owner(...)`
 - `allure.tag("e2e")`
-- `allure.tag("smoke")` or `allure.tag("regression")`
+- `allure.tag("regression")`
 
 Recommended pattern:
 
@@ -125,7 +125,7 @@ Scenario("student logs in with valid credentials", async ({ I }) => {
   allure.severity("critical");
   allure.owner("qa-e2e");
   allure.tag("e2e");
-  allure.tag("smoke");
+  allure.tag("regression");
 
   I.amOnPage("/login");
   I.fillField("Email", "student@apsas.edu.vn");
@@ -161,7 +161,7 @@ Artifacts:
 
 - Follow existing JavaScript style used in nearby test files.
 - Use clear, behavior-oriented scenario names.
-- Keep helper methods in `steps_file.js` semantic and reusable.
+- Keep helper methods in `steps_file.ts` semantic and reusable.
 - Do not reformat unrelated files.
 
 ## Security and Data Handling
@@ -202,4 +202,4 @@ Do not commit generated artifacts:
 - Missing browser/system deps: run `bun run setup:playwright`.
 - Stack startup issues: verify Docker daemon and retry `bun run stack:up`.
 - Frontend unreachable: confirm `http://localhost:5173` is ready before running tests.
-- Config updates: run `npx codeceptjs check` after editing `codecept.conf.js`.
+- Config updates: run `npx codeceptjs check` after editing `codecept.conf.js` or TypeScript test files.
