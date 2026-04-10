@@ -46,8 +46,36 @@ jobs:
         run: gradle test
         working-directory: backend/
 
+      - name: Collect backend Allure results
+        if: always()
+        run: |
+          rm -rf ./allure-results-backend
+          mkdir -p ./allure-results-backend
+          while IFS= read -r -d '' dir; do
+            cp -R "${dir}/." ./allure-results-backend/
+          done < <(find ./backend -type d -path "*/build/allure-results" -print0)
+
+      - name: Label backend results by testing type
+        if: always()
+        run: |
+          node -e '
+          const fs = require("fs");
+          const path = "./allure-results-backend";
+          const label = { name: "type", value: "backend test" };
+          if (!fs.existsSync(path)) process.exit(0);
+          for (const file of fs.readdirSync(path)) {
+            if (!file.endsWith("-result.json")) continue;
+            const full = `${path}/${file}`;
+            const data = JSON.parse(fs.readFileSync(full, "utf8"));
+            data.labels = Array.isArray(data.labels) ? data.labels : [];
+            const exists = data.labels.some((l) => l.name === "type");
+            if (!exists) data.labels.push(label);
+            fs.writeFileSync(full, JSON.stringify(data));
+          }'
+
       - name: Zip test results
-        run: npx allure results pack --name allure-results-backend.zip
+        if: always()
+        run: npx allure results pack "./allure-results-backend" --name allure-results-backend.zip
 
       - name: Upload test results
         if: always()
@@ -58,10 +86,59 @@ jobs:
           compression-level: 0
           retention-days: 1
 
+  test-e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Bun
+        run: |
+          curl -fsSL https://bun.sh/install | bash
+          echo "$HOME/.bun/bin" >> "$GITHUB_PATH"
+
+      - name: Install E2E dependencies
+        run: bun install
+        working-directory: e2e/
+
+      - name: Run E2E tests
+        run: bun run test:ci
+        working-directory: e2e/
+
+      - name: Label E2E results by testing type
+        if: always()
+        run: |
+          node -e '
+          const fs = require("fs");
+          const path = "./e2e/allure-results";
+          const label = { name: "type", value: "e2e test" };
+          if (!fs.existsSync(path)) process.exit(0);
+          for (const file of fs.readdirSync(path)) {
+            if (!file.endsWith("-result.json")) continue;
+            const full = `${path}/${file}`;
+            const data = JSON.parse(fs.readFileSync(full, "utf8"));
+            data.labels = Array.isArray(data.labels) ? data.labels : [];
+            const exists = data.labels.some((l) => l.name === "type");
+            if (!exists) data.labels.push(label);
+            fs.writeFileSync(full, JSON.stringify(data));
+          }'
+
+      - name: Zip E2E test results
+        if: always()
+        run: npx allure results pack "./e2e/allure-results" --name allure-results-e2e.zip
+
+      - name: Upload E2E test results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: allure-results-e2e
+          path: allure-results-e2e.zip
+          compression-level: 0
+          retention-days: 1
+
   report:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    needs: [ test-backend ]
+    needs: [ test-backend, test-e2e ]
     steps:
       - uses: actions/checkout@v6
 
@@ -71,8 +148,17 @@ jobs:
           name: allure-results-backend
           path: ./
 
+      - name: Download E2E test results
+        uses: actions/download-artifact@v7
+        with:
+          name: allure-results-e2e
+          path: ./
+
       - name: Unpack backend test results
         run: npx allure results unpack allure-results-backend.zip
+
+      - name: Unpack E2E test results
+        run: npx allure results unpack allure-results-e2e.zip
 
       - name: Build report
         run: npx allure generate ./allure-results
@@ -89,7 +175,7 @@ jobs:
       name: test-report
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    needs: [ test-backend ]
+    needs: [ test-backend, test-e2e ]
     steps:
       - uses: actions/checkout@v6
 
@@ -99,8 +185,17 @@ jobs:
           name: allure-results-backend
           path: ./
 
+      - name: Download E2E test results
+        uses: actions/download-artifact@v7
+        with:
+          name: allure-results-e2e
+          path: ./
+
       - name: Unpack backend test results
         run: npx allure results unpack allure-results-backend.zip
+
+      - name: Unpack E2E test results
+        run: npx allure results unpack allure-results-e2e.zip
 
       - name: Build report
         run: npx allure generate ./allure-results

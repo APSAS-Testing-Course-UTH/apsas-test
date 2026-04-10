@@ -6,12 +6,12 @@ export default {
     name: "APSAS - Allure Report",
     historyPath: "./.allure/history.jsonl",
     plugins: {
-        "default": {
+        "testing-type-view": {
             import: "@allurereport/plugin-awesome",
             options: {
-                reportName: "Default View",
-                groupBy: ["epic", "feature", "story"],
-                filter: ({ labels }) => labels.some(label => label.name === "epic"),
+                reportName: "Testing Type View",
+                groupBy: ["type", "epic", "feature", "story"],
+                filter: ({ labels }) => labels.some(label => label.name === "type"),
             }
         },
         "package-view": {
