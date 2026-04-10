@@ -45,8 +45,6 @@ services:
       POSTGRES_DB: apsas
     ports:
       - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
     networks:
       - apsas-e2e
     healthcheck:
@@ -63,8 +61,6 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
-    volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
     networks:
       - apsas-e2e
     healthcheck:
@@ -78,8 +74,6 @@ services:
     command: redis-server --requirepass apsas --appendonly yes
     ports:
       - "6379:6379"
-    volumes:
-      - redis_data:/data
     networks:
       - apsas-e2e
     healthcheck:
@@ -101,8 +95,6 @@ services:
     privileged: true
     ports:
       - "2000:2000"
-    volumes:
-      - piston_packages:/piston/packages
     networks:
       - apsas-e2e
 
@@ -141,7 +133,7 @@ services:
       THC_PORT: 8888
       <<: *backend-common-env
     volumes:
-      - ../backend/config:/config
+      - ./../backend/config:/config
     networks:
       - apsas-e2e
     depends_on:
@@ -335,7 +327,7 @@ services:
     ports:
       - "5173:5173"
     volumes:
-      - ../frontend:/app
+      - ./../frontend:/app
     networks:
       - apsas-e2e
     depends_on:
@@ -345,9 +337,3 @@ services:
 networks:
   apsas-e2e:
     driver: bridge
-
-volumes:
-  postgres_data:
-  rabbitmq_data:
-  redis_data:
-  piston_packages:

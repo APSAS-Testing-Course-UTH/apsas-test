@@ -1,63 +1,205 @@
-# E2E Testing Agent Guide
+# AGENTS.md
 
-This directory contains the APSAS end-to-end test project built with CodeceptJS + Playwright.
-E2E must run with the real backend stack (no MSW mock-only flow).
+## Project Overview
 
-## Scope
+This folder contains APSAS end-to-end tests using:
 
-- Work only inside the `e2e/` directory for E2E changes.
-- Prefer minimal, focused test updates.
-- Do not modify backend services for E2E-only requests.
+- CodeceptJS test runner
+- Playwright browser automation
+- Allure reporting via `allure-codeceptjs`
 
-## Prerequisites
+E2E is expected to run against the real stack (gateway + backend services + piston + frontend), not a mock-only flow.
 
-- Node.js 18+.
-- Docker + Docker Compose available locally.
+## Scope and Boundaries
 
-## Common Commands
+- Make E2E changes inside `e2e/` only unless a request explicitly requires cross-project edits.
+- Keep scenarios focused on observable behavior.
+- Prefer minimal, targeted changes over broad refactors.
 
-Run from the `e2e/` directory:
+## Setup Commands
+
+Run all commands from `e2e/`.
+
+Preferred setup:
 
 ```bash
-npm install
+bun install
+bun run setup:playwright
+```
+
+## Development Workflow
+
+Fast local checks:
+
+```bash
 npx codeceptjs check
-npm test
-npm run test:ci
-npm run test:parallel
-npm run stack:up
-npm run stack:down
-npm run test:real
+bun run test
+bun run test:parallel
 ```
 
-## Allure Reporting
+Single-command with real stack:
 
 ```bash
-npm run test:allure
-npm run allure:open
+bun run test:e2e
 ```
 
-- Raw results are written to `allure-results/`.
-- Generated HTML report is written to `allure-report/`.
+Run against already-running app:
 
-## Runtime Stack for Real E2E
+```bash
+APP_URL=http://localhost:5173 bun run test:real
+```
 
-- Use `docker-compose.e2e.yaml` to run:
-  - backend infrastructure and backend services
-  - piston API
-  - frontend configured with `VITE_ENABLE_MSW=false`
-- Default frontend URL for tests is `http://localhost:5173`.
-- API gateway is exposed on `http://localhost:8080`.
+Full real-stack workflow:
 
-## Test Authoring Rules
+```bash
+bun run stack:up
+bun run test:real
+bun run stack:down
+```
 
-- Keep selectors stable and user-facing (labels/text) before CSS selectors.
-- Prefer short smoke scenarios that validate critical flows.
-- Reuse shared steps in `steps_file.js` when behavior repeats.
-- Keep tests deterministic (avoid random waits; prefer explicit checks).
+Single-command CI-style workflow:
 
-## Validation Before Completion
+```bash
+bun run test:ci
+```
 
-- Run `npx codeceptjs check` after config changes.
-- If tests were changed, run at least the impacted scenarios.
-- For CI/integration validation, run `npm run test:ci` to exercise the real stack.
-- Ensure generated artifacts are not committed (`output/`, `allure-results/`, `allure-report/`).
+## Testing Instructions
+
+### Test Locations and Naming
+
+- Test files: `tests/**/*.test.js`
+- Shared helper steps: `steps_file.js`
+- Main config: `codecept.conf.js`
+
+### Runtime Expectations
+
+- Default base URL is `http://localhost:5173`.
+- Override URL with `APP_URL`.
+- Headless mode is controlled by `CI`.
+
+### E2E Stack Composition
+
+`docker-compose.e2e.yaml` starts:
+
+- backend infrastructure (PostgreSQL, RabbitMQ, Redis)
+- APSAS backend services and API gateway
+- Piston API
+- frontend with `VITE_ENABLE_MSW=false`
+
+## CodeceptJS + Allure Authoring Guidelines
+
+Use these conventions when writing or updating `tests/*.test.js`.
+
+### Scenario Design Rules
+
+- One business behavior per `Scenario`.
+- Prefer user-facing selectors (label, visible text, role) before CSS fallbacks.
+- Avoid fixed sleeps; wait on meaningful UI states.
+- Reuse shared actions in `steps_file.js` for repeated flows.
+- Keep data deterministic and independent between scenarios.
+
+### Required Allure Metadata for Scenarios
+
+Apply backend-style reporting discipline to e2e scenarios so triage is consistent.
+Each scenario should set:
+
+- `allure.epic(...)`
+- `allure.feature(...)`
+- `allure.story(...)`
+- `allure.severity("critical" | "normal" | "minor")`
+- `allure.owner(...)`
+- `allure.tag("e2e")`
+- `allure.tag("smoke")` or `allure.tag("regression")`
+
+Recommended pattern:
+
+```js
+const { allure } = require("allure-codeceptjs");
+
+Feature("Authentication");
+
+Scenario("student logs in with valid credentials", async ({ I }) => {
+  allure.epic("Learning Platform Access");
+  allure.feature("Authentication");
+  allure.story("Student Login");
+  allure.severity("critical");
+  allure.owner("qa-e2e");
+  allure.tag("e2e");
+  allure.tag("smoke");
+
+  I.amOnPage("/login");
+  I.fillField("Email", "student@apsas.edu.vn");
+  I.fillField("Mật khẩu", "Student@123");
+  I.click("Đăng nhập");
+  I.waitForNavigation();
+  I.dontSeeInCurrentUrl("/login");
+});
+```
+
+## Allure Report Commands
+
+Generate and open report:
+
+```bash
+bun run test:allure
+bun run allure:open
+```
+
+Serve directly from raw results:
+
+```bash
+bun run allure:serve
+```
+
+Artifacts:
+
+- Raw results: `allure-results/`
+- Generated HTML report: `allure-report/`
+- Codecept output/screenshots: `output/`
+
+## Code Style Guidelines
+
+- Follow existing JavaScript style used in nearby test files.
+- Use clear, behavior-oriented scenario names.
+- Keep helper methods in `steps_file.js` semantic and reusable.
+- Do not reformat unrelated files.
+
+## Security and Data Handling
+
+- Do not commit real credentials, secrets, or tokens.
+- Use seeded/test accounts and environment variables only.
+- Never attach sensitive values in Allure artifacts.
+
+## Build and Execution Notes
+
+- `test:e2e` performs stack-up, real test run, and stack-down through npm lifecycle hooks.
+- `postinstall` and `setup:playwright` ensure browser binary/dependencies are installed.
+- API gateway is reachable at `http://localhost:8080` during real-stack runs.
+
+## Pull Request Checklist
+
+Before opening or updating a PR with E2E changes:
+
+```bash
+npx codeceptjs check
+bun run test
+```
+
+For integration confidence:
+
+```bash
+bun run test:ci
+```
+
+Do not commit generated artifacts:
+
+- `output/`
+- `allure-results/`
+- `allure-report/`
+
+## Troubleshooting
+
+- Missing browser/system deps: run `bun run setup:playwright`.
+- Stack startup issues: verify Docker daemon and retry `bun run stack:up`.
+- Frontend unreachable: confirm `http://localhost:5173` is ready before running tests.
+- Config updates: run `npx codeceptjs check` after editing `codecept.conf.js`.
