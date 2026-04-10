@@ -11,9 +11,11 @@
     "test:ui": "codeceptjs run --steps --reporter mochawesome",
     "test:parallel": "codeceptjs run-workers 2",
     "test:allure": "npm run test && npm run allure:generate",
-    "stack:up": "docker compose -f ./docker-compose.e2e.yaml up -d --wait --wait-timeout 600",
+    "stack:up": "docker compose -f ./docker-compose.e2e.yaml up -d --wait --wait-timeout 600 && wait-on http://localhost:5173",
     "stack:down": "docker compose -f ./docker-compose.e2e.yaml down --remove-orphans",
-    "test:e2e": "sh -c 'code=0; npm run stack:up || code=$?; if [ \"$code\" -eq 0 ]; then npm run test:real || code=$?; fi; npm run stack:down; exit \"$code\"'",
+    "pretest:e2e": "npm run stack:up",
+    "test:e2e": "npm run test:real",
+    "posttest:e2e": "npm run stack:down",
     "test:ci": "npm run test:e2e",
     "allure:generate": "allure generate ./allure-results --clean -o ./allure-report",
     "allure:open": "allure open ./allure-report",
@@ -25,6 +27,7 @@
     "allure-commandline": "^2.38.1",
     "codeceptjs": "^3.7.8",
     "playwright": "^1.49.0",
-    "start-server-and-test": "^3.0.0"
+    "start-server-and-test": "^3.0.0",
+    "wait-on": "^9.0.4"
   }
 }
