@@ -1,0 +1,359 @@
+name: apsas-e2e
+
+x-backend-common-env: &backend-common-env
+  DB_HOST: postgres
+  DB_PORT: 5432
+  DB_NAME: apsas
+  DB_USERNAME: apsas
+  DB_PASSWORD: apsas
+  RABBITMQ_HOST: rabbitmq
+  RABBITMQ_PORT: 5672
+  RABBITMQ_USERNAME: apsas
+  RABBITMQ_PASSWORD: apsas
+  REDIS_HOST: redis
+  REDIS_PORT: 6379
+  REDIS_PASSWORD: apsas
+  JWT_SECRET: apsas-e2e-jwt-secret
+  JWT_EXPIRATION: 86400
+  PISTON_API_URL: http://piston:2000
+  MAIL_HOST: mailpit
+  MAIL_PORT: 1025
+  MAIL_USERNAME: ""
+  MAIL_PASSWORD: ""
+  MAIL_PROTOCOL: smtp
+  MAIL_TLS_ENABLED: "false"
+  EMAIL_FROM: noreply@apsas.edu.vn
+  EMAIL_FROM_NAME: APSAS System
+  ASSIGNMENT_URL: http://localhost:5173/assignments/%id%
+  SUBMISSION_URL: http://localhost:5173/submissions/%id%
+  SUPPORT_SESSION_URL: http://localhost:5173/support/sessions/%id%
+  VERIFICATION_URL: http://localhost:5173/verify-email?token=%token%
+  RESET_PASSWORD_URL: http://localhost:5173/reset-password?token=%token%
+  FIREBASE_ENABLED: "false"
+  API_DOCS_ENABLED: "false"
+  ADMIN_USERNAME: admin
+  ADMIN_PASSWORD: admin
+  ADMIN_PORTAL_PORT: 9090
+  ADMIN_PORTAL_URL: http://localhost:9090
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: apsas
+      POSTGRES_PASSWORD: apsas
+      POSTGRES_DB: apsas
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - apsas-e2e
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U apsas" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  rabbitmq:
+    image: rabbitmq:4.1-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: apsas
+      RABBITMQ_DEFAULT_PASS: apsas
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - apsas-e2e
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:8.2-alpine
+    command: redis-server --requirepass apsas --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - apsas-e2e
+    healthcheck:
+      test: [ "CMD", "redis-cli", "-a", "apsas", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    networks:
+      - apsas-e2e
+
+  piston:
+    image: ghcr.io/engineer-man/piston
+    privileged: true
+    ports:
+      - "2000:2000"
+    volumes:
+      - piston_packages:/piston/packages
+    networks:
+      - apsas-e2e
+
+  service-registry:
+    image: tozydev/apsas-service-registry:latest
+    user: "0:0"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      EUREKA_INSTANCE_HOSTNAME: service-registry
+      THC_PATH: /actuator/health
+      THC_PORT: 8761
+      <<: *backend-common-env
+    networks:
+      - apsas-e2e
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "/workspace/health-check" ]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+
+  config-server:
+    image: tozydev/apsas-config-server:latest
+    user: "0:0"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      EUREKA_URL: http://service-registry:8761/eureka/
+      EUREKA_INSTANCE_HOSTNAME: config-server
+      THC_PATH: /actuator/health
+      THC_PORT: 8888
+      MANAGEMENT_ENDPOINT_ENV_SHOW_VALUES: always
+      <<: *backend-common-env
+    volumes:
+      - ../backend/config:/config
+    networks:
+      - apsas-e2e
+    depends_on:
+      service-registry:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "/workspace/health-check" ]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+
+  api-gateway:
+    image: tozydev/apsas-gateway:latest
+    user: "0:0"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      EUREKA_URL: http://service-registry:8761/eureka/
+      EUREKA_INSTANCE_HOSTNAME: api-gateway
+      SPRING_CLOUD_CONFIG_DISOVERY_SERVICE_ID: config-server
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+      THC_PATH: /actuator/health
+      THC_PORT: 8080
+      <<: *backend-common-env
+    ports:
+      - "8080:8080"
+    networks:
+      - apsas-e2e
+    depends_on:
+      service-registry:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+
+  identity-service:
+    image: tozydev/apsas-identity:latest
+    user: "0:0"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      EUREKA_URL: http://service-registry:8761/eureka/
+      EUREKA_INSTANCE_HOSTNAME: identity-service
+      SPRING_CLOUD_CONFIG_DISOVERY_SERVICE_ID: config-server
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+      <<: *backend-common-env
+    networks:
+      - apsas-e2e
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      service-registry:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+
+  content-service:
+    image: tozydev/apsas-content:latest
+    user: "0:0"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      EUREKA_URL: http://service-registry:8761/eureka/
+      EUREKA_INSTANCE_HOSTNAME: content-service
+      SPRING_CLOUD_CONFIG_DISOVERY_SERVICE_ID: config-server
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+      <<: *backend-common-env
+    networks:
+      - apsas-e2e
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      service-registry:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+
+  submission-service:
+    image: tozydev/apsas-submission:latest
+    user: "0:0"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      EUREKA_URL: http://service-registry:8761/eureka/
+      EUREKA_INSTANCE_HOSTNAME: submission-service
+      SPRING_CLOUD_CONFIG_DISOVERY_SERVICE_ID: config-server
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+      <<: *backend-common-env
+    networks:
+      - apsas-e2e
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      service-registry:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+
+  evaluation-service:
+    image: tozydev/apsas-evaluation:latest
+    user: "0:0"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      EUREKA_URL: http://service-registry:8761/eureka/
+      EUREKA_INSTANCE_HOSTNAME: evaluation-service
+      SPRING_CLOUD_CONFIG_DISOVERY_SERVICE_ID: config-server
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+      <<: *backend-common-env
+    networks:
+      - apsas-e2e
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      piston:
+        condition: service_started
+      service-registry:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+
+  support-service:
+    image: tozydev/apsas-support:latest
+    user: "0:0"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      EUREKA_URL: http://service-registry:8761/eureka/
+      EUREKA_INSTANCE_HOSTNAME: support-service
+      SPRING_CLOUD_CONFIG_DISOVERY_SERVICE_ID: config-server
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+      <<: *backend-common-env
+    networks:
+      - apsas-e2e
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      service-registry:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+
+  notification-service:
+    image: tozydev/apsas-notification:latest
+    user: "0:0"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      EUREKA_URL: http://service-registry:8761/eureka/
+      EUREKA_INSTANCE_HOSTNAME: notification-service
+      SPRING_CLOUD_CONFIG_DISOVERY_SERVICE_ID: config-server
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+      <<: *backend-common-env
+    networks:
+      - apsas-e2e
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      service-registry:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+
+  frontend:
+    image: oven/bun:1.3.0
+    working_dir: /app
+    environment:
+      VITE_API_BASE_URL: http://localhost:8080
+      VITE_API_TIMEOUT: 10000
+      VITE_APP_NAME: APSAS
+      VITE_APP_VERSION: 1.0.0
+      VITE_APP_ENV: development
+      VITE_ENABLE_DEVTOOLS: "false"
+      VITE_ENABLE_MSW: "false"
+      VITE_ENABLE_AUTH: "true"
+      VITE_ENABLE_NOTIFICATIONS: "true"
+      VITE_ENABLE_WEBSOCKET: "false"
+      VITE_WEBSOCKET_URL: http://localhost:8085/ws/support
+      VITE_FIREBASE_VAPID_KEY: e2e-vapid-key
+      VITE_ADMIN_PORTAL_URL: http://localhost:9090
+      VITE_CSP_ENABLED: "false"
+    command: sh -c "bun install && bun run dev --host 0.0.0.0 --port 5173"
+    ports:
+      - "5173:5173"
+    volumes:
+      - ../frontend:/app
+    networks:
+      - apsas-e2e
+    healthcheck:
+      test: [ "CMD", "bun", "-e", "fetch('http://localhost:5173').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))" ]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+    depends_on:
+      api-gateway:
+        condition: service_started
+
+networks:
+  apsas-e2e:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  rabbitmq_data:
+  redis_data:
+  piston_packages:

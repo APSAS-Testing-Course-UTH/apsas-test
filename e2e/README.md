@@ -2,10 +2,12 @@
 
 End-to-end tests for APSAS using [CodeceptJS](https://codecept.io/) + [Playwright](https://playwright.dev/).
 
+> E2E uses the real backend stack (not MSW mock mode).
+
 ## Prerequisites
 
 - Node.js 18+
-- The frontend dev server (auto-started when running `npm run test:ci`)
+- Docker + Docker Compose
 
 ## Setup
 
@@ -16,32 +18,25 @@ npm install
 
 ## Running Tests
 
-### Spin up frontend automatically and run tests (CI / local integration)
+### Run full E2E stack (backend + piston + frontend) and execute tests
 
 ```bash
 npm run test:ci
 ```
 
-This uses `start-server-and-test` to:
-1. Start the Vite dev server on `http://localhost:5173`
-2. Wait until the server is ready
-3. Run the full CodeceptJS suite
-4. Shut down the server when tests finish
+This uses Docker Compose (`docker-compose.e2e.yaml`) to:
+1. Start backend infrastructure + backend services + piston API
+2. Start frontend with `VITE_ENABLE_MSW=false`
+3. Wait for services to become healthy
+4. Run CodeceptJS against `http://localhost:5173`
+5. Tear down the stack after tests finish
 
-### Run tests against an already-running frontend
-
-```bash
-# Start the frontend first (in a separate terminal):
-cd ../frontend && bun run dev
-
-# Then run e2e tests:
-cd e2e && npm test
-```
-
-### Run tests against a custom URL
+### Manage stack manually
 
 ```bash
-APP_URL=http://localhost:4173 npm test
+npm run stack:up
+npm run test:real
+npm run stack:down
 ```
 
 ### Run with parallel workers
@@ -77,6 +72,7 @@ e2e/
 │   └── register.test.js
 ├── steps_file.js      # Custom step definitions (shared helpers)
 ├── codecept.conf.js   # CodeceptJS configuration
+├── docker-compose.e2e.yaml # Full E2E runtime stack
 ├── allure-results/    # Raw Allure results (git-ignored)
 ├── allure-report/     # Generated Allure report (git-ignored)
 ├── output/            # Screenshots, test artifacts (git-ignored)
@@ -100,16 +96,9 @@ Scenario("does something", ({ I }) => {
 
 See [CodeceptJS Playwright helper docs](https://codecept.io/helpers/Playwright/) for all available actions.
 
-## Mock Accounts (MSW)
+## Test Accounts
 
-The frontend uses MSW for API mocking in development. Available test accounts:
-
-| Role       | Email                    | Password        |
-|------------|--------------------------|-----------------|
-| Student    | student@apsas.edu.vn     | Student@123     |
-| Instructor | instructor@apsas.edu.vn  | Instructor@123  |
-| Provider   | provider@apsas.edu.vn    | Provider@123    |
-| Admin      | admin@apsas.edu.vn       | Admin@123       |
+Use accounts available in your backend seed data/environment.
 
 ## CI Integration
 
