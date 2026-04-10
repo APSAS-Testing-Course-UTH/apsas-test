@@ -75,10 +75,15 @@ jobs:
 
       - name: Zip test results
         if: always()
-        run: npx allure results pack "./allure-results-backend" --name allure-results-backend.zip
+        run: |
+          if [ -d "./allure-results-backend" ]; then
+            npx allure results pack "./allure-results-backend" --name allure-results-backend.zip
+          else
+            echo "No backend allure results directory found, skipping pack step."
+          fi
 
       - name: Upload test results
-        if: always()
+        if: always() && hashFiles('allure-results-backend.zip') != ''
         uses: actions/upload-artifact@v7
         with:
           name: allure-results-backend
@@ -124,10 +129,15 @@ jobs:
 
       - name: Zip E2E test results
         if: always()
-        run: npx allure results pack "./e2e/allure-results" --name allure-results-e2e.zip
+        run: |
+          if [ -d "./e2e/allure-results" ]; then
+            npx allure results pack "./e2e/allure-results" --name allure-results-e2e.zip
+          else
+            echo "No e2e allure results directory found, skipping pack step."
+          fi
 
       - name: Upload E2E test results
-        if: always()
+        if: always() && hashFiles('allure-results-e2e.zip') != ''
         uses: actions/upload-artifact@v7
         with:
           name: allure-results-e2e
