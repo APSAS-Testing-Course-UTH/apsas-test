@@ -161,7 +161,7 @@ services:
       SPRING_PROFILES_ACTIVE: prod
       EUREKA_URL: http://service-registry:8761/eureka/
       EUREKA_INSTANCE_HOSTNAME: api-gateway
-      SPRING_CLOUD_CONFIG_DISOVERY_SERVICE_ID: config-server
+      SPRING_CLOUD_CONFIG_DISCOVERY_SERVICE_ID: config-server
       SPRING_CLOUD_CONFIG_URI: http://config-server:8888
       THC_PATH: /actuator/health
       THC_PORT: 8080
@@ -183,7 +183,7 @@ services:
       SPRING_PROFILES_ACTIVE: prod
       EUREKA_URL: http://service-registry:8761/eureka/
       EUREKA_INSTANCE_HOSTNAME: identity-service
-      SPRING_CLOUD_CONFIG_DISOVERY_SERVICE_ID: config-server
+      SPRING_CLOUD_CONFIG_DISCOVERY_SERVICE_ID: config-server
       SPRING_CLOUD_CONFIG_URI: http://config-server:8888
       <<: *backend-common-env
     networks:
@@ -207,7 +207,7 @@ services:
       SPRING_PROFILES_ACTIVE: prod
       EUREKA_URL: http://service-registry:8761/eureka/
       EUREKA_INSTANCE_HOSTNAME: content-service
-      SPRING_CLOUD_CONFIG_DISOVERY_SERVICE_ID: config-server
+      SPRING_CLOUD_CONFIG_DISCOVERY_SERVICE_ID: config-server
       SPRING_CLOUD_CONFIG_URI: http://config-server:8888
       <<: *backend-common-env
     networks:
@@ -231,7 +231,7 @@ services:
       SPRING_PROFILES_ACTIVE: prod
       EUREKA_URL: http://service-registry:8761/eureka/
       EUREKA_INSTANCE_HOSTNAME: submission-service
-      SPRING_CLOUD_CONFIG_DISOVERY_SERVICE_ID: config-server
+      SPRING_CLOUD_CONFIG_DISCOVERY_SERVICE_ID: config-server
       SPRING_CLOUD_CONFIG_URI: http://config-server:8888
       <<: *backend-common-env
     networks:
@@ -255,7 +255,7 @@ services:
       SPRING_PROFILES_ACTIVE: prod
       EUREKA_URL: http://service-registry:8761/eureka/
       EUREKA_INSTANCE_HOSTNAME: evaluation-service
-      SPRING_CLOUD_CONFIG_DISOVERY_SERVICE_ID: config-server
+      SPRING_CLOUD_CONFIG_DISCOVERY_SERVICE_ID: config-server
       SPRING_CLOUD_CONFIG_URI: http://config-server:8888
       <<: *backend-common-env
     networks:
@@ -277,7 +277,7 @@ services:
       SPRING_PROFILES_ACTIVE: prod
       EUREKA_URL: http://service-registry:8761/eureka/
       EUREKA_INSTANCE_HOSTNAME: support-service
-      SPRING_CLOUD_CONFIG_DISOVERY_SERVICE_ID: config-server
+      SPRING_CLOUD_CONFIG_DISCOVERY_SERVICE_ID: config-server
       SPRING_CLOUD_CONFIG_URI: http://config-server:8888
       <<: *backend-common-env
     networks:
@@ -299,7 +299,7 @@ services:
       SPRING_PROFILES_ACTIVE: prod
       EUREKA_URL: http://service-registry:8761/eureka/
       EUREKA_INSTANCE_HOSTNAME: notification-service
-      SPRING_CLOUD_CONFIG_DISOVERY_SERVICE_ID: config-server
+      SPRING_CLOUD_CONFIG_DISCOVERY_SERVICE_ID: config-server
       SPRING_CLOUD_CONFIG_URI: http://config-server:8888
       <<: *backend-common-env
     networks:
