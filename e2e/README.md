@@ -106,6 +106,8 @@ The current automated regression login scenario uses:
 | --------------------- | ----------- |
 | student@apsas.edu.vn  | Student@123 |
 
+> These credentials are for isolated test environments only.
+
 ## CI Integration
 
 Set the `CI` environment variable to run tests in headless mode (GitHub Actions sets this automatically):
