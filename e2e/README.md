@@ -129,7 +129,7 @@ Use accounts available in your backend seed data/environment.
 | Email           | Password           | Tên         | Role    |
 |-----------------|--------------------|-------------|---------|
 | student1@apsas  | SecurePassword123! | An Trần     | STUDENT |
-| student2@apsas  | SecurePassword123! | Quâng Phạm  | STUDENT |
+| student2@apsas  | SecurePassword123! | Quang Phạm  | STUDENT |
 | student3@apsas  | SecurePassword123! | Bình Ngô    | STUDENT |
 | student4@apsas  | SecurePassword123! | Duy Lâm     | STUDENT |
 | student5@apsas  | SecurePassword123! | Hải Phan    | STUDENT |

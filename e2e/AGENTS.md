@@ -109,7 +109,7 @@ Use the following seeded accounts/data when writing or running E2E scenarios:
 | Email           | Password           | Tên         | Role    |
 |-----------------|--------------------|-------------|---------|
 | student1@apsas  | SecurePassword123! | An Trần     | STUDENT |
-| student2@apsas  | SecurePassword123! | Quâng Phạm  | STUDENT |
+| student2@apsas  | SecurePassword123! | Quang Phạm  | STUDENT |
 | student3@apsas  | SecurePassword123! | Bình Ngô    | STUDENT |
 | student4@apsas  | SecurePassword123! | Duy Lâm     | STUDENT |
 | student5@apsas  | SecurePassword123! | Hải Phan    | STUDENT |
@@ -214,8 +214,8 @@ Each scenario should set:
 
 Recommended pattern:
 
-```js
-const { allure } = require("allure-codeceptjs");
+```ts
+import { allure } from "allure-codeceptjs"
 
 Feature("Authentication");
 
@@ -229,8 +229,8 @@ Scenario("student logs in with valid credentials", async ({ I }) => {
   allure.tag("regression");
 
   I.amOnPage("/login");
-  I.fillField("Email", "student@apsas.edu.vn");
-  I.fillField("Mật khẩu", "Student@123");
+  I.fillField("Email", "student1@apsas");
+  I.fillField("Mật khẩu", "SecurePassword123!");
   I.click("Đăng nhập");
   I.waitForNavigation();
   I.dontSeeInCurrentUrl("/login");
