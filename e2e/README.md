@@ -99,6 +99,11 @@ See [CodeceptJS Playwright helper docs](https://codecept.io/helpers/Playwright/)
 ## Test Accounts
 
 Use accounts available in your backend seed data/environment.
+Current smoke tests expect the default seeded student account:
+
+| Role    | Email                | Password    |
+|---------|----------------------|-------------|
+| Student | student@apsas.edu.vn | Student@123 |
 
 ## CI Integration
 

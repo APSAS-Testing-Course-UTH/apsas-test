@@ -139,7 +139,6 @@ services:
       EUREKA_INSTANCE_HOSTNAME: config-server
       THC_PATH: /actuator/health
       THC_PORT: 8888
-      MANAGEMENT_ENDPOINT_ENV_SHOW_VALUES: always
       <<: *backend-common-env
     volumes:
       - ../backend/config:/config
