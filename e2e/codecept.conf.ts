@@ -1,4 +1,5 @@
 import { setHeadlessWhen, setCommonPlugins } from "@codeceptjs/configure";
+import os from "os";
 
 // Run headless in CI, headed locally
 setHeadlessWhen(process.env.CI);
@@ -36,6 +37,22 @@ export const config: CodeceptJS.MainConfig = {
       enabled: true,
       require: "allure-codeceptjs",
       outputDir: "allure-results",
+      links: {
+        issue: {
+          urlTemplate:
+            "https://github.com/APSAS-Testing-Course-UTH/apsas-test/issues/%s",
+        },
+        tms: {
+          urlTemplate:
+            "https://github.com/APSAS-Testing-Course-UTH/apsas-test/issues?q=%s",
+        },
+      },
+      environmentInfo: {
+        os_platform: os.platform(),
+        os_release: os.release(),
+        os_version: os.version(),
+        node_version: process.version,
+      },
     },
   },
   name: "apsas-e2e",

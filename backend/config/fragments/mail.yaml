@@ -7,10 +7,10 @@ spring:
     properties:
       mail:
         smtp:
-          auth: true
+          auth: ${SMTP_AUTH:true}
           starttls:
-            enable: true
-            required: true
+            enable: ${SMTP_TLS_ENABLED:true}
+            required: ${SMTP_TSL_REQUIRED:true}
         transport:
           protocol: smtp
     default-encoding: UTF-8

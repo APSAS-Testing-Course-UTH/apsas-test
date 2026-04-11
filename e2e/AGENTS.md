@@ -16,6 +16,14 @@ E2E is expected to run against the real stack (gateway + backend services + pist
 - Keep scenarios focused on observable behavior.
 - Prefer minimal, targeted changes over broad refactors.
 
+## Rules
+
+- E2E tests include focus areas: `identity`, `content`, `submission`, `evaluation`, `support`.
+- Each scenario must have Allure metadata: `epic`, `feature`, `story`, `severity`, `tag("e2e")`, `tag("regression")`, `tms`.
+- Use shared steps in `steps_file.ts` for common flows (e.g. login).
+- Attach screenshots on failure for UI debugging.
+- Organize tests in `tests/<service>/<feature>.test.ts` structure.
+
 ## Setup Commands
 
 Run all commands from `e2e/`.
@@ -85,14 +93,14 @@ Use the following seeded accounts/data when writing or running E2E scenarios:
 
 #### Admin (Quản Trị Viên)
 
-| Email | Password | Tên | Role |
-| --- | --- | --- | --- |
-| admin@apsas | admin | System Administrator | ADMIN |
+| Email       | Password | Tên                  | Role  |
+| ----------- | -------- | -------------------- | ----- |
+| admin@apsas | admin    | System Administrator | ADMIN |
 
 #### Instructors (Giảng Viên)
 
 | Email             | Password           | Tên         | Role       |
-|-------------------|--------------------|-------------|------------|
+| ----------------- | ------------------ | ----------- | ---------- |
 | instructor1@apsas | SecurePassword123! | Tuấn Nguyễn | INSTRUCTOR |
 | instructor2@apsas | SecurePassword123! | Hương Vũ    | INSTRUCTOR |
 | instructor3@apsas | SecurePassword123! | Vinh Trần   | INSTRUCTOR |
@@ -100,14 +108,14 @@ Use the following seeded accounts/data when writing or running E2E scenarios:
 #### Content Providers (Nhà Cung Cấp Nội Dung)
 
 | Email                  | Password           | Tên     | Role             |
-|------------------------|--------------------|---------|------------------|
+| ---------------------- | ------------------ | ------- | ---------------- |
 | contentprovider1@apsas | SecurePassword123! | Minh Lê | CONTENT_PROVIDER |
 | contentprovider2@apsas | SecurePassword123! | Lan Đỗ  | CONTENT_PROVIDER |
 
 #### Students (Sinh Viên)
 
 | Email           | Password           | Tên         | Role    |
-|-----------------|--------------------|-------------|---------|
+| --------------- | ------------------ | ----------- | ------- |
 | student1@apsas  | SecurePassword123! | An Trần     | STUDENT |
 | student2@apsas  | SecurePassword123! | Quang Phạm  | STUDENT |
 | student3@apsas  | SecurePassword123! | Bình Ngô    | STUDENT |
@@ -123,13 +131,13 @@ Use the following seeded accounts/data when writing or running E2E scenarios:
 
 Hệ thống có sẵn **5 bài tập lập trình** cơ bản:
 
-| # | Tiêu Đề                     | Độ Khó | Nhà Cung Cấp           | Điểm Tối Đa | Mô Tả                 |
-|---|-----------------------------|--------|------------------------|-------------|-----------------------|
-| 1 | Hello World                 | EASY   | contentprovider1@apsas | 10          | In ra "Hello, World!" |
-| 2 | Tính Tổng Hai Số            | EASY   | contentprovider2@apsas | 15          | Đọc 2 số, in ra tổng  |
-| 3 | Kiểm Tra Số Chẵn Hay Lẻ     | EASY   | contentprovider1@apsas | 15          | Kiểm tra chẵn/lẻ      |
-| 4 | Tìm Số Lớn Nhất Trong Ba Số | EASY   | contentprovider2@apsas | 20          | Tìm max của 3 số      |
-| 5 | Tính Giai Thừa (Factorial)  | MEDIUM | contentprovider1@apsas | 25          | Tính n!               |
+| #   | Tiêu Đề                     | Độ Khó | Nhà Cung Cấp           | Điểm Tối Đa | Mô Tả                 |
+| --- | --------------------------- | ------ | ---------------------- | ----------- | --------------------- |
+| 1   | Hello World                 | EASY   | contentprovider1@apsas | 10          | In ra "Hello, World!" |
+| 2   | Tính Tổng Hai Số            | EASY   | contentprovider2@apsas | 15          | Đọc 2 số, in ra tổng  |
+| 3   | Kiểm Tra Số Chẵn Hay Lẻ     | EASY   | contentprovider1@apsas | 15          | Kiểm tra chẵn/lẻ      |
+| 4   | Tìm Số Lớn Nhất Trong Ba Số | EASY   | contentprovider2@apsas | 20          | Tìm max của 3 số      |
+| 5   | Tính Giai Thừa (Factorial)  | MEDIUM | contentprovider1@apsas | 25          | Tính n!               |
 
 **Chi tiết các bài tập:**
 
@@ -156,7 +164,7 @@ Hệ thống có sẵn **8 hướng dẫn chi tiết** bằng Markdown:
 
 1. **Hướng Dẫn In Ra Dữ Liệu** - Giới thiệu print/printf/cout
 2. **Hướng Dẫn Đọc Dữ Liệu** - Giới thiệu input/scanf/cin
-3. **Hướng Dẫn Phép Toán Cơ Bản** - Các phép +, -, *, /, %
+3. **Hướng Dẫn Phép Toán Cơ Bản** - Các phép +, -, \*, /, %
 4. **Hướng Dẫn Điều Kiện** - If/else và toán tử so sánh
 5. **Hướng Dẫn Vòng Lặp** - For/while/do-while
 6. **Hướng Dẫn Hàm Đệ Quy** - Recursion và base case
@@ -204,29 +212,55 @@ Use these conventions when writing or updating `tests/*.test.ts`.
 Apply backend-style reporting discipline to e2e scenarios so triage is consistent.
 Each scenario should set:
 
-- `allure.epic(...)`
-- `allure.feature(...)`
-- `allure.story(...)`
+- `allure.epic(...)` - Current service or major feature area ("identity", "content", "submission", "evaluation", "support")
+- `allure.feature(...)` - Specific feature under test ("authentication", "assignment management", "submission flow", "evaluation flow", "support flow")
+- `allure.story(...)` - User story or behavior being tested ("student login", "instructor creates assignment", "student submits solution", "evaluator reviews submission", "user contacts support")
 - `allure.severity("critical" | "normal" | "minor")`
-- `allure.owner(...)`
 - `allure.tag("e2e")`
 - `allure.tag("regression")`
+- `allure.tms("TMS-123")` - Test case ID
+
+Also, the test must include screenshot attachments on failure for UI debugging.
+
+- `allure.attachment(name: string, content: Buffer | string, options: ContentType | string | AttachmentOptions): PromiseLike<void>`
+- `allure.attachmentPath(name: string, path: string, options: ContentType | string | Omit<AttachmentOptions, "encoding">): PromiseLike<void>`
+
+```ts
+const allure = require("allure-js-commons");
+const { ContentType } = require("allure-js-commons");
+
+Feature("Test My Website");
+
+Scenario("Test Authentication", async () => {
+  // ...
+
+  await allure.attachment(
+    "Text file",
+    "This is the file content.",
+    ContentType.TEXT,
+  );
+
+  await allure.attachmentPath("Screenshot", "/path/to/image.png", {
+    contentType: ContentType.PNG,
+    fileExtension: "png",
+  });
+});
+```
 
 Recommended pattern:
 
 ```ts
-import { allure } from "allure-codeceptjs"
+import { allure } from "allure-codeceptjs";
 
 Feature("Authentication");
 
 Scenario("student logs in with valid credentials", async ({ I }) => {
-  allure.epic("Learning Platform Access");
-  allure.feature("Authentication");
-  allure.story("Student Login");
-  allure.severity("critical");
-  allure.owner("qa-e2e");
-  allure.tag("e2e");
-  allure.tag("regression");
+  await allure.epic("identity");
+  await allure.feature("Authentication");
+  await allure.story("Student Login");
+  await allure.severity("critical");
+  await allure.tag("e2e");
+  await allure.tag("regression");
 
   I.amOnPage("/login");
   I.fillField("Email", "student1@apsas");
