@@ -28,12 +28,12 @@
     "allure-codeceptjs": "^3.7.1",
     "allure-commandline": "^2.38.1",
     "codeceptjs": "^3.7.8",
-    "playwright": "^1.49.0",
-    "wait-on": "^9.0.4"
+    "playwright": "^1.59.1",
+    "wait-on": "^9.0.5"
   },
   "devDependencies": {
-    "@types/node": "^24.9.1",
+    "@types/node": "^25.6.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.3"
+    "typescript": "^6.0.2"
   }
 }
