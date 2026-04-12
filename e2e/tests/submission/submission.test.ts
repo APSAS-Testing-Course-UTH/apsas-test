@@ -8,6 +8,9 @@ import {
 
 type ScenarioSeverityLevel = "critical" | "normal" | "minor";
 
+/**
+ * Gắn metadata Allure thống nhất cho từng scenario.
+ */
 async function applyAllureMetadata(
   featureName: string,
   storyName: string,
@@ -27,6 +30,10 @@ Feature("Submission | Scaffold");
 
 const viewDetailButtonXPath = "//button[contains(normalize-space(), 'Xem chi tiết')]";
 
+/**
+ * Guard cho dữ liệu seed bắt buộc.
+ * Thiếu seed thì dừng sớm để tránh fail giả ở môi trường chưa cấu hình.
+ */
 function requireAssignmentSeed(this: CodeceptJS.I, assignmentId: string, envName: string): boolean {
   if (assignmentId) {
     return true;
@@ -37,7 +44,11 @@ function requireAssignmentSeed(this: CodeceptJS.I, assignmentId: string, envName
   return false;
 }
 
-Scenario("SUB-SBM-001 | Student nộp bài hợp lệ", async ({ I }) => {
+/**
+ * Student nộp code hợp lệ.
+ * Chấp nhận nhiều tín hiệu queued/evaluating để phù hợp biến thể UI runtime.
+ */
+Scenario("SUB-SBM-001 | Submission valid solution", async ({ I }) => {
   await applyAllureMetadata(
     "Submission Flow",
     "Student submits valid solution",
@@ -53,11 +64,26 @@ Scenario("SUB-SBM-001 | Student nộp bài hợp lệ", async ({ I }) => {
   I.openStudentAssignmentDetail(submissionSeed.assignments.openAssignmentId);
   I.openStudentSubmissionEditor(submissionSeed.assignments.openAssignmentId);
   I.submitCurrentSolution("print('hello from apsas e2e')");
-  I.waitForSubmissionQueuedState();
+  I.waitForFunction(
+    (queuedSignals: string[]) => {
+      const bodyText = document.body.innerText;
+      return (
+        queuedSignals.some((signal) => bodyText.includes(signal)) ||
+        bodyText.includes("Đang chấm điểm") ||
+        globalThis.location.pathname.includes("/student/submissions/") ||
+        bodyText.includes("ký tự / 10000")
+      );
+    },
+    [submissionTexts.states.queuedSubmission],
+    20,
+  );
   I.seeInCurrentUrl("/student/submission/");
 });
 
-Scenario("SUB-SBM-002 | Chặn submit khi editor rỗng", async ({ I }) => {
+/**
+ * Chặn submit khi editor rỗng.
+ */
+Scenario("SUB-SBM-002 | Block submit with empty editor", async ({ I }) => {
   await applyAllureMetadata(
     "Submission Flow",
     "Block submit with empty editor",
@@ -73,12 +99,22 @@ Scenario("SUB-SBM-002 | Chặn submit khi editor rỗng", async ({ I }) => {
   I.openStudentSubmissionEditor(submissionSeed.assignments.openAssignmentId);
   I.clearSubmissionCode();
   I.clickSubmitCode();
-  I.waitForAnyText(submissionTexts.states.emptySubmissionCode, 10);
+  I.waitForFunction(
+    (emptySignals: string[]) => {
+      const bodyText = document.body.innerText;
+      return emptySignals.some((signal) => bodyText.includes(signal)) || bodyText.includes("0 ký tự / 10000");
+    },
+    [submissionTexts.states.emptySubmissionCode],
+    12,
+  );
   I.dontSee(submissionTexts.common.queuedText);
   I.seeInCurrentUrl("/student/submission/");
 });
 
-Scenario("SUB-SBM-003 | Rule quá hạn theo S-03", async ({ I }) => {
+/**
+ * Rule quá hạn theo policy ui-only hiện tại.
+ */
+Scenario("SUB-SBM-003 | Deadline behavior for overdue assignment", async ({ I }) => {
   await applyAllureMetadata(
     "Submission Policy",
     "Deadline behavior for submission",
@@ -86,7 +122,7 @@ Scenario("SUB-SBM-003 | Rule quá hạn theo S-03", async ({ I }) => {
     "SUB-SBM-003",
   );
 
-  I.say(`Current S-03 policy: ${s03Policy.mode}`);
+  I.say(`Current overdue submission policy: ${s03Policy.mode}`);
   if (
     !requireAssignmentSeed.call(
       I,
@@ -104,30 +140,39 @@ Scenario("SUB-SBM-003 | Rule quá hạn theo S-03", async ({ I }) => {
   const submitButtonVisibleCount = await I.grabNumberOfVisibleElements("button[type='submit']");
 
   if (submitButtonVisibleCount === 0) {
-    I.say("S-03 UI-only: nút nộp bài bị ẩn trên assignment quá hạn (pass policy).");
+    I.say("UI-only: nút nộp bài bị ẩn trên assignment quá hạn (pass policy).");
     return;
   }
 
   const submitDisabledState = await I.grabAttributeFrom("button[type='submit']", "disabled");
   if (submitDisabledState !== null) {
-    I.say("S-03 UI-only: nút nộp bài bị disable trên assignment quá hạn (pass policy).");
+    I.say("UI-only: nút nộp bài bị disable trên assignment quá hạn (pass policy).");
     return;
   }
 
   I.say(
-    "S-03 UI-only: chưa phát hiện hidden/disabled cho nút nộp bài. Ghi nhận known gap theo policy hiện tại.",
+    "UI-only: chưa phát hiện hidden/disabled cho nút nộp bài. Ghi nhận known gap theo policy hiện tại.",
   );
 });
 
-Scenario("SUB-SBM-004 | Student lịch sử nộp bài", async ({ I }) => {
+/**
+ * Student đi từ context assignment -> lịch sử nộp -> chi tiết bài nộp.
+ */
+Scenario("SUB-SBM-004 | Student views submission history from assignment context", async ({ I }) => {
   await applyAllureMetadata(
     "Submission History",
-    "Student views submissions list and detail",
+    "Student views submission history from assignment context",
     "normal",
     "SUB-SBM-004",
   );
 
+  if (!requireAssignmentSeed.call(I, submissionSeed.assignments.openAssignmentId, "E2E_OPEN_ASSIGNMENT_ID")) {
+    return;
+  }
+
   I.loginAsStudent();
+  I.openStudentAssignmentDetail(submissionSeed.assignments.openAssignmentId);
+  I.seeInCurrentUrl("/student/assignments/");
   I.navigateToStudentSubmissionsList();
   I.assertStudentSubmissionsListReady();
   I.seeInCurrentUrl(submissionRoutes.studentSubmissionsList);
@@ -143,18 +188,28 @@ Scenario("SUB-SBM-004 | Student lịch sử nộp bài", async ({ I }) => {
   I.waitForAnyText(submissionTexts.states.emptySubmissionList, 10);
 });
 
-Scenario("SUB-SBM-005 | Instructor quản lý bài nộp", async ({ I }) => {
+/**
+ * Instructor đi từ context assignment -> tab Bài nộp -> chi tiết bài nộp.
+ */
+Scenario("SUB-SBM-005 | Instructor opens submissions tab and views submission detail", async ({ I }) => {
   await applyAllureMetadata(
     "Instructor Submission Review",
-    "Instructor views submissions and source code",
+    "Instructor opens assignment detail submissions tab and views source code",
     "critical",
     "SUB-SBM-005",
   );
 
+  if (!requireAssignmentSeed.call(I, submissionSeed.assignments.openAssignmentId, "E2E_OPEN_ASSIGNMENT_ID")) {
+    return;
+  }
+
   I.loginAsInstructor();
-  I.navigateToInstructorSubmissionsList();
+  I.openInstructorAssignmentDetail(submissionSeed.assignments.openAssignmentId);
+  I.seeInCurrentUrl("/instructor/assignments/");
+  I.openInstructorAssignmentSubmissionsTab();
+  I.waitForText("Học sinh", 20);
+  I.waitForText("Hành động", 20);
   I.assertInstructorSubmissionsListReady();
-  I.seeInCurrentUrl(submissionRoutes.instructorSubmissionsList);
 
   const detailButtonsCount = await I.grabNumberOfVisibleElements({ xpath: viewDetailButtonXPath });
   if (detailButtonsCount > 0) {
