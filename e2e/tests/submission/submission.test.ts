@@ -28,7 +28,7 @@ async function applyAllureMetadata(
 
 Feature("Submission | Scaffold");
 
-const viewDetailButtonXPath = "//button[contains(normalize-space(), 'Xem chi tiết')]";
+const viewDetailButtonXPath = `//button[contains(normalize-space(), '${submissionTexts.common.viewDetailButton}')]`;
 
 /**
  * Guard cho dữ liệu seed bắt buộc.
