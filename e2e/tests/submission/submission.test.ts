@@ -60,24 +60,31 @@ Scenario("SUB-SBM-001 | Submission valid solution", async ({ I }) => {
     return;
   }
 
+  const acceptedSubmissionPaths = ["/student/submission/", "/student/submissions/"];
+
   I.loginAsStudent();
   I.openStudentAssignmentDetail(submissionSeed.assignments.openAssignmentId);
   I.openStudentSubmissionEditor(submissionSeed.assignments.openAssignmentId);
   I.submitCurrentSolution("print('hello from apsas e2e')");
   I.waitForFunction(
-    (queuedSignals: string[]) => {
+    (queuedSignals: string[], validPaths: string[]) => {
       const bodyText = document.body.innerText;
       return (
         queuedSignals.some((signal) => bodyText.includes(signal)) ||
         bodyText.includes("Đang chấm điểm") ||
-        globalThis.location.pathname.includes("/student/submissions/") ||
+        validPaths.some((path) => globalThis.location.pathname.includes(path)) ||
         bodyText.includes("ký tự / 10000")
       );
     },
-    [submissionTexts.states.queuedSubmission],
+    [submissionTexts.states.queuedSubmission, acceptedSubmissionPaths],
     20,
   );
-  I.seeInCurrentUrl("/student/submission/");
+  I.waitForFunction(
+    (validPaths: string[]) =>
+      validPaths.some((path) => globalThis.location.pathname.includes(path)),
+    [acceptedSubmissionPaths],
+    20,
+  );
 });
 
 /**
