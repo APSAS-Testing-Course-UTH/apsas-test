@@ -172,31 +172,24 @@ export = function (): any {
       this.assertNoAppErrorSignals();
     },
 
-    /** Nhập code vào Monaco bằng keyboard events để giảm flaky. */
+    /** Nhập code vào Monaco qua editor input để tránh flaky khi gõ từng ký tự. */
     fillSubmissionCode(this: CodeceptJS.I, code: string) {
-      this.waitForFunction(
-        () => document.querySelector(".monaco-editor") !== null,
-        [],
+      this.waitForElement(
+        submissionSelectors.student.editorInput,
         submissionTimeouts.editor,
       );
-      this.click(".monaco-editor");
-      this.pressKey(["Control", "A"]);
-      this.pressKey("Backspace");
-      for (const ch of code) {
-        this.pressKey(ch);
-      }
+      this.click(submissionSelectors.student.editorInput);
+      this.fillField(submissionSelectors.student.editorInput, code);
     },
 
     /** Xóa toàn bộ code hiện tại trong Monaco. */
     clearSubmissionCode(this: CodeceptJS.I) {
-      this.waitForFunction(
-        () => document.querySelector(".monaco-editor") !== null,
-        [],
+      this.waitForElement(
+        submissionSelectors.student.editorInput,
         submissionTimeouts.editor,
       );
-      this.click(".monaco-editor");
-      this.pressKey(["Control", "A"]);
-      this.pressKey("Backspace");
+      this.click(submissionSelectors.student.editorInput);
+      this.fillField(submissionSelectors.student.editorInput, "");
     },
 
     /** Click nút Nộp bài khi nút đã hiển thị trên UI. */
