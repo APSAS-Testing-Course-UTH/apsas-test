@@ -85,3 +85,16 @@ export const submissionLocatorPolicy = {
   editorUpgradeNote:
     "Editor should migrate to stable data-testid selectors when frontend supports them consistently.",
 };
+
+export const submissionTimeouts = {
+  navigation: 15,
+  editor: 15,
+  action: 10,
+  contentReady: 20,
+  appErrorCheck: 5,
+};
+
+export const submissionRetryPolicy = {
+  queuedStateAttempts: 3,
+  queuedStatePerAttemptSec: 8,
+};

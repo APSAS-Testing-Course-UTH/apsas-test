@@ -1,7 +1,9 @@
 import {
   submissionPageSignals,
+  submissionRetryPolicy,
   submissionRoutes,
   submissionSelectors,
+  submissionTimeouts,
   submissionTexts,
 } from "./tests/submission/locators";
 
@@ -25,6 +27,10 @@ export = function (): any {
   return actor({
     login(this: CodeceptJS.I, email: string, password: string) {
       this.amOnPage("/login");
+      this.executeScript(() => {
+        globalThis.localStorage.clear();
+        globalThis.sessionStorage.clear();
+      });
       this.fillField("Email", email);
       this.fillField("Mật khẩu", password);
       this.click("Đăng nhập");
@@ -32,12 +38,12 @@ export = function (): any {
 
     loginAsStudent(this: CodeceptJS.I) {
       this.loginAsRole("student");
-      this.waitInUrl("/student", 15);
+      this.waitInUrl("/student", submissionTimeouts.navigation);
     },
 
     loginAsInstructor(this: CodeceptJS.I) {
       this.loginAsRole("instructor");
-      this.waitInUrl("/instructor", 15);
+      this.waitInUrl("/instructor", submissionTimeouts.navigation);
     },
 
     loginAsRole(this: CodeceptJS.I, role: SeedRole) {
@@ -56,15 +62,23 @@ export = function (): any {
     },
 
     openStudentSubmissionsList(this: CodeceptJS.I) {
-      this.amOnPage(submissionRoutes.studentSubmissionsList);
-      this.waitForNoLoadingSignals();
-      this.waitForStudentSubmissionsListReady();
+      this.navigateToStudentSubmissionsList();
+      this.assertStudentSubmissionsListReady();
     },
 
     openInstructorSubmissionsList(this: CodeceptJS.I) {
+      this.navigateToInstructorSubmissionsList();
+      this.assertInstructorSubmissionsListReady();
+    },
+
+    navigateToStudentSubmissionsList(this: CodeceptJS.I) {
+      this.amOnPage(submissionRoutes.studentSubmissionsList);
+      this.waitForNoLoadingSignals();
+    },
+
+    navigateToInstructorSubmissionsList(this: CodeceptJS.I) {
       this.amOnPage(submissionRoutes.instructorSubmissionsList);
       this.waitForNoLoadingSignals();
-      this.waitForInstructorSubmissionsListReady();
     },
 
     openStudentSubmissionDetail(this: CodeceptJS.I, submissionId: string) {
@@ -79,51 +93,59 @@ export = function (): any {
 
     waitForSubmissionEditorReady(this: CodeceptJS.I) {
       this.waitForSubmissionPageSignals(submissionPageSignals.studentSubmissionEditor);
-      this.waitForElement(submissionSelectors.student.editorInput, 15);
+      this.waitForElement(submissionSelectors.student.editorInput, submissionTimeouts.editor);
     },
 
     waitForStudentSubmissionsListReady(this: CodeceptJS.I) {
-      this.waitForElement(submissionSelectors.common.pageTitle, 20);
-      this.waitForSubmissionListContentReady(20);
+      this.assertStudentSubmissionsListReady();
+    },
+
+    assertStudentSubmissionsListReady(this: CodeceptJS.I) {
+      this.waitForElement(submissionSelectors.common.pageTitle, submissionTimeouts.contentReady);
+      this.waitForSubmissionListContentReady(submissionTimeouts.contentReady);
       this.assertNoAppErrorSignals();
     },
 
     waitForInstructorSubmissionsListReady(this: CodeceptJS.I) {
-      this.waitForElement(submissionSelectors.common.pageTitle, 20);
-      this.waitForSubmissionListContentReady(20);
+      this.assertInstructorSubmissionsListReady();
+    },
+
+    assertInstructorSubmissionsListReady(this: CodeceptJS.I) {
+      this.waitForElement(submissionSelectors.common.pageTitle, submissionTimeouts.contentReady);
+      this.waitForSubmissionListContentReady(submissionTimeouts.contentReady);
       this.assertNoAppErrorSignals();
     },
 
     waitForStudentSubmissionDetailReady(this: CodeceptJS.I) {
-      this.waitForElement(submissionSelectors.common.pageTitle, 15);
-      this.waitForText("Tóm tắt kết quả", 15);
-      this.waitForText("Mã đã nộp", 15);
+      this.waitForElement(submissionSelectors.common.pageTitle, submissionTimeouts.contentReady);
+      this.waitForText("Tóm tắt kết quả", submissionTimeouts.contentReady);
+      this.waitForText("Mã đã nộp", submissionTimeouts.contentReady);
       this.assertNoAppErrorSignals();
     },
 
     waitForInstructorSubmissionDetailReady(this: CodeceptJS.I) {
-      this.waitForElement(submissionSelectors.common.pageTitle, 15);
-      this.waitForText("Tóm tắt kết quả", 15);
-      this.waitForText("Mã đã nộp", 15);
+      this.waitForElement(submissionSelectors.common.pageTitle, submissionTimeouts.contentReady);
+      this.waitForText("Tóm tắt kết quả", submissionTimeouts.contentReady);
+      this.waitForText("Mã đã nộp", submissionTimeouts.contentReady);
       this.assertNoAppErrorSignals();
     },
 
     fillSubmissionCode(this: CodeceptJS.I, code: string) {
-      this.waitForElement(submissionSelectors.student.editorInput, 15);
+      this.waitForElement(submissionSelectors.student.editorInput, submissionTimeouts.editor);
       this.click(submissionSelectors.student.editorInput);
       this.fillField(submissionSelectors.student.editorInput, code);
     },
 
     clearSubmissionCode(this: CodeceptJS.I) {
-      this.waitForElement(submissionSelectors.student.editorInput, 15);
+      this.waitForElement(submissionSelectors.student.editorInput, submissionTimeouts.editor);
       this.click(submissionSelectors.student.editorInput);
       this.pressKey(["Control", "A"]);
       this.pressKey("Backspace");
     },
 
     clickSubmitCode(this: CodeceptJS.I) {
-      this.waitForText(submissionTexts.common.submitButton, 10);
-      this.waitForClickable(submissionSelectors.common.submitButton, 10);
+      this.waitForText(submissionTexts.common.submitButton, submissionTimeouts.action);
+      this.waitForClickable(submissionSelectors.common.submitButton, submissionTimeouts.action);
       this.click(submissionTexts.common.submitButton);
     },
 
@@ -149,6 +171,16 @@ export = function (): any {
     waitForSubmissionListContentReady(this: CodeceptJS.I, sec = 20) {
       try {
         this.waitForElement(submissionSelectors.common.submissionListRows, sec);
+        this.waitForFunction(
+          (loadingSignals: string[]) => {
+            const rows = Array.from(document.querySelectorAll("table tbody tr"));
+            if (!rows.length) return true;
+            const rowsText = rows.map((row) => row.textContent || "").join(" ");
+            return !loadingSignals.some((signal) => rowsText.includes(signal));
+          },
+          [submissionTexts.common.loadingSignals],
+          sec,
+        );
       } catch {
         this.waitForAnyText(submissionTexts.states.emptySubmissionList, sec);
       }
@@ -169,12 +201,25 @@ export = function (): any {
         (appErrorSignals: string[]) =>
           !appErrorSignals.some((signal) => document.body.innerText.includes(signal)),
         [submissionTexts.common.appErrorSignals],
-        5,
+        submissionTimeouts.appErrorCheck,
       );
     },
 
     waitForSubmissionQueuedState(this: CodeceptJS.I) {
-      this.waitForAnyText(submissionTexts.states.queuedSubmission, 20);
+      for (let attempt = 0; attempt < submissionRetryPolicy.queuedStateAttempts; attempt += 1) {
+        try {
+          this.waitForAnyText(
+            submissionTexts.states.queuedSubmission,
+            submissionRetryPolicy.queuedStatePerAttemptSec,
+          );
+          return;
+        } catch (error) {
+          if (attempt === submissionRetryPolicy.queuedStateAttempts - 1) {
+            throw error;
+          }
+          this.waitForNoLoadingSignals(submissionTimeouts.action);
+        }
+      }
     },
   });
 };

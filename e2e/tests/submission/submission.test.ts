@@ -27,6 +27,16 @@ Feature("Submission | Scaffold");
 
 const viewDetailButtonXPath = "//button[contains(normalize-space(), 'Xem chi tiết')]";
 
+function requireAssignmentSeed(this: CodeceptJS.I, assignmentId: string, envName: string): boolean {
+  if (assignmentId) {
+    return true;
+  }
+  this.say(
+    `Thiếu ${envName} - bỏ qua runtime để tránh false fail ở môi trường chưa chốt seed.`,
+  );
+  return false;
+}
+
 Scenario("SUB-SBM-001 | Student nộp bài hợp lệ", async ({ I }) => {
   await applyAllureMetadata(
     "Submission Flow",
@@ -35,10 +45,7 @@ Scenario("SUB-SBM-001 | Student nộp bài hợp lệ", async ({ I }) => {
     "SUB-SBM-001",
   );
 
-  if (!submissionSeed.assignments.openAssignmentId) {
-    I.say(
-      "Thiếu E2E_OPEN_ASSIGNMENT_ID - bỏ qua runtime để tránh false fail ở môi trường chưa chốt seed.",
-    );
+  if (!requireAssignmentSeed.call(I, submissionSeed.assignments.openAssignmentId, "E2E_OPEN_ASSIGNMENT_ID")) {
     return;
   }
 
@@ -58,10 +65,7 @@ Scenario("SUB-SBM-002 | Chặn submit khi editor rỗng", async ({ I }) => {
     "SUB-SBM-002",
   );
 
-  if (!submissionSeed.assignments.openAssignmentId) {
-    I.say(
-      "Thiếu E2E_OPEN_ASSIGNMENT_ID - bỏ qua runtime để tránh false fail ở môi trường chưa chốt seed.",
-    );
+  if (!requireAssignmentSeed.call(I, submissionSeed.assignments.openAssignmentId, "E2E_OPEN_ASSIGNMENT_ID")) {
     return;
   }
 
@@ -83,10 +87,13 @@ Scenario("SUB-SBM-003 | Rule quá hạn theo S-03", async ({ I }) => {
   );
 
   I.say(`Current S-03 policy: ${s03Policy.mode}`);
-  if (!submissionSeed.assignments.overdueAssignmentId) {
-    I.say(
-      "Thiếu E2E_OVERDUE_ASSIGNMENT_ID - dừng sớm để tránh false fail ở môi trường chưa chốt seed.",
-    );
+  if (
+    !requireAssignmentSeed.call(
+      I,
+      submissionSeed.assignments.overdueAssignmentId,
+      "E2E_OVERDUE_ASSIGNMENT_ID",
+    )
+  ) {
     return;
   }
 
@@ -121,8 +128,8 @@ Scenario("SUB-SBM-004 | Student lịch sử nộp bài", async ({ I }) => {
   );
 
   I.loginAsStudent();
-  I.openStudentSubmissionsList();
-  I.waitForStudentSubmissionsListReady();
+  I.navigateToStudentSubmissionsList();
+  I.assertStudentSubmissionsListReady();
   I.seeInCurrentUrl(submissionRoutes.studentSubmissionsList);
 
   const detailButtonsCount = await I.grabNumberOfVisibleElements({ xpath: viewDetailButtonXPath });
@@ -145,8 +152,8 @@ Scenario("SUB-SBM-005 | Instructor quản lý bài nộp", async ({ I }) => {
   );
 
   I.loginAsInstructor();
-  I.openInstructorSubmissionsList();
-  I.waitForInstructorSubmissionsListReady();
+  I.navigateToInstructorSubmissionsList();
+  I.assertInstructorSubmissionsListReady();
   I.seeInCurrentUrl(submissionRoutes.instructorSubmissionsList);
 
   const detailButtonsCount = await I.grabNumberOfVisibleElements({ xpath: viewDetailButtonXPath });
