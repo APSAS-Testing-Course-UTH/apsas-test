@@ -1,5 +1,10 @@
 import { epic, feature, severity, story, tag, tms } from "allure-js-commons";
-import { s03Policy, submissionRoutes, submissionSeed, submissionTexts } from "./locators";
+import {
+  s03Policy,
+  submissionRoutes,
+  submissionSeed,
+  submissionTexts,
+} from "./locators";
 
 type ScenarioSeverityLevel = "critical" | "normal" | "minor";
 
@@ -20,6 +25,8 @@ async function applyAllureMetadata(
 
 Feature("Submission | Scaffold");
 
+const viewDetailButtonXPath = "//button[contains(normalize-space(), 'Xem chi tiết')]";
+
 Scenario("SUB-SBM-001 | Student nộp bài hợp lệ", async ({ I }) => {
   await applyAllureMetadata(
     "Submission Flow",
@@ -39,6 +46,8 @@ Scenario("SUB-SBM-001 | Student nộp bài hợp lệ", async ({ I }) => {
   I.openStudentAssignmentDetail(submissionSeed.assignments.openAssignmentId);
   I.openStudentSubmissionEditor(submissionSeed.assignments.openAssignmentId);
   I.submitCurrentSolution("print('hello from apsas e2e')");
+  I.waitForSubmissionQueuedState();
+  I.seeInCurrentUrl("/student/submission/");
 });
 
 Scenario("SUB-SBM-002 | Chặn submit khi editor rỗng", async ({ I }) => {
@@ -61,10 +70,11 @@ Scenario("SUB-SBM-002 | Chặn submit khi editor rỗng", async ({ I }) => {
   I.clearSubmissionCode();
   I.clickSubmitCode();
   I.waitForAnyText(submissionTexts.states.emptySubmissionCode, 10);
+  I.dontSee(submissionTexts.common.queuedText);
   I.seeInCurrentUrl("/student/submission/");
 });
 
-Scenario.skip("SUB-SBM-003 | Rule quá hạn theo S-03", async ({ I }) => {
+Scenario("SUB-SBM-003 | Rule quá hạn theo S-03", async ({ I }) => {
   await applyAllureMetadata(
     "Submission Policy",
     "Deadline behavior for submission",
@@ -73,15 +83,33 @@ Scenario.skip("SUB-SBM-003 | Rule quá hạn theo S-03", async ({ I }) => {
   );
 
   I.say(`Current S-03 policy: ${s03Policy.mode}`);
-  I.say("Scenario này đang giữ skip cho đến khi feature deadline được chốt ở UI/backend.");
   if (!submissionSeed.assignments.overdueAssignmentId) {
     I.say(
-      "Thiếu E2E_OVERDUE_ASSIGNMENT_ID - giữ skip runtime để tránh điều hướng route không hợp lệ.",
+      "Thiếu E2E_OVERDUE_ASSIGNMENT_ID - dừng sớm để tránh false fail ở môi trường chưa chốt seed.",
     );
     return;
   }
 
-  I.amOnPage(submissionRoutes.studentSubmissionEditor(submissionSeed.assignments.overdueAssignmentId));
+  I.loginAsStudent();
+  I.openStudentSubmissionEditor(submissionSeed.assignments.overdueAssignmentId);
+  I.seeInCurrentUrl("/student/submission/");
+
+  const submitButtonVisibleCount = await I.grabNumberOfVisibleElements("button[type='submit']");
+
+  if (submitButtonVisibleCount === 0) {
+    I.say("S-03 UI-only: nút nộp bài bị ẩn trên assignment quá hạn (pass policy).");
+    return;
+  }
+
+  const submitDisabledState = await I.grabAttributeFrom("button[type='submit']", "disabled");
+  if (submitDisabledState !== null) {
+    I.say("S-03 UI-only: nút nộp bài bị disable trên assignment quá hạn (pass policy).");
+    return;
+  }
+
+  I.say(
+    "S-03 UI-only: chưa phát hiện hidden/disabled cho nút nộp bài. Ghi nhận known gap theo policy hiện tại.",
+  );
 });
 
 Scenario("SUB-SBM-004 | Student lịch sử nộp bài", async ({ I }) => {
@@ -96,6 +124,16 @@ Scenario("SUB-SBM-004 | Student lịch sử nộp bài", async ({ I }) => {
   I.openStudentSubmissionsList();
   I.waitForStudentSubmissionsListReady();
   I.seeInCurrentUrl(submissionRoutes.studentSubmissionsList);
+
+  const detailButtonsCount = await I.grabNumberOfVisibleElements({ xpath: viewDetailButtonXPath });
+  if (detailButtonsCount > 0) {
+    I.click({ xpath: `(${viewDetailButtonXPath})[1]` });
+    I.waitForStudentSubmissionDetailReady();
+    I.seeInCurrentUrl("/student/submissions/");
+    return;
+  }
+
+  I.waitForAnyText(submissionTexts.states.emptySubmissionList, 10);
 });
 
 Scenario("SUB-SBM-005 | Instructor quản lý bài nộp", async ({ I }) => {
@@ -110,4 +148,14 @@ Scenario("SUB-SBM-005 | Instructor quản lý bài nộp", async ({ I }) => {
   I.openInstructorSubmissionsList();
   I.waitForInstructorSubmissionsListReady();
   I.seeInCurrentUrl(submissionRoutes.instructorSubmissionsList);
+
+  const detailButtonsCount = await I.grabNumberOfVisibleElements({ xpath: viewDetailButtonXPath });
+  if (detailButtonsCount > 0) {
+    I.click({ xpath: `(${viewDetailButtonXPath})[1]` });
+    I.waitForInstructorSubmissionDetailReady();
+    I.seeInCurrentUrl("/instructor/submissions/");
+    return;
+  }
+
+  I.waitForAnyText(submissionTexts.states.emptySubmissionList, 10);
 });

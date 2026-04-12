@@ -95,11 +95,17 @@ export = function (): any {
     },
 
     waitForStudentSubmissionDetailReady(this: CodeceptJS.I) {
-      this.waitForSubmissionPageSignals(submissionPageSignals.studentSubmissionDetail);
+      this.waitForElement(submissionSelectors.common.pageTitle, 15);
+      this.waitForText("Tóm tắt kết quả", 15);
+      this.waitForText("Mã đã nộp", 15);
+      this.assertNoAppErrorSignals();
     },
 
     waitForInstructorSubmissionDetailReady(this: CodeceptJS.I) {
-      this.waitForSubmissionPageSignals(submissionPageSignals.instructorSubmissionDetail);
+      this.waitForElement(submissionSelectors.common.pageTitle, 15);
+      this.waitForText("Tóm tắt kết quả", 15);
+      this.waitForText("Mã đã nộp", 15);
+      this.assertNoAppErrorSignals();
     },
 
     fillSubmissionCode(this: CodeceptJS.I, code: string) {

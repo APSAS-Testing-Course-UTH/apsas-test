@@ -54,8 +54,8 @@ export const submissionPageSignals = {
   studentSubmissionEditor: ["Biểu mẫu nộp", "Nộp bài"],
   studentSubmissionsList: ["Bài nộp", "Lịch sử các bài nộp của bạn"],
   instructorSubmissionsList: ["Quản lý Bài nộp", "Xem bài nộp, cấp điểm"],
-  studentSubmissionDetail: ["Chi tiết bài nộp", "Trạng thái", "Kết quả"],
-  instructorSubmissionDetail: ["Chi tiết bài nộp", "Học sinh", "Mã nguồn"],
+  studentSubmissionDetail: ["Chi tiết Bài nộp", "Tóm tắt kết quả", "Mã đã nộp", "Kết quả kiểm tra"],
+  instructorSubmissionDetail: ["Chi tiết Bài nộp", "Tóm tắt kết quả", "Mã đã nộp", "Kết quả kiểm tra"],
 };
 
 export const submissionSeed = {
