@@ -1,4 +1,4 @@
-import { epic, feature, severity, story, tag, tms } from "allure-js-commons";
+import { allure } from "allure-codeceptjs";
 import {
   s03Policy,
   submissionRoutes,
@@ -17,13 +17,13 @@ async function applyAllureMetadata(
   severityLevel: ScenarioSeverityLevel,
   tmsId: string,
 ) {
-  await epic("submission");
-  await feature(featureName);
-  await story(storyName);
-  await severity(severityLevel);
-  await tag("e2e");
-  await tag("regression");
-  await tms(tmsId);
+  await allure.epic("submission");
+  await allure.feature(featureName);
+  await allure.story(storyName);
+  await allure.severity(severityLevel);
+  await allure.tag("e2e");
+  await allure.tag("regression");
+  await allure.tms(tmsId);
 }
 
 Feature("Submission | Scaffold");
