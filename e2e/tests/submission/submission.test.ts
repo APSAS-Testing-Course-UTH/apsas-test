@@ -157,8 +157,8 @@ Scenario("SUB-SBM-003 | Deadline behavior for overdue assignment", async ({ I })
     return;
   }
 
-  I.say(
-    "UI-only: chưa phát hiện hidden/disabled cho nút nộp bài. Ghi nhận known gap theo policy hiện tại.",
+  throw new Error(
+    "UI-only policy violated: overdue assignment still shows an enabled submit button. Expected the submit button to be hidden or disabled.",
   );
 });
 
