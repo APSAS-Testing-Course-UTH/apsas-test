@@ -1,5 +1,5 @@
 import { setHeadlessWhen, setCommonPlugins } from "@codeceptjs/configure";
-import os from "os";
+import os from "node:os";
 
 // Run headless in CI, headed locally
 setHeadlessWhen(process.env.CI);
@@ -9,6 +9,13 @@ setCommonPlugins();
 
 const BASE_URL = process.env.APP_URL || "http://localhost:5173";
 
+/**
+ * Cấu hình runner E2E cho APSAS.
+ *
+ * Mục tiêu:
+ * - Dùng Playwright cho browser automation.
+ * - Giữ plugin screenshotOnFail + allure luôn bật để phục vụ debug/audit.
+ */
 export const config: CodeceptJS.MainConfig = {
   tests: "./tests/**/*.test.ts",
   output: "./output",

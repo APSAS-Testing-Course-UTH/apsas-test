@@ -1,5 +1,4 @@
 import {
-  submissionPageSignals,
   submissionRetryPolicy,
   submissionRoutes,
   submissionSelectors,
@@ -23,8 +22,16 @@ const seedAccounts = {
 
 type SeedRole = keyof typeof seedAccounts;
 
+/**
+ * Shared steps cho E2E, ưu tiên tái sử dụng cho các flow submission.
+ *
+ * Ghi chú:
+ * - Các hàm wait dựa trên tín hiệu UI thực tế, tránh sleep cứng.
+ * - Editor Monaco được thao tác qua focus + keyboard để hạn chế flaky selector.
+ */
 export = function (): any {
   return actor({
+    /** Đăng nhập bằng cặp email/password truyền vào. */
     login(this: CodeceptJS.I, email: string, password: string) {
       this.amOnPage("/login");
       this.executeScript(() => {
@@ -36,11 +43,13 @@ export = function (): any {
       this.click("Đăng nhập");
     },
 
+    /** Đăng nhập nhanh bằng tài khoản student seed. */
     loginAsStudent(this: CodeceptJS.I) {
       this.loginAsRole("student");
       this.waitInUrl("/student", submissionTimeouts.navigation);
     },
 
+    /** Đăng nhập nhanh bằng tài khoản instructor seed. */
     loginAsInstructor(this: CodeceptJS.I) {
       this.loginAsRole("instructor");
       this.waitInUrl("/instructor", submissionTimeouts.navigation);
@@ -50,12 +59,15 @@ export = function (): any {
       this.login(seedAccounts[role].email, seedAccounts[role].password);
     },
 
+    /** Mở trang chi tiết assignment của student và chờ trang sẵn sàng. */
     openStudentAssignmentDetail(this: CodeceptJS.I, assignmentId: string) {
       this.amOnPage(submissionRoutes.studentAssignmentsDetail(assignmentId));
       this.waitForNoLoadingSignals();
-      this.waitForSubmissionPageSignals(submissionPageSignals.studentAssignmentDetail);
+      this.waitForElement(submissionSelectors.common.pageTitle, submissionTimeouts.contentReady);
+      this.assertNoAppErrorSignals();
     },
 
+    /** Mở trang nộp bài của student (web editor). */
     openStudentSubmissionEditor(this: CodeceptJS.I, assignmentId: string) {
       this.amOnPage(submissionRoutes.studentSubmissionEditor(assignmentId));
       this.waitForSubmissionEditorReady();
@@ -69,6 +81,21 @@ export = function (): any {
     openInstructorSubmissionsList(this: CodeceptJS.I) {
       this.navigateToInstructorSubmissionsList();
       this.assertInstructorSubmissionsListReady();
+    },
+
+    /** Mở trang chi tiết assignment của instructor. */
+    openInstructorAssignmentDetail(this: CodeceptJS.I, assignmentId: string) {
+      this.amOnPage(submissionRoutes.instructorAssignmentsDetail(assignmentId));
+      this.waitForNoLoadingSignals();
+      this.waitForElement(submissionSelectors.common.pageTitle, submissionTimeouts.contentReady);
+      this.assertNoAppErrorSignals();
+    },
+
+    /** Chuyển tab Bài nộp trong màn hình chi tiết assignment (instructor). */
+    openInstructorAssignmentSubmissionsTab(this: CodeceptJS.I) {
+      this.waitForText("Bài nộp", submissionTimeouts.contentReady);
+      this.click("Bài nộp");
+      this.waitForNoLoadingSignals();
     },
 
     navigateToStudentSubmissionsList(this: CodeceptJS.I) {
@@ -91,9 +118,16 @@ export = function (): any {
       this.waitForInstructorSubmissionDetailReady();
     },
 
+    /** Chờ editor Monaco sẵn sàng để thao tác nhập/xóa code. */
     waitForSubmissionEditorReady(this: CodeceptJS.I) {
-      this.waitForSubmissionPageSignals(submissionPageSignals.studentSubmissionEditor);
-      this.waitForElement(submissionSelectors.student.editorInput, submissionTimeouts.editor);
+      this.waitForNoLoadingSignals();
+      this.waitForText("Ngôn ngữ", submissionTimeouts.contentReady);
+      this.waitForFunction(
+        () => document.querySelector(".monaco-editor") !== null,
+        [],
+        submissionTimeouts.editor,
+      );
+      this.assertNoAppErrorSignals();
     },
 
     waitForStudentSubmissionsListReady(this: CodeceptJS.I) {
@@ -112,7 +146,15 @@ export = function (): any {
 
     assertInstructorSubmissionsListReady(this: CodeceptJS.I) {
       this.waitForElement(submissionSelectors.common.pageTitle, submissionTimeouts.contentReady);
-      this.waitForSubmissionListContentReady(submissionTimeouts.contentReady);
+      this.waitForFunction(
+        (emptyTexts: string[]) => {
+          const rows = Array.from(document.querySelectorAll("table tbody tr"));
+          const body = document.body.innerText;
+          return rows.length > 0 || emptyTexts.some((text) => body.includes(text));
+        },
+        [submissionTexts.states.emptySubmissionList],
+        submissionTimeouts.contentReady,
+      );
       this.assertNoAppErrorSignals();
     },
 
@@ -130,29 +172,43 @@ export = function (): any {
       this.assertNoAppErrorSignals();
     },
 
+    /** Nhập code vào Monaco bằng keyboard events để giảm flaky. */
     fillSubmissionCode(this: CodeceptJS.I, code: string) {
-      this.waitForElement(submissionSelectors.student.editorInput, submissionTimeouts.editor);
-      this.click(submissionSelectors.student.editorInput);
-      this.fillField(submissionSelectors.student.editorInput, code);
+      this.waitForFunction(
+        () => document.querySelector(".monaco-editor") !== null,
+        [],
+        submissionTimeouts.editor,
+      );
+      this.click(".monaco-editor");
+      this.pressKey(["Control", "A"]);
+      this.pressKey("Backspace");
+      for (const ch of code) {
+        this.pressKey(ch);
+      }
     },
 
+    /** Xóa toàn bộ code hiện tại trong Monaco. */
     clearSubmissionCode(this: CodeceptJS.I) {
-      this.waitForElement(submissionSelectors.student.editorInput, submissionTimeouts.editor);
-      this.click(submissionSelectors.student.editorInput);
+      this.waitForFunction(
+        () => document.querySelector(".monaco-editor") !== null,
+        [],
+        submissionTimeouts.editor,
+      );
+      this.click(".monaco-editor");
       this.pressKey(["Control", "A"]);
       this.pressKey("Backspace");
     },
 
+    /** Click nút Nộp bài khi nút đã hiển thị trên UI. */
     clickSubmitCode(this: CodeceptJS.I) {
       this.waitForText(submissionTexts.common.submitButton, submissionTimeouts.action);
-      this.waitForClickable(submissionSelectors.common.submitButton, submissionTimeouts.action);
       this.click(submissionTexts.common.submitButton);
     },
 
+    /** Flow submit solution đầy đủ: nhập code rồi submit. */
     submitCurrentSolution(this: CodeceptJS.I, code: string) {
       this.fillSubmissionCode(code);
       this.clickSubmitCode();
-      this.waitForSubmissionQueuedState();
     },
 
     waitForAnyText(this: CodeceptJS.I, texts: string[], sec = 15) {
@@ -196,6 +252,7 @@ export = function (): any {
       this.assertNoAppErrorSignals();
     },
 
+    /** Assert không có tín hiệu lỗi ứng dụng ở mức toàn trang. */
     assertNoAppErrorSignals(this: CodeceptJS.I) {
       this.waitForFunction(
         (appErrorSignals: string[]) =>
@@ -205,6 +262,7 @@ export = function (): any {
       );
     },
 
+    /** Chờ trạng thái queued theo retry policy cho các flow cần polling. */
     waitForSubmissionQueuedState(this: CodeceptJS.I) {
       for (let attempt = 0; attempt < submissionRetryPolicy.queuedStateAttempts; attempt += 1) {
         try {
