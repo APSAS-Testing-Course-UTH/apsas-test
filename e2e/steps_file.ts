@@ -121,7 +121,7 @@ export = function (): any {
     /** Chờ editor Monaco sẵn sàng để thao tác nhập/xóa code. */
     waitForSubmissionEditorReady(this: CodeceptJS.I) {
       this.waitForNoLoadingSignals();
-      this.waitForText("Ngôn ngữ", submissionTimeouts.contentReady);
+      this.waitForText(submissionTexts.student.languageLabel, submissionTimeouts.contentReady);
       this.waitForFunction(
         () => document.querySelector(".monaco-editor") !== null,
         [],
