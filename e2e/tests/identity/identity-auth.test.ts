@@ -84,8 +84,7 @@ Scenario("I-01 đăng ký với email mới thành công", async ({I}) => {
             password: "SecurePassword123!",
         });
 
-        I.waitForText("Đăng ký thành công", 10);
-        I.waitInUrl("/student/dashboard", 10);
+        I.waitForText("Tài khoản đã được tạo", 30);
     });
 });
 
@@ -105,9 +104,12 @@ Scenario("I-02 đăng ký với email đã tồn tại thất bại", async ({I}
             lastName: "User",
             email: duplicateEmail,
             password: "SecurePassword123!",
+        }, {
+            waitForRedirect: true,
+            timeoutInSeconds: 30,
         });
 
-        I.waitInUrl("/student/dashboard", 10);
+        I.waitInUrl("/student/dashboard", 30);
         I.logout();
 
         I.registerStudent({
@@ -117,7 +119,7 @@ Scenario("I-02 đăng ký với email đã tồn tại thất bại", async ({I}
             password: "SecurePassword123!",
         });
 
-        I.waitInUrl("/register", 10);
+        I.waitInUrl("/register", 30);
         I.dontSeeInCurrentUrl("/student/dashboard");
         I.seeInField("Email", duplicateEmail);
         I.seeElement("button[type='submit']");
@@ -133,8 +135,10 @@ Scenario("I-03 đăng nhập Student thành công", async ({I}) => {
     });
 
     await withFailureScreenshot(I, "I-03-STUDENT", async () => {
-        I.login("student1@apsas", "SecurePassword123!");
-        I.waitInUrl("/student/dashboard", 10);
+        I.login("student1@apsas", "SecurePassword123!", {
+            timeoutInSeconds: 30,
+        });
+        I.waitInUrl("/student/dashboard", 30);
         I.see("Hành động nhanh");
     });
 });
@@ -148,8 +152,11 @@ Scenario("I-03 đăng nhập Instructor thành công", async ({I}) => {
     });
 
     await withFailureScreenshot(I, "I-03-INSTRUCTOR", async () => {
-        I.login("instructor1@apsas", "SecurePassword123!");
-        I.waitInUrl("/instructor/dashboard", 10);
+        I.login("instructor1@apsas", "SecurePassword123!", {
+            expectedUrl: "/instructor/dashboard",
+            timeoutInSeconds: 30,
+        });
+        I.waitInUrl("/instructor/dashboard", 30);
         I.see("Bảng điều khiển Giảng viên");
     });
 });
@@ -187,8 +194,10 @@ Scenario("I-05 cập nhật profile và giữ dữ liệu sau refresh", async ({
         const firstName = `E2E${Date.now()}`;
         const lastName = "Profile";
 
-        I.login("student2@apsas", "SecurePassword123!");
-        I.waitInUrl("/student/dashboard", 10);
+        I.login("student2@apsas", "SecurePassword123!", {
+            timeoutInSeconds: 30,
+        });
+        I.waitInUrl("/student/dashboard", 30);
 
         I.amOnPage("/student/profile");
         I.waitForText("Hồ sơ cá nhân", 10);

@@ -1,10 +1,23 @@
 export = function (): any {
   return actor({
-    login(this: CodeceptJS.I, email: string, password: string) {
+    login(
+      this: CodeceptJS.I,
+      email: string,
+      password: string,
+      options?: {
+        expectedUrl?: string;
+        timeoutInSeconds?: number;
+        waitForRedirect?: boolean;
+      },
+    ) {
       this.amOnPage("/login");
       this.fillField("Email", email);
       this.fillField("Mật khẩu", password);
-      this.click("Đăng nhập");
+      this.click('button[type="submit"]');
+
+      if (options?.waitForRedirect !== false) {
+        this.waitInUrl(options?.expectedUrl ?? "/student/dashboard", options?.timeoutInSeconds ?? 30);
+      }
     },
 
     registerStudent(
@@ -15,6 +28,11 @@ export = function (): any {
         email: string;
         password: string;
       },
+      options?: {
+        expectedUrl?: string;
+        timeoutInSeconds?: number;
+        waitForRedirect?: boolean;
+      },
     ) {
       this.amOnPage("/register");
       this.fillField("Họ", payload.firstName);
@@ -23,7 +41,11 @@ export = function (): any {
       this.fillField("Mật khẩu", payload.password);
       this.fillField("Xác nhận mật khẩu", payload.password);
       this.checkOption("Tôi đồng ý với điều khoản sử dụng");
-      this.click("Tạo tài khoản");
+      this.click('button[type="submit"]');
+
+      if (options?.waitForRedirect) {
+        this.waitInUrl(options?.expectedUrl ?? "/student/dashboard", options?.timeoutInSeconds ?? 30);
+      }
     },
 
     logout(this: CodeceptJS.I) {
