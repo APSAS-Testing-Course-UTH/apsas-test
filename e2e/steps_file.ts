@@ -142,24 +142,50 @@ export = function (): any {
 
     /** Chờ editor Monaco sẵn sàng để thao tác nhập/xóa code. */
     waitForSubmissionEditorReady(this: CodeceptJS.I) {
-      this.waitForNoLoadingSignals();
+      this.waitForNoLoadingSignals(30);
       this.waitForFunction(
-        (submitButtonText: string, languageLabel: string) => {
-          const body = document.body.innerText;
-          const hasEditor =
-            document.querySelector(".monaco-editor") !== null ||
-            document.querySelector("[data-testid='submission-code-editor']") !== null ||
-            document.querySelector("textarea.inputarea, textarea.ime-text-area") !== null;
-          const hasSubmissionSignals =
-            body.includes(submitButtonText) ||
-            body.includes("Biểu mẫu nộp") ||
-            body.includes(languageLabel);
-
-          return hasEditor || hasSubmissionSignals;
-        },
-        [submissionTexts.common.submitButton, submissionTexts.student.languageLabel],
-        submissionTimeouts.contentReady,
+        () => globalThis.location.pathname.includes("/student/submission/"),
+        [],
+        15,
       );
+
+      const waitEditorSignals = () => {
+        this.waitForFunction(
+          (submitButtonText: string, languageLabel: string) => {
+            const body = document.body.innerText;
+            const hasEditor =
+              document.querySelector(".monaco-editor") !== null ||
+              document.querySelector("[data-testid='submission-code-editor']") !== null ||
+              document.querySelector("textarea.inputarea, textarea.ime-text-area") !== null ||
+              document.querySelector("textarea") !== null;
+            const hasSubmissionSignals =
+              body.includes(submitButtonText) ||
+              body.includes("Biểu mẫu nộp") ||
+              body.includes(languageLabel) ||
+              body.includes("Mã nguồn") ||
+              body.includes("Source") ||
+              body.includes("Code");
+
+            return hasEditor || hasSubmissionSignals;
+          },
+          [submissionTexts.common.submitButton, submissionTexts.student.languageLabel],
+          40,
+        );
+      };
+
+      try {
+        waitEditorSignals();
+      } catch {
+        this.refreshPage();
+        this.waitForNoLoadingSignals(30);
+        this.waitForFunction(
+          () => globalThis.location.pathname.includes("/student/submission/"),
+          [],
+          15,
+        );
+        waitEditorSignals();
+      }
+
       this.assertNoAppErrorSignals();
     },
 
