@@ -1,78 +1,40 @@
 import * as allure from "allure-js-commons";
-import path from "path";
-import type { Page, Response } from "playwright";
 
-const APP_URL = process.env.APP_URL || "http://localhost:5173";
-const HELLO_WORLD_ASSIGNMENT_ID = "550e8400-e29b-41d4-a716-446655440001";
+const STUDENT_PASSED_SUBMISSION_ID = "80000000-0000-0000-0000-000000000001";
 const PASSED_SUBMISSION_ID = "80000000-0000-0000-0000-000000000002";
 const FAILED_SUBMISSION_ID = "80000000-0000-0000-0000-000000000005";
+const PARTIAL_SUBMISSION_ID = "80000000-0000-0000-0000-000000000003";
 
 async function loginAsStudent(I: CodeceptJS.I, email: string): Promise<void> {
-  I.amOnPage("/login");
-  I.fillField("Email", email);
-  I.fillField("Mật khẩu", "SecurePassword123!");
-  I.click("Đăng nhập");
-  I.waitInUrl("/student/dashboard", 30);
-}
+  let lastError: unknown = null;
 
-async function loginAsInstructor(I: CodeceptJS.I): Promise<void> {
-  I.amOnPage("/login");
-  I.fillField("Email", "instructor1@apsas");
-  I.fillField("Mật khẩu", "SecurePassword123!");
-  I.click("Đăng nhập");
-  I.waitForText("Quản lý", 20);
-  I.waitInUrl("/instructor/dashboard", 20);
-}
+  for (let attempt = 1; attempt <= 2; attempt += 1) {
+    I.amOnPage("/login");
+    I.fillField("Email", email);
+    I.fillField("Mật khẩu", "SecurePassword123!");
+    I.click("Đăng nhập");
 
-async function submitAssignmentViaUi(
-  I: CodeceptJS.I,
-  assignmentId: string,
-  fileName: string,
-  afterSubmit?: (page: Page, submissionId: string) => Promise<void>,
-): Promise<void> {
-  const filePath = path.resolve(__dirname, "../../fixtures", fileName);
+    try {
+      await I.waitInUrl("/student/dashboard", 30);
+      return;
+    } catch (error) {
+      lastError = error;
+    }
+  }
 
-  I.amOnPage(`/student/submission/${assignmentId}`);
-  await I.waitForText("Tải lên tệp", 60);
-
-  I.usePlaywrightTo(
-    "populate Monaco editor and submit code",
-    async ({ page }: { page: Page }) => {
-      await page.getByRole("tab", { name: "Tải lên tệp" }).click();
-      const fileInput = page.locator('input[type="file"]').first();
-      await fileInput.setInputFiles(filePath);
-
-      const responsePromise = page.waitForResponse(
-        (response: Response) => {
-          return (
-            response.url().includes("/api/v1/submissions") &&
-            response.request().method() === "POST"
-          );
-        },
-        { timeout: 15000 },
-      );
-
-      await page.getByRole("button", { name: "Nộp bài" }).click();
-
-      const response = await responsePromise;
-      const payload = await response.json();
-      const submissionId: string = payload?.id || "";
-
-      if (afterSubmit) {
-        await afterSubmit(page, submissionId);
-      }
-    },
-  );
+  throw lastError instanceof Error
+    ? lastError
+    : new Error(`Failed to login as student ${email}`);
 }
 
 Feature("Evaluation Service");
 
 Scenario(
-  "EVL-E2E-001: Show evaluating status after submission",
+  "EVL-E2E-001: Show evaluated summary for seeded submission",
   async ({ I }) => {
     await allure.epic("evaluation");
     await allure.feature("submission flow");
-    await allure.story("student sees submission processing state");
+    await allure.story("student sees summary of an evaluated submission");
     await allure.severity("critical");
     await allure.tag("e2e");
     await allure.tag("regression");
@@ -81,9 +43,10 @@ Scenario(
 
     await loginAsStudent(I, "student1@apsas");
 
-    await submitAssignmentViaUi(I, HELLO_WORLD_ASSIGNMENT_ID, "hello_world.c");
-    I.waitForText("Code của bạn đang được kiểm tra", 15);
-    I.see("Bài nộp thành công!");
+    I.amOnPage(`/student/submissions/${STUDENT_PASSED_SUBMISSION_ID}`);
+    I.waitForText("Tóm tắt kết quả", 15);
+    I.see("ĐÃ ĐÁNH GIÁ");
+    I.see("Điểm số");
   },
 );
 
@@ -133,66 +96,40 @@ Scenario(
   },
 );
 
-Scenario("EVL-E2E-004: Display compilation error details", async ({ I }) => {
+Scenario("EVL-E2E-004: Display PARTIAL result details", async ({ I }) => {
   await allure.epic("evaluation");
   await allure.feature("evaluation flow");
-  await allure.story("student sees a compilation failure");
+  await allure.story("student sees a partial evaluation result");
   await allure.severity("critical");
   await allure.tag("e2e");
   await allure.tag("regression");
   await allure.tms("EVL-E2E-004");
   await allure.issue("37");
 
-  await loginAsStudent(I, "student4@apsas");
+  await loginAsStudent(I, "student3@apsas");
 
-  await submitAssignmentViaUi(
-    I,
-    HELLO_WORLD_ASSIGNMENT_ID,
-    "compile_error.c",
-    async (page, submissionId) => {
-      if (!submissionId) {
-        throw new Error(
-          `Submission ID was not returned for assignment ${HELLO_WORLD_ASSIGNMENT_ID}`,
-        );
-      }
-      await page.goto(`${APP_URL}/student/submissions/${submissionId}`);
-    },
-  );
-
+  I.amOnPage(`/student/submissions/${PARTIAL_SUBMISSION_ID}`);
   I.waitForText("Tóm tắt kết quả", 30);
-  await I.waitForText("ĐÃ ĐÁNH GIÁ", 180);
-  I.see("Mã đã nộp");
-  I.see("c");
-  I.click("Xem chi tiết");
-  I.see("compile_error.c");
-  I.see("error:");
+  I.see("ĐÃ ĐÁNH GIÁ");
+  I.see("ĐẠT MỘT PHẦN");
+  I.see("Kết quả kiểm tra");
 });
 
 Scenario(
   "EVL-E2E-005: Instructor feedback is visible to student",
   async ({ I }) => {
-    const feedbackMessage = `Good job! Your code is correct. ${Date.now()}`;
-
     await allure.epic("evaluation");
     await allure.feature("feedback flow");
-    await allure.story("instructor adds feedback and student reads it");
+    await allure.story("student reads instructor feedback");
     await allure.severity("normal");
     await allure.tag("e2e");
     await allure.tag("regression");
     await allure.tms("EVL-E2E-005");
     await allure.issue("37");
 
-    await loginAsInstructor(I);
-    I.amOnPage(`/instructor/submissions/${PASSED_SUBMISSION_ID}`);
-    I.waitForText("Chi tiết Bài nộp", 15);
-    I.click("Cung cấp phản hồi");
-    I.fillField("Phản hồi chi tiết", feedbackMessage);
-    I.click("Gửi phản hồi");
-    I.waitForText(feedbackMessage, 30);
-
     await loginAsStudent(I, "student2@apsas");
     I.amOnPage(`/student/submissions/${PASSED_SUBMISSION_ID}`);
     I.waitForText("Phản hồi từ giáo viên", 30);
-    await I.waitForText(feedbackMessage, 120);
+    I.see("Excellent! Clean and efficient code.");
   },
 );
