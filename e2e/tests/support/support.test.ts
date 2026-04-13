@@ -143,17 +143,37 @@ async function createSupportSession(I: CodeceptJS.I, initialMessage: string): Pr
 
   I.amOnPage("/student/support")
   I.waitForText("Yêu cầu hỗ trợ", 20)
-  I.click("Tạo yêu cầu")
-  I.waitForElement("div[role='dialog']", 10)
+  I.waitForFunction(() => {
+    const modalTextarea = document.querySelector(
+      "textarea[placeholder^='Mô tả chi tiết vấn đề của bạn']",
+    )
+
+    if (modalTextarea) {
+      return true
+    }
+
+    const createButton = Array.from(document.querySelectorAll("button"))
+      .find((button) => {
+        const text = button.textContent?.replace(/\s+/g, " ").trim() ?? ""
+        return text === "Tạo yêu cầu" && !!button.querySelector("svg[class*='tabler-icon-plus']")
+      }) as HTMLElement | undefined
+
+    if (createButton) {
+      createButton.click()
+    }
+
+    return false
+  }, [], 20)
   I.waitForText("Tạo yêu cầu hỗ trợ mới", 10)
   I.fillField(
-    "div[role='dialog'] textarea[placeholder^='Mô tả chi tiết vấn đề của bạn']",
+    "textarea[placeholder^='Mô tả chi tiết vấn đề của bạn']",
     initialMessage,
   )
   I.click({
-    xpath: "//div[@role='dialog']//button[normalize-space()='Tạo yêu cầu' and not(@disabled)]",
+    xpath:
+      "//button[normalize-space()='Tạo yêu cầu' and not(@disabled) and not(.//*[contains(@class,'tabler-icon-plus')])]",
   })
-  I.waitForInvisible("div[role='dialog']", 20)
+  I.waitForInvisible("textarea[placeholder^='Mô tả chi tiết vấn đề của bạn']", 20)
   I.waitForFunction((targetMessageKey: string) => {
     const items = Array.from(document.querySelectorAll("[class*='sessionItem']"))
     return items.some((item) => {
