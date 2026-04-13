@@ -4,18 +4,20 @@ const STUDENT_PASSED_SUBMISSION_ID = "80000000-0000-0000-0000-000000000001";
 const PASSED_SUBMISSION_ID = "80000000-0000-0000-0000-000000000002";
 const FAILED_SUBMISSION_ID = "80000000-0000-0000-0000-000000000005";
 const PARTIAL_SUBMISSION_ID = "80000000-0000-0000-0000-000000000003";
+const MAX_LOGIN_ATTEMPTS = 2;
+const LOGIN_TIMEOUT_SECONDS = 30;
 
 async function loginAsStudent(I: CodeceptJS.I, email: string): Promise<void> {
   let lastError: unknown = null;
 
-  for (let attempt = 1; attempt <= 2; attempt += 1) {
+  for (let attempt = 1; attempt <= MAX_LOGIN_ATTEMPTS; attempt++) {
     I.amOnPage("/login");
     I.fillField("Email", email);
     I.fillField("Mật khẩu", "SecurePassword123!");
     I.click("Đăng nhập");
 
     try {
-      await I.waitInUrl("/student/dashboard", 30);
+      await I.waitInUrl("/student/dashboard", LOGIN_TIMEOUT_SECONDS);
       return;
     } catch (error) {
       lastError = error;
