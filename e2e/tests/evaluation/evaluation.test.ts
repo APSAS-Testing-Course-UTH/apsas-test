@@ -14,7 +14,7 @@ async function waitForTextWithReload(
   stepSeconds = 15,
 ): Promise<void> {
   const attempts = Math.ceil(timeoutSeconds / stepSeconds);
-  let lastError: unknown;
+  let lastError: unknown = null;
 
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     try {
