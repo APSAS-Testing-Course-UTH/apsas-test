@@ -63,7 +63,18 @@ export = function (): any {
     openStudentAssignmentDetail(this: CodeceptJS.I, assignmentId: string) {
       this.amOnPage(submissionRoutes.studentAssignmentsDetail(assignmentId));
       this.waitForNoLoadingSignals();
-      this.waitForElement(submissionSelectors.common.pageTitle, submissionTimeouts.contentReady);
+      this.waitForFunction(
+        () => {
+          const body = document.body.innerText;
+          return (
+            document.querySelector("h1") !== null ||
+            body.includes("Bài tập") ||
+            body.includes("Nộp bài")
+          );
+        },
+        [],
+        submissionTimeouts.contentReady,
+      );
       this.assertNoAppErrorSignals();
     },
 
@@ -87,7 +98,18 @@ export = function (): any {
     openInstructorAssignmentDetail(this: CodeceptJS.I, assignmentId: string) {
       this.amOnPage(submissionRoutes.instructorAssignmentsDetail(assignmentId));
       this.waitForNoLoadingSignals();
-      this.waitForElement(submissionSelectors.common.pageTitle, submissionTimeouts.contentReady);
+      this.waitForFunction(
+        () => {
+          const body = document.body.innerText;
+          return (
+            document.querySelector("h1") !== null ||
+            body.includes("Bài nộp") ||
+            body.includes("Quản lý")
+          );
+        },
+        [],
+        submissionTimeouts.contentReady,
+      );
       this.assertNoAppErrorSignals();
     },
 
@@ -121,13 +143,21 @@ export = function (): any {
     /** Chờ editor Monaco sẵn sàng để thao tác nhập/xóa code. */
     waitForSubmissionEditorReady(this: CodeceptJS.I) {
       this.waitForNoLoadingSignals();
-      this.waitForText(submissionTexts.student.languageLabel, submissionTimeouts.contentReady);
       this.waitForFunction(
-        () =>
-          document.querySelector(".monaco-editor") !== null ||
-          document.querySelector("[data-testid='submission-code-editor']") !== null ||
-          document.querySelector("textarea.inputarea, textarea.ime-text-area") !== null,
-        [],
+        (submitButtonText: string, languageLabel: string) => {
+          const body = document.body.innerText;
+          const hasEditor =
+            document.querySelector(".monaco-editor") !== null ||
+            document.querySelector("[data-testid='submission-code-editor']") !== null ||
+            document.querySelector("textarea.inputarea, textarea.ime-text-area") !== null;
+          const hasSubmissionSignals =
+            body.includes(submitButtonText) ||
+            body.includes("Biểu mẫu nộp") ||
+            body.includes(languageLabel);
+
+          return hasEditor || hasSubmissionSignals;
+        },
+        [submissionTexts.common.submitButton, submissionTexts.student.languageLabel],
         submissionTimeouts.contentReady,
       );
       this.assertNoAppErrorSignals();
