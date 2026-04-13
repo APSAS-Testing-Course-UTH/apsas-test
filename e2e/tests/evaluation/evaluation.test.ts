@@ -33,7 +33,7 @@ async function submitAssignmentViaUi(
   const filePath = path.resolve(__dirname, "../../fixtures", fileName);
 
   I.amOnPage(`/student/submission/${assignmentId}`);
-  I.waitForText("Tải lên tệp", 60);
+  await I.waitForText("Tải lên tệp", 60);
 
   I.usePlaywrightTo(
     "populate Monaco editor and submit code",
@@ -160,7 +160,7 @@ Scenario("EVL-E2E-004: Display compilation error details", async ({ I }) => {
   );
 
   I.waitForText("Tóm tắt kết quả", 30);
-  I.waitForText("ĐÃ ĐÁNH GIÁ", 180);
+  await I.waitForText("ĐÃ ĐÁNH GIÁ", 180);
   I.see("Mã đã nộp");
   I.see("c");
   I.click("Xem chi tiết");
@@ -193,6 +193,6 @@ Scenario(
     await loginAsStudent(I, "student2@apsas");
     I.amOnPage(`/student/submissions/${PASSED_SUBMISSION_ID}`);
     I.waitForText("Phản hồi từ giáo viên", 30);
-    I.waitForText(feedbackMessage, 120);
+    await I.waitForText(feedbackMessage, 120);
   },
 );
