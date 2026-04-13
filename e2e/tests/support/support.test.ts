@@ -29,18 +29,34 @@ function normalizeWhitespace(value: string): string {
   return value.replace(/\s+/g, " ").trim()
 }
 
-async function grabCurrentSessionLabel(I: CodeceptJS.I): Promise<string> {
-  const rawLabel = await I.executeScript(() => {
-    const labels = Array.from(document.querySelectorAll("body *"))
-      .map((element) => element.textContent?.trim() ?? "")
-      .filter((text) => /^Yêu cầu\s*#[a-z0-9]{8}$/i.test(text))
+function extractMessageKey(message: string): string {
+  return message.trim().split(/\s+/)[0] ?? message
+}
 
-    return labels[0] ?? ""
-  })
+async function grabSessionLabelByMessageKey(
+  I: CodeceptJS.I,
+  messageKey: string,
+): Promise<string> {
+  const rawLabel = await I.executeScript((targetMessageKey: string) => {
+    const items = Array.from(document.querySelectorAll("[class*='sessionItem']"))
+
+    const target = items.find((item) => {
+      const text = item.textContent?.replace(/\s+/g, " ").trim() ?? ""
+      return text.includes(targetMessageKey)
+    })
+
+    if (!target) {
+      return ""
+    }
+
+    const text = target.textContent?.replace(/\s+/g, " ").trim() ?? ""
+    const match = text.match(/Yêu cầu\s*#[a-z0-9]{8}/i)
+    return match?.[0] ?? ""
+  }, messageKey)
 
   const sessionLabel = normalizeWhitespace(String(rawLabel))
   if (!sessionLabel) {
-    throw new Error("Unable to capture created support session label")
+    throw new Error(`Unable to capture support session label for message key: ${messageKey}`)
   }
 
   return sessionLabel
@@ -123,21 +139,31 @@ async function applyMetadata(metadata: ScenarioMetadata): Promise<void> {
 }
 
 async function createSupportSession(I: CodeceptJS.I, initialMessage: string): Promise<string> {
+  const messageKey = extractMessageKey(initialMessage)
+
   I.amOnPage("/student/support")
   I.waitForText("Yêu cầu hỗ trợ", 20)
   I.click("Tạo yêu cầu")
+  I.waitForElement("div[role='dialog']", 10)
   I.waitForText("Tạo yêu cầu hỗ trợ mới", 10)
   I.fillField(
-    "textarea[placeholder^='Mô tả chi tiết vấn đề của bạn']",
+    "div[role='dialog'] textarea[placeholder^='Mô tả chi tiết vấn đề của bạn']",
     initialMessage,
   )
   I.click({
-    xpath: "(//button[normalize-space()='Tạo yêu cầu'])[last()]",
+    xpath: "//div[@role='dialog']//button[normalize-space()='Tạo yêu cầu' and not(@disabled)]",
   })
-  I.waitForText("Yêu cầu #", 20)
+  I.waitForInvisible("div[role='dialog']", 20)
+  I.waitForFunction((targetMessageKey: string) => {
+    const items = Array.from(document.querySelectorAll("[class*='sessionItem']"))
+    return items.some((item) => {
+      const text = item.textContent?.replace(/\s+/g, " ").trim() ?? ""
+      return text.includes(targetMessageKey)
+    })
+  }, [messageKey], 30)
   I.waitForText(initialMessage, 20)
 
-  return grabCurrentSessionLabel(I)
+  return grabSessionLabelByMessageKey(I, messageKey)
 }
 
 async function openInstructorSessionFromList(I: CodeceptJS.I, sessionLabel: string): Promise<void> {
