@@ -123,9 +123,12 @@ export = function (): any {
       this.waitForNoLoadingSignals();
       this.waitForText(submissionTexts.student.languageLabel, submissionTimeouts.contentReady);
       this.waitForFunction(
-        () => document.querySelector(".monaco-editor") !== null,
+        () =>
+          document.querySelector(".monaco-editor") !== null ||
+          document.querySelector("[data-testid='submission-code-editor']") !== null ||
+          document.querySelector("textarea.inputarea, textarea.ime-text-area") !== null,
         [],
-        submissionTimeouts.editor,
+        submissionTimeouts.contentReady,
       );
       this.assertNoAppErrorSignals();
     },
@@ -174,22 +177,48 @@ export = function (): any {
 
     /** Nhập code vào Monaco qua editor input để tránh flaky khi gõ từng ký tự. */
     fillSubmissionCode(this: CodeceptJS.I, code: string) {
-      this.waitForElement(
-        submissionSelectors.student.editorInput,
-        submissionTimeouts.editor,
+      this.waitForFunction(
+        () =>
+          document.querySelector(".monaco-editor") !== null ||
+          document.querySelector("[data-testid='submission-code-editor']") !== null ||
+          document.querySelector("textarea.inputarea, textarea.ime-text-area") !== null,
+        [],
+        submissionTimeouts.contentReady,
       );
-      this.click(submissionSelectors.student.editorInput);
-      this.fillField(submissionSelectors.student.editorInput, code);
+      this.click(".monaco-editor");
+      this.executeScript((nextCode: string) => {
+        const anyGlobal = globalThis as unknown as {
+          monaco?: {
+            editor?: {
+              getEditors?: () => Array<{ setValue: (value: string) => void }>;
+            };
+          };
+        };
+
+        const editors = anyGlobal.monaco?.editor?.getEditors?.();
+        if (editors && editors.length > 0) {
+          editors[0].setValue(nextCode);
+          return;
+        }
+
+        const textarea = document.querySelector(
+          ".monaco-editor textarea.inputarea, [data-testid='submission-code-editor'] textarea.inputarea, [data-testid='submission-code-editor'] textarea",
+        ) as HTMLTextAreaElement | null;
+
+        if (!textarea) {
+          return;
+        }
+
+        textarea.focus();
+        textarea.value = nextCode;
+        textarea.dispatchEvent(new Event("input", { bubbles: true }));
+        textarea.dispatchEvent(new Event("change", { bubbles: true }));
+      }, code);
     },
 
     /** Xóa toàn bộ code hiện tại trong Monaco. */
     clearSubmissionCode(this: CodeceptJS.I) {
-      this.waitForElement(
-        submissionSelectors.student.editorInput,
-        submissionTimeouts.editor,
-      );
-      this.click(submissionSelectors.student.editorInput);
-      this.fillField(submissionSelectors.student.editorInput, "");
+      this.fillSubmissionCode("");
     },
 
     /** Click nút Nộp bài khi nút đã hiển thị trên UI. */
