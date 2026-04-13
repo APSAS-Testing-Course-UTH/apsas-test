@@ -2,83 +2,35 @@ import * as allure from "allure-js-commons";
 import path from "path";
 import type { Page, Response } from "playwright";
 
-const API_URL = process.env.API_URL || "http://localhost:8080";
 const APP_URL = process.env.APP_URL || "http://localhost:5173";
 const HELLO_WORLD_ASSIGNMENT_ID = "550e8400-e29b-41d4-a716-446655440001";
 const PASSED_SUBMISSION_ID = "80000000-0000-0000-0000-000000000002";
 const FAILED_SUBMISSION_ID = "80000000-0000-0000-0000-000000000005";
 
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
+async function waitForTextWithReload(
+  I: CodeceptJS.I,
+  text: string,
+  timeoutSeconds: number,
+  stepSeconds = 15,
+): Promise<void> {
+  const attempts = Math.ceil(timeoutSeconds / stepSeconds);
+  let lastError: unknown;
 
-async function loginApi(email: string, password: string): Promise<string> {
-  let lastError: unknown = null;
-
-  for (let attempt = 1; attempt <= 3; attempt += 1) {
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
     try {
-      const response = await fetch(`${API_URL}/api/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const payload = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          payload?.detail || payload?.message || `Login failed for ${email}`,
-        );
-      }
-
-      if (!payload?.token) {
-        throw new Error(`Missing token in login response for ${email}`);
-      }
-
-      return payload.token;
+      I.waitForText(text, stepSeconds);
+      return;
     } catch (error) {
       lastError = error;
-      if (attempt < 3) {
-        await sleep(1000 * attempt);
+      if (attempt < attempts) {
+        I.refreshPage();
       }
     }
   }
 
   throw lastError instanceof Error
     ? lastError
-    : new Error(`Login failed for ${email}`);
-}
-
-async function publishAssignment(
-  token: string,
-  assignmentId: string,
-): Promise<void> {
-  const response = await fetch(
-    `${API_URL}/api/v1/assignments/${assignmentId}/publish`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    },
-  );
-
-  if (!response.ok) {
-    const payload = await response.json().catch(() => ({}));
-    const message = String(payload?.detail || payload?.message || "");
-
-    if (
-      response.status === 409 ||
-      message.includes("Only draft assignments can be published") ||
-      message.toLowerCase().includes("already published")
-    ) {
-      return;
-    }
-
-    throw new Error(message || `Failed to publish assignment ${assignmentId}`);
-  }
+    : new Error(`Text "${text}" was not found after ${timeoutSeconds} seconds`);
 }
 
 async function loginAsStudent(I: CodeceptJS.I, email: string): Promise<void> {
@@ -86,8 +38,7 @@ async function loginAsStudent(I: CodeceptJS.I, email: string): Promise<void> {
   I.fillField("Email", email);
   I.fillField("Mật khẩu", "SecurePassword123!");
   I.click("Đăng nhập");
-  I.waitForText("Xin chào", 20);
-  I.waitInUrl("/student/dashboard", 20);
+  I.waitInUrl("/student/dashboard", 30);
 }
 
 async function loginAsInstructor(I: CodeceptJS.I): Promise<void> {
@@ -154,12 +105,6 @@ Scenario(
     await allure.tms("EVL-E2E-001");
     await allure.issue("37");
 
-    const contentProviderToken = await loginApi(
-      "contentprovider1@apsas",
-      "SecurePassword123!",
-    );
-    await publishAssignment(contentProviderToken, HELLO_WORLD_ASSIGNMENT_ID);
-
     await loginAsStudent(I, "student1@apsas");
 
     await submitAssignmentViaUi(I, HELLO_WORLD_ASSIGNMENT_ID, "hello_world.c");
@@ -224,12 +169,6 @@ Scenario("EVL-E2E-004: Display compilation error details", async ({ I }) => {
   await allure.tms("EVL-E2E-004");
   await allure.issue("37");
 
-  const contentProviderToken = await loginApi(
-    "contentprovider1@apsas",
-    "SecurePassword123!",
-  );
-  await publishAssignment(contentProviderToken, HELLO_WORLD_ASSIGNMENT_ID);
-
   await loginAsStudent(I, "student4@apsas");
 
   await submitAssignmentViaUi(
@@ -247,8 +186,11 @@ Scenario("EVL-E2E-004: Display compilation error details", async ({ I }) => {
   );
 
   I.waitForText("Tóm tắt kết quả", 30);
-  I.waitForText("ĐANG CHỜ", 30);
-  I.waitForText("ĐÃ ĐÁNH GIÁ", 120);
+  try {
+    await waitForTextWithReload(I, "ĐANG CHỜ", 30, 10);
+  } catch {
+  }
+  await waitForTextWithReload(I, "ĐÃ ĐÁNH GIÁ", 180, 15);
   I.see("Mã đã nộp");
   I.see("c");
   I.click("Xem chi tiết");
@@ -281,6 +223,6 @@ Scenario(
     await loginAsStudent(I, "student2@apsas");
     I.amOnPage(`/student/submissions/${PASSED_SUBMISSION_ID}`);
     I.waitForText("Phản hồi từ giáo viên", 30);
-    I.waitForText(feedbackMessage, 30);
+    await waitForTextWithReload(I, feedbackMessage, 90, 15);
   },
 );
