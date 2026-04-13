@@ -18,7 +18,7 @@ async function waitForTextWithReload(
 
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     try {
-      I.waitForText(text, stepSeconds);
+      await I.waitForText(text, stepSeconds);
       return;
     } catch (error) {
       lastError = error;
@@ -186,10 +186,6 @@ Scenario("EVL-E2E-004: Display compilation error details", async ({ I }) => {
   );
 
   I.waitForText("Tóm tắt kết quả", 30);
-  try {
-    await waitForTextWithReload(I, "ĐANG CHỜ", 30, 10);
-  } catch {
-  }
   await waitForTextWithReload(I, "ĐÃ ĐÁNH GIÁ", 180, 15);
   I.see("Mã đã nộp");
   I.see("c");
