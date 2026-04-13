@@ -267,7 +267,7 @@ Scenario("SP-01: Student opens a support session", async ({ I }: ScenarioContext
   await createSupportSession(I, initialMessage)
 
   I.see(initialMessage)
-  I.see("MỞ")
+  I.see("Mở")
 })
 
 Scenario("SP-02: Instructor sees student session in support list", async ({ I }: ScenarioContext) => {

@@ -13,7 +13,7 @@ const seedAccounts = {
   },
 }
 
-export = function (): any {
+export = function () {
   return actor({
     login(
       this: CodeceptJS.I,
