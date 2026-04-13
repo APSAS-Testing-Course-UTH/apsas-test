@@ -1,4 +1,4 @@
-import { allure } from "allure-codeceptjs";
+import * as allure from "allure-js-commons";
 import path from "path";
 import type { Page, Response } from "playwright";
 
