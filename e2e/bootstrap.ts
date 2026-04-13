@@ -12,7 +12,11 @@ function sanitizeFileName(input: string): string {
 
 export function bootstrap(): void {
   event.dispatcher.on(event.test.finished, (test: CodeceptJS.Test) => {
-    recorder.add("capture screenshot for each finished test", async () => {
+    if (test.state !== "failed") {
+      return;
+    }
+
+    recorder.add("capture screenshot for failed test", async () => {
       const playwright = container.helpers("Playwright") as any;
 
       if (!playwright || typeof playwright.saveScreenshot !== "function") {

@@ -1,8 +1,9 @@
-import allure from "allure-js-commons";
+import { allure } from "allure-codeceptjs";
 import path from "path";
 import type { Page, Response } from "playwright";
 
 const API_URL = process.env.API_URL || "http://localhost:8080";
+const APP_URL = process.env.APP_URL || "http://localhost:5173";
 const HELLO_WORLD_ASSIGNMENT_ID = "550e8400-e29b-41d4-a716-446655440001";
 const PASSED_SUBMISSION_ID = "80000000-0000-0000-0000-000000000002";
 const FAILED_SUBMISSION_ID = "80000000-0000-0000-0000-000000000005";
@@ -102,9 +103,9 @@ async function submitAssignmentViaUi(
   I: CodeceptJS.I,
   assignmentId: string,
   fileName: string,
-): Promise<string> {
-  let submissionId = "";
-  const filePath = path.resolve(__dirname, "../fixtures", fileName);
+  afterSubmit?: (page: Page, submissionId: string) => Promise<void>,
+): Promise<void> {
+  const filePath = path.resolve(__dirname, "../../fixtures", fileName);
 
   I.amOnPage(`/student/submission/${assignmentId}`);
   I.waitForText("Nhập mã code", 20);
@@ -130,17 +131,13 @@ async function submitAssignmentViaUi(
 
       const response = await responsePromise;
       const payload = await response.json();
-      submissionId = payload?.id || "";
+      const submissionId: string = payload?.id || "";
+
+      if (afterSubmit) {
+        await afterSubmit(page, submissionId);
+      }
     },
   );
-
-  if (!submissionId) {
-    throw new Error(
-      `Submission ID was not returned for assignment ${assignmentId}`,
-    );
-  }
-
-  return submissionId;
 }
 
 Feature("Evaluation Service");
@@ -235,17 +232,28 @@ Scenario("EVL-E2E-004: Display compilation error details", async ({ I }) => {
 
   await loginAsStudent(I, "student4@apsas");
 
-  const submissionId = await submitAssignmentViaUi(
+  await submitAssignmentViaUi(
     I,
     HELLO_WORLD_ASSIGNMENT_ID,
     "compile_error.c",
+    async (page, submissionId) => {
+      if (!submissionId) {
+        throw new Error(
+          `Submission ID was not returned for assignment ${HELLO_WORLD_ASSIGNMENT_ID}`,
+        );
+      }
+      await page.goto(`${APP_URL}/student/submissions/${submissionId}`);
+    },
   );
 
-  I.amOnPage(`/student/submissions/${submissionId}`);
   I.waitForText("Tóm tắt kết quả", 30);
   I.waitForText("ĐANG CHỜ", 30);
+  I.waitForText("ĐÃ ĐÁNH GIÁ", 60);
   I.see("Mã đã nộp");
   I.see("c");
+  I.click("Xem chi tiết");
+  I.see("compile_error.c");
+  I.see("error:");
 });
 
 Scenario(
