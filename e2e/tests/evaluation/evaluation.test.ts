@@ -7,32 +7,6 @@ const HELLO_WORLD_ASSIGNMENT_ID = "550e8400-e29b-41d4-a716-446655440001";
 const PASSED_SUBMISSION_ID = "80000000-0000-0000-0000-000000000002";
 const FAILED_SUBMISSION_ID = "80000000-0000-0000-0000-000000000005";
 
-async function waitForTextWithReload(
-  I: CodeceptJS.I,
-  text: string,
-  timeoutSeconds: number,
-  stepSeconds = 15,
-): Promise<void> {
-  const attempts = Math.ceil(timeoutSeconds / stepSeconds);
-  let lastError: unknown = null;
-
-  for (let attempt = 1; attempt <= attempts; attempt += 1) {
-    try {
-      await I.waitForText(text, stepSeconds);
-      return;
-    } catch (error) {
-      lastError = error;
-      if (attempt < attempts) {
-        I.refreshPage();
-      }
-    }
-  }
-
-  throw lastError instanceof Error
-    ? lastError
-    : new Error(`Text "${text}" was not found after ${timeoutSeconds} seconds`);
-}
-
 async function loginAsStudent(I: CodeceptJS.I, email: string): Promise<void> {
   I.amOnPage("/login");
   I.fillField("Email", email);
@@ -59,7 +33,7 @@ async function submitAssignmentViaUi(
   const filePath = path.resolve(__dirname, "../../fixtures", fileName);
 
   I.amOnPage(`/student/submission/${assignmentId}`);
-  I.waitForText("Nhập mã code", 20);
+  I.waitForText("Tải lên tệp", 60);
 
   I.usePlaywrightTo(
     "populate Monaco editor and submit code",
@@ -186,7 +160,7 @@ Scenario("EVL-E2E-004: Display compilation error details", async ({ I }) => {
   );
 
   I.waitForText("Tóm tắt kết quả", 30);
-  await waitForTextWithReload(I, "ĐÃ ĐÁNH GIÁ", 180, 15);
+  I.waitForText("ĐÃ ĐÁNH GIÁ", 180);
   I.see("Mã đã nộp");
   I.see("c");
   I.click("Xem chi tiết");
@@ -219,6 +193,6 @@ Scenario(
     await loginAsStudent(I, "student2@apsas");
     I.amOnPage(`/student/submissions/${PASSED_SUBMISSION_ID}`);
     I.waitForText("Phản hồi từ giáo viên", 30);
-    await waitForTextWithReload(I, feedbackMessage, 90, 15);
+    I.waitForText(feedbackMessage, 120);
   },
 );
