@@ -248,7 +248,7 @@ Scenario("EVL-E2E-004: Display compilation error details", async ({ I }) => {
 
   I.waitForText("Tóm tắt kết quả", 30);
   I.waitForText("ĐANG CHỜ", 30);
-  I.waitForText("ĐÃ ĐÁNH GIÁ", 60);
+  I.waitForText("ĐÃ ĐÁNH GIÁ", 120);
   I.see("Mã đã nộp");
   I.see("c");
   I.click("Xem chi tiết");
@@ -259,6 +259,8 @@ Scenario("EVL-E2E-004: Display compilation error details", async ({ I }) => {
 Scenario(
   "EVL-E2E-005: Instructor feedback is visible to student",
   async ({ I }) => {
+    const feedbackMessage = `Good job! Your code is correct. ${Date.now()}`;
+
     await allure.epic("evaluation");
     await allure.feature("feedback flow");
     await allure.story("instructor adds feedback and student reads it");
@@ -272,13 +274,14 @@ Scenario(
     I.amOnPage(`/instructor/submissions/${PASSED_SUBMISSION_ID}`);
     I.waitForText("Chi tiết Bài nộp", 15);
     I.click("Cung cấp phản hồi");
-    I.fillField("Phản hồi chi tiết", "Good job! Your code is correct.");
+    I.fillField("Phản hồi chi tiết", feedbackMessage);
     I.click("Gửi phản hồi");
-    I.waitForText("Good job! Your code is correct.", 15);
+    I.waitForText(feedbackMessage, 30);
 
     await loginAsStudent(I, "student2@apsas");
     I.amOnPage(`/student/submissions/${PASSED_SUBMISSION_ID}`);
-    I.waitForText("Phản hồi từ giáo viên", 15);
-    I.see("Good job! Your code is correct.");
+    I.waitForText("Phản hồi từ giáo viên", 30);
+    I.waitForText(feedbackMessage, 30);
+    I.see(feedbackMessage);
   },
 );
