@@ -1,4 +1,4 @@
-import * as allure from "allure-js-commons";
+import { allure } from "allure-codeceptjs";
 import {
   s03Policy,
   submissionRoutes,

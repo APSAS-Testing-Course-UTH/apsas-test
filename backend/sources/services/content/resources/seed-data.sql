@@ -791,6 +791,76 @@ Viết chương trình tính **giai thừa** (factorial) của một số nguyê
 ON CONFLICT (id) DO NOTHING;
 
 -- ============================================================================
+-- ASSIGNMENT 98: E2E Open Assignment - dành cho submission E2E tests (open/PUBLISHED)
+-- ============================================================================
+INSERT INTO content.assignments (id, title, description, difficulty_level, creator_id,
+                                 start_date, due_date, max_score, status, languages, test_cases)
+VALUES ('550e8400-e29b-41d4-a716-446655440098',
+        'E2E Open Assignment',
+        $$# E2E Open Assignment
+
+Bài tập dành riêng cho E2E tests. Hãy in ra dòng chữ "hello from apsas e2e".$$,
+        'EASY',
+        '29ada301-a1f4-41d5-a8fb-dbb8618f2f1d',
+        NOW() - INTERVAL '1 day',
+        NOW() + INTERVAL '30 days',
+        10.00,
+        'PUBLISHED',
+        '[
+          "python",
+          "javascript",
+          "typescript"
+        ]'::jsonb,
+        '[
+          {
+            "order": 1,
+            "description": "Basic output test",
+            "hidden": false,
+            "weight": 1.0,
+            "input": "",
+            "output": "hello from apsas e2e",
+            "timeout": 5,
+            "memoryLimit": 256
+          }
+        ]'::jsonb)
+ON CONFLICT (id) DO NOTHING;
+
+-- ============================================================================
+-- ASSIGNMENT 99: E2E Overdue Assignment - dành cho submission E2E tests (overdue/PUBLISHED)
+-- ============================================================================
+INSERT INTO content.assignments (id, title, description, difficulty_level, creator_id,
+                                 start_date, due_date, max_score, status, languages, test_cases)
+VALUES ('550e8400-e29b-41d4-a716-446655440099',
+        'E2E Overdue Assignment',
+        $$# E2E Overdue Assignment
+
+Bài tập dành riêng cho E2E tests. Bài tập đã quá hạn nộp.$$,
+        'EASY',
+        '29ada301-a1f4-41d5-a8fb-dbb8618f2f1d',
+        NOW() - INTERVAL '30 days',
+        NOW() - INTERVAL '1 day',
+        10.00,
+        'PUBLISHED',
+        '[
+          "python",
+          "javascript",
+          "typescript"
+        ]'::jsonb,
+        '[
+          {
+            "order": 1,
+            "description": "Basic output test",
+            "hidden": false,
+            "weight": 1.0,
+            "input": "",
+            "output": "hello from apsas e2e",
+            "timeout": 5,
+            "memoryLimit": 256
+          }
+        ]'::jsonb)
+ON CONFLICT (id) DO NOTHING;
+
+-- ============================================================================
 -- SKILLS - Kỹ năng lập trình
 -- ============================================================================
 INSERT INTO content.skills (id, name, description)
