@@ -282,6 +282,5 @@ Scenario(
     I.amOnPage(`/student/submissions/${PASSED_SUBMISSION_ID}`);
     I.waitForText("Phản hồi từ giáo viên", 30);
     I.waitForText(feedbackMessage, 30);
-    I.see(feedbackMessage);
   },
 );
