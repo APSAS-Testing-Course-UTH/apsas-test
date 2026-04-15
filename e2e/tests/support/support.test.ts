@@ -4,6 +4,19 @@ import * as allure from "allure-js-commons"
 
 const SUPPORT_ISSUE_ID = "33"
 
+const defaultSeedPassword = process.env.E2E_SEED_PASSWORD || "SecurePassword123!"
+
+const seedAccounts = {
+  student: {
+    email: process.env.E2E_STUDENT_EMAIL || "student1@apsas",
+    password: process.env.E2E_STUDENT_PASSWORD || defaultSeedPassword,
+  },
+  instructor: {
+    email: process.env.E2E_INSTRUCTOR_EMAIL || "instructor1@apsas",
+    password: process.env.E2E_INSTRUCTOR_PASSWORD || defaultSeedPassword,
+  },
+}
+
 declare const Feature: (title: string) => unknown
 declare const Scenario: (
   title: string,
@@ -19,6 +32,43 @@ interface ScenarioMetadata {
   story: string
   severity: ScenarioSeverity
   tms: string
+}
+
+function loginAsStudent(I: CodeceptJS.I) {
+  I.amOnPage("/login")
+  I.executeScript(() => {
+    localStorage.clear()
+    sessionStorage.clear()
+  })
+  I.waitForElement("input[placeholder^='Nhập email']", 20)
+  I.waitForElement("input[placeholder^='Nhập mật khẩu']", 20)
+  I.fillField("input[placeholder^='Nhập email']", seedAccounts.student.email)
+  I.fillField("input[placeholder^='Nhập mật khẩu']", seedAccounts.student.password)
+  I.click("Đăng nhập")
+  I.waitInUrl("/student/dashboard", 30)
+}
+
+function loginAsInstructor(I: CodeceptJS.I) {
+  I.amOnPage("/login")
+  I.executeScript(() => {
+    localStorage.clear()
+    sessionStorage.clear()
+  })
+  I.waitForElement("input[placeholder^='Nhập email']", 20)
+  I.waitForElement("input[placeholder^='Nhập mật khẩu']", 20)
+  I.fillField("input[placeholder^='Nhập email']", seedAccounts.instructor.email)
+  I.fillField("input[placeholder^='Nhập mật khẩu']", seedAccounts.instructor.password)
+  I.click("Đăng nhập")
+  I.waitInUrl("/instructor/dashboard", 30)
+}
+
+function logout(I: CodeceptJS.I) {
+  I.amOnPage("/login")
+  I.clearCookie()
+  I.executeScript(() => {
+    localStorage.clear()
+    sessionStorage.clear()
+  })
 }
 
 function uniqueToken(): string {
@@ -263,7 +313,7 @@ Scenario("SP-01: Student opens a support session", async ({ I }: ScenarioContext
   const token = uniqueToken()
   const initialMessage = `SP01-${token} cần hỗ trợ`
 
-  I.loginAsStudent()
+  loginAsStudent(I)
   await createSupportSession(I, initialMessage)
 
   I.see(initialMessage)
@@ -284,11 +334,11 @@ Scenario("SP-02: Instructor sees student session in support list", async ({ I }:
   const token = uniqueToken()
   const initialMessage = `SP02-${token} cần hỗ trợ`
 
-  I.loginAsStudent()
+  loginAsStudent(I)
   const sessionLabel = await createSupportSession(I, initialMessage)
 
-  I.logout()
-  I.loginAsInstructor()
+  logout(I)
+  loginAsInstructor(I)
   await openInstructorSessionFromList(I, sessionLabel)
 
   I.see(sessionLabel)
@@ -307,11 +357,11 @@ Scenario("SP-03: Instructor replies in support chat", async ({ I }: ScenarioCont
   const initialMessage = `SP03-${token.slice(-6)}`
   const instructorReply = `SP03-R-${token.slice(-5)}`
 
-  I.loginAsStudent()
+  loginAsStudent(I)
   const sessionLabel = await createSupportSession(I, initialMessage)
 
-  I.logout()
-  I.loginAsInstructor()
+  logout(I)
+  loginAsInstructor(I)
   await openInstructorSessionFromList(I, sessionLabel)
   sendChatMessage(I, instructorReply)
 
@@ -331,16 +381,16 @@ Scenario("SP-04: Student sees instructor message and replies", async ({ I }: Sce
   const instructorReply = `SP04-R-${token.slice(-5)}`
   const studentReply = `SP04-S-${token.slice(-5)}`
 
-  I.loginAsStudent()
+  loginAsStudent(I)
   const sessionLabel = await createSupportSession(I, initialMessage)
 
-  I.logout()
-  I.loginAsInstructor()
+  logout(I)
+  loginAsInstructor(I)
   await openInstructorSessionFromList(I, sessionLabel)
   sendChatMessage(I, instructorReply)
 
-  I.logout()
-  I.loginAsStudent()
+  logout(I)
+  loginAsStudent(I)
   await openStudentSessionFromList(I, sessionLabel)
 
   I.see(instructorReply)
@@ -362,7 +412,7 @@ Scenario("SP-05: Session keeps long message history visible", async ({ I }: Scen
   let firstMessage = ""
   let lastMessage = ""
 
-  I.loginAsStudent()
+  loginAsStudent(I)
   await createSupportSession(I, initialMessage)
 
   for (let index = 1; index <= totalMessages; index += 1) {
@@ -400,7 +450,7 @@ Scenario("SP-06: Student closes session and input is disabled or hidden", async 
   const token = uniqueToken()
   const initialMessage = `SP06-${token} cần đóng phiên`
 
-  I.loginAsStudent()
+  loginAsStudent(I)
   await createSupportSession(I, initialMessage)
   closeCurrentSession(I)
 
