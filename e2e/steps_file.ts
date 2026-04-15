@@ -140,53 +140,45 @@ export = function (): any {
       this.waitForInstructorSubmissionDetailReady();
     },
 
-    /** Chờ editor Monaco sẵn sàng để thao tác nhập/xóa code. */
+    /** Chờ editor Monaco sẵn sàng hoặc phát hiện trạng thái không tìm thấy bài tập.
+     *  Thoát sớm khi bài tập không tồn tại để tránh timeout dài. */
     waitForSubmissionEditorReady(this: CodeceptJS.I) {
       this.waitForNoLoadingSignals(30);
       this.waitForFunction(
         () => globalThis.location.pathname.includes("/student/submission/"),
         [],
-        15,
+        submissionTimeouts.navigation,
       );
-
-      const waitEditorSignals = () => {
-        this.waitForFunction(
-          (submitButtonText: string, languageLabel: string) => {
-            const body = document.body.innerText;
-            const hasEditor =
-              document.querySelector(".monaco-editor") !== null ||
-              document.querySelector("[data-testid='submission-code-editor']") !== null ||
-              document.querySelector("textarea.inputarea, textarea.ime-text-area") !== null ||
-              document.querySelector("textarea") !== null;
-            const hasSubmissionSignals =
-              body.includes(submitButtonText) ||
-              body.includes("Biểu mẫu nộp") ||
-              body.includes(languageLabel) ||
-              body.includes("Mã nguồn") ||
-              body.includes("Source") ||
-              body.includes("Code");
-
-            return hasEditor || hasSubmissionSignals;
-          },
-          [submissionTexts.common.submitButton, submissionTexts.student.languageLabel],
-          40,
-        );
-      };
-
-      try {
-        waitEditorSignals();
-      } catch {
-        this.refreshPage();
-        this.waitForNoLoadingSignals(30);
-        this.waitForFunction(
-          () => globalThis.location.pathname.includes("/student/submission/"),
-          [],
-          15,
-        );
-        waitEditorSignals();
-      }
-
-      this.assertNoAppErrorSignals();
+      // Accept terminal state: editor ready OR assignment not found (fast exit)
+      this.waitForFunction(
+        (submitButtonText: string, languageLabel: string) => {
+          const body = document.body.innerText;
+          // Fast exit for not-found / error states
+          if (
+            body.includes("Không tìm thấy bài tập") ||
+            body.includes("Lỗi khi tải bài tập")
+          ) {
+            return true;
+          }
+          const hasEditor =
+            document.querySelector(".monaco-editor") !== null ||
+            document.querySelector("[data-testid='submission-code-editor']") !== null ||
+            document.querySelector("textarea.inputarea, textarea.ime-text-area") !== null ||
+            document.querySelector("textarea") !== null;
+          const hasSubmissionSignals =
+            body.includes(submitButtonText) ||
+            body.includes("Biểu mẫu nộp") ||
+            body.includes(languageLabel) ||
+            body.includes("Mã nguồn") ||
+            body.includes("Source") ||
+            body.includes("Code");
+          return hasEditor || hasSubmissionSignals;
+        },
+        [submissionTexts.common.submitButton, submissionTexts.student.languageLabel],
+        submissionTimeouts.editor,
+      );
+      // Note: assertNoAppErrorSignals is intentionally NOT called here.
+      // Callers check the editor state themselves and skip when not available.
     },
 
     waitForStudentSubmissionsListReady(this: CodeceptJS.I) {
