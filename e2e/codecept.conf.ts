@@ -1,5 +1,5 @@
-import { setHeadlessWhen, setCommonPlugins } from "@codeceptjs/configure";
-import os from "os";
+const { setHeadlessWhen, setCommonPlugins } = require("@codeceptjs/configure");
+const os = require("os");
 
 // Run headless in CI, headed locally
 setHeadlessWhen(process.env.CI);
@@ -9,7 +9,7 @@ setCommonPlugins();
 
 const BASE_URL = process.env.APP_URL || "http://localhost:5173";
 
-export const config: CodeceptJS.MainConfig = {
+const config: CodeceptJS.MainConfig = {
   tests: "./tests/**/*.test.ts",
   output: "./output",
   require: ["ts-node/register/transpile-only"],
@@ -57,3 +57,5 @@ export const config: CodeceptJS.MainConfig = {
   },
   name: "apsas-e2e",
 };
+
+module.exports = { config };
