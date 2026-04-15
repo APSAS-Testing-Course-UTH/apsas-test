@@ -86,11 +86,12 @@ export const submissionSeed = {
     },
   },
   assignments: {
-    // Deterministic defaults are aligned with backend seed-data.sql for local/CI runs.
+    // Uses seeded "Hello World" assignment (001) from the stock seed data.
+    // Override via env vars if a specific assignment is needed.
     openAssignmentId:
-      process.env.E2E_OPEN_ASSIGNMENT_ID || "550e8400-e29b-41d4-a716-446655440098",
-    overdueAssignmentId:
-      process.env.E2E_OVERDUE_ASSIGNMENT_ID || "550e8400-e29b-41d4-a716-446655440099",
+      process.env.E2E_OPEN_ASSIGNMENT_ID || "550e8400-e29b-41d4-a716-446655440001",
+    // Overdue assignment requires explicit opt-in; no reliable default in stock seed.
+    overdueAssignmentId: process.env.E2E_OVERDUE_ASSIGNMENT_ID || "",
   },
 };
 

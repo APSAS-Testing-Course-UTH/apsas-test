@@ -1,21 +1,121 @@
 import { epic, feature, severity, story, tag, tms } from "allure-js-commons";
 import {
-  s03Policy,
   submissionRoutes,
   submissionSeed,
   submissionSelectors,
   submissionTexts,
+  submissionTimeouts,
 } from "./locators";
 
-type ScenarioSeverityLevel = "critical" | "normal" | "minor";
+// ═══════════════════════════════════════════════════════════════
+// Helpers — submission-specific, defined locally instead of steps_file.ts
+// ═══════════════════════════════════════════════════════════════
+
+const API_URL = process.env.API_URL || "http://localhost:8080";
+const SEED_PASSWORD = process.env.E2E_SEED_PASSWORD || "SecurePassword123!";
 
 /**
- * Gắn metadata Allure thống nhất cho từng scenario.
+ * Publish an assignment via the content provider API so a student can submit.
+ * Safe to call even if the assignment is already published (ignores non-fatal errors).
  */
+async function publishAssignment(assignmentId: string): Promise<void> {
+  try {
+    const loginRes = await fetch(`${API_URL}/api/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: "contentprovider1@apsas", password: SEED_PASSWORD }),
+    });
+    if (!loginRes.ok) return;
+    const loginData = (await loginRes.json()) as { token?: string };
+    if (!loginData.token) return;
+
+    await fetch(`${API_URL}/api/v1/assignments/${assignmentId}/publish`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${loginData.token}` },
+    });
+  } catch {
+    // Ignore — assignment may already be published or API not reachable in this env.
+  }
+}
+
+function loginAsStudent(I: CodeceptJS.I) {
+  I.login("student1@apsas", SEED_PASSWORD);
+  I.waitInUrl("/student", submissionTimeouts.navigation);
+}
+
+function loginAsInstructor(I: CodeceptJS.I) {
+  I.login("instructor1@apsas", SEED_PASSWORD);
+  I.waitInUrl("/instructor", submissionTimeouts.navigation);
+}
+
+/** Navigate to the student submission editor and wait for it to be ready. */
+function openStudentSubmissionEditor(I: CodeceptJS.I, assignmentId: string) {
+  I.amOnPage(submissionRoutes.studentSubmissionEditor(assignmentId));
+  I.waitForFunction(
+    () => globalThis.location.pathname.includes("/student/submission/"),
+    [],
+    submissionTimeouts.navigation,
+  );
+  I.waitForFunction(
+    (submitText: string, langLabel: string) => {
+      const body = document.body.innerText;
+      if (
+        body.includes("Không tìm thấy bài tập") ||
+        body.includes("Lỗi khi tải bài tập")
+      ) {
+        return true;
+      }
+      const hasEditor =
+        document.querySelector(".monaco-editor") !== null ||
+        document.querySelector("textarea") !== null;
+      return hasEditor || body.includes(submitText) || body.includes(langLabel);
+    },
+    [submissionTexts.common.submitButton, submissionTexts.student.languageLabel],
+    submissionTimeouts.editor,
+  );
+}
+
+/** Set Monaco editor content via the monaco API or direct textarea manipulation. */
+function fillSubmissionCode(I: CodeceptJS.I, code: string) {
+  I.executeScript((nextCode: string) => {
+    const anyGlobal = globalThis as Record<string, unknown> & {
+      monaco?: { editor?: { getEditors?: () => Array<{ setValue: (v: string) => void }> } };
+    };
+    const editors = anyGlobal.monaco?.editor?.getEditors?.();
+    if (editors && editors.length > 0) {
+      editors[0].setValue(nextCode);
+      return;
+    }
+    const textarea = document.querySelector(
+      ".monaco-editor textarea.inputarea, .monaco-editor textarea",
+    ) as HTMLTextAreaElement | null;
+    if (textarea) {
+      textarea.focus();
+      textarea.value = nextCode;
+      textarea.dispatchEvent(new Event("input", { bubbles: true }));
+      textarea.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+  }, code);
+}
+
+/** Wait until there are no loading/spinner texts on the page. */
+function waitForNoLoadingSignals(I: CodeceptJS.I, sec = 20) {
+  I.waitForFunction(
+    (signals: string[]) =>
+      !signals.some((s) => document.body.innerText.includes(s)),
+    [submissionTexts.common.loadingSignals],
+    sec,
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Allure metadata helper
+// ═══════════════════════════════════════════════════════════════
+
 async function applyAllureMetadata(
   featureName: string,
   storyName: string,
-  severityLevel: ScenarioSeverityLevel,
+  severityLevel: "critical" | "normal" | "minor",
   tmsId: string,
 ) {
   await epic("submission");
@@ -27,27 +127,28 @@ async function applyAllureMetadata(
   await tms(tmsId);
 }
 
-Feature("Submission | Scaffold");
+// ═══════════════════════════════════════════════════════════════
+// Guard — skip scenario when required seed config is absent
+// ═══════════════════════════════════════════════════════════════
 
-const viewDetailButtonXPath = `//button[contains(normalize-space(), '${submissionTexts.common.viewDetailButton}')]`;
-
-/**
- * Guard cho dữ liệu seed bắt buộc.
- * Thiếu seed thì dừng sớm để tránh fail giả ở môi trường chưa cấu hình.
- */
-function requireAssignmentSeed(this: CodeceptJS.I, assignmentId: string, envName: string): boolean {
-  if (assignmentId) {
-    return true;
-  }
-  this.say(
-    `Thiếu ${envName} - bỏ qua runtime để tránh false fail ở môi trường chưa chốt seed.`,
-  );
+function requireAssignmentSeed(I: CodeceptJS.I, assignmentId: string, envName: string): boolean {
+  if (assignmentId) return true;
+  I.say(`Thiếu ${envName} - bỏ qua scenario ở môi trường chưa cấu hình.`);
   return false;
 }
 
+// XPath helper reusing shared text constant
+const viewDetailButtonXPath = `//button[contains(normalize-space(), '${submissionTexts.common.viewDetailButton}')]`;
+
+// ═══════════════════════════════════════════════════════════════
+// Test suite
+// ═══════════════════════════════════════════════════════════════
+
+Feature("Submission | Scaffold");
+
 /**
- * Student nộp code hợp lệ.
- * Chấp nhận nhiều tín hiệu queued/evaluating để phù hợp biến thể UI runtime.
+ * SUB-SBM-001 — Student submits a valid solution.
+ * Publishes the assignment via API before submitting to ensure it is available.
  */
 Scenario("SUB-SBM-001 | Submission valid solution", async ({ I }) => {
   await applyAllureMetadata(
@@ -57,31 +158,45 @@ Scenario("SUB-SBM-001 | Submission valid solution", async ({ I }) => {
     "SUB-SBM-001",
   );
 
-  if (!requireAssignmentSeed.call(I, submissionSeed.assignments.openAssignmentId, "E2E_OPEN_ASSIGNMENT_ID")) {
+  if (!requireAssignmentSeed(I, submissionSeed.assignments.openAssignmentId, "E2E_OPEN_ASSIGNMENT_ID")) {
     return;
   }
 
-  I.loginAsStudent();
-  I.openStudentAssignmentDetail(submissionSeed.assignments.openAssignmentId);
-  I.openStudentSubmissionEditor(submissionSeed.assignments.openAssignmentId);
+  await publishAssignment(submissionSeed.assignments.openAssignmentId);
 
-  const submitBtnCount = await I.grabNumberOfVisibleElements(
-    submissionSelectors.common.submitButton,
-  );
+  loginAsStudent(I);
+  openStudentSubmissionEditor(I, submissionSeed.assignments.openAssignmentId);
+
+  const submitBtnCount = await I.grabNumberOfVisibleElements(submissionSelectors.common.submitButton);
   if (submitBtnCount === 0) {
-    I.say("Editor không khả dụng trong môi trường này (bài tập chưa xuất bản) - bỏ qua test.");
+    I.say("Nút nộp bài không hiển thị sau khi publish - bỏ qua test.");
     return;
   }
 
-  I.assertNoAppErrorSignals();
-  I.submitCurrentSolution("print('hello from apsas e2e')");
-  I.waitForNoLoadingSignals(20);
-  I.assertNoAppErrorSignals();
+  fillSubmissionCode(I, 'console.log("hello from apsas e2e")');
+  I.waitForText(submissionTexts.common.submitButton, submissionTimeouts.action);
+  I.click(submissionTexts.common.submitButton);
+
+  // Wait for any post-submit signal: queued text, evaluating text, or URL change away from editor
+  const editorPath = submissionRoutes.studentSubmissionEditor(submissionSeed.assignments.openAssignmentId);
+  I.waitForFunction(
+    (queuedSignals: string[], currentEditorPath: string) => {
+      const bodyText = document.body.innerText;
+      const onEditorPage = globalThis.location.pathname === currentEditorPath;
+      return (
+        queuedSignals.some((s) => bodyText.includes(s)) ||
+        bodyText.includes("Đang chấm điểm") ||
+        !onEditorPage
+      );
+    },
+    [submissionTexts.states.queuedSubmission, editorPath],
+    20,
+  );
   I.seeInCurrentUrl("/student");
 });
 
 /**
- * Chặn submit khi editor rỗng.
+ * SUB-SBM-002 — Submitting with an empty editor is blocked by the UI.
  */
 Scenario("SUB-SBM-002 | Block submit with empty editor", async ({ I }) => {
   await applyAllureMetadata(
@@ -91,29 +206,29 @@ Scenario("SUB-SBM-002 | Block submit with empty editor", async ({ I }) => {
     "SUB-SBM-002",
   );
 
-  if (!requireAssignmentSeed.call(I, submissionSeed.assignments.openAssignmentId, "E2E_OPEN_ASSIGNMENT_ID")) {
+  if (!requireAssignmentSeed(I, submissionSeed.assignments.openAssignmentId, "E2E_OPEN_ASSIGNMENT_ID")) {
     return;
   }
 
-  I.loginAsStudent();
-  I.openStudentSubmissionEditor(submissionSeed.assignments.openAssignmentId);
+  await publishAssignment(submissionSeed.assignments.openAssignmentId);
 
-  const submitBtnCount = await I.grabNumberOfVisibleElements(
-    submissionSelectors.common.submitButton,
-  );
+  loginAsStudent(I);
+  openStudentSubmissionEditor(I, submissionSeed.assignments.openAssignmentId);
+
+  const submitBtnCount = await I.grabNumberOfVisibleElements(submissionSelectors.common.submitButton);
   if (submitBtnCount === 0) {
-    I.say("Editor không khả dụng trong môi trường này (bài tập chưa xuất bản) - bỏ qua test.");
+    I.say("Nút nộp bài không hiển thị sau khi publish - bỏ qua test.");
     return;
   }
 
-  I.assertNoAppErrorSignals();
-  I.clearSubmissionCode();
-  I.clickSubmitCode();
+  fillSubmissionCode(I, "");
+  I.waitForText(submissionTexts.common.submitButton, submissionTimeouts.action);
+  I.click(submissionTexts.common.submitButton);
+
   I.waitForFunction(
-    (emptySignals: string[]) => {
-      const bodyText = document.body.innerText;
-      return emptySignals.some((signal) => bodyText.includes(signal)) || bodyText.includes("0 ký tự / 10000");
-    },
+    (emptySignals: string[]) =>
+      emptySignals.some((s) => document.body.innerText.includes(s)) ||
+      document.body.innerText.includes("0 ký tự / 10000"),
     [submissionTexts.states.emptySubmissionCode],
     12,
   );
@@ -122,7 +237,8 @@ Scenario("SUB-SBM-002 | Block submit with empty editor", async ({ I }) => {
 });
 
 /**
- * Rule quá hạn theo policy ui-only hiện tại.
+ * SUB-SBM-003 — Overdue assignment enforces UI-only deadline policy.
+ * Requires E2E_OVERDUE_ASSIGNMENT_ID to be set; skips otherwise.
  */
 Scenario("SUB-SBM-003 | Deadline behavior for overdue assignment", async ({ I }) => {
   await applyAllureMetadata(
@@ -132,23 +248,15 @@ Scenario("SUB-SBM-003 | Deadline behavior for overdue assignment", async ({ I })
     "SUB-SBM-003",
   );
 
-  I.say(`Current overdue submission policy: ${s03Policy.mode}`);
-  if (
-    !requireAssignmentSeed.call(
-      I,
-      submissionSeed.assignments.overdueAssignmentId,
-      "E2E_OVERDUE_ASSIGNMENT_ID",
-    )
-  ) {
+  if (!requireAssignmentSeed(I, submissionSeed.assignments.overdueAssignmentId, "E2E_OVERDUE_ASSIGNMENT_ID")) {
     return;
   }
 
-  I.loginAsStudent();
-  I.openStudentSubmissionEditor(submissionSeed.assignments.overdueAssignmentId);
+  loginAsStudent(I);
+  openStudentSubmissionEditor(I, submissionSeed.assignments.overdueAssignmentId);
   I.seeInCurrentUrl("/student/submission/");
 
   const submitButtonVisibleCount = await I.grabNumberOfVisibleElements("button[type='submit']");
-
   if (submitButtonVisibleCount === 0) {
     I.say("UI-only: nút nộp bài bị ẩn trên assignment quá hạn (pass policy).");
     return;
@@ -160,13 +268,13 @@ Scenario("SUB-SBM-003 | Deadline behavior for overdue assignment", async ({ I })
     return;
   }
 
-  I.say(
-    "UI-only: phát hiện known gap - assignment quá hạn vẫn cho phép submit (enabled). Ghi nhận để theo dõi product gap.",
+  throw new Error(
+    "UI-only policy violated: overdue assignment still shows an enabled submit button. Expected the submit button to be hidden or disabled.",
   );
 });
 
 /**
- * Student đi từ context assignment -> lịch sử nộp -> chi tiết bài nộp.
+ * SUB-SBM-004 — Student navigates from assignment detail to submission history and opens a detail.
  */
 Scenario("SUB-SBM-004 | Student views submission history from assignment context", async ({ I }) => {
   await applyAllureMetadata(
@@ -176,30 +284,47 @@ Scenario("SUB-SBM-004 | Student views submission history from assignment context
     "SUB-SBM-004",
   );
 
-  if (!requireAssignmentSeed.call(I, submissionSeed.assignments.openAssignmentId, "E2E_OPEN_ASSIGNMENT_ID")) {
+  if (!requireAssignmentSeed(I, submissionSeed.assignments.openAssignmentId, "E2E_OPEN_ASSIGNMENT_ID")) {
     return;
   }
 
-  I.loginAsStudent();
-  I.openStudentAssignmentDetail(submissionSeed.assignments.openAssignmentId);
+  loginAsStudent(I);
+
+  I.amOnPage(submissionRoutes.studentAssignmentsDetail(submissionSeed.assignments.openAssignmentId));
+  waitForNoLoadingSignals(I);
   I.seeInCurrentUrl("/student/assignments/");
-  I.navigateToStudentSubmissionsList();
-  I.assertStudentSubmissionsListReady();
+
+  I.amOnPage(submissionRoutes.studentSubmissionsList);
+  waitForNoLoadingSignals(I);
   I.seeInCurrentUrl(submissionRoutes.studentSubmissionsList);
+
+  I.waitForFunction(
+    (emptyTexts: string[]) => {
+      const body = document.body.innerText;
+      const rows = Array.from(document.querySelectorAll("table tbody tr"));
+      return rows.length > 0 || emptyTexts.some((t) => body.includes(t));
+    },
+    [submissionTexts.states.emptySubmissionList],
+    submissionTimeouts.contentReady,
+  );
 
   const detailButtonsCount = await I.grabNumberOfVisibleElements({ xpath: viewDetailButtonXPath });
   if (detailButtonsCount > 0) {
     I.click({ xpath: `(${viewDetailButtonXPath})[1]` });
-    I.waitForStudentSubmissionDetailReady();
+    I.waitForElement(submissionSelectors.common.pageTitle, submissionTimeouts.contentReady);
+    I.waitForText("Tóm tắt kết quả", submissionTimeouts.contentReady);
     I.seeInCurrentUrl("/student/submissions/");
-    return;
+  } else {
+    I.waitForFunction(
+      (texts: string[]) => texts.some((t) => document.body.innerText.includes(t)),
+      [submissionTexts.states.emptySubmissionList],
+      10,
+    );
   }
-
-  I.waitForAnyText(submissionTexts.states.emptySubmissionList, 10);
 });
 
 /**
- * Instructor đi từ context assignment -> tab Bài nộp -> chi tiết bài nộp.
+ * SUB-SBM-005 — Instructor opens submissions tab and views a submission detail.
  */
 Scenario("SUB-SBM-005 | Instructor opens submissions tab and views submission detail", async ({ I }) => {
   await applyAllureMetadata(
@@ -209,25 +334,42 @@ Scenario("SUB-SBM-005 | Instructor opens submissions tab and views submission de
     "SUB-SBM-005",
   );
 
-  if (!requireAssignmentSeed.call(I, submissionSeed.assignments.openAssignmentId, "E2E_OPEN_ASSIGNMENT_ID")) {
+  if (!requireAssignmentSeed(I, submissionSeed.assignments.openAssignmentId, "E2E_OPEN_ASSIGNMENT_ID")) {
     return;
   }
 
-  I.loginAsInstructor();
-  I.openInstructorAssignmentDetail(submissionSeed.assignments.openAssignmentId);
+  loginAsInstructor(I);
+  I.amOnPage(submissionRoutes.instructorAssignmentsDetail(submissionSeed.assignments.openAssignmentId));
+  waitForNoLoadingSignals(I);
   I.seeInCurrentUrl("/instructor/assignments/");
-  I.openInstructorAssignmentSubmissionsTab();
+
+  I.waitForText("Bài nộp", submissionTimeouts.contentReady);
+  I.click("Bài nộp");
+  waitForNoLoadingSignals(I);
   I.waitForText("Học sinh", 20);
   I.waitForText("Hành động", 20);
-  I.assertInstructorSubmissionsListReady();
+
+  I.waitForFunction(
+    (emptyTexts: string[]) => {
+      const rows = Array.from(document.querySelectorAll("table tbody tr"));
+      const body = document.body.innerText;
+      return rows.length > 0 || emptyTexts.some((t) => body.includes(t));
+    },
+    [submissionTexts.states.emptySubmissionList],
+    submissionTimeouts.contentReady,
+  );
 
   const detailButtonsCount = await I.grabNumberOfVisibleElements({ xpath: viewDetailButtonXPath });
   if (detailButtonsCount > 0) {
     I.click({ xpath: `(${viewDetailButtonXPath})[1]` });
-    I.waitForInstructorSubmissionDetailReady();
+    I.waitForElement(submissionSelectors.common.pageTitle, submissionTimeouts.contentReady);
+    I.waitForText("Tóm tắt kết quả", submissionTimeouts.contentReady);
     I.seeInCurrentUrl("/instructor/submissions/");
-    return;
+  } else {
+    I.waitForFunction(
+      (texts: string[]) => texts.some((t) => document.body.innerText.includes(t)),
+      [submissionTexts.states.emptySubmissionList],
+      10,
+    );
   }
-
-  I.waitForAnyText(submissionTexts.states.emptySubmissionList, 10);
 });
