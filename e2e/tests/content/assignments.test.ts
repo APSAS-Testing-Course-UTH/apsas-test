@@ -321,23 +321,39 @@ async function isStudentAssignmentVisibleInAnyPage(
   I: CodeceptJS.I,
   title: string,
 ): Promise<boolean> {
-  const maxPage = await I.executeScript(() => {
-    const pageButtons = Array.from(document.querySelectorAll("button"))
-      .map((button) => Number(button.textContent?.trim()))
-      .filter((value) => Number.isInteger(value) && value > 0);
+  // Always check current page first (works when there is no pagination control).
+  let visibleMatches = await I.grabNumberOfVisibleElements(
+    locate("td").withText(title),
+  );
 
-    if (pageButtons.length === 0) {
+  if (visibleMatches > 0) {
+    return true;
+  }
+
+  const maxPage = await I.executeScript(() => {
+    const pageNumbers = Array.from(document.querySelectorAll("button"))
+      .map((button) => Number(button.textContent?.trim()))
+      .filter((value) => Number.isInteger(value) && value > 1);
+
+    if (pageNumbers.length === 0) {
       return 1;
     }
 
-    return Math.max(...pageButtons);
+    return Math.max(...pageNumbers);
   });
 
-  for (let page = 1; page <= maxPage; page += 1) {
-    await I.click(locate("button").withText(String(page)));
+  // Start from page 2 because current page is already checked.
+  for (let page = 2; page <= maxPage; page += 1) {
+    const pageButton = locate("button").withText(String(page));
+    const pageButtonCount = await I.grabNumberOfVisibleElements(pageButton);
+    if (pageButtonCount === 0) {
+      continue;
+    }
+
+    await I.click(pageButton);
     await I.wait(0.5);
 
-    const visibleMatches = await I.grabNumberOfVisibleElements(
+    visibleMatches = await I.grabNumberOfVisibleElements(
       locate("td").withText(title),
     );
 
