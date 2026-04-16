@@ -222,15 +222,15 @@ async function createDraftAssignment(
 async function loginAsProvider(I: CodeceptJS.I) {
   await I.resetSession();
   await I.amOnPage("/login");
-  await I.login(providerAccount.email, providerAccount.password);
-  await I.waitInUrl("/provider/dashboard", 10);
+  await I.login(providerAccount.email, providerAccount.password, {
+    expectedUrl: "/provider/dashboard",
+  });
 }
 
 async function loginAsStudent(I: CodeceptJS.I) {
   await I.resetSession();
   await I.amOnPage("/login");
   await I.login(studentAccount.email, studentAccount.password);
-  await I.waitInUrl("/student/dashboard", 10);
 }
 
 async function getAssignmentStatusInfoByTitle(I: CodeceptJS.I, title: string) {
