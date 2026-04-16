@@ -12,6 +12,10 @@ const BASE_URL = process.env.APP_URL || "http://localhost:5173";
 const config: CodeceptJS.MainConfig = {
   tests: "./tests/**/*.test.ts",
   output: "./output",
+  bootstrap: async () => {
+    const { bootstrap } = await import("./bootstrap");
+    bootstrap();
+  },
   require: ["ts-node/register/transpile-only"],
   helpers: {
     Playwright: {

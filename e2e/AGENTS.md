@@ -250,7 +250,7 @@ Scenario("Test Authentication", async () => {
 Recommended pattern:
 
 ```ts
-import { allure } from "allure-codeceptjs";
+import * as allure from "allure-js-commons";
 
 Feature("Authentication");
 
