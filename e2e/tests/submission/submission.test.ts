@@ -44,8 +44,7 @@ function loginAsStudent(I: CodeceptJS.I) {
 }
 
 function loginAsInstructor(I: CodeceptJS.I) {
-  I.login("instructor1@apsas", SEED_PASSWORD);
-  I.waitInUrl("/instructor", submissionTimeouts.navigation);
+  I.login("instructor1@apsas", SEED_PASSWORD, { expectedUrl: "/instructor/dashboard" });
 }
 
 /** Navigate to the student submission editor and wait for it to be ready. */
