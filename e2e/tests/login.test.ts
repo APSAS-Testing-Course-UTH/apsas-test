@@ -7,3 +7,10 @@ Scenario("logs in as a student with valid credentials", ({ I }) => {
   I.click("Đăng nhập")
   I.waitInUrl("/student/dashboard", 10)
 })
+
+Scenario("logs in as a provider with valid credentials", ({ I }) => {
+  I.login("contentprovider1@apsas", "SecurePassword123!", {
+    timeoutInSeconds: 30,
+  })
+  I.waitInUrl("/provider/dashboard", 30)
+})
