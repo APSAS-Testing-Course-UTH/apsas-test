@@ -1,9 +1,9 @@
 /// <reference types='codeceptjs' />
 
 export = function (): any {
-  const resolveExpectedUrl = (email: string, explicitExpectedUrl?: string) => {
-    if (explicitExpectedUrl) {
-      return explicitExpectedUrl;
+  const resolveExpectedUrl = (email: string, expectedUrl?: string) => {
+    if (expectedUrl) {
+      return expectedUrl;
     }
 
     const normalizedEmail = email.trim().toLowerCase();
