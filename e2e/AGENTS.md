@@ -250,17 +250,17 @@ Scenario("Test Authentication", async () => {
 Recommended pattern:
 
 ```ts
-import * as allure from "allure-js-commons";
+import { epic, feature, story, severity, tag, tms } from "allure-js-commons";
 
 Feature("Authentication");
 
 Scenario("student logs in with valid credentials", async ({ I }) => {
-  await allure.epic("identity");
-  await allure.feature("Authentication");
-  await allure.story("Student Login");
-  await allure.severity("critical");
-  await allure.tag("e2e");
-  await allure.tag("regression");
+  await epic("identity");
+  await feature("Authentication");
+  await story("Student Login");
+  await severity("critical");
+  await tag("e2e");
+  await tag("regression");
 
   I.amOnPage("/login");
   I.fillField("Email", "student1@apsas");
