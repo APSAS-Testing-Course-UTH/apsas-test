@@ -1,5 +1,5 @@
-const { setHeadlessWhen, setCommonPlugins } = require("@codeceptjs/configure");
-const os = require("os");
+import { setHeadlessWhen, setCommonPlugins } from "@codeceptjs/configure";
+import os from "os";
 
 // Run headless in CI, headed locally
 setHeadlessWhen(process.env.CI);
@@ -9,13 +9,9 @@ setCommonPlugins();
 
 const BASE_URL = process.env.APP_URL || "http://localhost:5173";
 
-const config: CodeceptJS.MainConfig = {
+export const config: CodeceptJS.MainConfig = {
   tests: "./tests/**/*.test.ts",
   output: "./output",
-  bootstrap: async () => {
-    const { bootstrap } = await import("./bootstrap");
-    bootstrap();
-  },
   require: ["ts-node/register/transpile-only"],
   helpers: {
     Playwright: {
@@ -61,5 +57,3 @@ const config: CodeceptJS.MainConfig = {
   },
   name: "apsas-e2e",
 };
-
-module.exports = { config };

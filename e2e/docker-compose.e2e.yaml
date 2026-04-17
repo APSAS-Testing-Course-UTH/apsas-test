@@ -45,7 +45,8 @@ services:
       POSTGRES_USER: apsas
       POSTGRES_PASSWORD: apsas
       POSTGRES_DB: apsas
-    # Keep DB internal to the compose network; host mapping causes local port conflicts.
+    ports:
+      - "5432:5432"
     networks:
       - apsas-e2e
     healthcheck:
@@ -59,7 +60,9 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: apsas
       RABBITMQ_DEFAULT_PASS: apsas
-    # Keep AMQP/management ports internal; tests do not require direct host access.
+    ports:
+      - "5672:5672"
+      - "15672:15672"
     networks:
       - apsas-e2e
     healthcheck:
@@ -71,7 +74,8 @@ services:
   redis:
     image: redis:8.2-alpine
     command: redis-server --requirepass apsas --appendonly yes
-    # Keep Redis internal to avoid collision with local dev Redis.
+    ports:
+      - "6379:6379"
     networks:
       - apsas-e2e
     healthcheck:
@@ -82,14 +86,17 @@ services:
 
   mailpit:
     image: axllent/mailpit:latest
-    # Mailpit is only used by services in-network during e2e runs.
+    ports:
+      - "8025:8025"
+      - "1025:1025"
     networks:
       - apsas-e2e
 
   piston:
     image: ghcr.io/engineer-man/piston
     privileged: true
-    # Piston is consumed internally by evaluation-service via service DNS.
+    ports:
+      - "2000:2000"
     networks:
       - apsas-e2e
     volumes:
