@@ -1,3 +1,5 @@
+/// <reference types='codeceptjs' />
+
 export = function (): any {
   return actor({
     login(
@@ -56,5 +58,14 @@ export = function (): any {
         sessionStorage.clear();
       });
     },
+
+    resetSession(this: CodeceptJS.I) {
+      this.clearCookie();
+      this.amOnPage("/login");
+      this.executeScript(() => {
+        localStorage.clear();
+        sessionStorage.clear();
+      });
+    },
   });
-}
+};
