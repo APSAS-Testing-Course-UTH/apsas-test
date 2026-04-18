@@ -1,25 +1,6 @@
 /// <reference types='codeceptjs' />
 
 export = function (): any {
-  const resolveExpectedUrl = (email: string, expectedUrl?: string) => {
-    if (expectedUrl) {
-      return expectedUrl;
-    }
-
-    const normalizedEmail = email.trim().toLowerCase();
-    if (normalizedEmail.startsWith("contentprovider")) {
-      return "/provider/dashboard";
-    }
-    if (normalizedEmail.startsWith("instructor")) {
-      return "/instructor/dashboard";
-    }
-    if (normalizedEmail.startsWith("student")) {
-      return "/student/dashboard";
-    }
-
-    return "/student/dashboard";
-  };
-
   return actor({
     login(
       this: CodeceptJS.I,
@@ -37,10 +18,7 @@ export = function (): any {
       this.click('button[type="submit"]');
 
       if (options?.waitForRedirect !== false) {
-        this.waitInUrl(
-          resolveExpectedUrl(email, options?.expectedUrl),
-          options?.timeoutInSeconds ?? 30,
-        );
+        this.waitInUrl(options?.expectedUrl ?? "/student/dashboard", options?.timeoutInSeconds ?? 30);
       }
     },
 
@@ -68,10 +46,7 @@ export = function (): any {
       this.click('button[type="submit"]');
 
       if (options?.waitForRedirect) {
-        this.waitInUrl(
-          options?.expectedUrl ?? "/student/dashboard",
-          options?.timeoutInSeconds ?? 30,
-        );
+        this.waitInUrl(options?.expectedUrl ?? "/student/dashboard", options?.timeoutInSeconds ?? 30);
       }
     },
 
