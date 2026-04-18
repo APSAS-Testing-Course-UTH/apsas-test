@@ -18,10 +18,7 @@ const seedAccounts = {
 }
 
 declare const Feature: (title: string) => unknown
-declare const Scenario: (
-  title: string,
-  callback: (ctx: ScenarioContext) => Promise<void> | void,
-) => unknown
+declare const Scenario: (title: string, callback: (ctx: ScenarioContext) => Promise<void> | void) => unknown
 
 type ScenarioContext = { I: CodeceptJS.I }
 
@@ -83,10 +80,7 @@ function extractMessageKey(message: string): string {
   return message.trim().split(/\s+/)[0] ?? message
 }
 
-async function grabSessionLabelByMessageKey(
-  I: CodeceptJS.I,
-  messageKey: string,
-): Promise<string> {
+async function grabSessionLabelByMessageKey(I: CodeceptJS.I, messageKey: string): Promise<string> {
   const rawLabel = await I.executeScript((targetMessageKey: string) => {
     const items = Array.from(document.querySelectorAll("[class*='sessionItem']"))
 
@@ -112,10 +106,7 @@ async function grabSessionLabelByMessageKey(
   return sessionLabel
 }
 
-async function clickSessionFromSidebar(
-  I: CodeceptJS.I,
-  sessionLabel: string,
-): Promise<void> {
+async function clickSessionFromSidebar(I: CodeceptJS.I, sessionLabel: string): Promise<void> {
   const maxPageHops = 15
 
   for (let hop = 0; hop < maxPageHops; hop += 1) {
@@ -145,18 +136,16 @@ async function clickSessionFromSidebar(
         return false
       }
 
-      const pageButtons = Array.from(paginationRoot.querySelectorAll("button"))
-        .filter((button) => /^\d+$/.test(button.textContent?.trim() ?? "")) as HTMLButtonElement[]
+      const pageButtons = Array.from(paginationRoot.querySelectorAll("button")).filter((button) =>
+        /^\d+$/.test(button.textContent?.trim() ?? ""),
+      ) as HTMLButtonElement[]
 
       if (pageButtons.length === 0) {
         return false
       }
 
       const activeIndex = pageButtons.findIndex((button) => {
-        return (
-          button.getAttribute("aria-current") === "page" ||
-          button.getAttribute("data-active") === "true"
-        )
+        return button.getAttribute("aria-current") === "page" || button.getAttribute("data-active") === "true"
       })
 
       if (activeIndex < 0 || activeIndex + 1 >= pageButtons.length) {
@@ -193,44 +182,46 @@ async function createSupportSession(I: CodeceptJS.I, initialMessage: string): Pr
 
   I.amOnPage("/student/support")
   I.waitForText("Yêu cầu hỗ trợ", 20)
-  I.waitForFunction(() => {
-    const modalTextarea = document.querySelector(
-      "textarea[placeholder^='Mô tả chi tiết vấn đề của bạn']",
-    )
+  I.waitForFunction(
+    () => {
+      const modalTextarea = document.querySelector("textarea[placeholder^='Mô tả chi tiết vấn đề của bạn']")
 
-    if (modalTextarea) {
-      return true
-    }
+      if (modalTextarea) {
+        return true
+      }
 
-    const createButton = Array.from(document.querySelectorAll("button"))
-      .find((button) => {
+      const createButton = Array.from(document.querySelectorAll("button")).find((button) => {
         const text = button.textContent?.replace(/\s+/g, " ").trim() ?? ""
         return text === "Tạo yêu cầu" && !!button.querySelector("svg[class*='tabler-icon-plus']")
       }) as HTMLElement | undefined
 
-    if (createButton) {
-      createButton.click()
-    }
+      if (createButton) {
+        createButton.click()
+      }
 
-    return false
-  }, [], 20)
-  I.waitForText("Tạo yêu cầu hỗ trợ mới", 10)
-  I.fillField(
-    "textarea[placeholder^='Mô tả chi tiết vấn đề của bạn']",
-    initialMessage,
+      return false
+    },
+    [],
+    20,
   )
+  I.waitForText("Tạo yêu cầu hỗ trợ mới", 10)
+  I.fillField("textarea[placeholder^='Mô tả chi tiết vấn đề của bạn']", initialMessage)
   I.click({
     xpath:
       "//button[normalize-space()='Tạo yêu cầu' and not(@disabled) and not(.//*[contains(@class,'tabler-icon-plus')])]",
   })
   I.waitForInvisible("textarea[placeholder^='Mô tả chi tiết vấn đề của bạn']", 20)
-  I.waitForFunction((targetMessageKey: string) => {
-    const items = Array.from(document.querySelectorAll("[class*='sessionItem']"))
-    return items.some((item) => {
-      const text = item.textContent?.replace(/\s+/g, " ").trim() ?? ""
-      return text.includes(targetMessageKey)
-    })
-  }, [messageKey], 30)
+  I.waitForFunction(
+    (targetMessageKey: string) => {
+      const items = Array.from(document.querySelectorAll("[class*='sessionItem']"))
+      return items.some((item) => {
+        const text = item.textContent?.replace(/\s+/g, " ").trim() ?? ""
+        return text.includes(targetMessageKey)
+      })
+    },
+    [messageKey],
+    30,
+  )
   I.waitForText(initialMessage, 20)
 
   return grabSessionLabelByMessageKey(I, messageKey)
@@ -271,33 +262,39 @@ function closeCurrentSession(I: CodeceptJS.I) {
 }
 
 function assertClosedSessionUi(I: CodeceptJS.I) {
-  I.waitForFunction(() => {
-    const text = document.body.innerText.toUpperCase()
-    return text.includes("CLOSED") || text.includes("ĐÃ ĐÓNG")
-  }, [], 20)
+  I.waitForFunction(
+    () => {
+      const text = document.body.innerText.toUpperCase()
+      return text.includes("CLOSED") || text.includes("ĐÃ ĐÓNG")
+    },
+    [],
+    20,
+  )
 
-  I.waitForFunction(() => {
-    const textarea = document.querySelector(
-      "textarea[placeholder^='Nhập tin nhắn']",
-    ) as HTMLTextAreaElement | null
-    const sendButton = document.querySelector(
-      "button[title='Nhấn Enter hoặc click để gửi']",
-    ) as HTMLButtonElement | null
+  I.waitForFunction(
+    () => {
+      const textarea = document.querySelector("textarea[placeholder^='Nhập tin nhắn']") as HTMLTextAreaElement | null
+      const sendButton = document.querySelector(
+        "button[title='Nhấn Enter hoặc click để gửi']",
+      ) as HTMLButtonElement | null
 
-    const textareaLocked =
-      !textarea ||
-      textarea.disabled ||
-      textarea.hasAttribute("disabled") ||
-      textarea.getAttribute("aria-disabled") === "true"
+      const textareaLocked =
+        !textarea ||
+        textarea.disabled ||
+        textarea.hasAttribute("disabled") ||
+        textarea.getAttribute("aria-disabled") === "true"
 
-    const sendButtonLocked =
-      !sendButton ||
-      sendButton.disabled ||
-      sendButton.hasAttribute("disabled") ||
-      sendButton.getAttribute("aria-disabled") === "true"
+      const sendButtonLocked =
+        !sendButton ||
+        sendButton.disabled ||
+        sendButton.hasAttribute("disabled") ||
+        sendButton.getAttribute("aria-disabled") === "true"
 
-    return textareaLocked && sendButtonLocked
-  }, [], 20)
+      return textareaLocked && sendButtonLocked
+    },
+    [],
+    20,
+  )
 }
 
 Feature("Support Service")
@@ -317,10 +314,14 @@ Scenario("SP-01: Student opens a support session", async ({ I }: ScenarioContext
   await createSupportSession(I, initialMessage)
 
   I.see(initialMessage)
-  I.waitForFunction(() => {
-    const text = document.body.innerText.toUpperCase()
-    return text.includes("MỞ") || text.includes("OPEN")
-  }, [], 20)
+  I.waitForFunction(
+    () => {
+      const text = document.body.innerText.toUpperCase()
+      return text.includes("MỞ") || text.includes("OPEN")
+    },
+    [],
+    20,
+  )
 })
 
 Scenario("SP-02: Instructor sees student session in support list", async ({ I }: ScenarioContext) => {

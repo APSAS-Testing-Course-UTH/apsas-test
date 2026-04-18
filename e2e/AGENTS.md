@@ -226,49 +226,45 @@ Also, the test must include screenshot attachments on failure for UI debugging.
 - `allure.attachmentPath(name: string, path: string, options: ContentType | string | Omit<AttachmentOptions, "encoding">): PromiseLike<void>`
 
 ```ts
-const allure = require("allure-js-commons");
-const { ContentType } = require("allure-js-commons");
+const allure = require("allure-js-commons")
+const { ContentType } = require("allure-js-commons")
 
-Feature("Test My Website");
+Feature("Test My Website")
 
 Scenario("Test Authentication", async () => {
   // ...
 
-  await allure.attachment(
-    "Text file",
-    "This is the file content.",
-    ContentType.TEXT,
-  );
+  await allure.attachment("Text file", "This is the file content.", ContentType.TEXT)
 
   await allure.attachmentPath("Screenshot", "/path/to/image.png", {
     contentType: ContentType.PNG,
     fileExtension: "png",
-  });
-});
+  })
+})
 ```
 
 Recommended pattern:
 
 ```ts
-import { epic, feature, story, severity, tag, tms } from "allure-js-commons";
+import { epic, feature, story, severity, tag, tms } from "allure-js-commons"
 
-Feature("Authentication");
+Feature("Authentication")
 
 Scenario("student logs in with valid credentials", async ({ I }) => {
-  await epic("identity");
-  await feature("Authentication");
-  await story("Student Login");
-  await severity("critical");
-  await tag("e2e");
-  await tag("regression");
+  await epic("identity")
+  await feature("Authentication")
+  await story("Student Login")
+  await severity("critical")
+  await tag("e2e")
+  await tag("regression")
 
-  I.amOnPage("/login");
-  I.fillField("Email", "student1@apsas");
-  I.fillField("Mật khẩu", "SecurePassword123!");
-  I.click("Đăng nhập");
-  I.waitForNavigation();
-  I.dontSeeInCurrentUrl("/login");
-});
+  I.amOnPage("/login")
+  I.fillField("Email", "student1@apsas")
+  I.fillField("Mật khẩu", "SecurePassword123!")
+  I.click("Đăng nhập")
+  I.waitForNavigation()
+  I.dontSeeInCurrentUrl("/login")
+})
 ```
 
 ## Allure Report Commands

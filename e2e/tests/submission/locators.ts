@@ -10,7 +10,7 @@ export const submissionRoutes = {
   instructorAssignmentsDetail: (assignmentId: string) => `/instructor/assignments/${assignmentId}`,
   instructorSubmissionsList: "/instructor/submissions",
   instructorSubmissionDetail: (submissionId: string) => `/instructor/submissions/${submissionId}`,
-};
+}
 
 /**
  * Tập text/label dùng để assert theo góc nhìn người dùng.
@@ -44,7 +44,7 @@ export const submissionTexts = {
     queuedSubmission: ["Đang nộp...", "Code của bạn đang được kiểm tra..."],
     emptySubmissionList: ["Chưa có bài nộp nào", "Không tìm thấy bài tập nào để quản lý"],
   },
-};
+}
 
 /**
  * Selector fallback cho các vùng khó định danh ổn định (vd: Monaco).
@@ -61,7 +61,7 @@ export const submissionSelectors = {
     editorInput:
       "[data-testid='submission-code-editor'] textarea, .monaco-editor textarea.ime-text-area, .ime-text-area, .monaco-editor textarea.inputarea",
   },
-};
+}
 
 export const submissionPageSignals = {
   studentAssignmentDetail: ["Bài tập", "Danh sách các bài tập của bạn"],
@@ -70,7 +70,7 @@ export const submissionPageSignals = {
   instructorSubmissionsList: ["Quản lý Bài nộp", "Xem bài nộp, cấp điểm"],
   studentSubmissionDetail: ["Chi tiết Bài nộp", "Tóm tắt kết quả", "Mã đã nộp", "Kết quả kiểm tra"],
   instructorSubmissionDetail: ["Chi tiết Bài nộp", "Tóm tắt kết quả", "Mã đã nộp", "Kết quả kiểm tra"],
-};
+}
 
 /**
  * Seed test data dùng chung cho local/CI.
@@ -88,12 +88,11 @@ export const submissionSeed = {
   assignments: {
     // Uses seeded "Hello World" assignment (001) from the stock seed data.
     // Override via env vars if a specific assignment is needed.
-    openAssignmentId:
-      process.env.E2E_OPEN_ASSIGNMENT_ID || "550e8400-e29b-41d4-a716-446655440001",
+    openAssignmentId: process.env.E2E_OPEN_ASSIGNMENT_ID || "550e8400-e29b-41d4-a716-446655440001",
     // Overdue assignment requires explicit opt-in; no reliable default in stock seed.
     overdueAssignmentId: process.env.E2E_OVERDUE_ASSIGNMENT_ID || "",
   },
-};
+}
 
 /**
  * Chính sách hiện tại cho S-03 (quá hạn nộp bài).
@@ -101,18 +100,16 @@ export const submissionSeed = {
  */
 export const s03Policy = {
   mode: "ui-only" as const,
-  note:
-    "R4 mặc định assert theo UI-only. Nếu backend enforce deadline được triển khai, bổ sung assert API reject trong scenario riêng.",
-};
+  note: "R4 mặc định assert theo UI-only. Nếu backend enforce deadline được triển khai, bổ sung assert API reject trong scenario riêng.",
+}
 
 /**
  * Quy tắc ưu tiên locator để giữ test ổn định và dễ bảo trì.
  */
 export const submissionLocatorPolicy = {
   priority: ["role", "label", "text", "css-fallback"],
-  editorUpgradeNote:
-    "Cần chuyển sang selector data-testid ổn định khi frontend hỗ trợ nhất quán.",
-};
+  editorUpgradeNote: "Cần chuyển sang selector data-testid ổn định khi frontend hỗ trợ nhất quán.",
+}
 
 /**
  * Timeout chuẩn cho các thao tác trong flow submission.
@@ -123,7 +120,7 @@ export const submissionTimeouts = {
   action: 10,
   contentReady: 20,
   appErrorCheck: 5,
-};
+}
 
 /**
  * Retry policy cho các trạng thái bất đồng bộ (queued/evaluating).
@@ -131,4 +128,4 @@ export const submissionTimeouts = {
 export const submissionRetryPolicy = {
   queuedStateAttempts: 3,
   queuedStatePerAttemptSec: 8,
-};
+}

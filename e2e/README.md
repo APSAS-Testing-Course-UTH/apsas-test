@@ -85,14 +85,14 @@ e2e/
 Tests follow the [BDD-style Gherkin syntax](https://codecept.io/basics/#writing-tests):
 
 ```ts
-Feature("My Feature");
+Feature("My Feature")
 
 Scenario("does something", ({ I }) => {
-  I.amOnPage("/some-path");
-  I.see("Expected text");
-  I.fillField("Label", "value");
-  I.click("Button text");
-});
+  I.amOnPage("/some-path")
+  I.see("Expected text")
+  I.fillField("Label", "value")
+  I.click("Button text")
+})
 ```
 
 See [CodeceptJS Playwright helper docs](https://codecept.io/helpers/Playwright/) for all available actions.
@@ -105,14 +105,14 @@ Use accounts available in your backend seed data/environment.
 
 #### Admin (Quản Trị Viên)
 
-| Email | Password | Tên | Role |
-| --- | --- | --- | --- |
-| admin@apsas | admin | System Administrator | ADMIN |
+| Email       | Password | Tên                  | Role  |
+| ----------- | -------- | -------------------- | ----- |
+| admin@apsas | admin    | System Administrator | ADMIN |
 
 #### Instructors (Giảng Viên)
 
 | Email             | Password           | Tên         | Role       |
-|-------------------|--------------------|-------------|------------|
+| ----------------- | ------------------ | ----------- | ---------- |
 | instructor1@apsas | SecurePassword123! | Tuấn Nguyễn | INSTRUCTOR |
 | instructor2@apsas | SecurePassword123! | Hương Vũ    | INSTRUCTOR |
 | instructor3@apsas | SecurePassword123! | Vinh Trần   | INSTRUCTOR |
@@ -120,14 +120,14 @@ Use accounts available in your backend seed data/environment.
 #### Content Providers (Nhà Cung Cấp Nội Dung)
 
 | Email                  | Password           | Tên     | Role             |
-|------------------------|--------------------|---------|------------------|
+| ---------------------- | ------------------ | ------- | ---------------- |
 | contentprovider1@apsas | SecurePassword123! | Minh Lê | CONTENT_PROVIDER |
 | contentprovider2@apsas | SecurePassword123! | Lan Đỗ  | CONTENT_PROVIDER |
 
 #### Students (Sinh Viên)
 
 | Email           | Password           | Tên         | Role    |
-|-----------------|--------------------|-------------|---------|
+| --------------- | ------------------ | ----------- | ------- |
 | student1@apsas  | SecurePassword123! | An Trần     | STUDENT |
 | student2@apsas  | SecurePassword123! | Quang Phạm  | STUDENT |
 | student3@apsas  | SecurePassword123! | Bình Ngô    | STUDENT |
@@ -143,13 +143,13 @@ Use accounts available in your backend seed data/environment.
 
 Hệ thống có sẵn **5 bài tập lập trình** cơ bản:
 
-| # | Tiêu Đề                     | Độ Khó | Nhà Cung Cấp           | Điểm Tối Đa | Mô Tả                 |
-|---|-----------------------------|--------|------------------------|-------------|-----------------------|
-| 1 | Hello World                 | EASY   | contentprovider1@apsas | 10          | In ra "Hello, World!" |
-| 2 | Tính Tổng Hai Số            | EASY   | contentprovider2@apsas | 15          | Đọc 2 số, in ra tổng  |
-| 3 | Kiểm Tra Số Chẵn Hay Lẻ     | EASY   | contentprovider1@apsas | 15          | Kiểm tra chẵn/lẻ      |
-| 4 | Tìm Số Lớn Nhất Trong Ba Số | EASY   | contentprovider2@apsas | 20          | Tìm max của 3 số      |
-| 5 | Tính Giai Thừa (Factorial)  | MEDIUM | contentprovider1@apsas | 25          | Tính n!               |
+| #   | Tiêu Đề                     | Độ Khó | Nhà Cung Cấp           | Điểm Tối Đa | Mô Tả                 |
+| --- | --------------------------- | ------ | ---------------------- | ----------- | --------------------- |
+| 1   | Hello World                 | EASY   | contentprovider1@apsas | 10          | In ra "Hello, World!" |
+| 2   | Tính Tổng Hai Số            | EASY   | contentprovider2@apsas | 15          | Đọc 2 số, in ra tổng  |
+| 3   | Kiểm Tra Số Chẵn Hay Lẻ     | EASY   | contentprovider1@apsas | 15          | Kiểm tra chẵn/lẻ      |
+| 4   | Tìm Số Lớn Nhất Trong Ba Số | EASY   | contentprovider2@apsas | 20          | Tìm max của 3 số      |
+| 5   | Tính Giai Thừa (Factorial)  | MEDIUM | contentprovider1@apsas | 25          | Tính n!               |
 
 **Chi tiết các bài tập:**
 
@@ -176,7 +176,7 @@ Hệ thống có sẵn **8 hướng dẫn chi tiết** bằng Markdown:
 
 1. **Hướng Dẫn In Ra Dữ Liệu** - Giới thiệu print/printf/cout
 2. **Hướng Dẫn Đọc Dữ Liệu** - Giới thiệu input/scanf/cin
-3. **Hướng Dẫn Phép Toán Cơ Bản** - Các phép +, -, *, /, %
+3. **Hướng Dẫn Phép Toán Cơ Bản** - Các phép +, -, \*, /, %
 4. **Hướng Dẫn Điều Kiện** - If/else và toán tử so sánh
 5. **Hướng Dẫn Vòng Lặp** - For/while/do-while
 6. **Hướng Dẫn Hàm Đệ Quy** - Recursion và base case

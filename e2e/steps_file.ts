@@ -7,65 +7,65 @@ export = function (): any {
       email: string,
       password: string,
       options?: {
-        expectedUrl?: string;
-        timeoutInSeconds?: number;
-        waitForRedirect?: boolean;
+        expectedUrl?: string
+        timeoutInSeconds?: number
+        waitForRedirect?: boolean
       },
     ) {
-      this.amOnPage("/login");
-      this.fillField("Email", email);
-      this.fillField("Mật khẩu", password);
-      this.click('button[type="submit"]');
+      this.amOnPage("/login")
+      this.fillField("Email", email)
+      this.fillField("Mật khẩu", password)
+      this.click('button[type="submit"]')
 
       if (options?.waitForRedirect !== false) {
-        this.waitInUrl(options?.expectedUrl ?? "/student/dashboard", options?.timeoutInSeconds ?? 30);
+        this.waitInUrl(options?.expectedUrl ?? "/student/dashboard", options?.timeoutInSeconds ?? 30)
       }
     },
 
     registerStudent(
       this: CodeceptJS.I,
       payload: {
-        firstName: string;
-        lastName: string;
-        email: string;
-        password: string;
+        firstName: string
+        lastName: string
+        email: string
+        password: string
       },
       options?: {
-        expectedUrl?: string;
-        timeoutInSeconds?: number;
-        waitForRedirect?: boolean;
+        expectedUrl?: string
+        timeoutInSeconds?: number
+        waitForRedirect?: boolean
       },
     ) {
-      this.amOnPage("/register");
-      this.fillField("Họ", payload.firstName);
-      this.fillField("Tên", payload.lastName);
-      this.fillField("Email", payload.email);
-      this.fillField("Mật khẩu", payload.password);
-      this.fillField("Xác nhận mật khẩu", payload.password);
-      this.checkOption("Tôi đồng ý với điều khoản sử dụng");
-      this.click('button[type="submit"]');
+      this.amOnPage("/register")
+      this.fillField("Họ", payload.firstName)
+      this.fillField("Tên", payload.lastName)
+      this.fillField("Email", payload.email)
+      this.fillField("Mật khẩu", payload.password)
+      this.fillField("Xác nhận mật khẩu", payload.password)
+      this.checkOption("Tôi đồng ý với điều khoản sử dụng")
+      this.click('button[type="submit"]')
 
       if (options?.waitForRedirect) {
-        this.waitInUrl(options?.expectedUrl ?? "/student/dashboard", options?.timeoutInSeconds ?? 30);
+        this.waitInUrl(options?.expectedUrl ?? "/student/dashboard", options?.timeoutInSeconds ?? 30)
       }
     },
 
     logout(this: CodeceptJS.I) {
-      this.amOnPage("/login");
-      this.clearCookie();
+      this.amOnPage("/login")
+      this.clearCookie()
       this.executeScript(() => {
-        localStorage.clear();
-        sessionStorage.clear();
-      });
+        localStorage.clear()
+        sessionStorage.clear()
+      })
     },
 
     resetSession(this: CodeceptJS.I) {
-      this.clearCookie();
-      this.amOnPage("/login");
+      this.clearCookie()
+      this.amOnPage("/login")
       this.executeScript(() => {
-        localStorage.clear();
-        sessionStorage.clear();
-      });
+        localStorage.clear()
+        sessionStorage.clear()
+      })
     },
-  });
-};
+  })
+}
