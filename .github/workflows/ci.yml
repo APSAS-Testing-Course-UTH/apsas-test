@@ -133,7 +133,7 @@ jobs:
           npx allure results unpack --output ./allure-results/e2e allure-results-e2e.zip
 
       - name: Build report
-        run: npx allure generate --config ./allurerc.mjs ./allure-results/backend ./allure-results/e2e
+        run: npx allure generate --config ./allurerc.mjs ./allure-results/**
 
       - name: Allure Report Official
         uses: allure-framework/allure-action@v0
@@ -170,7 +170,7 @@ jobs:
           npx allure results unpack --output ./allure-results/e2e allure-results-e2e.zip
 
       - name: Build report
-        run: npx allure generate --config ./allurerc.mjs ./allure-results/backend ./allure-results/e2e
+        run: npx allure generate --config ./allurerc.mjs --history-limit 20 ./allure-results/**
 
       - name: Commit and push test history
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
