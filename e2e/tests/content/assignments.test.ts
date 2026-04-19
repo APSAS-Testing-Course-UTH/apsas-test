@@ -355,7 +355,7 @@ Scenario("[C-01][C-02][C-03][C-05][C-06] provider tạo, cập nhật, gán tài
   await loginAsProvider(I)
 
   // C-01: Create Assignment (Tạo bài tập)
-  allure.step("Create draft assignment")
+  await allure.logStep("Create draft assignment")
   await createDraftAssignment(I, draftTitle, description)
 
   await filterAssignmentsByTitle(I, draftTitle)
@@ -363,7 +363,7 @@ Scenario("[C-01][C-02][C-03][C-05][C-06] provider tạo, cập nhật, gán tài
   await assertAssignmentStatusByTitle(I, draftTitle, "Bản nháp", "gray")
 
   // C-02: Update Assignment (Cập nhật bài tập)
-  allure.step("Update assignment title")
+  await allure.logStep("Update assignment title")
   await openAssignmentFromList(I, draftTitle)
   await I.waitForText("Chỉnh sửa bài tập", 10)
   await I.seeInField("Tiêu đề bài tập", draftTitle)
@@ -385,7 +385,7 @@ Scenario("[C-01][C-02][C-03][C-05][C-06] provider tạo, cập nhật, gán tài
   await I.see(updatedTitle)
 
   // C-05: Attach Skills (Gắn Kỹ năng)
-  allure.step("Attach skills to assignment")
+  await allure.logStep("Attach skills to assignment")
   await I.amOnPage(`/provider/assignments/${assignmentId}`)
   await I.waitForText("Chỉnh sửa bài tập", 10)
   await I.click("Nâng cao")
@@ -394,14 +394,14 @@ Scenario("[C-01][C-02][C-03][C-05][C-06] provider tạo, cập nhật, gán tài
   await I.see(skillName)
 
   // C-06: Attach Tutorial (Gắn Hướng dẫn)
-  allure.step("Attach tutorial to assignment")
+  await allure.logStep("Attach tutorial to assignment")
   await selectMultiSelectValue(I, "Chọn hướng dẫn (tuỳ chọn)", tutorialTitle)
   await I.see(tutorialTitle)
   await I.click("Lưu thay đổi")
   await I.waitInUrl("/provider/assignments", 10)
 
   // C-03: Publish Assignment (Xuất bản bài tập)
-  allure.step("Publish assignment")
+  await allure.logStep("Publish assignment")
   await I.amOnPage(`/provider/assignments/${assignmentId}`)
   await I.waitForText("Chỉnh sửa bài tập", 10)
   const persistedTitleAfterAdvanced = await I.grabValueFrom("Tiêu đề bài tập")
@@ -412,7 +412,7 @@ Scenario("[C-01][C-02][C-03][C-05][C-06] provider tạo, cập nhật, gán tài
   await assertAssignmentStatusByTitle(I, persistedTitleAfterAdvanced || updatedTitle, "Đã công bố", "blue")
 
   // Verify published assignment is visible to student
-  allure.step("Verify student can see published assignment")
+  await allure.logStep("Verify student can see published assignment")
   await loginAsStudent(I)
   await I.amOnPage(`/student/assignments/${assignmentId}`)
   await I.waitForText(persistedTitleAfterAdvanced || updatedTitle, 10)
@@ -436,10 +436,10 @@ Scenario("[C-04] student chỉ nhìn thấy bài tập đã xuất bản", async
   await loginAsProvider(I)
 
   // Create draft and published assignments
-  allure.step("Create draft assignment")
+  await allure.logStep("Create draft assignment")
   await createDraftAssignment(I, hiddenDraftTitle, description)
 
-  allure.step("Create and publish another assignment")
+  await allure.logStep("Create and publish another assignment")
   await createDraftAssignment(I, publishedTitle, `${description} (published)`)
 
   await I.amOnPage("/provider/assignments")
@@ -449,7 +449,7 @@ Scenario("[C-04] student chỉ nhìn thấy bài tập đã xuất bản", async
   await publishAssignmentFromList(I, publishedTitle)
 
   // Verify student visibility
-  allure.step("Verify student only sees published assignment, not draft")
+  await allure.logStep("Verify student only sees published assignment, not draft")
   await loginAsStudent(I)
   await I.amOnPage("/student/assignments")
 
@@ -484,11 +484,11 @@ Scenario("[C-04-Extended] student cannot access draft assignment directly", asyn
   allure.tag("security")
   allure.tms("C-04")
 
-  allure.step("Student attempts to access seeded draft assignment by direct URL")
+  await allure.logStep("Student attempts to access seeded draft assignment by direct URL")
   await loginAsStudent(I)
   await I.amOnPage(`/student/assignments/${seededDraftAssignmentId}`)
 
-  allure.step("Verify student cannot see draft assignment content")
+  await allure.logStep("Verify student cannot see draft assignment content")
   await I.dontSee(seededDraftTitle)
 })
 
