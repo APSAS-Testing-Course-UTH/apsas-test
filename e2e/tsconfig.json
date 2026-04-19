@@ -15,6 +15,6 @@
   "ts-node": {
     "files": true
   },
-  "include": ["./tests/**/*.ts", "./steps_file.ts", "./steps.d.ts", "./codecept.conf.ts", "./bootstrap.ts"],
+  "include": ["./tests/**/*.ts", "./steps_file.ts", "./steps.d.ts", "./codecept.conf.ts"],
   "exclude": ["node_modules"]
 }

@@ -55,24 +55,6 @@ jobs:
             cp -R "${dir}/." ./allure-results-backend/
           done < <(find ./backend -type d -path "*/build/allure-results" -print0)
 
-      - name: Label backend results by testing type
-        if: always()
-        run: |
-          node -e '
-          const fs = require("fs");
-          const path = "./allure-results-backend";
-          const label = { name: "type", value: "backend test" };
-          if (!fs.existsSync(path)) process.exit(0);
-          for (const file of fs.readdirSync(path)) {
-            if (!file.endsWith("-result.json")) continue;
-            const full = `${path}/${file}`;
-            const data = JSON.parse(fs.readFileSync(full, "utf8"));
-            data.labels = Array.isArray(data.labels) ? data.labels : [];
-            const exists = data.labels.some((l) => l.name === "type");
-            if (!exists) data.labels.push(label);
-            fs.writeFileSync(full, JSON.stringify(data));
-          }'
-
       - name: Zip test results
         if: always()
         run: |
@@ -106,24 +88,6 @@ jobs:
       - name: Run E2E tests
         run: bun run test:ci
         working-directory: e2e/
-
-      - name: Label E2E results by testing type
-        if: always()
-        run: |
-          node -e '
-          const fs = require("fs");
-          const path = "./e2e/allure-results";
-          const label = { name: "type", value: "e2e test" };
-          if (!fs.existsSync(path)) process.exit(0);
-          for (const file of fs.readdirSync(path)) {
-            if (!file.endsWith("-result.json")) continue;
-            const full = `${path}/${file}`;
-            const data = JSON.parse(fs.readFileSync(full, "utf8"));
-            data.labels = Array.isArray(data.labels) ? data.labels : [];
-            const exists = data.labels.some((l) => l.name === "type");
-            if (!exists) data.labels.push(label);
-            fs.writeFileSync(full, JSON.stringify(data));
-          }'
 
       - name: Zip E2E test results
         if: always()

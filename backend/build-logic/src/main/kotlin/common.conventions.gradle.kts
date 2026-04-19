@@ -81,6 +81,7 @@ tasks {
         val issueLink = "https://github.com/APSAS-Testing-Course-UTH/apsas-test/issues"
         systemProperty("allure.link.issue.pattern", "$issueLink/{}")
         systemProperty("allure.link.tms.pattern", "$issueLink?q={}")
+        systemProperty("allure.label.type", "backend")
     }
 
     jacocoTestReport {

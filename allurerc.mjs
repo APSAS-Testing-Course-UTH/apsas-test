@@ -28,10 +28,10 @@ export default {
     },
     environments: {
         backend: {
-            matcher: ({ labels }) => labels.find(label => label.name === "type" && label.value === "backend test") !== undefined
+            matcher: ({ labels }) => labels.find(label => label.name === "type" && label.value === "backend") !== undefined
         },
         e2e: {
-            matcher: ({ labels }) => labels.find(label => label.name === "type" && label.value === "e2e test") !== undefined
+            matcher: ({ labels }) => labels.find(label => label.name === "type" && label.value === "e2e") !== undefined
         }
     }
 }

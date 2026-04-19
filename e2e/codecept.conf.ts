@@ -12,10 +12,6 @@ const BASE_URL = process.env.APP_URL || "http://localhost:5173"
 export const config: CodeceptJS.MainConfig = {
   tests: "./tests/**/*.test.ts",
   output: "./output",
-  bootstrap: async () => {
-    const { bootstrap } = await import("./bootstrap")
-    bootstrap()
-  },
   require: ["ts-node/register/transpile-only"],
   helpers: {
     Playwright: {
@@ -30,12 +26,12 @@ export const config: CodeceptJS.MainConfig = {
     I: "./steps_file.ts",
   },
   plugins: {
-    pauseOnFail: {},
     retryFailedStep: {
       enabled: true,
     },
-    screenshotOnFail: {
+    stepByStepReport: {
       enabled: true,
+      screenshotsForAllureReport: true,
     },
     allure: {
       enabled: true,
@@ -43,9 +39,11 @@ export const config: CodeceptJS.MainConfig = {
       outputDir: "allure-results",
       links: {
         issue: {
+          nameTemplate: "#%s",
           urlTemplate: "https://github.com/APSAS-Testing-Course-UTH/apsas-test/issues/%s",
         },
         tms: {
+          nameTemplate: "%s",
           urlTemplate: "https://github.com/APSAS-Testing-Course-UTH/apsas-test/issues?q=%s",
         },
       },
