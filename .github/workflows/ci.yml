@@ -162,14 +162,11 @@ jobs:
           name: allure-results-e2e
           path: ./
 
-      - name: Unpack backend test results
-        run: npx allure results unpack allure-results-backend.zip
-
-      - name: Unpack E2E test results
-        run: npx allure results unpack allure-results-e2e.zip
+      - name: Unpack backend and E2E test results
+        run: npx allure results unpack --output ./allure-results allure-results-backend.zip allure-results-e2e.zip
 
       - name: Build report
-        run: npx allure generate ./allure-results
+        run: npx allure generate --config ./allurerc.mjs ./allure-results
 
       - name: Allure Report Official
         uses: allure-framework/allure-action@v0
@@ -199,14 +196,11 @@ jobs:
           name: allure-results-e2e
           path: ./
 
-      - name: Unpack backend test results
-        run: npx allure results unpack allure-results-backend.zip
-
-      - name: Unpack E2E test results
-        run: npx allure results unpack allure-results-e2e.zip
+      - name: Unpack backend and E2E test results
+        run: npx allure results unpack --output ./allure-results allure-results-backend.zip allure-results-e2e.zip
 
       - name: Build report
-        run: npx allure generate ./allure-results
+        run: npx allure generate --config ./allurerc.mjs ./allure-results
 
       - name: Commit and push test history
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
